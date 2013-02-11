@@ -1,0 +1,175 @@
+/*
+* Copyright 2012 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+var sensors = require("./sensorsJNEXT").sensors,
+    _event = require("../../lib/event"),
+    _utils = require("../../lib/utils"),
+    _sensorEvents = require("./sensorsEvents"),
+    _actionMap = {
+        deviceaccelerometer: {
+            context: _sensorEvents,
+            event: "deviceaccelerometer",
+            triggerEvent: "deviceaccelerometer",
+            trigger: function (obj) {
+                _event.trigger("deviceaccelerometer", obj);
+            }
+        },
+        devicemagnetometer: {
+            context: _sensorEvents,
+            event: "devicemagnetometer",
+            triggerEvent: "devicemagnetometer",
+            trigger: function (obj) {
+                _event.trigger("devicemagnetometer", obj);
+            }
+        },
+        devicegyroscope: {
+            context: _sensorEvents,
+            event: "devicegyroscope",
+            triggerEvent: "devicegyroscope",
+            trigger: function (obj) {
+                _event.trigger("devicegyroscope", obj);
+            }
+        },
+        devicecompass: {
+            context: _sensorEvents,
+            event: "devicecompass",
+            triggerEvent: "devicecompass",
+            trigger: function (obj) {
+                _event.trigger("devicecompass", obj);
+            }
+        },
+        deviceproximity: {
+            context: _sensorEvents,
+            event: "deviceproximity",
+            triggerEvent: "deviceproximity",
+            trigger: function (obj) {
+                _event.trigger("deviceproximity", obj);
+            }
+        },
+        devicelight: {
+            context: _sensorEvents,
+            event: "devicelight",
+            triggerEvent: "devicelight",
+            trigger: function (obj) {
+                _event.trigger("devicelight", obj);
+            }
+        },
+        devicegravity: {
+            context: _sensorEvents,
+            event: "devicegravity",
+            triggerEvent: "devicegravity",
+            trigger: function (obj) {
+                _event.trigger("devicegravity", obj);
+            }
+        },
+        devicelinearacceleration: {
+            context: _sensorEvents,
+            event: "devicelinearacceleration",
+            triggerEvent: "devicelinearacceleration",
+            trigger: function (obj) {
+                _event.trigger("devicelinearacceleration", obj);
+            }
+        },
+        devicerotationmatrix: {
+            context: _sensorEvents,
+            event: "devicerotationmatrix",
+            triggerEvent: "devicerotationmatrix",
+            trigger: function (obj) {
+                _event.trigger("devicerotationmatrix", obj);
+            }
+        },
+        deviceorientation: {
+            context: _sensorEvents,
+            event: "deviceorientation",
+            triggerEvent: "deviceorientation",
+            trigger: function (obj) {
+                _event.trigger("deviceorientation", obj);
+            }
+        },
+        deviceazimuthpitchroll: {
+            context: _sensorEvents,
+            event: "deviceazimuthpitchroll",
+            triggerEvent: "deviceazimuthpitchroll",
+            trigger: function (obj) {
+                _event.trigger("deviceazimuthpitchroll", obj);
+            }
+        },
+        deviceholster: {
+            context: _sensorEvents,
+            event: "deviceholster",
+            triggerEvent: "deviceholster",
+            trigger: function (obj) {
+                _event.trigger("deviceholster", obj);
+            }
+        }
+    };
+
+module.exports = {
+    registerEvents: function (success, fail, args, env) {
+        try {
+            var _eventExt = _utils.loadExtensionModule("event", "index");
+            _eventExt.registerEvents(_actionMap);
+            success();
+        } catch (e) {
+            fail(-1, e);
+        }
+    },
+
+    setOptions: function (success, fail, args) {
+        if (args.options) {
+            args.options = JSON.parse(decodeURIComponent(args.options));
+
+            if (!args.options.sensor) {
+                fail(-1, "Must specify a sensor");
+                return;
+            }
+
+            if (args.options.delay && typeof(args.options.delay) !== "number") {
+                fail(-1, "Delay must be a number");
+                return;
+            }
+
+            if (args.options.queue && typeof(args.options.queue) !== "boolean") {
+                fail(-1, "Queue must be a boolean value");
+                return;
+            }
+
+            if (args.options.batching && typeof(args.options.batching) !== "boolean") {
+                fail(-1, "Batching must be a boolean value");
+                return;
+            }
+
+            if (args.options.background && typeof(args.options.background) !== "boolean") {
+                fail(-1, "Background must be a booleani value");
+                return;
+            }
+
+            if (args.options.reducedReporting && typeof(args.options.reducedReporting) !== "boolean") {
+                fail(-1, "Reduced reporting must be a boolean value");
+                return;
+            }
+
+            sensors.getInstance().setOptions(args.options);
+            success();
+        } else {
+            fail(-1, "Need to specify arguments");
+        }
+    },
+
+    supportedSensors: function (success, fail, args) {
+        success(sensors.getInstance().supportedSensors());
+    }
+};
