@@ -17,12 +17,6 @@ SRCS+=filetransfer_curl.cpp \
 
 EXTRA_INCVPATH+=../../../../ui.dialog/native
 
-ifeq ($(UNITTEST),yes)
-NAME=test
-SRCS+=test_main.cpp
-USEFILE=
-endif
-
 LIBS+=bps curl
 
 include $(MKFILES_ROOT)/qtargets.mk

@@ -11,13 +11,13 @@ include ../../../../meta.mk
 
 override CCFLAGS := $(filter-out -Werror , $(CCFLAGS))
 
-EXTRA_SRCVPATH+=$(WEBWORKS_DIR)/ext/jpps/native/src/utils \
-				$(WEBWORKS_DIR)/ext/jpps/native/src/core \
-				$(WEBWORKS_DIR)/ext/jpps/native/src/plugin
+EXTRA_SRCVPATH+=$(WEBWORKS_DIR)/plugin/jpps/native/src/utils \
+				$(WEBWORKS_DIR)/plugin/jpps/native/src/core \
+				$(WEBWORKS_DIR)/plugin/jpps/native/src/plugin
 
-EXTRA_INCVPATH+=$(WEBWORKS_DIR)/ext/jpps/native/src/utils \
-				$(WEBWORKS_DIR)/ext/jpps/native/src/core \
-				$(WEBWORKS_DIR)/ext/jpps/native/src/plugin
+EXTRA_INCVPATH+=$(WEBWORKS_DIR)/plugin/jpps/native/src/utils \
+				$(WEBWORKS_DIR)/plugin/jpps/native/src/core \
+				$(WEBWORKS_DIR)/plugin/jpps/native/src/plugin
 
 SRCS+=src/utils/Thread.cpp \
       src/core/PPSInterface.cpp \

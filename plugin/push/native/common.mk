@@ -12,12 +12,6 @@ include ../../../../meta.mk
 SRCS+=push_js.cpp \
       push_ndk.cpp
 
-ifeq ($(UNITTEST),yes)
-NAME=test
-SRCS+=test_main.cpp
-USEFILE=
-endif
-
 include $(MKFILES_ROOT)/qtargets.mk
 
 LIBS+=PushService

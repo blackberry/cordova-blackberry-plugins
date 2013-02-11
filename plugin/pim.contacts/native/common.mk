@@ -13,12 +13,6 @@ SRCS+=pim_contacts_qt.cpp \
       pim_contacts_js.cpp \
       contact_account.cpp
 
-ifeq ($(UNITTEST),yes)
-NAME=test
-SRCS+=test_main.cpp
-USEFILE=
-endif
-
 include $(MKFILES_ROOT)/qtargets.mk
 
 LIBS+=bbpim bbcascadespickers QtCore img

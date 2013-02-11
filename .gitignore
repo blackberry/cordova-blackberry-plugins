@@ -1,0 +1,30 @@
+#Node Modules
+node_modules/
+
+#Eclipse Junk
+.project
+.settings
+
+#Mac OS stuff
+*.DS_Store
+
+#Ctags
+tags
+
+#swp and tmp files
+*.*~
+*.swp
+
+#output
+target/
+clientFiles/
+lib/webworks-info.js
+/plugin/*/native/arm/*/*.o
+/plugin/*/native/arm/*/*.so
+/plugin/*/native/arm/*/*.a
+/plugin/*/native/arm/*/test
+/plugin/*/native/x86/*/*.a
+/plugin/*/native/x86/*/*.o
+/plugin/*/native/x86/*/*.so
+/plugin/*/native/x86/*/test
+
