@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/invoke/",
-    _libDir = __dirname + "./../../../../lib/",
-    _extDir = __dirname + "./../../../../ext/",
+var _apiDir = __dirname + "/../../../plugin/invoke/",
+    _libDir = __dirname + "/../../../lib/",
+    _extDir = __dirname + "/../../../plugin/",
     mockedInvocation,
     mockedApplication,
     mockedController,
@@ -298,7 +298,7 @@ describe("invoke index", function () {
             beforeEach(function () {
                 utils = require(_libDir + "utils");
                 events = require(_libDir + "event");
-                eventExt = require(__dirname + "./../../../../ext/event/index");
+                eventExt = require(__dirname + "/../../../plugin/event/index");
                 spyOn(utils, "loadExtensionModule").andCallFake(function () {
                     return eventExt;
                 });

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/notification/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/notification/",
+    _libDir = __dirname + "/../../../lib/",
     index,
     mockNotification,
     successCB,

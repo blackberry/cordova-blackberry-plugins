@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/bbm.platform/",
+var _apiDir = __dirname + "/../../../plugin/bbm.platform/",
     BBMEvents;
 
 describe("bbm.platform BBMEvents", function () {

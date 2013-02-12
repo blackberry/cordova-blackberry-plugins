@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var _extDir = __dirname + "./../../../../ext",
+var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/card",
     _ID = require(_apiDir + "/manifest").namespace,
     client,

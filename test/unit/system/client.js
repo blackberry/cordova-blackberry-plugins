@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var extDir = __dirname + "./../../../../ext",
+var extDir = __dirname + "/../../../plugin",
     apiDir = extDir + "/system",
     ID = require(apiDir + "/manifest").namespace,
     sysClient = null,

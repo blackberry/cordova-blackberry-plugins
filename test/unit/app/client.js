@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _extDir = __dirname + "./../../../../ext",
+var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/app",
     _ID = require(_apiDir + "/manifest").namespace,
     client,
@@ -46,7 +46,7 @@ describe("app client", function () {
 
     beforeEach(function () {
         mockedWebworks = {
-            execSync: jasmine.createSpy("ext/app/client mockWebworks").andReturn(mockData)
+            execSync: jasmine.createSpy("plugin/app/client mockWebworks").andReturn(mockData)
         };
         GLOBAL.window = {
             webworks: mockedWebworks,

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var libDir = __dirname + "./../../../../lib/",
-    extDir = __dirname + "./../../../../ext/",
+var libDir = __dirname + "/../../../lib/",
+    extDir = __dirname + "/../../../plugin/",
     ID = "system",
     apiDir = extDir + ID + "/",
     Whitelist = require(libDir + "policy/whitelist").Whitelist,

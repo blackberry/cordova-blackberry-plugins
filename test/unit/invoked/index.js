@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/invoked/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/invoked/",
+    _libDir = __dirname + "/../../../lib/",
     mockedInvocation,
     index,
     successCB,
@@ -68,7 +68,7 @@ describe("invoked index", function () {
         beforeEach(function () {
             utils = require(_libDir + "utils");
             events = require(_libDir + "event");
-            eventExt = require(__dirname + "./../../../../ext/event/index");
+            eventExt = require(__dirname + "/../../../plugin/event/index");
             spyOn(utils, "loadExtensionModule").andCallFake(function () {
                 return eventExt;
             });

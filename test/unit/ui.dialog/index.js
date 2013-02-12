@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var root = __dirname + "/../../../../",
+var root = __dirname + "/../../../",
     webview = require(root + "lib/webview"),
     overlayWebView = require(root + "lib/overlayWebView"),
     events = require(root + "lib/event"),
@@ -29,7 +29,7 @@ describe("ui.dialog index", function () {
             require : jasmine.createSpy()
         };
         spyOn(events, "trigger");
-        index = require(root + "ext/ui.dialog/index");
+        index = require(root + "plugin/ui.dialog/index");
     });
 
     afterEach(function () {

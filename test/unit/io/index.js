@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _apiDir = __dirname + "./../../../../ext/io/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/io/",
+    _libDir = __dirname + "/../../../lib/",
     index = require(_apiDir + "/index"),
     utils = require(_libDir + "/utils"),
     mockedWebview = {

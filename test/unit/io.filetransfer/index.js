@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var root = __dirname + "/../../../../",
+var root = __dirname + "/../../../",
     webview = require(root + "lib/webview"),
     index;
 
@@ -42,7 +42,7 @@ describe("io.filetransfer index", function () {
         };
 
         spyOn(webview, "windowGroup").andReturn(42);
-        index = require(root + "ext/io.filetransfer/index");
+        index = require(root + "plugin/io.filetransfer/index");
     });
 
     afterEach(function () {

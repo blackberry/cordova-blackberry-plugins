@@ -15,7 +15,7 @@
  */
 
 var root = __dirname + "/../../../../",
-    apiDir = root + "ext/ui.toast/",
+    apiDir = root + "plugin/ui.toast/",
     client = null,
     ID = require(apiDir + "/manifest").namespace,
     danielCraig,

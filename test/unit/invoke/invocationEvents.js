@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/invoke/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/invoke/",
+    _libDir = __dirname + "/../../../lib/",
     invocationEvents,
     startupMode,
     mockedInvocation,

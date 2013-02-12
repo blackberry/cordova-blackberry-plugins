@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/ui.cover/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/ui.cover/",
+    _libDir = __dirname + "/../../../lib/",
     events = require(_libDir + "event"),
-    eventExt = require(__dirname + "./../../../../ext/event/index"),
+    eventExt = require(__dirname + "/../../../plugin/event/index"),
     index,
     mockedCoverSize,
     mockedUpdateCover;

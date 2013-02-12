@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var _extDir = __dirname + "./../../../../ext",
+var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/invoke",
     _ID = require(_apiDir + "/manifest").namespace,
     _eventID = 'blackberry.event',

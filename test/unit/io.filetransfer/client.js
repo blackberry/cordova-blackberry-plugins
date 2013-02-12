@@ -15,7 +15,7 @@
  */
 
 var root = __dirname + "/../../../../",
-    _apiDir = root + "ext/io.filetransfer/",
+    _apiDir = root + "plugin/io.filetransfer/",
     _ID = require(_apiDir + "/manifest").namespace,
     client,
     mockedWebworks = {},

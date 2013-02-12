@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _apiDir = __dirname + "./../../../../ext/bbm.platform/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/bbm.platform/",
+    _libDir = __dirname + "/../../../lib/",
     events = require(_libDir + "event"),
-    eventExt = require(__dirname + "./../../../../ext/event/index"),
+    eventExt = require(__dirname + "/../../../plugin/event/index"),
     index = null;
 
 describe("bbm.platform index", function () {

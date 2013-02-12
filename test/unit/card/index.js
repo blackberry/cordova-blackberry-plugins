@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/card/",
-    _libDir = __dirname + "./../../../../lib/",
-    _extDir = __dirname + "./../../../../ext/",
+var _apiDir = __dirname + "/../../../plugin/card/",
+    _libDir = __dirname + "/../../../lib/",
+    _extDir = __dirname + "/../../../plugin/",
     mockedController,
     mockedWebview,
     mockedMediaPlayer,

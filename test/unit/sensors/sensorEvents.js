@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var _apiDir = __dirname + "./../../../../ext/sensors/",
+var _apiDir = __dirname + "/../../../plugin/sensors/",
     sensorsEvents;
 
 describe("sensor sensorEvents", function () {

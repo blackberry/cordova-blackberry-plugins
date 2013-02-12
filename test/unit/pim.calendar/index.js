@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _apiDir = __dirname + "./../../../../ext/pim.calendar/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/pim.calendar/",
+    _libDir = __dirname + "/../../../lib/",
     utils = require(_libDir + "utils"),
     events = require(_libDir + "event"),
     CalendarFindOptions = require(_apiDir + "CalendarFindOptions"),

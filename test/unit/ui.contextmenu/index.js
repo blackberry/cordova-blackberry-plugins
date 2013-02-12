@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _extDir = __dirname + "./../../../../ext/",
-    _libDir = __dirname + "./../../../../lib/",
+var _extDir = __dirname + "/../../../plugin/",
+    _libDir = __dirname + "/../../../lib/",
     _event = require(_libDir + "event"),
     contextmenu,
     overlayWebView,

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var root = __dirname + "/../../../../",
-    index = require(root + "ext/event/index");
+var root = __dirname + "/../../../",
+    index = require(root + "plugin/event/index");
 
 describe("blackberry.event index", function () {
     describe("registerEvents", function () {

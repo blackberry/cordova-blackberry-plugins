@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _apiDir = __dirname + "./../../../../ext/pim.contacts/",
-    _libDir = __dirname + "./../../../../lib/",
+var _apiDir = __dirname + "/../../../plugin/pim.contacts/",
+    _libDir = __dirname + "/../../../lib/",
     utils = require(_libDir + "utils"),
     events = require(_libDir + "event"),
     ContactFindOptions = require(_apiDir + "ContactFindOptions"),

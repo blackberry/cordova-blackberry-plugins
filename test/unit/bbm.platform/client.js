@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 var root = __dirname + "/../../../../",
-    apiDir = root + "ext/bbm.platform/",
+    apiDir = root + "plugin/bbm.platform/",
     _ID = require(apiDir + "/manifest").namespace,
     client = null,
     mockedWebworks = {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 var _ID = "blackberry.ui.contextmenu",
-    _extDir = __dirname + "./../../../../ext",
+    _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/" + "ui.contextmenu",
     client = null,
     mockedWebworks = {

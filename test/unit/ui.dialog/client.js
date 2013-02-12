@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-var root = __dirname + "/../../../../",
-    apiDir = root + "ext/ui.dialog/",
+var root = __dirname + "/../../../",
+    apiDir = root + "plugin/ui.dialog/",
     client = null,
     ID = require(apiDir + "/manifest").namespace,
     mockedWebworks = {

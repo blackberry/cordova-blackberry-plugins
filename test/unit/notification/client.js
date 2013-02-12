@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _extDir = __dirname + "./../../../../ext",
+var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/notification",
     _ID = require(_apiDir + "/manifest").namespace,
     client,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var root = __dirname + "/../../../../",
+var root = __dirname + "/../../../",
     webview = require(root + "lib/webview"),
     overlayWebView,
     index;
@@ -54,7 +54,7 @@ describe("ui.toast index", function () {
 
         GLOBAL.qnx = mockQnx;
 
-        index = require(root + "ext/ui.toast/index");
+        index = require(root + "plugin/ui.toast/index");
     });
 
     afterEach(function () {
