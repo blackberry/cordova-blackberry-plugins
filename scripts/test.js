@@ -40,6 +40,8 @@ module.exports = function (done, custom) {
 
     test = jWorkflow.order();
     test.start(function (code) {
+        console.log("-------------------");
+        console.log("Unit Tests: ");
         jasmine.executeSpecsInFolder(specs, function (runner, log) {
             wrench.rmdirSyncRecursive(_c.TEMP, true);
             var failed = runner.results().failedCount === 0 ? 0 : 1;
