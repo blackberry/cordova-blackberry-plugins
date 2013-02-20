@@ -16,6 +16,7 @@
  
 var _self = {},
     _ID = require("./manifest.json").namespace,
+    exception = require("../../lib/exception.js"),
     utils = require("../../lib/utils.js");
 
 _self.customAskAsync = function (message, buttons, callback, settings) {
