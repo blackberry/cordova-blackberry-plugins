@@ -72,7 +72,7 @@ function _lintCPP() {
     return returnValue;
 }
 
-module.exports = function (files, cb) {
+module.exports = function (files, complete) {
     utils.copyFolder(path.join(_c.ROOT, "plugin"), path.join(_c.TEMP, "plugin"));
     utils.copyFolder(path.join(_c.ROOT, "test/lib"), path.join(_c.TEMP, "lib"));
     utils.copyFolder(path.join(_c.ROOT, "scripts"), path.join(_c.TEMP, "scripts"));
@@ -86,6 +86,6 @@ module.exports = function (files, cb) {
         .start(function (code) {
             wrench.rmdirSyncRecursive(_c.TEMP, true);
             _done(code);
-            cb();
+            complete();
         });
 };
