@@ -14,41 +14,44 @@
  * limitations under the License.
  */
 
-var wrench = require('wrench'),
+var fs = require('fs'),
     jWorkflow = require('jWorkflow'),
     path = require('path'),
-    utils = require('./utils'),
-    _c = require('./conf');
+    _c = require('./conf'),
+    testPlugin = require('./test-plugin');
 
-module.exports = function (done, custom) {
-    var jasmine = require('jasmine-node'),
-        verbose = false,
-        colored = false,
-        specs = path.join(_c.TEMP, (custom ? custom : "test/unit")),
-        key,
-        test;
+module.exports = function (done, id) {
+    var plugins = id ? [id] : fs.readdirSync(path.join(_c.ROOT, "plugin")),
+        totalFailed = 0,
+        test = function (prev, baton) {
+            baton.take();
+            if (/blackberry\./.test(this.plugin)) {
+                testPlugin(function (failed) {
+                    totalFailed += failed;
+                    baton.pass();
+                }, this.plugin);
+            } else {
+                baton.pass();
+            }
+        },
+        testWorkflow = function () {
+            var order;
 
-    for (key in jasmine) {
-        if (Object.prototype.hasOwnProperty.call(jasmine, key)) {
-            global[key] = jasmine[key];
-        }
-    }
+            plugins.forEach(function (plugin, idx) {
+                if (idx === 0) {
+                    order = jWorkflow.order(test, {plugin: plugin});
+                } else {
+                    order = order.andThen(test, {plugin: plugin});
+                }
+            });
 
-    utils.copyFolder(path.join(_c.ROOT, "plugin"), path.join(_c.TEMP, "plugin"));
-    utils.copyFolder(path.join(_c.ROOT, "test/lib"), path.join(_c.TEMP, "lib"));
-    utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
+            return order;
+        };
 
-    test = jWorkflow.order();
-    test.start(function (code) {
-        console.log("-------------------");
-        console.log("Unit Tests: ");
-        jasmine.executeSpecsInFolder(specs, function (runner, log) {
-            wrench.rmdirSyncRecursive(_c.TEMP, true);
-            var failed = runner.results().failedCount === 0 ? 0 : 1;
-            setTimeout(function () {
-                (typeof done !== "function" ? process.exit : done)(failed);
+
+    testWorkflow().start(function () {
+        setTimeout(function () {
+                (typeof done !== "function" ? process.exit : done)(totalFailed);
             }, 10);
-
-        }, verbose, colored);
     });
 };

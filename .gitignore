@@ -19,12 +19,14 @@ tags
 target/
 clientFiles/
 lib/webworks-info.js
-/plugin/*/native/arm/*/*.o
-/plugin/*/native/arm/*/*.so
-/plugin/*/native/arm/*/*.a
-/plugin/*/native/arm/*/test
-/plugin/*/native/x86/*/*.a
-/plugin/*/native/x86/*/*.o
-/plugin/*/native/x86/*/*.so
-/plugin/*/native/x86/*/test
+plugin/*/src/blackberry10/native/arm/*/*.o
+plugin/*/src/blackberry10/native/arm/*/*.so
+plugin/*/src/blackberry10/native/arm/*/*.a
+plugin/*/src/blackberry10/native/arm/*/test
+plugin/*/src/blackberry10/native/x86/*/*.a
+plugin/*/src/blackberry10/native/x86/*/*.o
+plugin/*/src/blackberry10/native/x86/*/*.so
+plugin/*/src/blackberry10/native/x86/*/test
+plugin/*/src/blackberry10/native/device/*.so
+plugin/*/src/blackberry10/native/simulator/*.so
 

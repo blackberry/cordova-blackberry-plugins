@@ -41,7 +41,8 @@
         "atob",
         //automated tests
         "showOverlay",
-        "hideOverlay"
+        "hideOverlay",
+        "cordova"
     ],
 
     "node" : false,
