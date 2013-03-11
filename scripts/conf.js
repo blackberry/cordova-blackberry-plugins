@@ -13,10 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-var path = require("path"),
-    utils = require("./utils");
+var path = require("path");
 
 module.exports = {
+    CORDOVA_BB10_REPOS: {
+        "dir": path.normalize(__dirname + "/../test/cordova-blackberry"),
+        "url": "https://github.com/blackberry/cordova-blackberry.git"
+    },
     ROOT: path.normalize(__dirname + "/../"),
     TEMP: path.normalize(__dirname + "/../temp/"),
+    TEST_APP_APP: path.normalize(__dirname + "/../test/test-app/app"),
+    TEST_SUITE_APP: path.normalize(__dirname + "/../test/test-suite/app")
 };

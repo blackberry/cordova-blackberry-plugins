@@ -15,8 +15,9 @@
  */
 
 var utils = require('./scripts/utils'),
-    jWorkflow = require('jWorkflow'),
-    childProcess = require('child_process');
+	jWorkflow = require('jWorkflow'),
+    childProcess = require('child_process'),
+    DESC_NEW_LINE = "\n\t\t\t # ";
 
 desc("runs clean, hint, build and test");
 task('default', ['clean', 'hint', 'build', 'test'], function () {});
@@ -59,3 +60,11 @@ desc("run unit tests in node - jake test [pluginId]");
 task('test', [], function () {
     require('./scripts/test')(null, process.argv.length >= 4 ? process.argv[3] : null);
 }, true);
+
+desc("deploy and run test app on device/simulator" + DESC_NEW_LINE +
+    "Usage: jake deploy-test-app['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
+    "Example: jake deploy-test-app['nextBB10','mybb10','169.254.0.1','device','password']");
+task('deploy-test-app', ['build'], require('./scripts/deploy-test-app'), true);
+
+desc("run test suite in node - jake deploy-test-suite[branch,targetname,ip,targettype,password]");
+task('deploy-test-suite', [], require('./scripts/test-suite'));
