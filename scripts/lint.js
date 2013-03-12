@@ -35,7 +35,7 @@ function _done(error) {
 }
 
 function _lintJS() {
-    var options = ["--reporter", "scripts/reporter.js", "--show-non-errors"],
+    var options = ["--reporter", "scripts/reporter.js"],
         files = ["."];
 
     return utils.execCommandWithJWorkflow('jshint ' + files.concat(options).join(' '), {cwd: _c.TEMP});

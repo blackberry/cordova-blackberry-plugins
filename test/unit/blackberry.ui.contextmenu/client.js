@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jshint -W079 */
 var _ID = "blackberry.ui.contextmenu",
     _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/" + _ID,

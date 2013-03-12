@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/*jshint -W079 */
 var _ID = "blackberry.io.filetransfer",
     _apiDir = __dirname + "/../../../plugin/" + _ID + "/",
     client,

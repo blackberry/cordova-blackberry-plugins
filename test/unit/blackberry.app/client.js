@@ -17,6 +17,7 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "blackberry.app",
     _apiDir = _extDir + "/" + _ID,
     client,
+    /*jshint -W079 */
     module = {
         exports: null
     },
