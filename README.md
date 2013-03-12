@@ -6,6 +6,7 @@ This repo contains plugins for Apache Cordova that expose functionality of the B
 2. Install [BlackBerry Native SDK](https://bdsc.webapps.blackberry.com/native/).
 3. [*Windows*] Add git bin to PATH. i.e. `*Installation Directory*\bin`
 4. Install [jake] globally (npm install --global jake).
+5. Install [jshint] globall (npm install --global jshint).
 
 ##Setup and Build
 1. `git clone http://github.rim.net/webworks/BB10-WebWorks-Cordova.git`

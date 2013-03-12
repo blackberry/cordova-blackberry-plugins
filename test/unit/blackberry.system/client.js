@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/*jshint -W079 */
 var extDir = __dirname + "/../../../plugin",
     ID = "blackberry.system",
     apiDir = extDir + "/" + ID,

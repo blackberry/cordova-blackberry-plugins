@@ -48,7 +48,7 @@
     "node" : false,
     "es5" : true,
     "browser" : true,
-
+    "unused": false,
     "boss" : false,
     "curly": false,
     "bitwise" : false,
@@ -71,5 +71,6 @@
     "regexp": false,
     "undef": true,
     "sub": true,
-    "strict": false
+    "strict": false,
+    "globals": {"blackberry": true}
 }
