@@ -10,7 +10,7 @@ LDFLAGS+=-Wl,-rpath,./app/native/plugins/jnext,-z,relro,-z,now,-s
 EXTRA_LIBVPATH+=$(QNX_LIB) \
                 $(QNX_USR_LIB) \
                 $(QNX_USR_LIB)/qt4/lib \
-                $(WEBWORKS_DIR)/plugin/utils/src/blackberry10/native/$(CPU)/$(VARIANT1)
+                $(WEBWORKS_DIR)/plugin/com.blackberry.utils/src/blackberry10/native/$(CPU)/$(VARIANT1)
 
 EXTRA_INCVPATH+=$(QNX_INCLUDE) \
                 $(QNX_INCLUDE)/qt4 \
@@ -18,11 +18,11 @@ EXTRA_INCVPATH+=$(QNX_INCLUDE) \
                 $(QNX_INCLUDE)/qt4/QtCore \
                 $(WEBWORKS_DIR)/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common \
                 $(WEBWORKS_DIR)/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include \
-                $(WEBWORKS_DIR)/plugin/utils/src/blackberry10/native
+                $(WEBWORKS_DIR)/plugin/com.blackberry.utils/src/blackberry10/native
 
 EXTRA_SRCVPATH+=$(WEBWORKS_DIR)/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json \
                 $(WEBWORKS_DIR)/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common \
-                $(WEBWORKS_DIR)/plugin/utils/src/blackberry10/native
+                $(WEBWORKS_DIR)/plugin/com.blackberry.utils/src/blackberry10/native
 
 ifeq ($(PLUGIN),yes)
 SRCS+=$(WEBWORKS_DIR)/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.cpp

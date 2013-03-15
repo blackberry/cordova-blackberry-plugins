@@ -1,5 +1,0 @@
-{
-    "global": false,
-    "namespace": "blackberry.pim.calendar",
-    "dependencies": ["utils"]
-}

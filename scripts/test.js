@@ -25,7 +25,7 @@ module.exports = function (done, id) {
         totalFailed = 0,
         test = function (prev, baton) {
             baton.take();
-            if (/blackberry\./.test(this.plugin)) {
+            if (/blackberry\./.test(this.plugin) && fs.existsSync(path.join(_c.ROOT, "plugin", this.plugin, "www"))) {
                 testPlugin(function (failed) {
                     totalFailed += failed;
                     baton.pass();
