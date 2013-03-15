@@ -1,5 +1,5 @@
 LIST=VARIANT
-EARLY_DIRS=utils
+EARLY_DIRS=com.blackberry.utils
 ifndef QRECURSE
 QRECURSE=recurse.mk
 ifdef QCONFIG

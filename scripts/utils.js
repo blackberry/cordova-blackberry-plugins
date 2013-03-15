@@ -113,13 +113,13 @@ module.exports = {
         };
     },
 
-    copyFolder: function (source, destination) {
+    copyFolder: function (source, destination, options) {
         //create the destination folder if it does not exist
         if (!fs.existsSync(destination)) {
             wrench.mkdirSyncRecursive(destination, "0755");
         }
 
-        wrench.copyDirSyncRecursive(source, destination);
+        wrench.copyDirSyncRecursive(source, destination, options);
     },
 
     isDirectory: function (source) {

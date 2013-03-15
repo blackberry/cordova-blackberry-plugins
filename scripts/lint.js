@@ -45,7 +45,7 @@ function _lintCPP() {
     var returnValue = function (prev, baton) {},
         options = ["--R", "--filter=-whitespace/line_length,-whitespace/comments,-whitespace/labels,-whitespace/braces,-readability/streams"],
         files = ["plugin"],
-        blacklist = ["jpps"];
+        blacklist = ["com.blackberry.jpps"];
     //Only cpplint on unix. Windows currently has an issue with cpplinting
     if (!utils.isWindows()) {
         //This will expand files into an array of arrays and then reduce into a single array

@@ -41,8 +41,7 @@
         "atob",
         //automated tests
         "showOverlay",
-        "hideOverlay",
-        "cordova"
+        "hideOverlay"
     ],
 
     "node" : false,
@@ -71,6 +70,5 @@
     "regexp": false,
     "undef": true,
     "sub": true,
-    "strict": false,
-    "globals": {"blackberry": true}
+    "strict": false
 }

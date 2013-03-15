@@ -58,8 +58,8 @@ module.exports = function (done, id) {
     utils.copyFolder(path.join(_c.ROOT, "plugin", id, "src/blackberry10"), path.join(_c.TEMP, "plugin", id));
 
     // event dependency
-    if (id !== "blackberry.event")  {
-        utils.copyFolder(path.join(_c.ROOT, "plugin/blackberry.event/src/blackberry10"), path.join(_c.TEMP, "plugin/blackberry.event"));
+    if (id !== "com.blackberry.event")  {
+        utils.copyFolder(path.join(_c.ROOT, "plugin/com.blackberry.event/src/blackberry10"), path.join(_c.TEMP, "plugin/com.blackberry.event"));
     }
 
     // lib
@@ -67,6 +67,11 @@ module.exports = function (done, id) {
 
     // client.js
     utils.copyFolder(path.join(_c.ROOT, "plugin", id, "www"), path.join(_c.TEMP, "plugin", id, "www"));
+
+    // copy .js files in src/blackberry10, since they are required by .js files in www
+    if (id.indexOf("pim") !== -1) {
+        utils.copyFolder(path.join(_c.ROOT, "plugin", id, "src/blackberry10"), path.join(_c.TEMP, "plugin", id, "www"), {preserve: true, preserveFiles: true});
+    }
 
     // test files
     utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
