@@ -107,6 +107,23 @@ module.exports = {
             });
     },
 
+    addPlugins: function (projectPath, plugins, done) {
+        var pluginsPath = path.join(baseDir, 'plugin'),
+            plug,
+            addPlugin = "cordova/plugin add %s",
+             task = jWorkflow.order();
+
+        plugins.forEach(function (plugin) {
+            var cmd = util.format(addPlugin, path.join(pluginsPath, plugin));
+            task.andThen(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}));
+        });
+        task.start(function () {
+            if (done) {
+                done();
+            }
+        });
+    },
+
     // TODO: To be removed later
     copyExtensions: function (projectPath, done) {
         var extPath = path.join(baseDir, 'plugin'),

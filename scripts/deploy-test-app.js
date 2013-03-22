@@ -81,8 +81,33 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         wrench.copyDirSyncRecursive(path.join(baseDir, "test/integration/manual"), path.join(testAppPrj, "www", "manual", "framework", "spec"));
     })
     .andThen(function (prev, baton) {
+        var plugins = [
+            "com.blackberry.app",
+            "com.blackberry.bbm.platform",
+            "com.blackberry.connection",
+            "com.blackberry.event",
+            "com.blackberry.identity",
+            "com.blackberry.invoke",
+            "com.blackberry.invoke.card",
+            "com.blackberry.invoked",
+            "com.blackberry.io",
+            "com.blackberry.io.filetransfer",
+            "com.blackberry.jpps",
+            "com.blackberry.notification",
+            "com.blackberry.payment",
+            "com.blackberry.pim.calendar",
+            "com.blackberry.pim.contacts",
+            "com.blackberry.push",
+            "com.blackberry.sensors",
+            "com.blackberry.system",
+            "com.blackberry.ui.contextmenu",
+            "com.blackberry.ui.cover",
+            "com.blackberry.ui.dialog",
+            "com.blackberry.ui.toast",
+            "com.blackberry.utils"
+        ];
         baton.take();
-        prjUtils.copyExtensions(testAppPrj, function () {
+        prjUtils.addPlugins(testAppPrj, plugins, function () {
             baton.pass();
         });
     })
