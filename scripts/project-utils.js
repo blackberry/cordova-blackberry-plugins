@@ -77,7 +77,7 @@ module.exports = {
                     }
                 });
         } else {
-            console.log("Invalide parameters, run jake -T to get the usage");
+            console.log("Invalid parameters, run jake -T to get the usage");
             process.exit(-1);
         }
     },
@@ -109,9 +109,8 @@ module.exports = {
 
     addPlugins: function (projectPath, plugins, done) {
         var pluginsPath = path.join(baseDir, 'plugin'),
-            plug,
             addPlugin = "cordova/plugin add %s",
-             task = jWorkflow.order();
+            task = jWorkflow.order();
 
         plugins.forEach(function (plugin) {
             var cmd = util.format(addPlugin, path.join(pluginsPath, plugin));
@@ -122,73 +121,6 @@ module.exports = {
                 done();
             }
         });
-    },
-
-    // TODO: To be removed later
-    copyExtensions: function (projectPath, done) {
-        var extPath = path.join(baseDir, 'plugin'),
-            extDest = path.join(projectPath, 'plugin');
-
-        if (fs.existsSync(extPath)) {
-            //Iterate over extensions directory
-            fs.readdirSync(extPath).forEach(function (extension) {
-                var apiDir = path.normalize(path.resolve(extPath, extension)),
-                    apiDirDeviceSO = path.normalize(path.join(apiDir, 'src', 'blackberry10', 'native', 'arm', 'so.le-v7')),
-                    apiDirSimulatorSO = path.normalize(path.join(apiDir, 'src', 'blackberry10', 'native', 'x86', 'so')),
-                    apiDest = path.join(extDest, extension),
-                    extensionStats = fs.lstatSync(apiDir),
-                    soDest,
-                    soFiles;
-
-                //In case there is a file in the ext directory
-                //check that we are dealing with a real extenion first
-                if (extensionStats.isDirectory()) {
-                    //find all .js files or .json files
-                    [{ base: apiDir, sub: "src/blackberry10" }, { base: apiDir, sub: "www"}].forEach(function (target) {
-                        if (!fs.existsSync(path.join(target.base, target.sub))) {
-                            return;
-                        }
-                        jsFiles = utils.listFiles(path.join(target.base, target.sub), function (file) {
-                            var extName = path.extname(file);
-                            return extName === ".js" || extName === ".json";
-                        });
-
-                        //Copy each .js file to its extensions folder
-                        jsFiles.forEach(function (jsFile) {
-                            utils.copyFile(jsFile, path.join(apiDest, target.sub), path.join(target.base, target.sub));
-                        });
-
-                        if (fs.existsSync(apiDest)) {
-                            // Copy the .so file for this extension
-                            [{ src: apiDirDeviceSO, dst: "device" }, { src: apiDirSimulatorSO, dst: "simulator"}].forEach(function (target) {
-                                var nativeDir = path.join(apiDest, 'src', 'blackberry10', 'native');
-                                if (!fs.existsSync(nativeDir)) {
-                                    fs.mkdirSync(nativeDir);
-                                }
-                                if (fs.existsSync(target.src)) {
-                                    soDest = path.join(nativeDir, target.dst);
-                                    if (!fs.existsSync(soDest)) {
-                                        fs.mkdirSync(soDest);
-                                    }
-
-                                    soFiles = utils.listFiles(target.src, function (file) {
-                                        return path.extname(file) === ".so";
-                                    });
-
-                                    soFiles.forEach(function (soFile) {
-                                        utils.copyFile(soFile, soDest);
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        if (done) {
-            done();
-        }
     },
 
     removeProject: function (projectPath, done) {

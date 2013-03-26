@@ -74,29 +74,7 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPwd) 
         })
         .andThen(function (prev, baton) {
             var plugins = [
-                "com.blackberry.app",
-                "com.blackberry.bbm.platform",
-                "com.blackberry.connection",
-                "com.blackberry.event",
-                "com.blackberry.identity",
-                "com.blackberry.invoke",
-                "com.blackberry.invoke.card",
-                "com.blackberry.invoked",
-                "com.blackberry.io",
-                "com.blackberry.io.filetransfer",
-                "com.blackberry.jpps",
-                "com.blackberry.notification",
-                "com.blackberry.payment",
-                "com.blackberry.pim.calendar",
-                "com.blackberry.pim.contacts",
-                "com.blackberry.push",
-                "com.blackberry.sensors",
-                "com.blackberry.system",
-                "com.blackberry.ui.contextmenu",
-                "com.blackberry.ui.cover",
-                "com.blackberry.ui.dialog",
-                "com.blackberry.ui.toast",
-                "com.blackberry.utils"
+                "com.blackberry.app"
             ];
             baton.take();
             projectUtils.addPlugins(projectPath, plugins, function () {
