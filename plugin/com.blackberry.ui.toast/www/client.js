@@ -18,51 +18,28 @@
  */
 
 var toast = {},
-    ID = "com.blackberry.ui.toast",
-    _listeningForCallbacks = false,
-    _storedButtonCallbacks = {},
-    _storedDismissCallbacks = {};
-
-
-// Register to listen to all toast callbacks
-window.webworks.event.add("com.blackberry.event", 'toast.callback', function (toastId) {
-    if (typeof _storedButtonCallbacks[toastId] === 'function') {
-        //Dispatch the proper toast callback
-        _storedButtonCallbacks[toastId]();
-        delete _storedButtonCallbacks[toastId];
-    }
-});
-
-
-window.webworks.event.add("com.blackberry.event", 'toast.dismiss', function (toastId) {
-    if (typeof _storedDismissCallbacks[toastId] === 'function') {
-        _storedDismissCallbacks[toastId]();
-        delete _storedDismissCallbacks[toastId];
-
-    }
-    // No matter what remove the stored button callback since we dismissed the toast
-    if (typeof _storedButtonCallbacks[toastId] === 'function') {
-        delete _storedButtonCallbacks[toastId];
-    }
-});
+    ID = "com.blackberry.ui.toast";
 
 toast.show = function (message, options) {
     var toastId,
-        success = function (data, response) {
-            toastId = data;
+        success = function (message) {
+            if (message.reason === "buttonClicked") {
+                if (typeof options.buttonCallback === "function") {
+                    options.buttonCallback();
+                }
+            } else if (message.reason === "dismissed") {
+                if (typeof options.dismissCallback === "function") {
+                    options.dismissCallback();
+                }
+            } else if (message.reason === "created") {
+                toastId = message.toastId;
+            }
         },
-        fail = function (data, response) {
-            throw data;
-        };
+        //TODO: Add an errorCallback to the options for this API and call it here
+        fail = function (message) { };
 
     window.webworks.exec(success, fail, ID, 'show', {message : message, options : options});
 
-    if (options && options.buttonCallback) {
-        _storedButtonCallbacks[toastId] = options.buttonCallback;
-    }
-    if (options && options.dismissCallback) {
-        _storedDismissCallbacks[toastId] = options.dismissCallback;
-    }
     return toastId;
 };
 
