@@ -19,7 +19,24 @@
 
 var _self = {},
     ID = "com.blackberry.system",
-    deviceProperties;
+    deviceProperties,
+    noop = function () {},
+    //TODO: change to require("cordova/exec");
+    execFunc = window.webworks.exec,
+    events = ["batterystatus", "batterylow", "battercritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
+    channels = events.map(function (eventName) {
+        var channel = cordova.addWindowEventHandler(eventName);
+        channel.onHasSubscribersChange = function () {
+            if (this.numHandlers === 1) {
+                execFunc(cordova.fireWindowEvent.bind(null, eventName),
+                                     console.log.bind("Error initializing " + eventName + " listener: "),
+                                     ID, "startEvent", {eventName: eventName});
+            } else if (this.numHandlers === 0) {
+                execFunc(noop, noop, ID, "stopEvent", {eventName: eventName});
+            }
+        };
+        return channel;
+    });
 
 function getFieldValue(field, args) {
     var value = null,
@@ -31,7 +48,7 @@ function getFieldValue(field, args) {
         };
 
     try {
-        window.webworks.exec(success, fail, ID, field, args);
+        execFunc(success, fail, ID, field, args);
     } catch (e) {
         console.error(e);
     }
@@ -60,10 +77,6 @@ function defineGetter(field, getterArg) {
     });
 }
 
-_self.hasPermission = function (module) {
-    return getFieldValue("hasPermission", {"module": module});
-};
-
 _self.hasCapability = function (capability) {
     return getFieldValue("hasCapability", {"capability": capability});
 };
@@ -81,7 +94,7 @@ _self.getTimezones = function () {
 };
 
 _self.setWallpaper = function (path) {
-    window.webworks.exec(function () {}, function () {}, ID, "setWallpaper", {"wallpaper": path});
+    execFunc(noop, noop, ID, "setWallpaper", {"wallpaper": path});
 };
 
 defineGetter("region");
@@ -95,7 +108,5 @@ window.webworks.defineReadOnlyField(_self, "DENY", 1);
 window.webworks.defineReadOnlyField(_self, "hardwareId", getDeviceProperty("hardwareId"));
 window.webworks.defineReadOnlyField(_self, "softwareVersion", getDeviceProperty("softwareVersion"));
 window.webworks.defineReadOnlyField(_self, "name", getDeviceProperty("name"));
-
-window.webworks.exec(function () {}, function () {}, ID, "registerEvents", null);
 
 module.exports = _self;

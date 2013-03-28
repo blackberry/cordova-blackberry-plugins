@@ -33,6 +33,8 @@
         "require",
         "Node",
         "JSZip",
+        "PluginResult",
+        "cordova",
         //UI Components
         "x$",
         "iris",

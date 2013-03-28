@@ -51,20 +51,8 @@ describe("blackberry.system", function () {
         testSystemReadOnly("DENY");
     });
 
-    it("blackberry.system.hasPermission should exist", function () {
-        expect(blackberry.system.hasPermission).toBeDefined();
-    });
-
     it("blackberry.system.hasCapability should exist", function () {
         expect(blackberry.system.hasCapability).toBeDefined();
-    });
-
-    it("blackberry.system.hasPermission should return true for module in whitelist", function () {
-        expect(blackberry.system.hasPermission("blackberry.system")).toBe(blackberry.system.ALLOW);
-    });
-
-    it("blackberry.system.hasPermission should return false for module not in whitelist", function () {
-        expect(blackberry.system.hasPermission("blackberry.system.event")).toBe(blackberry.system.DENY);
     });
 
     it("blackberry.system.hasCapability should return true for wifi", function () {

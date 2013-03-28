@@ -43,11 +43,11 @@ describe("blackberry.system", function () {
 
         beforeEach(function () {
             onBatteryStatusChange = jasmine.createSpy("onBatteryStatusChange");
-            blackberry.event.addEventListener('batterystatus', onBatteryStatusChange);
+            window.addEventListener('batterystatus', onBatteryStatusChange);
         });
 
         afterEach(function () {
-            blackberry.event.removeEventListener('batterystatus', onBatteryStatusChange);
+            window.removeEventListener('batterystatus', onBatteryStatusChange);
             onBatteryStatusChange = null;
         });
 
@@ -76,7 +76,7 @@ describe("blackberry.system", function () {
                 expect(onBatteryStatusChange).toHaveBeenCalled();
                 expect(onBatteryStatusChange.mostRecentCall.args[0].level).toBeDefined();
                 expect(onBatteryStatusChange.mostRecentCall.args[0].isPlugged).toBeTruthy();
-                blackberry.event.removeEventListener('batterystatus', onBatteryStatusChange);
+                window.removeEventListener('batterystatus', onBatteryStatusChange);
             });
         });
 
@@ -114,11 +114,11 @@ describe("blackberry.system", function () {
 
         beforeEach(function () {
             onBatteryLow = jasmine.createSpy("onBatteryLow");
-            blackberry.event.addEventListener('batterylow', onBatteryLow);
+            window.addEventListener('batterylow', onBatteryLow);
         });
 
         afterEach(function () {
-            blackberry.event.removeEventListener('batterylow', onBatteryLow);
+            window.removeEventListener('batterylow', onBatteryLow);
             onBatteryLow = null;
         });
 
@@ -163,10 +163,10 @@ describe("blackberry.system", function () {
         it("should trigger callback for low event when re-entering threshold after adding event lister after all were removed", function () {
 
             window.confirm("[Device]Drain the battery to level lower than 15%. [SIM]Set 'StateOfCharge' in battery PPS Object to level lower than 15%");
-            blackberry.event.removeEventListener('batterylow', onBatteryLow);
+            window.removeEventListener('batterylow', onBatteryLow);
             window.confirm("[Device]Charge the battery to level higher or equal to 15%. [SIM]Set 'StateOfCharge' in battery PPS Object to level higher or equal to 15");
             window.confirm("[Device]Drain the battery to level lower than 15%. [SIM]Set 'StateOfCharge' in battery PPS Object to level lower than 15%");
-            blackberry.event.addEventListener('batterylow', onBatteryLow);
+            window.addEventListener('batterylow', onBatteryLow);
 
             waitsFor(function () {
                 return onBatteryLow.callCount;
@@ -185,11 +185,11 @@ describe("blackberry.system", function () {
 
         beforeEach(function () {
             onBatteryCritical = jasmine.createSpy("onBatteryCritical");
-            blackberry.event.addEventListener('batterycritical', onBatteryCritical);
+            window.addEventListener('batterycritical', onBatteryCritical);
         });
 
         afterEach(function () {
-            blackberry.event.removeEventListener('batterycritical', onBatteryCritical);
+            window.removeEventListener('batterycritical', onBatteryCritical);
             onBatteryCritical = null;
         });
 
@@ -237,11 +237,11 @@ describe("blackberry.system", function () {
 
         beforeEach(function () {
             onRegionChanged = jasmine.createSpy("onRegionChanged");
-            blackberry.event.addEventListener("regionchanged", onRegionChanged);
+            window.addEventListener("regionchanged", onRegionChanged);
         });
 
         afterEach(function () {
-            blackberry.event.removeEventListener("regionchanged", onRegionChanged);
+            window.removeEventListener("regionchanged", onRegionChanged);
             onRegionChanged = null;
         });
 
@@ -260,7 +260,7 @@ describe("blackberry.system", function () {
         it("should not be called when the language is changed", function () {
             var onLanguageChanged = jasmine.createSpy("onLanguageChanged");
 
-            blackberry.event.addEventListener("languagechanged", onLanguageChanged);
+            window.addEventListener("languagechanged", onLanguageChanged);
             window.confirm("Change the language on device");
 
             waitsFor(function () {
@@ -270,7 +270,7 @@ describe("blackberry.system", function () {
             runs(function () {
                 expect(onRegionChanged).not.toHaveBeenCalled();
 
-                blackberry.event.removeEventListener("languagechanged", onLanguageChanged);
+                window.removeEventListener("languagechanged", onLanguageChanged);
                 onLanguageChanged = null;
             });
         });
@@ -281,11 +281,11 @@ describe("blackberry.system", function () {
 
         beforeEach(function () {
             onLanguageChanged = jasmine.createSpy("onLanguageChanged");
-            blackberry.event.addEventListener("languagechanged", onLanguageChanged);
+            window.addEventListener("languagechanged", onLanguageChanged);
         });
 
         afterEach(function () {
-            blackberry.event.removeEventListener("languagechanged", onLanguageChanged);
+            window.removeEventListener("languagechanged", onLanguageChanged);
             onLanguageChanged = null;
         });
 
@@ -304,7 +304,7 @@ describe("blackberry.system", function () {
         it("should not be called when the region is changed", function () {
             var onRegionChanged = jasmine.createSpy("onRegionChanged");
 
-            blackberry.event.addEventListener("regionchanged", onRegionChanged);
+            window.addEventListener("regionchanged", onRegionChanged);
             window.confirm("Change the region on device");
 
             waitsFor(function () {
@@ -314,7 +314,7 @@ describe("blackberry.system", function () {
             runs(function () {
                 expect(onLanguageChanged).not.toHaveBeenCalled();
 
-                blackberry.event.removeEventListener("regionchanged", onRegionChanged);
+                window.removeEventListener("regionchanged", onRegionChanged);
                 onRegionChanged = null;
             });
         });
@@ -324,7 +324,7 @@ describe("blackberry.system", function () {
         it("should call fontchanged callback when it registered to listend for the event", function () {
             var fontChangedCB = jasmine.createSpy("fontchanged");
 
-            blackberry.event.addEventListener('fontchanged', fontChangedCB);
+            window.addEventListener('fontchanged', fontChangedCB);
 
             window.confirm("Change the font event settings and press 'OK'");
 
@@ -334,15 +334,15 @@ describe("blackberry.system", function () {
 
             runs(function () {
                 expect(fontChangedCB).toHaveBeenCalled();
-                blackberry.event.removeEventListener('fontchanged', fontChangedCB);
+                window.removeEventListener('fontchanged', fontChangedCB);
             });
         });
 
         it("should not call fontchanged callback when it was un-registered", function () {
             var fontChangedCB = jasmine.createSpy("fontchanged");
 
-            blackberry.event.addEventListener('fontchanged', fontChangedCB);
-            blackberry.event.removeEventListener('fontchanged', fontChangedCB);
+            window.addEventListener('fontchanged', fontChangedCB);
+            window.removeEventListener('fontchanged', fontChangedCB);
 
             window.confirm("Change the font event settings and press 'OK'");
 
