@@ -26,7 +26,6 @@ var libDir = __dirname + "/../../../lib/",
     successCB,
     failCB;
 
-
 describe("system index", function () {
     beforeEach(function () {
         sysIndex = require(apiDir + "index");
@@ -36,22 +35,55 @@ describe("system index", function () {
         sysIndex = null;
     });
 
-    it("hasPermission", function () {
-        var success = jasmine.createSpy(),
-            env = {
-                "request": {
-                    "origin": "blah"
-                },
-                "response": {
-                }
+    describe("Events", function () {
+        var mockedPluginResult,
+            noop = function () {};
+
+        beforeEach(function () {
+            mockedPluginResult = {
+                error: jasmine.createSpy("PluginResult.error"),
+                noResult: jasmine.createSpy("PluginResult.noResult")
             };
 
-        spyOn(Whitelist.prototype, "isFeatureAllowed").andReturn(true);
+            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+        });
 
-        sysIndex.hasPermission(success, undefined, {"module": "com.blackberry.system"}, env);
+        afterEach(function () {
+            delete GLOBAL.PluginResult;
+        });
 
-        expect(Whitelist.prototype.isFeatureAllowed).toHaveBeenCalled();
-        expect(success).toHaveBeenCalledWith(0);
+        it("startEvent", function () {
+            var applicationEvents = require(libDir + "events/applicationEvents"),
+                eventName = "perimeterunlocked",
+                env = {webview: {id: 42 }};
+
+            spyOn(applicationEvents, "addEventListener");
+
+            sysIndex.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(applicationEvents.addEventListener).toHaveBeenCalledWith("windowUnlock", jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
+
+            //Will not start it twice
+            sysIndex.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        });
+
+        it("stopEvent", function () {
+            var applicationEvents = require(libDir + "events/applicationEvents"),
+                eventName = "perimeterunlocked",
+                env = {webview: {id: 42 }};
+
+            spyOn(applicationEvents, "removeEventListener");
+
+            sysIndex.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(applicationEvents.removeEventListener).toHaveBeenCalledWith("windowUnlock", jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
+
+            //Will not stop an unstarted event
+            sysIndex.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        });
+
     });
 
     it("hasCapability", function () {
@@ -158,312 +190,6 @@ describe("system index", function () {
         });
     });
 
-    describe("languagechanged event", function () {
-        var appEvents;
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            appEvents = require(libDir + "events/applicationEvents");
-        });
-
-        it("responds to 'languagechanged' events", function () {
-            var clientEventName = "languagechanged",
-                eventName = "systemLanguageChange",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: appEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "languagechanged"
-            }, env.webview);
-        });
-
-        it("removes 'languagechanged' event", function () {
-            var clientEventName = "languagechanged",
-                eventName = "systemLanguageChange",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: appEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "languagechanged"
-            }, env.webview);
-        });
-    });
-
-    describe("regionchanged event", function () {
-        var appEvents;
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            appEvents = require(libDir + "events/applicationEvents");
-        });
-
-        it("responds to 'regionchanged' events", function () {
-            var clientEventName = "regionchanged",
-                eventName = "systemRegionChange",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: appEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "regionchanged"
-            }, env.webview);
-        });
-
-        it("removes 'regionchanged' event", function () {
-            var clientEventName = "regionchanged",
-                eventName = "systemRegionChange",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: appEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "regionchanged"
-            }, env.webview);
-        });
-    });
-
-    describe("batterystatus event", function () {
-        var deviceEvents;
-
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            deviceEvents = require(libDir + "events/deviceEvents");
-        });
-
-        it("responds to 'batterystatus' events", function () {
-            var clientEventName = "batterystatus",
-                eventName = "battery.statusChange",
-                args = { eventName : encodeURIComponent(clientEventName) },
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: deviceEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "batterystatus"
-            }, env.webview);
-        });
-
-        it("removes 'batterystatus' event", function () {
-            var clientEventName = "batterystatus",
-                eventName = "battery.statusChange",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: deviceEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "batterystatus"
-            }, env.webview);
-        });
-    });
-
-    describe("batterylow event", function () {
-        var deviceEvents;
-
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            deviceEvents = require(libDir + "events/deviceEvents");
-        });
-
-        it("responds to 'batterylow' events", function () {
-            var clientEventName = "batterylow",
-                eventName = "battery.chargeLow",
-                args = { eventName : encodeURIComponent(clientEventName) },
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: deviceEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "batterylow"
-            }, env.webview);
-        });
-
-        it("removes 'batterylow' event", function () {
-            var clientEventName = "batterylow",
-                eventName = "battery.chargeLow",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: deviceEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "batterylow"
-            }, env.webview);
-        });
-    });
-
-    describe("batterycritical event", function () {
-        var deviceEvents;
-
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            deviceEvents = require(libDir + "events/deviceEvents");
-        });
-
-        it("responds to 'batterycritical' events", function () {
-            var clientEventName = "batterycritical",
-                eventName = "battery.chargeCritical",
-                args = { eventName : encodeURIComponent(clientEventName) },
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: deviceEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "batterycritical"
-            }, env.webview);
-        });
-
-        it("removes 'batterycritical' event", function () {
-            var clientEventName = "batterycritical",
-                eventName = "battery.chargeCritical",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: deviceEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "batterycritical"
-            }, env.webview);
-        });
-    });
-
-    describe("perimeterlocked event", function () {
-        var applicationEvents;
-
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            applicationEvents = require(libDir + "events/applicationEvents");
-        });
-
-        it("responds to 'perimeterlocked' events", function () {
-            var clientEventName = "perimeterlocked",
-                eventName = "windowLock",
-                args = { eventName : encodeURIComponent(clientEventName) },
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: applicationEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "perimeterlocked"
-            }, env.webview);
-        });
-
-        it("removes 'perimeterlocked' event", function () {
-            var clientEventName = "perimeterlocked",
-                eventName = "windowLock",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: applicationEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "perimeterlocked"
-            }, env.webview);
-        });
-    });
-
-    describe("perimeterunlocked event", function () {
-        var applicationEvents;
-
-        beforeEach(function () {
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-            applicationEvents = require(libDir + "events/applicationEvents");
-        });
-
-        it("responds to 'perimeterunlocked' events", function () {
-            var clientEventName = "perimeterunlocked",
-                eventName = "windowUnlock",
-                args = { eventName : encodeURIComponent(clientEventName) },
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            sysIndex.registerEvents(jasmine.createSpy());
-            eventExt.add(null, null, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: applicationEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "perimeterunlocked"
-            }, env.webview);
-        });
-
-        it("removes 'perimeterunlocked' event", function () {
-            var clientEventName = "perimeterunlocked",
-                eventName = "windowUnlock",
-                args = {eventName : encodeURIComponent(clientEventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(null, null, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: applicationEvents,
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "perimeterunlocked"
-            }, env.webview);
-        });
-    });
-
     describe("font", function () {
         describe("font methods", function () {
             var fontFamily = "courier",
@@ -518,47 +244,6 @@ describe("system index", function () {
                 expect(failCB).toHaveBeenCalledWith(ERROR_ID, jasmine.any(Object));
             });
         });
-
-        describe("fontchanged event", function () {
-            var appEvents;
-            beforeEach(function () {
-                spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                    return eventExt;
-                });
-                appEvents = require(libDir + "events/applicationEvents");
-            });
-
-            it("responds to 'fontchanged' events", function () {
-                var eventName = "fontchanged",
-                    args = {eventName : encodeURIComponent(eventName)},
-                    env = {webview: {id: (new Date()).getTime()}};
-
-                spyOn(events, "add");
-                sysIndex.registerEvents(jasmine.createSpy());
-                eventExt.add(null, null, args, env);
-                expect(events.add).toHaveBeenCalledWith({
-                    context: appEvents,
-                    event: eventName,
-                    trigger: jasmine.any(Function),
-                    triggerEvent: "fontchanged"
-                }, env.webview);
-            });
-
-            it("removes 'fontchanged' event", function () {
-                var eventName = "fontchanged",
-                    args = {eventName : encodeURIComponent(eventName)},
-                    env = {webview: {id: (new Date()).getTime()}};
-
-                spyOn(events, "remove");
-                eventExt.remove(null, null, args, env);
-                expect(events.remove).toHaveBeenCalledWith({
-                    context: appEvents,
-                    event: eventName,
-                    trigger: jasmine.any(Function),
-                    triggerEvent: "fontchanged"
-                }, env.webview);
-            });
-        });
     });
 
     describe("getCurrentTimezone", function () {
@@ -580,7 +265,6 @@ describe("system index", function () {
 
         it("return timezone from PPS", function () {
             var successCb = jasmine.createSpy();
-
             sysIndex.getCurrentTimezone(successCb);
 
             expect(successCb).toHaveBeenCalledWith("hello123");
@@ -608,7 +292,6 @@ describe("system index", function () {
 
         it("return timezones from native", function () {
             var successCb = jasmine.createSpy();
-
             sysIndex.getTimezones(successCb);
 
             expect(successCb).toHaveBeenCalledWith(["America/New_York", "America/Los_Angeles"]);

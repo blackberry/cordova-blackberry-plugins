@@ -21,41 +21,78 @@ var extDir = __dirname + "/../../../plugin",
     ID = "com.blackberry.system",
     apiDir = extDir + "/" + ID,
     sysClient = null,
-    mockedWebworks = {
-        exec : function () {},
-        defineReadOnlyField: jasmine.createSpy()
-    };
+    mockedWebworks,
+    mockedCordova,
+    MockedChannel,
+    channelRegistry = {};
 
 describe("system client", function () {
     beforeEach(function () {
+
+        mockedWebworks = {
+            exec : jasmine.createSpy("webworks.exec"),
+            defineReadOnlyField: jasmine.createSpy("webworks.defineReadOnlyField")
+        };
+
+        MockedChannel = function () {
+            return {
+                onHasSubscribersChange: undefined,
+                numHandlers: undefined
+            };
+        };
+
+        mockedCordova = {
+            addWindowEventHandler: jasmine.createSpy("cordova.addWindowEventHandler").andCallFake(function (eventName) {
+                channelRegistry[eventName] = new MockedChannel();
+                return channelRegistry[eventName];
+            }),
+            fireWindowEvent: jasmine.createSpy("cordova.fireWindowEvent")
+        };
+
         //Set up mocking, no need to "spyOn" since spies are included in mock
         GLOBAL.window = {
-            webworks: mockedWebworks
+            webworks: mockedWebworks,
+            cordova: mockedCordova
         };
+        GLOBAL.cordova = mockedCordova;
+
+        delete require.cache[require.resolve(apiDir + "/www/client")];
         sysClient = require(apiDir + "/www/client");
     });
 
     afterEach(function () {
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
+
+        delete require.cache[require.resolve(apiDir + "/www/client")];
+        sysClient = null;
     });
 
-    it("hasPermission", function () {
-        var result;
+    it("defines events", function () {
+        var events = ["batterystatus", "batterylow", "battercritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"];
+        events.forEach(function (event) {
+            var channel;
 
-        spyOn(mockedWebworks, "exec").andCallFake(function (success, fail, service, action, args) {
-            success(0);
+            //test channel creation
+            expect(mockedCordova.addWindowEventHandler).toHaveBeenCalledWith(event);
+
+            //test Subscriber add
+            channel = channelRegistry[event];
+            channel.numHandlers = 1;
+            channel.onHasSubscribersChange();
+            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "startEvent", {eventName: event});
+
+            //test Subscriber remove
+            channel.numHandlers = 0;
+            channel.onHasSubscribersChange();
+            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "stopEvent", {eventName: event});
         });
-
-        result = sysClient.hasPermission("com.blackberry.app");
-
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "hasPermission", {"module": "com.blackberry.app"});
-        expect(result).toEqual(0);
     });
 
     it("hasCapability", function () {
         var result;
 
-        spyOn(mockedWebworks, "exec").andCallFake(function (success, fail, service, action, args) {
+        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
             success(true);
         });
 
@@ -68,7 +105,7 @@ describe("system client", function () {
     it("getFontInfo", function () {
         var result;
 
-        spyOn(mockedWebworks, "exec").andCallFake(function (success, fail, service, action, args) {
+        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
             success(true);
         });
 
@@ -79,7 +116,7 @@ describe("system client", function () {
     });
 
     it("getCurrentTimezone", function () {
-        spyOn(mockedWebworks, "exec").andCallFake(function (success, fail, service, action, args) {
+        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
             success("America/New_York");
         });
 
@@ -93,7 +130,7 @@ describe("system client", function () {
         var timezones = ["America/New_York", "America/Los_Angeles"],
             result;
 
-        spyOn(mockedWebworks, "exec").andCallFake(function (success, fail, service, action, args) {
+        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
             success(timezones);
         });
 
@@ -106,14 +143,13 @@ describe("system client", function () {
     it("setWallpaper", function () {
         var filePath = "file:///accounts/1000/shared/camera/IMG_00000001.jpg";
 
-        spyOn(mockedWebworks, "exec");
         sysClient.setWallpaper(filePath);
 
         expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "setWallpaper", {"wallpaper": filePath});
     });
 
     it("deviceLockedStatus", function () {
-        spyOn(mockedWebworks, "exec").andCallFake(function (success, fail, service, action, args) {
+        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
             success("notLocked");
         });
 
@@ -121,15 +157,7 @@ describe("system client", function () {
         expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "deviceLockedStatus", undefined);
     });
 
-    it("ALLOW", function () {
-        expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "ALLOW", 0);
-    });
-
-    it("DENY", function () {
-        expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "DENY", 1);
-    });
-
-    describe("device properties and registerEvents", function () {
+    describe("device properties and ReadOnlyFields", function () {
 
         var mockDeviceProperties = {
             hardwareId: "123",
@@ -138,33 +166,28 @@ describe("system client", function () {
         };
 
         beforeEach(function () {
-            mockedWebworks.exec = jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
+            mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
                 success(mockDeviceProperties);
             });
-            mockedWebworks.defineReadOnlyField = jasmine.createSpy();
-            GLOBAL.window = {
-                webworks: mockedWebworks
-            };
             // client needs to be required for each test
             delete require.cache[require.resolve(apiDir + "/www/client")];
             sysClient = require(apiDir + "/www/client");
         });
 
         afterEach(function () {
-            delete GLOBAL.window;
             delete require.cache[require.resolve(apiDir + "/www/client")];
             sysClient = null;
         });
 
-        it("exec should have been called once for all system fields", function () {
-            expect(mockedWebworks.exec.callCount).toEqual(2); // the extra call is for registerEvents
+        it("defines ALLOW", function () {
+            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "ALLOW", 0);
         });
 
-        it("registerEvents", function () {
-            expect(mockedWebworks.exec.argsForCall).toContain([jasmine.any(Function), jasmine.any(Function), ID, "registerEvents", null]);
+        it("defines DENY", function () {
+            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "DENY", 1);
         });
 
-        it("readonly fields set", function () {
+        it("sets readonly fields", function () {
             expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "hardwareId", "123");
             expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "softwareVersion", "456");
             expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "name", "789");
@@ -175,26 +198,13 @@ describe("system client", function () {
 
         describe("region", function () {
             beforeEach(function () {
-                mockedWebworks.exec = jasmine.createSpy("exec").andCallFake(function (success, fail, namespace, field) {
+                mockedWebworks.exec.andCallFake(function (success, fail, namespace, field) {
                     if (field === "language") {
                         success("fr_CA");
                     } else if (field === "region") {
                         success("en_US");
                     }
                 });
-                mockedWebworks.defineReadOnlyField = jasmine.createSpy();
-                GLOBAL.window = {
-                    webworks: mockedWebworks
-                };
-                // client needs to be required for each test
-                delete require.cache[require.resolve(apiDir + "/www/client")];
-                sysClient = require(apiDir + "/www/client");
-            });
-
-            afterEach(function () {
-                delete GLOBAL.window;
-                delete require.cache[require.resolve(apiDir + "/www/client")];
-                sysClient = null;
             });
 
             it("region", function () {

@@ -15,98 +15,114 @@
  */
 var Whitelist = require("../../lib/policy/whitelist").Whitelist,
     _whitelist = new Whitelist(),
-    _event = require("../../lib/event"),
     _utils = require("../../lib/utils"),
     _applicationEvents = require("../../lib/events/applicationEvents"),
     _deviceEvents = require("../../lib/events/deviceEvents"),
-
     _actionMap = {
         batterystatus: {
             context: _deviceEvents,
             event: "battery.statusChange",
             triggerEvent: "batterystatus",
-            trigger: function (data) {
-                _event.trigger("batterystatus", data);
+            trigger: function (pluginResult, data) {
+                pluginResult.callbackOk(data, true);
             }
         },
         batterylow: {
             context: _deviceEvents,
             event: "battery.chargeLow",
             triggerEvent: "batterylow",
-            trigger: function (data) {
-                _event.trigger("batterylow", data);
+            trigger: function (pluginResult, data) {
+                pluginResult.callbackOk(data, true);
             }
         },
         batterycritical: {
             context: _deviceEvents,
             event: "battery.chargeCritical",
             triggerEvent: "batterycritical",
-            trigger: function (data) {
-                _event.trigger("batterycritical", data);
+            trigger: function (pluginResult, data) {
+                pluginResult.callbackOk(data, true);
             }
         },
         languagechanged: {
             context: _applicationEvents,
             event: "systemLanguageChange",
             triggerEvent: "languagechanged",
-            trigger: function (language) {
-                _event.trigger("languagechanged", language);
+            trigger: function (pluginResult, language) {
+                pluginResult.callbackOk(language, true);
             }
         },
         regionchanged: {
             context: _applicationEvents,
             event: "systemRegionChange",
             triggerEvent: "regionchanged",
-            trigger: function (region) {
-                _event.trigger("regionchanged", region);
+            trigger: function (pluginResult, region) {
+                pluginResult.callbackOk(region, true);
             }
         },
         fontchanged: {
             context: _applicationEvents,
             event: "fontchanged",
             triggerEvent: "fontchanged",
-            trigger: function (fontFamily, fontSize) {
-                _event.trigger("fontchanged", {'fontFamily': fontFamily, 'fontSize': fontSize});
+            trigger: function (pluginResult, fontFamily, fontSize) {
+                pluginResult.callbackOk({'fontFamily': fontFamily, 'fontSize': fontSize}, true);
             }
         },
         perimeterlocked: {
             context: _applicationEvents,
             event: "windowLock",
             triggerEvent: "perimeterlocked",
-            trigger: function () {
-                _event.trigger("perimeterlocked", null);
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(null, true);
             }
         },
         perimeterunlocked: {
             context: _applicationEvents,
             event: "windowUnlock",
             triggerEvent: "perimeterunlocked",
-            trigger: function () {
-                _event.trigger("perimeterunlocked", null);
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(null, true);
             }
         }
     },
-    ERROR_ID = -1;
+    ERROR_ID = -1,
+    _listeners = {};
 
 module.exports = {
-    registerEvents: function (success, fail) {
-        try {
-            var _eventExt = _utils.loadExtensionModule("event", "index");
-            _eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            fail(-1, e);
+
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            context = _actionMap[eventName].context,
+            systemEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
+
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        } else {
+            context.addEventListener(systemEvent, listener);
+            _listeners[eventName][env.webview.id] = listener;
+            result.noResult(true);
         }
     },
 
-    hasPermission: function (success, fail, args, env) {
-        // TODO string argument surrounded by %22
-        // preserve dot for feature id
-        var module = args.module.replace(/[^a-zA-Z.]+/g, ""),
-            allowed = _whitelist.isFeatureAllowed(env.request.origin, module);
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName][env.webview.id],
+            context = _actionMap[eventName].context,
+            systemEvent = _actionMap[eventName].event;
 
-        // ALLOW - 0, DENY - 1
-        success(allowed ? 0 : 1);
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            context.removeEventListener(systemEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
+        }
     },
 
     hasCapability: function (success, fail, args) {
