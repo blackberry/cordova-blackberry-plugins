@@ -33,6 +33,7 @@
         "require",
         "Node",
         "JSZip",
+        "PluginResult",
         //UI Components
         "x$",
         "iris",
