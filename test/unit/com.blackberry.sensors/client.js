@@ -27,12 +27,32 @@ var _extDir = __dirname + "/../../../plugin",
                 success(["abc"]);
             }
         })
-    };
+    },
+    MockedChannel,
+    mockedCordova,
+    channelRegistry = {};
 
 describe("sensors", function () {
     beforeEach(function () {
+
+        MockedChannel = function () {
+            return {
+                onHasSubscribersChange: undefined,
+                numHandlers: undefined
+            };
+        };
+
+        mockedCordova = {
+            addWindowEventHandler: jasmine.createSpy("cordova.addWindowEventHandler").andCallFake(function (eventName) {
+                channelRegistry[eventName] = new MockedChannel();
+                return channelRegistry[eventName];
+            }),
+            fireWindowEvent: jasmine.createSpy("cordova.fireWindowEvent")
+        };
+
         GLOBAL.window = {
-            webworks: mockedWebworks
+            webworks: mockedWebworks,
+            cordova: mockedCordova
         };
         client = require(_apiDir + "/www/client");
         mockedWebworks.exec.reset();
@@ -40,6 +60,30 @@ describe("sensors", function () {
 
     afterEach(function () {
         delete GLOBAL.window;
+    });
+
+    it("defines events", function () {
+        var events = ["deviceaccelerometer", "devicemagnetometer", "devicegyroscope", "devicecompass",
+            "deviceproximity", "devicelight", "devicegravity", "devicerotationmatrix",
+            "deviceorientation", "deviceazimuthpitchroll", "deviceholster"];
+
+        events.forEach(function (event) {
+            var channel;
+
+            //test channel creation
+            expect(mockedCordova.addWindowEventHandler).toHaveBeenCalledWith(event);
+
+            //test Subscriber add
+            channel = channelRegistry[event];
+            channel.numHandlers = 1;
+            channel.onHasSubscribersChange();
+            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startEvent", {eventName: event});
+
+            //test Subscriber remove
+            channel.numHandlers = 0;
+            channel.onHasSubscribersChange();
+            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "stopEvent", {eventName: event});
+        });
     });
 
     describe("setOptions", function () {
@@ -52,7 +96,7 @@ describe("sensors", function () {
     describe("supportedSensors", function () {
         it("calls exec", function () {
             var supportedSensors;
-            
+
             supportedSensors = client.supportedSensors;
             expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "supportedSensors");
             // make sure it only gets called once

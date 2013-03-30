@@ -15,7 +15,6 @@
 */
 
 var sensors = require("./sensorsJNEXT").sensors,
-    _event = require("../../lib/event"),
     _utils = require("../../lib/utils"),
     _sensorEvents = require("./sensorsEvents"),
     _actionMap = {
@@ -23,108 +22,135 @@ var sensors = require("./sensorsJNEXT").sensors,
             context: _sensorEvents,
             event: "deviceaccelerometer",
             triggerEvent: "deviceaccelerometer",
-            trigger: function (obj) {
-                _event.trigger("deviceaccelerometer", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicemagnetometer: {
             context: _sensorEvents,
             event: "devicemagnetometer",
             triggerEvent: "devicemagnetometer",
-            trigger: function (obj) {
-                _event.trigger("devicemagnetometer", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicegyroscope: {
             context: _sensorEvents,
             event: "devicegyroscope",
             triggerEvent: "devicegyroscope",
-            trigger: function (obj) {
-                _event.trigger("devicegyroscope", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicecompass: {
             context: _sensorEvents,
             event: "devicecompass",
             triggerEvent: "devicecompass",
-            trigger: function (obj) {
-                _event.trigger("devicecompass", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         deviceproximity: {
             context: _sensorEvents,
             event: "deviceproximity",
             triggerEvent: "deviceproximity",
-            trigger: function (obj) {
-                _event.trigger("deviceproximity", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicelight: {
             context: _sensorEvents,
             event: "devicelight",
             triggerEvent: "devicelight",
-            trigger: function (obj) {
-                _event.trigger("devicelight", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicegravity: {
             context: _sensorEvents,
             event: "devicegravity",
             triggerEvent: "devicegravity",
-            trigger: function (obj) {
-                _event.trigger("devicegravity", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicelinearacceleration: {
             context: _sensorEvents,
             event: "devicelinearacceleration",
             triggerEvent: "devicelinearacceleration",
-            trigger: function (obj) {
-                _event.trigger("devicelinearacceleration", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         devicerotationmatrix: {
             context: _sensorEvents,
             event: "devicerotationmatrix",
             triggerEvent: "devicerotationmatrix",
-            trigger: function (obj) {
-                _event.trigger("devicerotationmatrix", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         deviceorientation: {
             context: _sensorEvents,
             event: "deviceorientation",
             triggerEvent: "deviceorientation",
-            trigger: function (obj) {
-                _event.trigger("deviceorientation", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         deviceazimuthpitchroll: {
             context: _sensorEvents,
             event: "deviceazimuthpitchroll",
             triggerEvent: "deviceazimuthpitchroll",
-            trigger: function (obj) {
-                _event.trigger("deviceazimuthpitchroll", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         },
         deviceholster: {
             context: _sensorEvents,
             event: "deviceholster",
             triggerEvent: "deviceholster",
-            trigger: function (obj) {
-                _event.trigger("deviceholster", obj);
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
             }
         }
-    };
+    },
+    _listeners = {};
 
 module.exports = {
-    registerEvents: function (success, fail, args, env) {
-        try {
-            var _eventExt = _utils.loadExtensionModule("event", "index");
-            _eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            fail(-1, e);
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            context = _actionMap[eventName].context,
+            systemEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
+
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        } else {
+            context.addEventListener(systemEvent, listener);
+            _listeners[eventName][env.webview.id] = listener;
+            result.noResult(true);
+        }
+    },
+
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName][env.webview.id],
+            context = _actionMap[eventName].context,
+            systemEvent = _actionMap[eventName].event;
+
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            context.removeEventListener(systemEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
         }
     },
 

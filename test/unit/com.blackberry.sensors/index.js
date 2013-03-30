@@ -25,7 +25,7 @@ describe("sensors index", function () {
             require: jasmine.createSpy().andReturn(true),
             createObject: jasmine.createSpy().andReturn("1"),
             invoke: jasmine.createSpy().andReturn(2),
-            registerEvents: jasmine.createSpy().andReturn(true),
+            registerEvents: jasmine.createSpy().andReturn(true)
         };
         index = require(_apiDir + "index");
     });
@@ -33,6 +33,63 @@ describe("sensors index", function () {
     afterEach(function () {
         delete GLOBAL.JNEXT;
         index = null;
+    });
+
+    describe("Events", function () {
+        var mockedPluginResult,
+            noop = function () {};
+
+        beforeEach(function () {
+            mockedPluginResult = {
+                error: jasmine.createSpy("PluginResult.error"),
+                noResult: jasmine.createSpy("PluginResult.noResult")
+            };
+
+            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+        });
+
+        afterEach(function () {
+            delete GLOBAL.PluginResult;
+        });
+
+        it("startEvent", function () {
+            var context = require(_apiDir + "sensorsEvents"),
+                eventName = "deviceaccelerometer",
+                systemEventName = "deviceaccelerometer",
+                env = {webview: {id: 22 }};
+
+            spyOn(context, "addEventListener");
+
+            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(context.addEventListener).toHaveBeenCalledWith(systemEventName, jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
+
+            //Will not start it twice
+            context.addEventListener.reset();
+            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(context.addEventListener).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        });
+
+        it("stopEvent", function () {
+            var context = require(_apiDir + "sensorsEvents"),
+                eventName = "deviceaccelerometer",
+                systemEventName = "deviceaccelerometer",
+                env = {webview: {id: 22 }};
+
+            spyOn(context, "removeEventListener");
+
+            index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(context.removeEventListener).toHaveBeenCalledWith(systemEventName, jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
+
+            //Will not stop an unstarted event
+            context.removeEventListener.reset();
+            index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(context.removeEventListener).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        });
+
     });
 
     describe("sensors", function () {
@@ -54,7 +111,7 @@ describe("sensors index", function () {
                     args = { options : JSON.stringify(options) };
 
                 index.setOptions(null, fail, args, null);
-                expect(fail).toHaveBeenCalled(); 
+                expect(fail).toHaveBeenCalled();
             });
         });
 
