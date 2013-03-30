@@ -19,7 +19,31 @@
 
 var _self = {},
     _ID = "com.blackberry.sensors",
-    sensorArray = null;
+    sensorArray = null,
+    noop = function () {},
+    //TODO: Change to cordova.exec
+    execFunc = window.webworks.exec,
+    events = ["deviceaccelerometer", "devicemagnetometer", "devicegyroscope", "devicecompass",
+              "deviceproximity", "devicelight", "devicegravity", "devicerotationmatrix",
+              "deviceorientation", "deviceazimuthpitchroll", "deviceholster"],
+    channels = events.map(function (eventName) {
+        var channel = window.cordova.addWindowEventHandler(eventName),
+            success = function (data) {
+                channel.fire(data);
+            },
+            fail = function (error) {
+                console.log("Error initializing " + eventName + " listener: ", error);
+            };
+
+        channel.onHasSubscribersChange = function () {
+            if (this.numHandlers === 1) {
+                execFunc(success, fail, _ID, "startEvent", {eventName: eventName});
+            } else if (this.numHandlers === 0) {
+                execFunc(noop, noop, _ID, "stopEvent", {eventName: eventName});
+            }
+        };
+        return channel;
+    });
 
 Object.defineProperty(_self, "supportedSensors", {
     get: function () {
@@ -31,7 +55,7 @@ Object.defineProperty(_self, "supportedSensors", {
             };
 
         if (sensorArray === null) {
-            window.webworks.exec(success, fail, _ID, "supportedSensors");
+            execFunc(success, fail, _ID, "supportedSensors");
         }
         return sensorArray;
     }
@@ -47,10 +71,8 @@ _self.setOptions = function (sensor, options) {
             throw data;
         };
     args.options.sensor = sensor;
-    window.webworks.exec(success, fail, _ID, "setOptions", args);
+    execFunc(success, fail, _ID, "setOptions", args);
     return result;
 };
-
-window.webworks.exec(function () {}, function () {}, _ID, "registerEvents", null);
 
 module.exports = _self;
