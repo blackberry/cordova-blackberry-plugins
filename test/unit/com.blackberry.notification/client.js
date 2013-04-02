@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -123,11 +123,6 @@ describe("notification client creates Notification object attached to window", f
             expect(window.webworks.exec.mostRecentCall.args[4].options.tag).toBeDefined();
         });
 
-        it("should notify by calling 'once' event when there is a callback(s) provided", function () {
-            new Notification("N Title", {'onshow': onShow, 'onerror': onError});
-
-            expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, jasmine.any(String), jasmine.any(Function));
-        });
 
         it("should throw an exception when title is not provided", function () {
             expect(function () {

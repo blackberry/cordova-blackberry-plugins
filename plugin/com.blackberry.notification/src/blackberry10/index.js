@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 var _config = require("./../../lib/config"),
-    _event = require("./../../lib/event"),
     _notification = qnx.webplatform.notification;
 
-function getCallback(eventName) {
-
-    return function (errorMsg) {
-        _event.trigger(eventName, errorMsg);
-    };
-}
-
 module.exports = {
-    notify: function (success, fail, args) {
-        var key;
+    notify: function (success, fail, sourceArgs, env) {
+        var result = new PluginResult(sourceArgs, env),
+            args = {},
+            key;
 
-        for (key in args) {
-            if (args.hasOwnProperty(key)) {
-                args[key] = JSON.parse(decodeURIComponent(args[key]));
+        for (key in sourceArgs) {
+            if (sourceArgs.hasOwnProperty(key)) {
+                args[key] = JSON.parse(decodeURIComponent(sourceArgs[key]));
             }
         }
 
@@ -41,35 +35,41 @@ module.exports = {
                 if (_config['invoke-target'].hasOwnProperty(key)) {
                     if (_config['invoke-target'][key].type.toLowerCase() === "application") {
                         args.options.target = _config['invoke-target'][key]["@"].id;
-
                         break;
                     }
                 }
             }
         }
 
-        if ((args.options.target && args.options.target.length > 0) && (!args.options.targetAction || args.options.targetAction.length === 0)) {
+        if ((args.options.target && args.options.target.length > 0) &&
+            (!args.options.targetAction || args.options.targetAction.length === 0)) {
             args.options.targetAction = "bb.action.OPEN";
         }
 
-        // Calling delete with tag before writing new notification, ensures new notification will override the old one.
+        // Calling delete with tag before writing new notification
+        // This ensures new notification will override the old one.
         _notification.remove(args.options.tag);
-        _notification.notify(args, getCallback(args.options.eventName));
+        _notification.notify(args, function (e) {
+            if (e) {
+                result.callbackError(e);
+            } else {
+                result.callbackOk();
+            }
+        });
 
-        success();
+        result.noResult(true);
     },
 
-    remove: function (success, fail, args) {
-        var key;
+    remove: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            tag;
 
-        for (key in args) {
-            if (args.hasOwnProperty(key)) {
-                args[key] = JSON.parse(decodeURIComponent(args[key]));
-            }
+        if (!args || !args.tag) {
+            result.error("No tag provided for notification removal");
+        } else {
+            tag = JSON.parse(decodeURIComponent(args.tag));
+            _notification.remove(tag);
+            result.ok();
         }
-
-        _notification.remove(args.tag);
-
-        success();
     }
 };

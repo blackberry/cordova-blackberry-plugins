@@ -25,13 +25,13 @@ function testNotificationReadOnly(field) {
 }
 
 describe("Notification", function () {
-    
+
     it("permissions granted", function () {
         expect(testNotificationValue("permission", "granted"));
     });
 
     it("permissions read-only", function () {
-        expect(testNotificationReadOnly("permission"));   
+        expect(testNotificationReadOnly("permission"));
     });
 
     it("request permission does not trigger callback", function () {
@@ -49,7 +49,7 @@ describe("Notification", function () {
 
     it("can create a notification with a body", function () {
         var notification;
-        notification = new window.Notification("TestApp - Notification!", { 
+        notification = new window.Notification("TestApp - Notification!", {
             body : 'tap to dismiss'
         });
         expect(notification).toBeDefined();
@@ -72,29 +72,29 @@ describe("Notification", function () {
         var notification,
             exception;
         try {
-            notification =  new window.Notification(123); 
-        } catch (e) { 
+            notification =  new window.Notification(123);
+        } catch (e) {
             exception = true;
         }
 
         expect(exception).toEqual(true);
     });
-    
+
     describe("close", function () {
         it("can close a notification", function () {
             var errorFlag,
                 showFlag,
-                onError = jasmine.createSpy("onError callback").andCallFake(function () { 
-                    errorFlag = true; 
+                onError = jasmine.createSpy("onError callback").andCallFake(function () {
+                    errorFlag = true;
                 }),
-                onShow = jasmine.createSpy("onShow callback").andCallFake(function () { 
-                    showFlag = true; 
+                onShow = jasmine.createSpy("onShow callback").andCallFake(function () {
+                    showFlag = true;
                 }),
                 myNotification;
-                
+
             runs(function () {
                 myNotification = new window.Notification("You should not see this notification!", {
-                    'onerror' : onError, 
+                    'onerror' : onError,
                     'onshow' : onShow
                 });
             });
@@ -109,44 +109,25 @@ describe("Notification", function () {
                 expect(onShow).toHaveBeenCalled();
             });
         });
-        
-        it("events do not fire once notification is closed", function () {
-            var errorFlag,
-                showFlag,
-                onError = jasmine.createSpy("onError callback").andCallFake(function () { 
-                    errorFlag = true; 
-                }),
-                onShow = jasmine.createSpy("onShow callback").andCallFake(function () { 
-                    showFlag = true; 
-                }),
-                myNotification = new window.Notification("You should not see this notification!", {
-                    'onerror' : onError, 
-                    'onshow' : onShow
-                });
 
-            myNotification.close();
-
-            expect(onError).not.toHaveBeenCalled();
-            expect(onShow).not.toHaveBeenCalled();
-        });
     });
 
     describe("Notification.remove", function () {
         it("can remove a notification", function () {
             var errorFlag,
                 showFlag,
-                onError = jasmine.createSpy("onError callback").andCallFake(function () { 
-                    errorFlag = true; 
+                onError = jasmine.createSpy("onError callback").andCallFake(function () {
+                    errorFlag = true;
                 }),
-                onShow = jasmine.createSpy("onShow callback").andCallFake(function () { 
-                    showFlag = true; 
+                onShow = jasmine.createSpy("onShow callback").andCallFake(function () {
+                    showFlag = true;
                 }),
                 tagNotification;
-                
+
             runs(function () {
                 tagNotification = new window.Notification("You should not see this notification!", {
                     'tag' : "this is a tag",
-                    'onerror' : onError, 
+                    'onerror' : onError,
                     'onshow' : onShow
                 });
             });
