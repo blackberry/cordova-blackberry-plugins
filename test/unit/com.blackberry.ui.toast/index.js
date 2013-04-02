@@ -22,12 +22,19 @@ var root = __dirname + "/../../../",
 describe("ui.toast index", function () {
     var mockedOverlayWebview,
         mockQnx,
-        mockedToast;
+        mockedToast,
+        mockedPluginResult,
+        storedDismissHandler,
+        storedCallbackHandler;
 
     beforeEach(function () {
         mockedOverlayWebview = {
             toast : {
-                show : jasmine.createSpy()
+                show : jasmine.createSpy("uiWebView.toast.show").andCallFake(function (message, options) {
+                    storedCallbackHandler = options.callbackHandler;
+                    storedDismissHandler = options.dismissHandler;
+                    return 73;
+                })
             }
         };
 
@@ -48,11 +55,18 @@ describe("ui.toast index", function () {
             }
         };
 
+        mockedPluginResult = {
+            callbackOk : jasmine.createSpy("PluginResult.callbackOk"),
+            ok: jasmine.createSpy("PluginResult.ok")
+        };
+
         GLOBAL.window = {
             qnx: mockQnx
         };
 
         GLOBAL.qnx = mockQnx;
+
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         index = require(root + "plugin/com.blackberry.ui.toast/index");
     });
@@ -60,18 +74,26 @@ describe("ui.toast index", function () {
     afterEach(function () {
         delete GLOBAL.window;
         delete GLOBAL.qnx;
+        delete GLOBAL.PluginResult;
     });
 
     it("shows toast", function () {
-        var success = jasmine.createSpy(),
-            fail = jasmine.createSpy(),
+        var noop = function () {},
             mockArgs = {
                 message: encodeURIComponent(JSON.stringify("This is a toast")),
                 options: encodeURIComponent(JSON.stringify({ buttonText : 'Test'}))
             };
 
-        index.show(success, fail, mockArgs, null);
+        index.show(noop, noop, mockArgs, null);
         expect(mockedOverlayWebview.toast.show).toHaveBeenCalledWith("This is a toast", { buttonText : 'Test', callbackHandler: jasmine.any(Function), dismissHandler: jasmine.any(Function)});
-        expect(success).toHaveBeenCalled();
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith({reason: "created", toastId: jasmine.any(Number)}, true);
+
+        //test Callback Handler
+        storedCallbackHandler(42);
+        expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith({reason: "buttonClicked", toastId: 42}, true);
+
+        //test Dismiss Handler
+        storedDismissHandler(22);
+        expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith({reason: "dismissed", toastId: 22}, false);
     });
 });

@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-var LIB_FOLDER = "../../lib/",
-    toast,
-    _overlayWebView,
-    _event = require(LIB_FOLDER + 'event'),
-    _utils = require(LIB_FOLDER + 'utils');
+var toast,
+    _overlayWebView;
 
 function show(success, fail, args, env) {
-    var message,
-        dismissHandler,
-        callbackHandler,
-        options;
+    var result = new PluginResult(args, env),
+        message = args.message !== 'undefined' ? JSON.parse(decodeURIComponent(args.message)) : undefined,
+        options = args.options !== 'undefined' ? JSON.parse(decodeURIComponent(args.options)) : {};
 
-    options = args.options !== 'undefined' ? JSON.parse(decodeURIComponent(args.options)) : {};
-    message = args.message !== 'undefined' ? JSON.parse(decodeURIComponent(args.message)) : undefined;
-
-    dismissHandler = function (toastId) {
-        _event.trigger("toast.dismiss", toastId);
+    options.dismissHandler = function (toastId) {
+        result.callbackOk({reason: "dismissed", toastId: toastId}, false);
     };
-    callbackHandler = function (toastId) {
-        _event.trigger("toast.callback", toastId);
+    options.callbackHandler = function (toastId) {
+        result.callbackOk({reason: "buttonClicked", toastId: toastId}, true);
     };
-
-    options.callbackHandler = callbackHandler;
-    options.dismissHandler  = dismissHandler;
 
     // Return the toastId to the client from WP created toast
-    success(_overlayWebView.toast.show(message, options));
+    result.ok({reason: "created", toastId: _overlayWebView.toast.show(message, options)}, true);
 }
 
 toast = {
