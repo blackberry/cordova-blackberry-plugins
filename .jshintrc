@@ -23,6 +23,7 @@
         "internal",
         "JNEXT",
         "frameworkModules",
+        "PluginResult",
         //Node
         "__dirname",
         "GLOBAL",

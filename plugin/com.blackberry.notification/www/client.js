@@ -19,6 +19,7 @@
 
 var _ID = "com.blackberry.notification",
     _self = {},
+    noop = function () {},
     Notification,
     globalId = 0,
     globalItemId = 0;
@@ -55,29 +56,13 @@ Notification = function (title, options) {
 
     id = generateId();
 
-    // itemId is required parameter that identifies the notification. If tag is provided it serves as an itemId, when tag isn't provided itemId is generated.
+    // itemId is required parameter that identifies the notification.
+    // If tag is provided it serves as an itemId, when tag isn't provided itemId is generated.
     if (!options.tag) {
         options.tag = generateItemId() + "_itemId";
     }
 
-    if (options.onerror || options.onshow) {
-        options.eventName = "notification.event_" + options.tag;
-
-        if (!window.webworks.event.isOn(options.eventName)) {
-            window.webworks.event.once(_ID, options.eventName, function (errorMsg) {
-                if (errorMsg) {
-                    if (options.onerror) {
-                        options.onerror();
-                    }
-                }
-                else if (options.onshow) {
-                    options.onshow();
-                }
-            });
-        }
-    }
-
-    window.webworks.exec(function () {}, function () {}, _ID, "notify", {'id': id, 'title': title, 'options': options});
+    window.webworks.exec(options.onshow || noop, options.onerror || noop, _ID, "notify", {'id': id, 'title': title, 'options': options});
 
     this.getId = function () {
         return id;
@@ -90,13 +75,13 @@ Notification.requestPermission = function (callback) {
 
 Notification.remove = function (tag) {
     if (tag) {
-        window.webworks.exec(function () {}, function () {}, _ID, "remove", {'tag': tag});
+        window.webworks.exec(noop, noop, _ID, "remove", {'tag': tag});
     }
 };
 
 Notification.prototype.close = function () {
     if (this.options && this.options.tag) {
-        window.webworks.exec(function () {}, function () {}, _ID, "remove", {'tag': this.options.tag});
+        window.webworks.exec(noop, noop, _ID, "remove", {'tag': this.options.tag});
     }
 };
 
