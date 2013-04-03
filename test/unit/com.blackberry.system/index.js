@@ -65,7 +65,7 @@ describe("system index", function () {
 
             //Will not start it twice
             sysIndex.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
-            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
         });
 
         it("stopEvent", function () {
