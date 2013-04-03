@@ -35,7 +35,7 @@ describe("blackberry.bbm.platform", function () {
                         flag = true;
                     }
                 });
-                blackberry.event.addEventListener("onaccesschanged", onChange);
+                window.addEventListener("onaccesschanged", onChange);
             });
 
             waitsFor(function () {
@@ -47,7 +47,7 @@ describe("blackberry.bbm.platform", function () {
             });
         });
     });
-    
+
 });
 
 describe("blackberry.bbm.platform.self", function () {
@@ -132,7 +132,7 @@ describe("blackberry.bbm.platform.self", function () {
                 expect(onSuccess).toHaveBeenCalledWith(item);
             });
         });
-        
+
         it("should invoke error callback when adding an item", function () {
             runs(function () {
                 blackberry.bbm.platform.self.profilebox.addItem({ }, onSuccess, onError);
@@ -160,7 +160,7 @@ describe("blackberry.bbm.platform.self", function () {
                 expect(onSuccess).toHaveBeenCalledWith(item);
             });
         });
-        
+
         it("should invoke error callback when removing an item", function () {
             runs(function () {
                 blackberry.bbm.platform.self.profilebox.removeItem({}, onSuccess, onError);
@@ -179,7 +179,7 @@ describe("blackberry.bbm.platform.self", function () {
             itemIconId = Math.floor(Math.random() * 32000);
 
             runs(function () {
-                blackberry.bbm.platform.self.profilebox.registerIcon({ icon: "local:///default-icon.png", iconId: itemIconId }, onSuccess, onError); 
+                blackberry.bbm.platform.self.profilebox.registerIcon({ icon: "local:///img/barney.jpg", iconId: itemIconId }, onSuccess, onError);
             });
 
             waitsFor(function () {
@@ -193,7 +193,7 @@ describe("blackberry.bbm.platform.self", function () {
 
         it("should invoke error callback when registering an icon with an invalid file", function () {
             runs(function () {
-                blackberry.bbm.platform.self.profilebox.registerIcon({ icon: "local:///no-icon.png", iconId: itemIconId }, onSuccess, onError); 
+                blackberry.bbm.platform.self.profilebox.registerIcon({ icon: "local:///no-icon.png", iconId: itemIconId }, onSuccess, onError);
             });
 
             waitsFor(function () {
@@ -207,7 +207,7 @@ describe("blackberry.bbm.platform.self", function () {
 
         it("should invoke error callback when registering an icon with an invalid iconId", function () {
             runs(function () {
-                blackberry.bbm.platform.self.profilebox.registerIcon({ icon: "local:///no-icon.png", iconId: "9000" }, onSuccess, onError); 
+                blackberry.bbm.platform.self.profilebox.registerIcon({ icon: "local:///no-icon.png", iconId: "9000" }, onSuccess, onError);
             });
 
             waitsFor(function () {
@@ -224,7 +224,7 @@ describe("blackberry.bbm.platform.self", function () {
                 item = { text: "text", cookie: "iconItem", iconId: itemIconId };
                 blackberry.bbm.platform.self.profilebox.addItem(item, onSuccess.andCallFake(itemAdded), onError);
             });
-            
+
             waitsFor(function () {
                 return onSuccess.callCount;
             }, "success never fired", waitForTimeout);
@@ -233,7 +233,7 @@ describe("blackberry.bbm.platform.self", function () {
                 expect(onSuccess).toHaveBeenCalledWith(item);
             });
         });
-        
+
         it("should be able to get the amount of items in the profile box", function () {
             runs(function () {
                 expect(blackberry.bbm.platform.self.profilebox.item.length).toBeGreaterThan(0);

@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-function requireLocal(id) {
-    return !!require.resolve ? require("../../" + id) : window.require(id);
-}
-
 var bbm,
     accesschangedCallback = null,
-    updateCallback = null,
-    _event = require("../../lib/event");
+    updateCallback = null;
 
 ///////////////////////////////////////////////////////////////////
 // JavaScript wrapper for JNEXT plugin
@@ -68,8 +63,9 @@ JNEXT.BBM = function ()
         return JNEXT.invoke(_self.m_id, "self.getProfile " + field);
     };
 
-    _self.self.getDisplayPicture = function (eventId) {
-        _self.getDisplayPictureEventId = eventId;
+    _self.self.getDisplayPicture = function (pluginResult) {
+        _self.getDisplayPictureHandlers.push(pluginResult);
+        //TODO: Send pluginResult.callbackId to native
         return JNEXT.invoke(_self.m_id, "self.getDisplayPicture");
     };
 
@@ -81,18 +77,21 @@ JNEXT.BBM = function ()
         JNEXT.invoke(_self.m_id, "self.setPersonalMessage " + personalMessage);
     };
 
-    _self.self.setDisplayPicture = function (displayPicture, eventId) {
-        _self.setDisplayPictureEventId = eventId;
+    _self.self.setDisplayPicture = function (displayPicture, pluginResult) {
+        _self.setDisplayPictureHandlers.push(pluginResult);
+        //TODO: Send pluginResult.callbackId to native
         JNEXT.invoke(_self.m_id, "self.setDisplayPicture " + displayPicture);
     };
 
-    _self.self.profilebox.addItem = function (options, eventId) {
-        _self.profileBoxAddItemEventId = eventId;
+    _self.self.profilebox.addItem = function (options, pluginResult) {
+        _self.profileBoxAddItemHandlers.push(pluginResult);
+        //TODO: Send pluginResult.callbackId to native
         JNEXT.invoke(_self.m_id, "self.profilebox.addItem " + JSON.stringify(options));
     };
 
-    _self.self.profilebox.removeItem = function (options, eventId) {
-        _self.profileBoxRemoveItemEventId = eventId;
+    _self.self.profilebox.removeItem = function (options, pluginResult) {
+        _self.profileBoxRemoveItemHandlers.push(pluginResult);
+        //TODO: Send pluginResult.callbackId to native
         JNEXT.invoke(_self.m_id, "self.profilebox.removeItem " + JSON.stringify(options));
     };
 
@@ -100,8 +99,9 @@ JNEXT.BBM = function ()
         JNEXT.invoke(_self.m_id, "self.profilebox.clearItems");
     };
 
-    _self.self.profilebox.registerIcon = function (options, eventId) {
-        _self.profileBoxRegisterIconEventId = eventId;
+    _self.self.profilebox.registerIcon = function (options, pluginResult) {
+        _self.profileBoxRegisterIconHandlers.push(pluginResult);
+        //TODO: Send pluginResult.callbackId to native
         JNEXT.invoke(_self.m_id, "self.profilebox.registerIcon " + JSON.stringify(options));
     };
 
@@ -139,7 +139,8 @@ JNEXT.BBM = function ()
         var arData = strData.split(" "),
             strEventDesc = arData[0],
             allowed,
-            obj;
+            obj,
+            result;
 
         if (strEventDesc === "onaccesschanged") {
             if (arData[1] === "allowed") {
@@ -155,28 +156,38 @@ JNEXT.BBM = function ()
             }
         } else if (strEventDesc === "self.getDisplayPicture") {
             obj = arData.slice(1, arData.length).join(" ");
-            _event.trigger(_self.getDisplayPictureEventId, JSON.parse(arData[1]));
+            //TODO: Switch from a queue getting the callbackId from native
+            result = _self.getDisplayPictureHandlers.shift();
+            result.callbackOk(JSON.parse(arData[1]));
         } else if (strEventDesc === "self.setDisplayPicture") {
             obj = arData.slice(1, arData.length).join(" ");
-            _event.trigger(_self.setDisplayPictureEventId, JSON.parse(obj));
+            //TODO: Switch from a queue getting the callbackId from native
+            result = _self.setDisplayPictureHandlers.shift();
+            result.callbackOk(JSON.parse(obj));
         } else if (strEventDesc === "self.profilebox.addItem") {
             obj = arData.slice(1, arData.length).join(" ");
-            _event.trigger(_self.profileBoxAddItemEventId, JSON.parse(obj));
+            //TODO: Switch from a queue getting the callbackId from native
+            result = _self.profileBoxAddItemHandlers.shift();
+            result.callbackOk(JSON.parse(obj));
         } else if (strEventDesc === "self.profilebox.removeItem") {
             obj = arData.slice(1, arData.length).join(" ");
-            _event.trigger(_self.profileBoxRemoveItemEventId, JSON.parse(obj));
+            //TODO: Switch from a queue getting the callbackId from native
+            result = _self.profileBoxRemoveItemHandlers.shift();
+            result.callbackOk(JSON.parse(obj));
         } else if (strEventDesc === "self.profilebox.registerIcon") {
             obj = arData.slice(1, arData.length).join(" ");
-            _event.trigger(_self.profileBoxRegisterIconEventId, JSON.parse(obj));
+            //TODO: Switch from a queue getting the callbackId from native
+            result = _self.profileBoxRegisterIconHandlers.shift();
+            result.callbackOk(JSON.parse(obj));
         }
     };
 
     _self.m_id = "";
-    _self.getDisplayPictureEventId = "";
-    _self.setDisplayPictureEventId = "";
-    _self.profileBoxAddItemEventId = "";
-    _self.profileBoxRemoveItemEventId = "";
-    _self.profileBoxRegisterIconEventId = "";
+    _self.getDisplayPictureHandlers = [];
+    _self.setDisplayPictureHandlers = [];
+    _self.profileBoxAddItemHandlers = [];
+    _self.profileBoxRemoveItemHandlers = [];
+    _self.profileBoxRegisterIconHandlers = [];
 
     _self.getInstance = function () {
         if (!hasInstance) {

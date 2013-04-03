@@ -16,12 +16,24 @@
 
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.bbm.platform/",
     _libDir = __dirname + "/../../../lib/",
-    events = require(_libDir + "event"),
     eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
-    index = null;
+    MockPluginResult,
+    index = null,
+    context = null;
 
 describe("bbm.platform index", function () {
+
     beforeEach(function () {
+
+        MockPluginResult = function () {};
+        MockPluginResult.prototype.callbackOk = jasmine.createSpy("PluginResult.callbackOk");
+        MockPluginResult.prototype.callbackError = jasmine.createSpy("PluginResult.callbackError");
+        MockPluginResult.prototype.ok = jasmine.createSpy("PluginResult.ok");
+        MockPluginResult.prototype.error = jasmine.createSpy("PluginResult.error");
+        MockPluginResult.prototype.noResult = jasmine.createSpy("PluginResult.noResult");
+
+        GLOBAL.PluginResult = MockPluginResult;
+
         GLOBAL.JNEXT = {
             require: jasmine.createSpy().andReturn(true),
             createObject: jasmine.createSpy().andReturn("1"),
@@ -29,10 +41,16 @@ describe("bbm.platform index", function () {
             registerEvents: jasmine.createSpy().andReturn(true),
             getgid: jasmine.createSpy().andReturn(jasmine.any(String))
         };
+
+        context = require(_apiDir + "BBMEvents.js");
+        spyOn(context, "addEventListener");
+        spyOn(context, "removeEventListener");
+
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
+        delete GLOBAL.PluginResult;
         delete GLOBAL.JNEXT;
         index = null;
         delete require.cache[require.resolve(_apiDir + "index")];
@@ -41,30 +59,22 @@ describe("bbm.platform index", function () {
     describe("bbm.platform", function () {
         describe("register", function () {
             it("can call success", function () {
-                var success = jasmine.createSpy(),
-                args,
-                options;
+                var options = { "uuid": "464d3ba0-caba-11e1-9b23-0800200c9a66" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "uuid": "464d3ba0-caba-11e1-9b23-0800200c9a66" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)) };
-
-                index.register(success, null, args, null);
+                index.register(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "register " + JSON.stringify(options));
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
             it("can call fail", function () {
-                var fail = jasmine.createSpy(),
-                args,
-                options;
+                var options = { "uuid": "9b23-0800200c9a66" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "uuid": "9b23-0800200c9a66" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)) };
+                index.register(null, null, args, null);
 
-                index.register(null, fail, args, null);
-
-                expect(fail).toHaveBeenCalledWith(-1, "UUID is not valid length");
+                expect(MockPluginResult.prototype.error).toHaveBeenCalledWith("UUID is not valid length");
             });
         });
     });
@@ -147,16 +157,12 @@ describe("bbm.platform index", function () {
 
         describe("getDisplayPicture", function () {
             it("can call getDisplayPicture", function () {
-                var success = jasmine.createSpy(),
-                    eventId = "bbm.self.displayPicture",
-                    args;
+                var args = {};
 
-                args = { "eventId": encodeURIComponent(JSON.stringify(eventId)) };
-
-                index.self.getDisplayPicture(success, null, args, null);
+                index.self.getDisplayPicture(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getDisplayPicture");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
         });
@@ -223,30 +229,24 @@ describe("bbm.platform index", function () {
 
         describe("setDisplayPicture", function () {
             it("can call setDisplayPicture and succeed", function () {
-                var success = jasmine.createSpy(),
-                    args,
-                    displayPicture = "/tmp/avatar.gif",
-                    eventId = "bbm.self.setDisplayPicture";
+                var displayPicture = "/tmp/avatar.gif",
+                    args = {"displayPicture": encodeURIComponent(JSON.stringify(displayPicture))};
 
-                args = { "displayPicture": encodeURIComponent(JSON.stringify(displayPicture)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
-
-                index.self.setDisplayPicture(success, null, args, null);
+                index.self.setDisplayPicture(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.setDisplayPicture " + displayPicture);
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
             it("can call setDisplayPicture and fail", function () {
-                var fail = jasmine.createSpy(),
-                    args,
-                    displayPicture = "",
-                    eventId = "bbm.self.setDisplayPicture";
+                var args,
+                    displayPicture = "";
 
-                args = { "displayPicture": encodeURIComponent(JSON.stringify(displayPicture)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
+                args = {"displayPicture": encodeURIComponent(JSON.stringify(displayPicture))};
 
-                index.self.setDisplayPicture(null, fail, args, null);
+                index.self.setDisplayPicture(null, null, args, null);
 
-                expect(fail).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
     });
@@ -254,63 +254,43 @@ describe("bbm.platform index", function () {
     describe("bbm.platform.users.profilebox", function () {
         describe("addItem", function () {
             it("can call addItem and succeed", function () {
-                var success = jasmine.createSpy(),
-                    eventId = "self.profilebox.addItem",
-                    args,
-                    options;
+                var options = { "text": "hello", "cookie": "hello" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "text": "hello", "cookie": "hello" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
-
-                index.self.profilebox.addItem(success, null, args, null);
+                index.self.profilebox.addItem(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.addItem " + JSON.stringify(options));
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
             it("can call addItem and fail", function () {
-                var fail = jasmine.createSpy(),
-                    eventId = "self.profilebox.addItem",
-                    args,
-                    options;
+                var options = { "text": "", "cookie": "" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "text": "", "cookie": "" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
+                index.self.profilebox.addItem(null, null, args, null);
 
-                index.self.profilebox.addItem(null, fail, args, null);
-
-                expect(fail).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
 
         describe("removeItem", function () {
             it("can call removeItem and succeed", function () {
-                var success = jasmine.createSpy(),
-                    eventId = "self.profilebox.removeItem",
-                    args,
-                    options;
+                var options = { "text": "", "cookie" : "", "id": "abc123" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "text": "", "cookie" : "", "id": "abc123" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
-
-                index.self.profilebox.removeItem(success, null, args, null);
+                index.self.profilebox.removeItem(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.removeItem " + JSON.stringify(options));
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
             it("can call removeItem and fail", function () {
-                var fail = jasmine.createSpy(),
-                    eventId = "self.profilebox.removeItem",
-                    args,
-                    options;
+                var options = { "text": "", "cookie": "" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "text": "", "cookie": "" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
+                index.self.profilebox.removeItem(null, null, args, null);
 
-                index.self.profilebox.removeItem(null, fail, args, null);
-
-                expect(fail).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
 
@@ -326,32 +306,22 @@ describe("bbm.platform index", function () {
 
         describe("registerIcon", function () {
             it("can call registerIcon and succeed", function () {
-                var success = jasmine.createSpy(),
-                    eventId = "self.profilebox.registerIcon",
-                    args,
-                    options;
+                var options = { "icon": "/tmp/icon.png", "iconId": 123 },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "icon": "/tmp/icon.png", "iconId": 123 };
-                args = { "options": encodeURIComponent(JSON.stringify(options)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
-
-                index.self.profilebox.registerIcon(success, null, args, null);
+                index.self.profilebox.registerIcon(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.registerIcon " + JSON.stringify(options));
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
             it("can call registerIcon and fail", function () {
-                var fail = jasmine.createSpy(),
-                    eventId = "self.profilebox.registerIcon",
-                    args,
-                    options;
+                var options = { "icon": "" },
+                    args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                options = { "icon": "" };
-                args = { "options": encodeURIComponent(JSON.stringify(options)), "eventId": encodeURIComponent(JSON.stringify(eventId)) };
+                index.self.profilebox.registerIcon(null, null, args, null);
 
-                index.self.profilebox.registerIcon(null, fail, args, null);
-
-                expect(fail).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
 
@@ -416,40 +386,34 @@ describe("bbm.platform index", function () {
         });
     });
 
-    describe("bbm.platform events", function () {
+    describe("bbm platform events", function () {
+
         describe("onaccesschanged", function () {
-
-            it("can register the 'onaccesschanged' event", function () {
+            it("can be registered, triggered and unregistered", function () {
                 var eventName = "onaccesschanged",
-                args = { "eventName": encodeURIComponent(eventName) },
-                env = {webviewId: 42},
-                success = jasmine.createSpy(),
-                utils = require(_libDir + "utils");
+                    args = { "eventName": encodeURIComponent(JSON.stringify(eventName)) },
+                    env = { webview: { id: 42} },
+                    trigger;
 
-                spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                    return eventExt;
+                context.addEventListener.andCallFake(function (eventName, listener) {
+                    trigger = listener;
                 });
 
-                spyOn(events, "add");
-                index.registerEvents(success);
-                eventExt.add(null, null, args, env);
-                expect(success).toHaveBeenCalled();
-                expect(events.add).toHaveBeenCalled();
-                expect(events.add.mostRecentCall.args[0].event).toEqual(eventName);
-                expect(events.add.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
+
+                index.startEvent(null, null, args, env);
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
+                expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
+                expect(context.addEventListener).toHaveBeenCalledWith(eventName, jasmine.any(Function));
+
+                trigger({});
+                expect(MockPluginResult.prototype.callbackOk).toHaveBeenCalled();
+
+                index.stopEvent(null, null, args, env);
+                expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
+                expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
+                expect(context.removeEventListener).toHaveBeenCalledWith(eventName, jasmine.any(Function));
             });
 
-            it("can un-register the 'onaccesschanged' event", function () {
-                var eventName = "onaccesschanged",
-                args = {eventName : encodeURIComponent(eventName)},
-                env = {webviewId: 42};
-
-                spyOn(events, "remove");
-                eventExt.remove(null, null, args, env);
-                expect(events.remove).toHaveBeenCalled();
-                expect(events.remove.mostRecentCall.args[0].event).toEqual(eventName);
-                expect(events.remove.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
-            });
         });
     });
 });

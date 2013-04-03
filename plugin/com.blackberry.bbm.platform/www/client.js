@@ -17,24 +17,51 @@
  under the License.
  */
 
-var _self = {},
+var _self = {
+        self: {
+            profilebox: {}
+        },
+        users: {}
+    },
+    noop = function () {},
     _ID = "com.blackberry.bbm.platform",
-    _getDisplayPictureEventId = "bbm.self.getDisplayPicture",
-    _setDisplayPictureEventId = "bbm.self.setDisplayPicture",
-    _profileBoxAddItemEventId = "bbm.self.profilebox.addItem",
-    _profileBoxRemoveItemEventId = "bbm.self.profilebox.removeItem",
-    _profileBoxRegisterIconEventId = "bbm.self.profilebox.registerIcon";
+    _onAccessChangedChannel = cordova.addWindowEventHandler("onaccesschanged"),
+    _onUpdateChannel = cordova.addWindowEventHandler("onupdate");
 
-_self.self = {};
-_self.self.profilebox = {};
-_self.users = {};
+_onAccessChangedChannel.onHasSubscribersChange = function () {
+    var success = function (data) {
+            _onAccessChangedChannel.fire(data.allowed, data.reason);
+        },
+        fail = function (error) {
+            console.log("Error initializing onaccesschanged listener: ", error);
+        };
+    if (this.numHandlers === 1) {
+        window.cordova.exec(success, fail, _ID, "startEvent", {eventName: "onaccesschanged"});
+    } else if (this.numHandlers === 0) {
+        window.cordova.exec(noop, noop, _ID, "stopEvent", {eventName: "onaccesschanged"});
+    }
+};
+
+_onUpdateChannel.onHasSubscribersChange = function () {
+    var success = function (data) {
+            _onUpdateChannel.fire(data.user, data.event);
+        },
+        fail = function (error) {
+            console.log("Error initializing onupdate listener: ", error);
+        };
+    if (this.numHandlers === 1) {
+        window.cordova.exec(success, fail, _ID, "startEvent", {eventName: "onupdate"});
+    } else if (this.numHandlers === 0) {
+        window.cordova.exec(noop, noop, _ID, "stopEvent", {eventName: "onupdate"});
+    }
+};
 
 function getFieldValue(field, args) {
     var value,
-        success = function (data, response) {
+        success = function (data) {
             value = data;
         },
-        fail = function (data, response) {
+        fail = function (data) {
             throw data;
         };
 
@@ -55,7 +82,7 @@ function defineGetter(obj, field) {
     });
 }
 
-function createEventHandler(onSuccess, onError, eventId) {
+function createEventHandler(onSuccess, onError) {
     var callback;
 
     callback = function (data) {
@@ -71,10 +98,6 @@ function createEventHandler(onSuccess, onError, eventId) {
             }
         }
     };
-
-    if (!window.webworks.event.isOn(eventId)) {
-        window.webworks.event.once(_ID, eventId, callback);
-    }
 
     return { "onSuccess": callback, "onError": function (args) {
                 callback({ "error": args });
@@ -97,36 +120,36 @@ defineGetter(_self.self, "self/status");
 defineGetter(_self.self, "self/statusMessage");
 
 _self.self.getDisplayPicture = function (success, error) {
-    var args = { "eventId": _getDisplayPictureEventId },
-        handler = createEventHandler(success, error, _getDisplayPictureEventId);
+    var args = {},
+        handler = createEventHandler(success, error);
     return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/getDisplayPicture", args);
 };
 
 _self.self.setStatus = function (status, statusMessage) {
-    var args = { "status": status, "statusMessage": statusMessage };
+    var args = {"status": status, "statusMessage": statusMessage};
     return getFieldValue("self/setStatus", args);
 };
 
 _self.self.setPersonalMessage = function (personalMessage) {
-    var args = { "personalMessage": personalMessage };
+    var args = {"personalMessage": personalMessage};
     return getFieldValue("self/setPersonalMessage", args);
 };
 
 _self.self.setDisplayPicture = function (displayPicture, success, error) {
-    var args = { "displayPicture": displayPicture, "eventId": _setDisplayPictureEventId },
-        handler = createEventHandler(success, error, _setDisplayPictureEventId);
+    var args = {"displayPicture": displayPicture},
+        handler = createEventHandler(success, error);
     return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/setDisplayPicture", args);
 };
 
 _self.self.profilebox.addItem = function (options, success, error) {
-    var args = { "options": options, "eventId": _profileBoxAddItemEventId },
-        handler = createEventHandler(success, error, _profileBoxAddItemEventId);
+    var args = {"options": options},
+        handler = createEventHandler(success, error);
     return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/addItem", args);
 };
 
 _self.self.profilebox.removeItem = function (options, success, error) {
-    var args = { "options": options, "eventId": _profileBoxRemoveItemEventId },
-        handler = createEventHandler(success, error, _profileBoxRemoveItemEventId);
+    var args = {"options": options},
+        handler = createEventHandler(success, error);
     return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/removeItem", args);
 };
 
@@ -135,8 +158,8 @@ _self.self.profilebox.clearItems = function () {
 };
 
 _self.self.profilebox.registerIcon = function (options, success, error) {
-    var args = { "options": options, "eventId": _profileBoxRegisterIconEventId },
-        handler = createEventHandler(success, error, _profileBoxRegisterIconEventId);
+    var args = {"options": options},
+        handler = createEventHandler(success, error);
     return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/registerIcon", args);
 };
 
@@ -155,7 +178,5 @@ Object.defineProperty(_self.self.profilebox, "item", {
         return getFieldValue("self/profilebox/getItems");
     }
 });
-
-window.webworks.exec(function () {}, function () {}, "registerEvents", null);
 
 module.exports = _self;
