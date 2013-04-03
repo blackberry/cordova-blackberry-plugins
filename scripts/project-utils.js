@@ -23,10 +23,13 @@ var path = require('path'),
     fs = require('fs'),
     wrench = require('wrench'),
     util = require('util'),
+    ncp = require('ncp').ncp,
     utils = require('./utils'),
     conf = require(path.join(__dirname, "conf")),
     baseDir = path.join(__dirname, '/../'),
-    cordovaDir = conf.CORDOVA_BB10_REPOS.dir;
+    cordovaDir = conf.CORDOVA_BB10_REPOS.dir,
+    mobileSpecDir = conf.MOBILE_SPEC_REPOS.dir,
+    mobileSpecURL = conf.MOBILE_SPEC_REPOS.url;
 
 module.exports = {
     setupRepo: function (branch, done) {
@@ -45,8 +48,23 @@ module.exports = {
             });
     },
 
+    setupMobileSpecRepo: function (branch, done) {
+        var clone = util.format("git clone %s %s", mobileSpecURL, mobileSpecDir),
+            checkout = util.format("git checkout %s", branch ? branch : 'master');
+
+        // Delete existing cordova repos folder
+        if (fs.existsSync(mobileSpecDir)) {
+            wrench.rmdirSyncRecursive(mobileSpecDir);
+        }
+        jWorkflow.order(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}))
+        .andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
+        .start(function () {
+            done();
+        });
+    },
+
     createProject: function (projectPath, name, done) {
-        var create = util.format("./bin/create %s %s", projectPath, name);
+        var create = util.format("./bin/create %s %s %s", projectPath, name, name);
 
         // Delete existing project folder
         if (fs.existsSync(projectPath)) {
@@ -54,11 +72,11 @@ module.exports = {
         }
 
         jWorkflow.order(utils.execCommandWithJWorkflow(create, {cwd: path.join(cordovaDir, "blackberry10")}))
-            .start(function () {
-                if (done) {
-                    done();
-                }
-            });
+        .start(function () {
+            if (done) {
+                done();
+            }
+        });
     },
 
     configProject: function (projectPath, targetName, targetIP, targetType, targetPassword, done) {
@@ -84,27 +102,46 @@ module.exports = {
 
     replaceWWW: function (projectPath, src, done) {
         jWorkflow.order(function () {
-                wrench.rmdirSyncRecursive(path.join(projectPath, "www"), true);
-            })
-            .andThen(function () {
-                wrench.copyDirSyncRecursive(src, path.join(projectPath, "www"));
-            })
-            .start(function () {
-                if (done) {
-                    done();
+            wrench.rmdirSyncRecursive(path.join(projectPath, "www"), true);
+        })
+        .andThen(function () {
+            wrench.copyDirSyncRecursive(src, path.join(projectPath, "www/"));
+        })
+        .start(function () {
+            if (done) {
+                done();
+            }
+        });
+    },
+
+    copyMobileSpec: function (projectPath, src, done) {
+        jWorkflow.order()
+        .andThen(function (prev, baton) {
+            baton.take();
+            ncp(src, path.join(projectPath, "www"), function (err) {
+                if (err) {
+                    console.log(err);
                 }
+                console.log("Copy Mobile Spec Finished");
+                baton.pass();
             });
+        })
+        .start(function () {
+            if (done) {
+                done();
+            }
+        });
     },
 
     buildProject: function (projectPath, done) {
         var cmd = "./cordova/build";
 
         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
-            .start(function () {
-                if (done) {
-                    done();
-                }
-            });
+        .start(function () {
+            if (done) {
+                done();
+            }
+        });
     },
 
     addPlugins: function (projectPath, plugins, done) {
