@@ -101,7 +101,7 @@ module.exports = {
         }
 
         if (_listeners[eventName][env.webview.id]) {
-            result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+            result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
         } else {
             context.addEventListener(systemEvent, listener);
             _listeners[eventName][env.webview.id] = listener;
