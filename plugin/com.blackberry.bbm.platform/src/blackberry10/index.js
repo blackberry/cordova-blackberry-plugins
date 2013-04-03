@@ -15,55 +15,83 @@
  */
 
 var bbm = require("./BBMJNEXT").bbm,
-    _event = require("../../lib/event"),
     _utils = require("../../lib/utils"),
     Whitelist = require("../../lib/policy/whitelist").Whitelist,
     _whitelist = new Whitelist(),
+    _listeners = {},
     _actionMap = {
         onaccesschanged: {
             context: require("./BBMEvents"),
             event: "onaccesschanged",
             triggerEvent: "onaccesschanged",
-            trigger: function (allowed, reason) {
-                _event.trigger("onaccesschanged", allowed, reason);
+            trigger: function (pluginResult, allowed, reason) {
+                pluginResult.callbackOk({"allowed": allowed, "reason": reason}, true);
             }
         },
         onupdate: {
             context: require("./BBMEvents"),
             event: "onupdate",
             triggerEvent: "onupdate",
-            trigger: function (user, event) {
-                _event.trigger("onupdate", user, event);
+            trigger: function (pluginResult, user, event) {
+                pluginResult.callbackOk({"user": user, "event": event});
             }
         }
     };
 
 module.exports = {
-    registerEvents: function (success, fail, args, env) {
-        try {
-            var _eventExt = _utils.loadExtensionModule("event", "index");
-            _eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            fail(-1, e);
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            context = _actionMap[eventName].context,
+            systemEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
+
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        } else {
+            context.addEventListener(systemEvent, listener);
+            _listeners[eventName][env.webview.id] = listener;
+            result.noResult(true);
+        }
+    },
+
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            context = _actionMap[eventName].context,
+            systemEvent = _actionMap[eventName].event,
+            listener;
+
+        if (!_listeners || !_listeners[eventName] || !_listeners[eventName][env.webview.id]) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            listener = _listeners[eventName][env.webview.id];
+            context.removeEventListener(systemEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
         }
     },
 
     register: function (success, fail, args, env) {
         if (args) {
+            var result = new PluginResult(args, env);
+
             args.options = JSON.parse(decodeURIComponent(args.options));
 
             if (!args.options.uuid || args.options.uuid.length === 0) {
-                fail(-1, "Must specifiy UUID");
+                result.error("Must specifiy UUID");
             }
 
             if (args.options.uuid.length < 32) {
-                fail(-1, "UUID is not valid length");
-                return;
+                result.error("UUID is not valid length");
+            } else {
+                bbm.getInstance().register(args.options);
+                result.noResult(true);
             }
-
-            bbm.getInstance().register(args.options);
-            success();
         }
     },
 
@@ -101,12 +129,11 @@ module.exports = {
         },
 
         getDisplayPicture: function (success, fail, args, env) {
-            if (args) {
-                args.eventId = JSON.parse(decodeURIComponent(args.eventId));
+            var result = new PluginResult(args, env);
 
-                bbm.getInstance().self.getDisplayPicture(args.eventId);
-                success();
-            }
+            bbm.getInstance().self.getDisplayPicture(result);
+
+            result.noResult(true);
         },
 
         setStatus: function (success, fail, args, env) {
@@ -139,65 +166,49 @@ module.exports = {
         },
 
         setDisplayPicture: function (success, fail, args, env) {
-            if (args) {
-                args.displayPicture = JSON.parse(decodeURIComponent(args.displayPicture));
-                args.eventId = JSON.parse(decodeURIComponent(args.eventId));
+            var result = new PluginResult(args, env);
 
-                if (args.displayPicture.length === 0) {
-                    fail(-1, "Display picture must not be empty");
-                    return;
-                }
+            args.displayPicture = JSON.parse(decodeURIComponent(args.displayPicture));
 
-                if (!_whitelist.isAccessAllowed(args.displayPicture)) {
-                    fail(-1, "URL denied by whitelist: " + args.displayPicture);
-                    return;
-                }
-
+            if (args.displayPicture.length === 0) {
+                result.error("Display picture must not be empty");
+            } else if (!_whitelist.isAccessAllowed(args.displayPicture)) {
+                result.error("URL denied by whitelist: " + args.displayPicture);
+            } else {
                 args.displayPicture = _utils.translatePath(args.displayPicture).replace(/file:\/\//, '');
+                bbm.getInstance().self.setDisplayPicture(args.displayPicture, result);
+                result.noResult(true);
             }
-
-            bbm.getInstance().self.setDisplayPicture(args.displayPicture, args.eventId);
-            success();
         },
 
         profilebox: {
             addItem: function (success, fail, args, env) {
-                if (args) {
-                    args.options = JSON.parse(decodeURIComponent(args.options));
-                    args.eventId = JSON.parse(decodeURIComponent(args.eventId));
+                var result = new PluginResult(args, env);
 
-                    if (!args.options.text || args.options.text.length === 0) {
-                        fail(-1, "must specify text");
-                        return;
-                    }
+                args.options = JSON.parse(decodeURIComponent(args.options));
 
-                    if (!args.options.cookie || args.options.cookie.length === 0) {
-                        fail(-1, "Must specify cookie");
-                        return;
-                    }
-
-                    if (args.options.iconId && args.options.iconId < 1) {
-                        fail(-1, "Invalid icon ID");
-                        return;
-                    }
-
-                    bbm.getInstance().self.profilebox.addItem(args.options, args.eventId);
-                    success();
+                if (!args.options.text || args.options.text.length === 0) {
+                    result.error("must specify text");
+                } else if (!args.options.cookie || args.options.cookie.length === 0) {
+                    result.error("Must specify cookie");
+                } else if (args.options.iconId && args.options.iconId < 1) {
+                    result.error("Invalid icon ID");
+                } else {
+                    bbm.getInstance().self.profilebox.addItem(args.options, result);
+                    result.noResult(true);
                 }
             },
 
             removeItem: function (success, fail, args, env) {
-                if (args) {
-                    args.options = JSON.parse(decodeURIComponent(args.options));
-                    args.eventId = JSON.parse(decodeURIComponent(args.eventId));
+                var result = new PluginResult(args, env);
 
-                    if (!args.options.id || args.options.id.length === 0 || typeof args.options.id !== "string") {
-                        fail(-1, "Must specify valid item id");
-                        return;
-                    }
+                args.options = JSON.parse(decodeURIComponent(args.options));
 
-                    bbm.getInstance().self.profilebox.removeItem(args.options, args.eventId);
-                    success();
+                if (!args.options.id || args.options.id.length === 0 || typeof args.options.id !== "string") {
+                    result.error("Must specify valid item id");
+                } else {
+                    bbm.getInstance().self.profilebox.removeItem(args.options, result);
+                    result.noResult(true);
                 }
             },
 
@@ -207,32 +218,20 @@ module.exports = {
             },
 
             registerIcon: function (success, fail, args, env) {
-                if (args) {
-                    args.options = JSON.parse(decodeURIComponent(args.options));
-                    args.eventId = JSON.parse(decodeURIComponent(args.eventId));
+                var result = new PluginResult(args, env);
 
-                    if (!args.options.iconId || args.options.iconId <= 0) {
-                        fail(-1, "Must specify valid ID for icon");
-                        return;
-                    }
+                args.options = JSON.parse(decodeURIComponent(args.options));
 
-                    if (!args.options.icon || args.options.icon.length === 0) {
-                        fail(-1, "Must specify icon to register");
-                        return;
-                    }
-
-                    if (args.options.icon) {
-
-                        if (!_whitelist.isAccessAllowed(args.options.icon)) {
-                            fail(-1, "URL denied by whitelist: " + args.displayPicture);
-                            return;
-                        }
-
-                        args.options.icon = _utils.translatePath(args.options.icon).replace(/file:\/\//, '');
-                    }
-
-                    bbm.getInstance().self.profilebox.registerIcon(args.options, args.eventId);
-                    success();
+                if (!args.options.iconId || args.options.iconId <= 0) {
+                    result.error("Must specify valid ID for icon");
+                } else if (!args.options.icon || args.options.icon.length === 0) {
+                    result.error("Must specify icon to register");
+                } else if (!_whitelist.isAccessAllowed(args.options.icon)) {
+                    result.error("URL denied by whitelist: " + args.displayPicture);
+                } else {
+                    args.options.icon = _utils.translatePath(args.options.icon).replace(/file:\/\//, '');
+                    bbm.getInstance().self.profilebox.registerIcon(args.options, result);
+                    result.noResult(true);
                 }
             },
 
