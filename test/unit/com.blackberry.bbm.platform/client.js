@@ -25,19 +25,38 @@ var root = __dirname + "/../../../",
         exec: jasmine.createSpy(),
         event: { once : jasmine.createSpy(),
                  isOn : jasmine.createSpy() }
-    };
+    },
+    MockedChannel,
+    mockedCordova;
 
 describe("bbm.platform", function () {
     beforeEach(function () {
-        GLOBAL.window = {
-            webworks: mockedWebworks
+        MockedChannel = function () {
+            return {
+                onHasSubscribersChange: undefined,
+                numHandlers: undefined
+            };
         };
+
+        mockedCordova = {
+            exec: mockedWebworks.exec,
+            addWindowEventHandler: jasmine.createSpy("cordova.addWindowEventHandler").andReturn(new MockedChannel()),
+            fireWindowEvent: jasmine.createSpy("cordova.fireWindowEvent")
+        };
+
+        GLOBAL.window = {
+            webworks: mockedWebworks,
+            cordova: mockedCordova
+        };
+
+        GLOBAL.cordova = mockedCordova;
         mockedWebworks.exec.reset();
         client = require(apiDir + "www/client");
     });
 
     afterEach(function () {
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
     });
 
     describe("bbm.platform.register", function () {
@@ -52,7 +71,7 @@ describe("bbm.platform", function () {
     describe("bbm.platform.self", function () {
         it("getDisplayPicture calls exec", function () {
             client.self.getDisplayPicture(function (img) { });
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/getDisplayPicture", { "eventId" : "bbm.self.getDisplayPicture" });
+            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/getDisplayPicture", {});
         });
 
         it("setStatus calls exec", function () {
@@ -67,7 +86,7 @@ describe("bbm.platform", function () {
 
         it("setDisplayPicture calls exec", function () {
             client.self.setDisplayPicture("/tmp/avatar.gif");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setDisplayPicture", { "displayPicture" : "/tmp/avatar.gif", "eventId": "bbm.self.setDisplayPicture" });
+            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setDisplayPicture", { "displayPicture" : "/tmp/avatar.gif"});
         });
     });
 
@@ -77,8 +96,7 @@ describe("bbm.platform", function () {
                     options : {
                         text : "hello",
                         cookie : "hellocookie"
-                    },
-                    eventId : "bbm.self.profilebox.addItem"
+                    }
                 };
 
             client.self.profilebox.addItem(args.options, function (item) { });
@@ -88,9 +106,8 @@ describe("bbm.platform", function () {
         it("removeItem calls exec", function () {
             var args = {
                     options : {
-                        id : "hello123",
-                    },
-                    eventId : "bbm.self.profilebox.removeItem"
+                        id : "hello123"
+                    }
                 };
 
             client.self.profilebox.removeItem(args.options);
@@ -108,11 +125,10 @@ describe("bbm.platform", function () {
                         text : "hello",
                         cookie : "hellocookie",
                         iconId : 123
-                    },
-                    eventId : "bbm.self.profilebox.registerIcon"
+                    }
                 };
 
-            client.self.profilebox.registerIcon(args.options); 
+            client.self.profilebox.registerIcon(args.options);
             expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/registerIcon", args);
         });
 
