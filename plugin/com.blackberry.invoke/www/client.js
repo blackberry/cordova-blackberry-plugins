@@ -17,12 +17,27 @@
   under the License.
  */
 
-var _self = {},
+var channel = cordova.require("cordova/channel"),
+    _self = {},
     _ID = "com.blackberry.invoke",
-    _invokeEventId = "invoke.invokeEventId",
-    _queryEventId = "invoke.queryEventId",
     _invokeInterrupter,
-    _invokeHandler;
+    _invokeHandler,
+    _noop = function () {},
+    _events = ["onchildcardstartpeek", "onchildcardendpeek", "onchildcardclosed"],
+    _channels = _events.map(function (eventName) {
+        var channel = cordova.addWindowEventHandler(eventName);
+        channel.onHasSubscribersChange = function () {
+            if (this.numHandlers === 1) {
+                window.webworks.exec(cordova.fireWindowEvent.bind(null, eventName),
+                                     console.log.bind("Error initializing " + eventName + " listener: "),
+                                     _ID, "startEvent", {eventName: eventName});
+            } else if (this.numHandlers === 0) {
+                window.webworks.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
+            }
+        };
+        return channel;
+    }),
+    _invokeInterruptChannel = channel.create("invocation.interrupted");
 
 _self.invoke = function (request, onSuccess, onError) {
     var data,
@@ -50,46 +65,27 @@ _self.invoke = function (request, onSuccess, onError) {
         }
     }
 
-    callback = function (error) {
-        if (error) {
-            if (onError && typeof onError === "function") {
-                onError(error);
-            }
-        } else {
-            if (onSuccess && typeof onSuccess === "function") {
-                onSuccess();
-            }
-        }
-    };
-
-    if (!window.webworks.event.isOn(_invokeEventId)) {
-        window.webworks.event.once(_ID, _invokeEventId, callback);
-    }
-
-    window.webworks.exec(function () {}, function () {}, _ID, "invoke", {request: request});
+    window.webworks.exec(onSuccess, onError, _ID, "invoke", {request: request});
 };
 
 _self.query = function (request, onSuccess, onError) {
-    var queryCallback = function (args) {
-            if (onError && typeof onError === 'function' &&
-                    args && args.error && typeof args.error === "string" &&
-                    args.error.length !== 0) {
-                onError(args.error);
-            } else if (onSuccess && typeof onSuccess === "function" &&
-                    args && args.response && args.response !== null) {
-                onSuccess(args.response);
-            }
-        };
-
-    if (!window.webworks.event.isOn(_queryEventId)) {
-        window.webworks.event.once(_ID, _queryEventId, queryCallback);
-    }
-
-    window.webworks.exec(function () {}, function () {}, _ID, "query", {request: request});
+    window.webworks.exec(onSuccess, onError, _ID, "query", {request: request});
 };
 
 _self.closeChildCard = function () {
-    window.webworks.exec(function () {}, function () {}, _ID, "closeChildCard");
+    window.webworks.exec(_noop, _noop, _ID, "closeChildCard");
+};
+
+_invokeInterruptChannel.onHasSubscribersChange = function () {
+    var eventName = "invocation.interrupted";
+
+    if (this.numHandlers === 1) {
+        window.webworks.exec(_invokeInterruptChannel.fire.bind(_invokeInterruptChannel),
+                             console.log.bind("Error initializing " + eventName + " listener: "),
+                             _ID, "startEvent", {eventName: eventName});
+    } else if (this.numHandlers === 0) {
+        window.webworks.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
+    }
 };
 
 Object.defineProperty(_self, "interrupter", {
@@ -98,34 +94,27 @@ Object.defineProperty(_self, "interrupter", {
     },
 
     set: function (handler) {
-        var returnRequest;
-        try {
-            // Clear the current one no matter what
-            if (window.webworks.event.isOn('invocation.interrupted')) {
-                window.webworks.event.remove('blackberry.event', 'invocation.interrupted', _invokeInterrupter);
-            }
-            // Check if we are nulling, or undefining the handler, take off the interruption
-            _invokeHandler = handler;
+        var eventName = "invocation.interrupted",
+            returnRequest;
 
-            if (!handler) {
-                window.webworks.exec(function () {}, function () {}, _ID, "clearInterrupter");
-            } else {
-                _invokeInterrupter = function (request) {
-                    returnRequest = handler(request);
-                    window.webworks.exec(function () {}, function () {}, _ID, "returnInterruption", {request : returnRequest});
-                };
+        _invokeHandler = handler;
 
-                window.webworks.event.add('blackberry.event', 'invocation.interrupted', _invokeInterrupter);
-                window.webworks.exec(function () {}, function () {}, _ID, "registerInterrupter");
-            }
-        } catch (error) {
-            console.error(error);
+        // Clear the current one no matter what
+        if (_invokeInterruptChannel.numHandlers === 1) {
+            _invokeInterruptChannel.unsubscribe(_invokeInterrupter);
+        }
+
+        if (handler) {
+            _invokeInterrupter = function (request) {
+                returnRequest = handler(request);
+                window.webworks.exec(_noop, _noop, _ID, "returnInterruption", {request : returnRequest});
+            };
+
+            _invokeInterruptChannel.subscribe(_invokeInterrupter);
         }
     }
 
 });
-
-window.webworks.exec(function () {}, function () {}, _ID, "registerEvents", null);
 
 window.webworks.defineReadOnlyField(_self, "FILE_TRANSFER_PRESERVE", 'PRESERVE');
 window.webworks.defineReadOnlyField(_self, "FILE_TRANSFER_COPY_RO", 'COPY_RO');

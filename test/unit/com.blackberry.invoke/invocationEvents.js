@@ -25,6 +25,7 @@ describe("invoke invocationEvents", function () {
         mockedInvocation = {
             addEventListener: jasmine.createSpy("invocation addEventListener"),
             removeEventListener: jasmine.createSpy("invocation removeEventListener"),
+            interrupter: undefined
         };
         GLOBAL.window.qnx = {
             webplatform: {
@@ -49,38 +50,51 @@ describe("invoke invocationEvents", function () {
         trigger = null;
     });
 
-    describe("onChildCardStartPeek", function () {
-        it("add proper event to invocation for 'onChildCardStartPeek'", function () {
-            invocationEvents.addEventListener("onChildCardStartPeek", trigger);
+    describe("onchildcardstartpeek", function () {
+        it("add proper event to invocation for 'onchildcardstartpeek'", function () {
+            invocationEvents.addEventListener("onchildcardstartpeek", trigger);
             expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardPeekStarted", trigger);
         });
 
-        it("remove proper event from invocation for 'onChildCardStartPeek", function () {
-            invocationEvents.removeEventListener("onChildCardStartPeek", trigger);
+        it("remove proper event from invocation for 'onchildcardstartpeek", function () {
+            invocationEvents.removeEventListener("onchildcardstartpeek", trigger);
             expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardPeekStarted", trigger);
         });
     });
 
-    describe("onChildCardEndPeek", function () {
-        it("add proper event to invocation for 'onChildCardEndPeek'", function () {
-            invocationEvents.addEventListener("onChildCardEndPeek", trigger);
+    describe("onchildcardendpeek", function () {
+        it("add proper event to invocation for 'onchildcardendpeek'", function () {
+            invocationEvents.addEventListener("onchildcardendpeek", trigger);
             expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardPeekEnded", trigger);
         });
 
-        it("remove proper event from invocation for 'onChildCardEndPeek", function () {
-            invocationEvents.removeEventListener("onChildCardEndPeek", trigger);
+        it("remove proper event from invocation for 'onchildcardendpeek", function () {
+            invocationEvents.removeEventListener("onchildcardendpeek", trigger);
             expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardPeekEnded", trigger);
         });
     });
-    describe("onChildCardClosed", function () {
-        it("add proper event to invocation for 'onChildCardClosed'", function () {
-            invocationEvents.addEventListener("onChildCardClosed", trigger);
+
+    describe("onchildcardclosed", function () {
+        it("add proper event to invocation for 'onchildcardclosed'", function () {
+            invocationEvents.addEventListener("onchildcardclosed", trigger);
             expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("childCardClosed", trigger);
         });
 
-        it("remove proper event from invocation for 'onChildCardClosed", function () {
-            invocationEvents.removeEventListener("onChildCardClosed", trigger);
+        it("remove proper event from invocation for 'onchildcardclosed", function () {
+            invocationEvents.removeEventListener("onchildcardclosed", trigger);
             expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("childCardClosed", trigger);
+        });
+    });
+
+    describe("invocation.interrupted", function () {
+        it("add proper event to invocation for 'invocation.interrupted'", function () {
+            invocationEvents.addEventListener("invocation.interrupted", trigger);
+            expect(mockedInvocation.interrupter).toEqual(trigger);
+        });
+
+        it("remove proper event from invocation for 'invocation.interrupted", function () {
+            invocationEvents.removeEventListener("invocation.interrupted", trigger);
+            expect(mockedInvocation.interrupter).toEqual(undefined);
         });
     });
 });

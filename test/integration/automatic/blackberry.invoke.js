@@ -45,7 +45,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             flag = false;
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -83,7 +83,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             flag = false;
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -124,7 +124,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             flag = false;
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -164,7 +164,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             flag = false;
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -201,7 +201,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             flag = false;
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -257,7 +257,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             flag = false;
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });

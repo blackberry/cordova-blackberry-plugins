@@ -13,53 +13,69 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _event = require("../../lib/event"),
+var _returnCallback,
     _actionMap = {
-        onChildCardStartPeek: {
+        "onchildcardstartpeek": {
             context: require("./invocationEvents"),
-            event: "onChildCardStartPeek",
-            triggerEvent: "onChildCardStartPeek",
-            trigger: function (peekType) {
-                _event.trigger("onChildCardStartPeek", peekType);
+            event: "onchildcardstartpeek",
+            trigger: function (pluginResult, peekType) {
+                pluginResult.callbackOk(peekType, true);
             }
         },
-        onChildCardEndPeek: {
+        "onchildcardendpeek": {
             context: require("./invocationEvents"),
-            event: "onChildCardEndPeek",
-            triggerEvent: "onChildCardEndPeek",
-            trigger: function () {
-                _event.trigger("onChildCardEndPeek");
+            event: "onchildcardendpeek",
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk({}, true);
             }
         },
-        onChildCardClosed: {
+        "onchildcardclosed": {
             context: require("./invocationEvents"),
-            event: "onChildCardClosed",
-            triggerEvent: "onChildCardClosed",
-            trigger: function (info) {
-                _event.trigger("onChildCardClosed", info);
+            event: "onchildcardclosed",
+            trigger: function (pluginResult, info) {
+                pluginResult.callbackOk(info, true);
+            }
+        },
+        "invocation.interrupted": {
+            context: require("./invocationEvents"),
+            event: "invocation.interrupted",
+            trigger: function (pluginResult, request, returnCallback) {
+                _returnCallback = returnCallback;
+                // Tell the client that we want to interrupt
+                pluginResult.callbackOk(request, true);
             }
         }
     },
     _interruption,
-    _returnCallback;
+    _listeners = {};
 
 module.exports = {
-    invoke: function (success, fail, args) {
+    invoke: function (success, fail, args, env) {
         // if request contains invalid args, the invocation framework will provide error in callback
         // no validation done here
-        var request = JSON.parse(decodeURIComponent(args["request"])),
+        var result = new PluginResult(args, env),
+            request = JSON.parse(decodeURIComponent(args["request"])),
             callback = function (error) {
-                _event.trigger("invoke.invokeEventId", error);
+                if (error) {
+                    result.callbackError(error, false);
+                } else {
+                    result.callbackOk(undefined, false);
+                }
             };
 
         window.qnx.webplatform.getApplication().invocation.invoke(request, callback);
-        success();
+        result.noResult(true);
     },
 
-    query: function (success, fail, args) {
-        var request = JSON.parse(decodeURIComponent(args["request"])),
+    query: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            request = JSON.parse(decodeURIComponent(args["request"])),
             callback = function (error, response) {
-                _event.trigger("invoke.queryEventId", {"error": error, "response": response});
+                if (error) {
+                    result.callbackError(error, false);
+                } else {
+                    result.callbackOk(response, false);
+                }
             },
             invocation = window.qnx.webplatform.getApplication().invocation;
 
@@ -91,59 +107,70 @@ module.exports = {
         }
 
         invocation.queryTargets(request, callback);
-        success();
+        result.noResult(true);
     },
 
-    closeChildCard: function (success, fail) {
+    closeChildCard: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
+
         try {
             window.qnx.webplatform.getApplication().invocation.closeChildCard();
-            success();
+            result.ok();
         } catch (e) {
-            fail(-1, e);
+            result.error(e);
         }
     },
 
-    registerEvents: function (success, fail, args, env) {
-        try {
-            var utils = require("./../../lib/utils"),
-                eventExt = utils.loadExtensionModule("event", "index");
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            context = _actionMap[eventName].context,
+            invokeEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
 
-            eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            fail(-1, e);
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        } else {
+            context.addEventListener(invokeEvent, listener);
+            _listeners[eventName][env.webview.id] = listener;
+            result.noResult(true);
         }
     },
 
-    returnInterruption : function (success, fail, args) {
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName][env.webview.id],
+            context = _actionMap[eventName].context,
+            invokeEvent = _actionMap[eventName].event;
+
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            context.removeEventListener(invokeEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
+        }
+    },
+
+    returnInterruption : function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            request;
+
         try {
-            var request = JSON.parse(decodeURIComponent(args.request));
+            request = JSON.parse(decodeURIComponent(args.request));
             if (typeof _returnCallback === 'function') {
                 _returnCallback(request);
             }
 
-            success();
+            result.ok();
         } catch (e) {
-            fail();
+            result.error(e);
         }
-    },
-
-    registerInterrupter : function (success, fail, args) {
-        try {
-            qnx.webplatform.getApplication().invocation.interrupter =  function (request, returnCallback) {
-                _returnCallback = returnCallback;
-                // Tell the client that we want to interrupt
-                _event.trigger("invocation.interrupted", request);
-            };
-            success();
-        } catch (e) {
-            fail();
-        }
-    },
-
-    clearInterrupter : function (success, fail) {
-        var application = qnx.webplatform.getApplication();
-        application.invocation.interrupter = undefined;
-    },
+    }
 };
 
