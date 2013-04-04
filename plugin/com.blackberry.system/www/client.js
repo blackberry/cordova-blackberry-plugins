@@ -25,17 +25,21 @@ var _self = {},
     execFunc = window.webworks.exec,
     events = ["batterystatus", "batterylow", "battercritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
     channels = events.map(function (eventName) {
-        var channel = cordova.addWindowEventHandler(eventName);
-        channel.onHasSubscribersChange = function () {
+        var thisChannel = cordova.addWindowEventHandler(eventName),
+            success = function (data) {
+                thisChannel.fire(data);
+            },
+            fail = function (error) {
+                console.log("Error initializing " + eventName + " listener: ", error);
+            };
+        thisChannel.onHasSubscribersChange = function () {
             if (this.numHandlers === 1) {
-                execFunc(cordova.fireWindowEvent.bind(null, eventName),
-                                     console.log.bind("Error initializing " + eventName + " listener: "),
-                                     ID, "startEvent", {eventName: eventName});
+                execFunc(success, fail, ID, "startEvent", {eventName: eventName});
             } else if (this.numHandlers === 0) {
                 execFunc(noop, noop, ID, "stopEvent", {eventName: eventName});
             }
         };
-        return channel;
+        return thisChannel;
     });
 
 function getFieldValue(field, args) {
