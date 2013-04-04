@@ -20,7 +20,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoke/",
     mockedInvocation,
     mockedApplication,
     mockedController,
-    _event,
+    mockedPluginResult,
     index,
     successCB,
     failCB,
@@ -30,11 +30,16 @@ describe("invoke index", function () {
 
     beforeEach(function () {
         mockedInvocation = {
-            invoke: jasmine.createSpy("invocation.invoke"),
-            queryTargets: jasmine.createSpy("invocation.queryTargets"),
+            invoke: jasmine.createSpy("invocation.invoke").andCallFake(function (request, callback) {
+                callback();
+            }),
+            queryTargets: jasmine.createSpy("invocation.queryTargets").andCallFake(function (request, callback) {
+                callback();
+            }),
             TARGET_TYPE_MASK_APPLICATION: 1,
             TARGET_TYPE_MASK_CARD: 2,
-            TARGET_TYPE_MASK_VIEWER: 4
+            TARGET_TYPE_MASK_VIEWER: 4,
+            interrupter : false
         };
         mockedController = {
             dispatchEvent : jasmine.createSpy(),
@@ -42,7 +47,6 @@ describe("invoke index", function () {
             removeEventListener : jasmine.createSpy()
         };
         mockedApplication = {
-            interrupter : false,
             invocation: mockedInvocation,
             addEventListener : jasmine.createSpy().andCallFake(function (eventName, callback) {
                     callback();
@@ -62,8 +66,17 @@ describe("invoke index", function () {
             }
         };
 
+        mockedPluginResult = {
+            callbackOk: jasmine.createSpy(),
+            callbackError: jasmine.createSpy(),
+            noResult: jasmine.createSpy(),
+            ok: jasmine.createSpy(),
+            error: jasmine.createSpy()
+        };
+
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
         GLOBAL.qnx = GLOBAL.window.qnx;
-        _event = require(_libDir + "./event");
         index = require(_apiDir + "index");
         successCB = jasmine.createSpy("success callback");
         failCB = jasmine.createSpy("fail callback");
@@ -72,6 +85,7 @@ describe("invoke index", function () {
     afterEach(function () {
         mockedInvocation = null;
         GLOBAL.window.qnx = null;
+        delete GLOBAL.PluginResult;
         index = null;
         successCB = null;
         failCB = null;
@@ -89,7 +103,8 @@ describe("invoke index", function () {
             expect(mockedInvocation.invoke).toHaveBeenCalledWith({
                 target: "abc.xyz"
             }, jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith(undefined, false);
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can invoke with uri", function () {
@@ -102,7 +117,8 @@ describe("invoke index", function () {
             expect(mockedInvocation.invoke).toHaveBeenCalledWith({
                 uri: "http://www.rim.com"
             }, jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith(undefined, false);
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can invoke with uri using the file_transfer_mode property", function () {
@@ -116,7 +132,8 @@ describe("invoke index", function () {
                 uri: "http://www.rim.com",
                 file_transfer_mode : "PRESERVE"
             }, jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith(undefined, false);
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
     });
@@ -142,8 +159,8 @@ describe("invoke index", function () {
             delete request["target_type"];
             request["target_type_mask"] = APPLICATION | VIEWER | CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can perform a query for application targets", function () {
@@ -162,8 +179,8 @@ describe("invoke index", function () {
             delete request["target_type"];
             request["target_type_mask"] = APPLICATION;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can perform a query for viewer targets", function  () {
@@ -182,8 +199,8 @@ describe("invoke index", function () {
             delete request["target_type"];
             request["target_type_mask"] = VIEWER;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can perform a query for card targets", function () {
@@ -202,8 +219,8 @@ describe("invoke index", function () {
             delete request["target_type"];
             request["target_type_mask"] = CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can perform a query for all targets", function () {
@@ -222,8 +239,8 @@ describe("invoke index", function () {
             delete request["target_type"];
             request["target_type_mask"] = APPLICATION | VIEWER | CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("will not generate a target_type property in the request if it is not an array", function () {
@@ -240,8 +257,8 @@ describe("invoke index", function () {
 
             index.query(success, fail, args);
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("will only use valid entries in the target type array to generate the target type mask", function () {
@@ -260,8 +277,8 @@ describe("invoke index", function () {
             request["target_type"] = ["INVALID_ENTRY"];
             request["target_type_mask"] = APPLICATION | VIEWER | CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
@@ -278,192 +295,94 @@ describe("invoke index", function () {
             it("can call closeChildCard with success callback at the end", function () {
                 index.closeChildCard(successCB, failCB);
                 expect(mockedInvocation.closeChildCard).toHaveBeenCalled();
-                expect(successCB).toHaveBeenCalled();
-                expect(failCB).not.toHaveBeenCalled();
-            });
-
-            it("can call closeChildCard with fail callback on wrong call", function () {
-                index.closeChildCard(null, failCB);
-                expect(mockedInvocation.closeChildCard).toHaveBeenCalled();
-                expect(successCB).not.toHaveBeenCalled();
-                expect(failCB).toHaveBeenCalledWith(errorCode, jasmine.any(Object));
+                expect(mockedPluginResult.ok).toHaveBeenCalled();
+                expect(mockedPluginResult.error).not.toHaveBeenCalled();
             });
         });
 
         describe("events", function () {
-            var utils,
-                events,
-                eventExt;
+            var invocationEvents;
 
             beforeEach(function () {
-                utils = require(_libDir + "utils");
-                events = require(_libDir + "event");
-                eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index");
-                spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                    return eventExt;
-                });
+                invocationEvents = require(_apiDir + "invocationEvents");
             });
 
             afterEach(function () {
-                utils = null;
-                events = null;
-                eventExt = null;
+                invocationEvents = null;
             });
 
-            it("can register for events", function () {
-                var evts = ["onChildCardStartPeek", "onChildCardEndPeek", "onChildCardClosed"],
-                    args,
-                    env = {webviewId: 42};
+            it("can call startEvent", function () {
+                var env = {
+                        webview: {
+                            id: 42
+                        }
+                    };
 
-                spyOn(events, "add");
+                spyOn(invocationEvents, "addEventListener");
 
-                evts.forEach(function (e) {
-                    args = {eventName : encodeURIComponent(e)};
-                    index.registerEvents(successCB);
-                    eventExt.add(null, null, args, env);
-                    expect(successCB).toHaveBeenCalled();
-                    expect(events.add).toHaveBeenCalled();
-                    expect(events.add.mostRecentCall.args[0].event).toEqual(e);
-                    expect(events.add.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
-                });
+                index.startEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("onchildcardclosed"))}, env);
+
+                expect(invocationEvents.addEventListener).toHaveBeenCalledWith("onchildcardclosed", jasmine.any(Function));
+                expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("call successCB when all went well", function () {
-                var eventName = "onChildCardClosed",
-                    args = {eventName: encodeURIComponent(eventName)},
-                    env = {webviewId: 42};
+            it("can call stopEvent", function () {
+                var env = {
+                        webview: {
+                            id: 42
+                        }
+                    };
 
-                spyOn(events, "add");
-                index.registerEvents(jasmine.createSpy(), jasmine.createSpy());
-                eventExt.add(successCB, failCB, args, env);
-                expect(events.add).toHaveBeenCalled();
-                expect(successCB).toHaveBeenCalled();
-                expect(failCB).not.toHaveBeenCalled();
+                spyOn(invocationEvents, "removeEventListener");
+
+                index.stopEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("onchildcardclosed"))}, env);
+
+                expect(invocationEvents.removeEventListener).toHaveBeenCalledWith("onchildcardclosed", jasmine.any(Function));
+                expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
             });
-
-            it("call errorCB when there was an error", function () {
-                var eventName = "onChildCardClosed",
-                    args = {eventName: encodeURIComponent(eventName)},
-                    env = {webview: {id: (new Date()).getTime()}};
-
-                spyOn(events, "add").andCallFake(function () {
-                    throw "";
-                });
-
-                index.registerEvents(jasmine.createSpy(), jasmine.createSpy());
-                eventExt.add(successCB, failCB, args, env);
-                expect(events.add).toHaveBeenCalledWith({
-                    context: require(_apiDir + "invocationEvents"),
-                    event: eventName,
-                    trigger: jasmine.any(Function),
-                    triggerEvent: "onChildCardClosed"
-                }, env.webview);
-                expect(successCB).not.toHaveBeenCalled();
-                expect(failCB).toHaveBeenCalledWith(-1, jasmine.any(String));
-            });
-
-            it("can un-register from events", function () {
-                var evts = ["onChildCardStartPeek", "onChildCardEndPeek", "onChildCardClosed"],
-                    args,
-                    env = {webview: {id: (new Date()).getTime()}};
-
-                spyOn(events, "remove");
-
-                evts.forEach(function (e) {
-                    args = {eventName : encodeURIComponent(e)};
-                    eventExt.remove(null, null, args, env);
-                    expect(events.remove).toHaveBeenCalledWith({
-                        context: require(_apiDir + "invocationEvents"),
-                        event: e,
-                        trigger: jasmine.any(Function),
-                        triggerEvent: e
-                    }, env.webview);
-                    expect(events.remove.mostRecentCall.args[0].event).toEqual(e);
-                    expect(events.remove.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
-                });
-            });
-
-            it("call successCB when all went well even when event is not defined", function () {
-                var eventName = "eventnotdefined",
-                    args = {eventName: encodeURIComponent(eventName)},
-                    env = {webview: {id: (new Date()).getTime()}};
-
-                spyOn(events, "remove");
-                eventExt.remove(successCB, failCB, args, env);
-                expect(events.remove).toHaveBeenCalledWith(undefined, env.webview);
-                expect(successCB).toHaveBeenCalled();
-                expect(failCB).not.toHaveBeenCalled();
-            });
-
-            it("call errorCB when there was exception occured", function () {
-                var eventName = "onChildCardClosed",
-                    args = {eventName: encodeURIComponent(eventName)},
-                    env = {webview: {id: (new Date()).getTime()}};
-
-                spyOn(events, "remove").andCallFake(function () {
-                    throw "";
-                });
-
-                eventExt.remove(successCB, failCB, args, env);
-                expect(events.remove).toHaveBeenCalledWith({
-                    context: require(_apiDir + "invocationEvents"),
-                    event: eventName,
-                    trigger: jasmine.any(Function),
-                    triggerEvent: "onChildCardClosed"
-                }, env.webview);
-                expect(successCB).not.toHaveBeenCalled();
-                expect(failCB).toHaveBeenCalledWith(-1, jasmine.any(String));
-            });
-
         });
 
         describe("interrupt invocation", function () {
+            var invocationEvents;
+
+            beforeEach(function () {
+                invocationEvents = require(_apiDir + "invocationEvents");
+            });
+
+            afterEach(function () {
+                invocationEvents = null;
+            });
 
             it("expect returnInterruption to be defined", function () {
                 expect(index.returnInterruption).toBeDefined();
             });
 
             it("can properly register for invocation interruption", function () {
-                var args = {someTestStuff : 'Test arges'};
-                index.registerInterrupter(successCB, failCB, args);
-                expect(mockedApplication.invocation.interrupter).toEqual(jasmine.any(Function));
-                expect(successCB).toHaveBeenCalled();
+                var env = {
+                        webview: {
+                            id: 42
+                        }
+                    };
+
+                spyOn(invocationEvents, "addEventListener");
+
+                index.startEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("invocation.interrupted"))}, env);
+                expect(invocationEvents.addEventListener).toHaveBeenCalledWith("invocation.interrupted", jasmine.any(Function));
+                expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("can properly trigger an event to the client after registration", function () {
-                var args = {someTestStuff : 'Test arges'},
-                    mockedRequest = {'mocked' : 'request'},
-                    returnCallback = jasmine.createSpy();
+            it("can properly unregister for invocation interruption", function () {
+                var env = {
+                        webview: {
+                            id: 42
+                        }
+                    };
 
-                index.registerInterrupter(successCB, failCB, args);
-                expect(mockedApplication.invocation.interrupter).toEqual(jasmine.any(Function));
+                spyOn(invocationEvents, "removeEventListener");
 
-                spyOn(_event, 'trigger');
-                mockedApplication.invocation.interrupter(mockedRequest, returnCallback);
-                expect(_event.trigger).toHaveBeenCalledWith('invocation.interrupted', mockedRequest);
-
-                expect(successCB).toHaveBeenCalled();
-            });
-
-            it("can properly return from the client to continue invocation", function () {
-                var mockedRequest = { request : encodeURIComponent(JSON.stringify({something : 'some other data'})) },
-                    returnCallback = jasmine.createSpy();
-
-                index.registerInterrupter(successCB, failCB, mockedRequest);
-                expect(mockedApplication.invocation.interrupter).toEqual(jasmine.any(Function));
-
-                spyOn(_event, 'trigger');
-                mockedApplication.invocation.interrupter(mockedRequest, returnCallback);
-                expect(_event.trigger).toHaveBeenCalledWith('invocation.interrupted', mockedRequest);
-
-                index.returnInterruption(successCB, failCB, mockedRequest);
-                expect(returnCallback).toHaveBeenCalledWith(JSON.parse(decodeURIComponent(mockedRequest.request)));
-                expect(successCB).toHaveBeenCalled();
-            });
-
-            it("can properly clear invocation interruption", function () {
-                index.clearInterrupter(successCB, failCB);
-                expect(mockedApplication.invocation.interrupter).toEqual(undefined);
+                index.stopEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("invocation.interrupted"))}, env);
+                expect(invocationEvents.removeEventListener).toHaveBeenCalledWith("invocation.interrupted", jasmine.any(Function));
+                expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
             });
 
         });

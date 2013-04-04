@@ -21,7 +21,6 @@ var onSuccess,
 
 describe("blackberry.invoke", function () {
     beforeEach(function () {
-        spyOn(window.webworks.event, 'isOn').andReturn(false);
         onSuccessFlag = false;
         onErrorFlag = false;
         onSuccess = jasmine.createSpy("success callback").andCallFake(
@@ -94,7 +93,7 @@ describe("blackberry.invoke", function () {
 
     describe("Cards", function () {
         var request = {
-                target: "net.rim.webworks.invoke.invoke.card.type",
+                target: "com.webworks.test.functional.invoke.card.target",
             },
             onChildCardClosed,
             onChildCardStartPeek,
@@ -105,18 +104,18 @@ describe("blackberry.invoke", function () {
             onChildCardClosed = jasmine.createSpy("onChildCardClosed event");
             onChildCardStartPeek = jasmine.createSpy("onChildCardStartPeek event");
             onChildCardEndPeek = jasmine.createSpy("onChildCardEndPeek event");
-            blackberry.event.addEventListener("onChildCardClosed", onChildCardClosed);
-            blackberry.event.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
-            blackberry.event.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
+            window.addEventListener("onChildCardClosed", onChildCardClosed);
+            window.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
+            window.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
         });
 
         afterEach(function () {
             onChildCardClosed = null;
             onChildCardStartPeek = null;
             onChildCardEndPeek = null;
-            blackberry.event.removeEventListener("onChildCardClosed", onChildCardClosed);
-            blackberry.event.removeEventListener("onChildCardStartPeek", onChildCardStartPeek);
-            blackberry.event.removeEventListener("onChildCardEndPeek", onChildCardEndPeek);
+            window.removeEventListener("onChildCardClosed", onChildCardClosed);
+            window.removeEventListener("onChildCardStartPeek", onChildCardStartPeek);
+            window.removeEventListener("onChildCardEndPeek", onChildCardEndPeek);
             confirm = null;
         });
 
@@ -166,7 +165,7 @@ describe("blackberry.invoke", function () {
         });
 
         it('invoke should be able to call closeChildCard after successfully invoking a card', function () {
-            request.target = "net.rim.webworks.invoke.invoke.card.type";
+            request.target = "com.webworks.test.functional.invoke.card.target";
 
             alert("This test will invoke card and close it without user interaction.");
 

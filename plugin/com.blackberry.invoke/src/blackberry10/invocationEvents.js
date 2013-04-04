@@ -18,14 +18,17 @@ var _application = window.qnx.webplatform.getApplication();
 module.exports = {
     addEventListener: function (event, trigger) {
         switch (event) {
-        case "onChildCardStartPeek":
-            window.qnx.webplatform.getApplication().invocation.addEventListener("cardPeekStarted", trigger);
+        case "onchildcardstartpeek":
+            _application.invocation.addEventListener("cardPeekStarted", trigger);
             break;
-        case "onChildCardEndPeek":
-            window.qnx.webplatform.getApplication().invocation.addEventListener("cardPeekEnded", trigger);
+        case "onchildcardendpeek":
+            _application.invocation.addEventListener("cardPeekEnded", trigger);
             break;
-        case "onChildCardClosed":
-            window.qnx.webplatform.getApplication().invocation.addEventListener("childCardClosed", trigger);
+        case "onchildcardclosed":
+            _application.invocation.addEventListener("childCardClosed", trigger);
+            break;
+        case "invocation.interrupted":
+            _application.invocation.interrupter = trigger;
             break;
         default:
             console.log("Ignore registration for unknown event: " + event);
@@ -34,14 +37,17 @@ module.exports = {
     },
     removeEventListener: function (event, trigger) {
         switch (event) {
-        case "onChildCardStartPeek":
-            window.qnx.webplatform.getApplication().invocation.removeEventListener("cardPeekStarted", trigger);
+        case "onchildcardstartpeek":
+            _application.invocation.removeEventListener("cardPeekStarted", trigger);
             break;
-        case "onChildCardEndPeek":
-            window.qnx.webplatform.getApplication().invocation.removeEventListener("cardPeekEnded", trigger);
+        case "onchildcardendpeek":
+            _application.invocation.removeEventListener("cardPeekEnded", trigger);
             break;
-        case "onChildCardClosed":
-            window.qnx.webplatform.getApplication().invocation.removeEventListener("childCardClosed", trigger);
+        case "onchildcardclosed":
+            _application.invocation.removeEventListener("childCardClosed", trigger);
+            break;
+        case "invocation.interrupted":
+            _application.invocation.interrupter = undefined;
             break;
         default:
             console.log("Ignore un-registration for unknown event: " + event);
