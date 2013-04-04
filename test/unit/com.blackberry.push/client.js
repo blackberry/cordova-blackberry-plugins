@@ -61,11 +61,7 @@ function unloadClient() {
 
 describe("push", function () {
     beforeEach(function () {
-        mockedWebworks.exec = jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
-            success(2);
-        });
-        mockedWebworks.event = { once : jasmine.createSpy().andReturn(3),
-                                 isOn : jasmine.createSpy().andReturn(4) };
+        mockedWebworks.exec = jasmine.createSpy();
         mockedWebworks.defineReadOnlyField = jasmine.createSpy();
         GLOBAL.window = {
             webworks: mockedWebworks
@@ -151,8 +147,7 @@ describe("push", function () {
                     simChangeCallback,
                     pushTransportReadyCallback;
 
-                expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
-                expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, "push.create.callback", jasmine.any(Function));
+                client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                 expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startService", options);
             });
 
@@ -165,13 +160,12 @@ describe("push", function () {
                     pushTransportReadyCallback;
 
                 runs(function () {
-                    expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                 });
 
                 runs(function () {
                     options.appId = "";
-                    expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
-                    expect(mockedWebworks.event.once.callCount).toEqual(2);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                     expect(mockedWebworks.exec.callCount).toEqual(2);
                 });
             });
@@ -186,7 +180,7 @@ describe("push", function () {
                     pushTransportReadyCallback;
 
                 runs(function () {
-                    expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                 });
 
                 runs(function () {
@@ -197,7 +191,6 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(invokeTargetIdError);
-                    expect(mockedWebworks.event.once.callCount).toEqual(1);
                     expect(mockedWebworks.exec.callCount).toEqual(1);
                 });
             });
@@ -212,7 +205,7 @@ describe("push", function () {
                     pushTransportReadyCallback;
 
                 runs(function () {
-                    expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                 });
 
                 runs(function () {
@@ -223,7 +216,6 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(appIdError);
-                    expect(mockedWebworks.event.once.callCount).toEqual(1);
                     expect(mockedWebworks.exec.callCount).toEqual(1);
                 });
             });
@@ -237,7 +229,7 @@ describe("push", function () {
                     pushTransportReadyCallback;
 
                 runs(function () {
-                    expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                 });
 
                 runs(function () {
@@ -248,7 +240,6 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(appIdError);
-                    expect(mockedWebworks.event.once.callCount).toEqual(1);
                     expect(mockedWebworks.exec.callCount).toEqual(1);
                 });
             });
@@ -263,7 +254,7 @@ describe("push", function () {
                     pushTransportReadyCallback;
 
                 runs(function () {
-                    expect(client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback)).toEqual(2);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
                 });
 
                 runs(function () {
@@ -275,7 +266,6 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(appIdError);
-                    expect(mockedWebworks.event.once.callCount).toEqual(1);
                     expect(mockedWebworks.exec.callCount).toEqual(1);
                 });
             });
@@ -283,22 +273,20 @@ describe("push", function () {
 
         describe("createChannel", function () {
             it("sets up the createChannel callback", function () {
-                var createChannelCallback,
+                var createChannelCallback = function () {},
                     pushService = new client.PushService();
 
-                expect(pushService.createChannel(createChannelCallback)).toEqual(2);
-                expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, "push.createChannel.callback", jasmine.any(Function));
+                pushService.createChannel(createChannelCallback);
                 expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "createChannel", null);
             });
         });
 
         describe("destroyChannel", function () {
             it("sets up the destroyChannel callback", function () {
-                var destroyChannelCallback,
+                var destroyChannelCallback = function () {},
                     pushService = new client.PushService();
 
-                expect(pushService.destroyChannel(destroyChannelCallback)).toEqual(2);
-                expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, "push.destroyChannel.callback", destroyChannelCallback);
+                pushService.destroyChannel(destroyChannelCallback);
                 expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "destroyChannel", null);
             });
         });
@@ -374,11 +362,10 @@ describe("push", function () {
             it("sets up the launchApplicationOnPush callback", function () {
                 var shouldLaunch = true,
                     shouldLaunchObj = {"shouldLaunch" : shouldLaunch},
-                    launchApplicationCallback,
+                    launchApplicationCallback = function () {},
                     pushService = new client.PushService();
 
-                expect(pushService.launchApplicationOnPush(shouldLaunch, launchApplicationCallback)).toEqual(2);
-                expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, "push.launchApplicationOnPush.callback", launchApplicationCallback);
+                pushService.launchApplicationOnPush(shouldLaunch, launchApplicationCallback);
                 expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "launchApplicationOnPush", shouldLaunchObj);
             });
         });
@@ -419,7 +406,7 @@ describe("push", function () {
                 args = { "id": "id", "shouldAcceptPush": shouldAcceptPush };
 
             pushPayload.id = "id";
-            expect(pushPayload.acknowledge(shouldAcceptPush)).toEqual(2);
+            pushPayload.acknowledge(shouldAcceptPush);
             expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "acknowledge", args);
         });
     });

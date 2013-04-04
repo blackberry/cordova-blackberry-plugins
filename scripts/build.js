@@ -60,7 +60,7 @@ function copyExtensions(extPath) {
 }
 
 module.exports = function (done) {
-    var cmd = 'make',
+    var cmd = 'make JLEVEL=4',
         buildTask = jWorkflow.order();
 
     buildTask.andThen(utils.execCommandWithJWorkflow(cmd, {}, true))

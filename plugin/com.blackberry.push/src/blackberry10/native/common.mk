@@ -5,6 +5,7 @@ include $(QCONFIG)
 
 NAME=pushjnext
 PLUGIN=yes
+UTILS=yes
 
 include ../../../../../../meta.mk
 
