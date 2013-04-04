@@ -21,13 +21,9 @@ var _self = {},
     _ID = "com.blackberry.push",
     PushService,
     PushPayload,
-    onCreateSuccess = null,
-    onCreateFail = null,
-    onCreateSimChange = null,
-    onCreatePushTransportReady = null,
-    onCreateChannel = null,
     createInvokeTargetId = null,
     createAppId = null,
+    noop = function () {},
     SUCCESS = 0,
     INTERNAL_ERROR = 500,
     INVALID_DEVICE_PIN = 10001,
@@ -55,41 +51,6 @@ var _self = {},
     CREATE_CHANNEL_OPERATION = 1,
     DESTROY_CHANNEL_OPERATION = 2;
 
-function webworksCreateCallback(result) {
-    if (result === SUCCESS) {
-        if (onCreateSimChange) {
-            window.webworks.event.once(_ID, "push.create.simChangeCallback", onCreateSimChange);
-        }
-
-        if (onCreatePushTransportReady) {
-            window.webworks.event.add(_ID, "push.create.pushTransportReadyCallback", onCreatePushTransportReady);
-        }
-        
-        if (onCreateSuccess) {
-            onCreateSuccess(new PushService());
-        }
-    } else {
-        if (onCreateFail) {
-            onCreateFail(result);
-        }
-
-        createInvokeTargetId = null;
-        createAppId = null;
-    }
-
-    onCreateSuccess = null;
-    onCreateFail = null;
-    onCreateSimChange = null;
-    onCreatePushTransportReady = null;
-}
-
-function webworksCreateChannelCallback(info) {
-    if (onCreateChannel) {
-        onCreateChannel(info.result, info.token);
-        onCreateChannel = null;
-    }
-}
-
 /*
  * Define methods of push.PushService
  */
@@ -101,12 +62,27 @@ PushService.create = function (options, successCallback, failCallback, simChange
     var args = { "invokeTargetId" : options.invokeTargetId || "",
                  "appId" : options.appId || "",
                  "ppgUrl" : options.ppgUrl || "" },
-        result,
-        success = function (data, response) {
-            result = data;
-        },
-        fail = function (data, response) {
-            throw data;
+        createCallback = function (result) {
+            if (result === SUCCESS) {
+                if (simChangeCallback) {
+                    window.webworks.exec(simChangeCallback, noop, _ID, "registerCallback", {id: "push.create.simChangeCallback"});
+                }
+
+                if (pushTransportReadyCallback) {
+                    window.webworks.exec(pushTransportReadyCallback, noop, _ID, "registerCallback", {id: "push.create.pushTransportReadyCallback"});
+                }
+
+                if (successCallback) {
+                    successCallback(new PushService());
+                }
+            } else {
+                if (failCallback) {
+                    failCallback(result);
+                }
+
+                createInvokeTargetId = null;
+                createAppId = null;
+            }
         };
 
     // Check if create() called more than once
@@ -125,54 +101,22 @@ PushService.create = function (options, successCallback, failCallback, simChange
     createInvokeTargetId = args.invokeTargetId;
     createAppId = args.appId;
 
-    // Register callbacks for push.create()
-    onCreateSuccess = successCallback;
-    onCreateFail = failCallback;
-    onCreateSimChange = simChangeCallback;
-    onCreatePushTransportReady = pushTransportReadyCallback;
-    window.webworks.event.once(_ID, "push.create.callback", webworksCreateCallback);
-
     // Send command to framework to start Push service
-    window.webworks.exec(success, fail, _ID, "startService", args);
-
-    return result;
+    window.webworks.exec(createCallback, noop, _ID, "startService", args);
 };
 
 PushService.prototype.createChannel = function (createChannelCallback) {
-    var result,
-        success = function (data, response) {
-            result = data;
-        },
-        fail = function (data, response) {
-            throw data;
-        };
-
-    // Register callbacks for push.createChannel()
-    onCreateChannel = createChannelCallback;
-    window.webworks.event.once(_ID, "push.createChannel.callback", webworksCreateChannelCallback);
-
     // Send command to framework to create Push channel
-    window.webworks.exec(success, fail, _ID, "createChannel", null);
-
-    return result;
+    window.webworks.exec(function (info) {
+        if (createChannelCallback) {
+            createChannelCallback(info.result, info.token);
+        }
+    }, noop, _ID, "createChannel", null);
 };
 
 PushService.prototype.destroyChannel = function (destroyChannelCallback) {
-    var result,
-        success = function (data, response) {
-            result = data;
-        },
-        fail = function (data, response) {
-            throw data;
-        };
-
-    // Register callbacks for push.destroyChannel()
-    window.webworks.event.once(_ID, "push.destroyChannel.callback", destroyChannelCallback);
-
     // Send command to framework to destroy Push channel
-    window.webworks.exec(success, fail, _ID, "destroyChannel", null);
-
-    return result;
+    window.webworks.exec(destroyChannelCallback, noop, _ID, "destroyChannel", null);
 };
 
 PushService.prototype.extractPushPayload = function (invokeObject) {
@@ -221,23 +165,10 @@ PushService.prototype.extractPushPayload = function (invokeObject) {
 };
 
 PushService.prototype.launchApplicationOnPush = function (shouldLaunch, launchApplicationCallback) {
-    var args = { "shouldLaunch" : shouldLaunch },
-        result,
-        success = function (data, response) {
-            result = data;
-        },
-        fail = function (data, response) {
-            throw data;
-        };
-
-
-    // Register callbacks for push.launchApplicationOnPush()
-    window.webworks.event.once(_ID, "push.launchApplicationOnPush.callback", launchApplicationCallback);
+    var args = { "shouldLaunch" : shouldLaunch };
 
     // Send command to framework to set the launch flag
-    window.webworks.exec(success, fail, _ID, "launchApplicationOnPush", args);
-
-    return result;
+    window.webworks.exec(launchApplicationCallback, noop, _ID, "launchApplicationOnPush", args);
 };
 
 /*
@@ -281,19 +212,10 @@ PushPayload = function (payload) {
 };
 
 PushPayload.prototype.acknowledge = function (shouldAcceptPush) {
-    var args = {"id" : this.id, "shouldAcceptPush" : shouldAcceptPush},
-        result,
-        success = function (data, response) {
-            result = data;
-        },
-        fail = function (data, response) {
-            throw data;
-        };
+    var args = {"id" : this.id, "shouldAcceptPush" : shouldAcceptPush};
 
     // Send command to framework to acknowledge the Push payload
-    window.webworks.exec(success, fail, _ID, "acknowledge", args);
-
-    return result;
+    window.webworks.exec(noop, noop, _ID, "acknowledge", args);
 };
 
 _self.PushService = PushService;
