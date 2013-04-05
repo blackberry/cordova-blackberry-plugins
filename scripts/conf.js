@@ -20,8 +20,13 @@ module.exports = {
         "dir": path.normalize(__dirname + "/../test/cordova-blackberry"),
         "url": "https://github.com/blackberry/cordova-blackberry.git"
     },
+    MOBILE_SPEC_REPOS: {
+        "dir": path.normalize(__dirname + "/../test/cordova-mobile-spec"),
+        "url": "https://github.com/apache/cordova-mobile-spec.git"
+    },
     ROOT: path.normalize(__dirname + "/../"),
     TEMP: path.normalize(__dirname + "/../temp/"),
     TEST_APP_APP: path.normalize(__dirname + "/../test/test-app/app"),
-    TEST_SUITE_APP: path.normalize(__dirname + "/../test/test-suite/app")
+    TEST_SUITE_APP: path.normalize(__dirname + "/../test/test-suite/app"),
+    MOBILE_SPEC_APP: path.normalize(__dirname + "/../test/mobile-spec/app")
 };

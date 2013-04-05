@@ -15,7 +15,11 @@ tags
 *.*~
 *.swp
 
-#output
+#build dependencies
+test/cordova-blackberry/
+test/cordova-mobile-spec/
+
+#build output
 target/
 clientFiles/
 lib/webworks-info.js
@@ -29,9 +33,9 @@ plugin/*/src/blackberry10/native/x86/*/*.so
 plugin/*/src/blackberry10/native/x86/*/test
 plugin/*/src/blackberry10/native/device/*.so
 plugin/*/src/blackberry10/native/simulator/*.so
-test/cordova-blackberry/
 test/test-app/app/*
 test/test-suite/app/*
+test/mobile-spec/
 test/test-app/project.json
 test/test-suite/project.json
 
