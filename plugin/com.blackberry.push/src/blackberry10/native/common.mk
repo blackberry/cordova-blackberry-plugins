@@ -10,7 +10,8 @@ UTILS=yes
 include ../../../../../../meta.mk
 
 SRCS+=push_js.cpp \
-      push_ndk.cpp
+      push_ndk.cpp \
+	  ConnectionTimerThread.cpp
 
 include $(MKFILES_ROOT)/qtargets.mk
 

@@ -25,6 +25,8 @@ var _extDir = __dirname + "/../../../plugin",
     constants = {
         "SUCCESS" : 0,
         "INTERNAL_ERROR" : 500,
+        "PUSH_SERVICE_CONNECTION_CLOSED" : 501,
+        "PUSH_SERVICE_CONNECTION_PERMISSION_ERROR" : 502,
         "INVALID_DEVICE_PIN" : 10001,
         "INVALID_PROVIDER_APPLICATION_ID" : 10002,
         "CHANNEL_ALREADY_DESTROYED" : 10004,
@@ -47,8 +49,10 @@ var _extDir = __dirname + "/../../../plugin",
         "MISSING_INVOKE_TARGET_ID" : 10111,
         "SESSION_ALREADY_EXISTS" : 10112,
         "INVALID_PPG_URL" : 10114,
+        "CREATE_OPERATION" : 0,
         "CREATE_CHANNEL_OPERATION" : 1,
-        "DESTROY_CHANNEL_OPERATION" : 2
+        "DESTROY_CHANNEL_OPERATION" : 2,
+        "LAUNCH_APP_ON_PUSH_OPERATION" : 3
     },
     constantsLength = 0,
     defineROFieldArgs = [];
@@ -89,6 +93,8 @@ describe("push", function () {
         it("call defineReadOnlyField with right params", function () {
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("SUCCESS")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INTERNAL_ERROR")]);
+            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("PUSH_SERVICE_CONNECTION_CLOSED")]);
+            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("PUSH_SERVICE_CONNECTION_PERMISSION_ERROR")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_DEVICE_PIN")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_PROVIDER_APPLICATION_ID")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CHANNEL_ALREADY_DESTROYED")]);
@@ -111,8 +117,10 @@ describe("push", function () {
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("MISSING_INVOKE_TARGET_ID")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("SESSION_ALREADY_EXISTS")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_PPG_URL")]);
+            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CREATE_OPERATION")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CREATE_CHANNEL_OPERATION")]);
             expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("DESTROY_CHANNEL_OPERATION")]);
+            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("LAUNCH_APP_ON_PUSH_OPERATION")]);
         });
     });
 
@@ -145,9 +153,10 @@ describe("push", function () {
                     successCallback,
                     failCallback,
                     simChangeCallback,
-                    pushTransportReadyCallback;
+                    pushTransportReadyCallback,
+                    pushServiceConnectionReadyCallback;
 
-                client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                 expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startService", options);
             });
 
@@ -157,15 +166,16 @@ describe("push", function () {
                     successCallback,
                     failCallback,
                     simChangeCallback,
-                    pushTransportReadyCallback;
+                    pushTransportReadyCallback,
+                    pushServiceConnectionReadyCallback;
 
                 runs(function () {
-                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                 });
 
                 runs(function () {
                     options.appId = "";
-                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                     expect(mockedWebworks.exec.callCount).toEqual(2);
                 });
             });
@@ -177,17 +187,18 @@ describe("push", function () {
                     successCallback,
                     failCallback,
                     simChangeCallback,
-                    pushTransportReadyCallback;
+                    pushTransportReadyCallback,
+                    pushServiceConnectionReadyCallback;
 
                 runs(function () {
-                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                 });
 
                 runs(function () {
                     options.invokeTargetId = "differentInvokeTargetId";
 
                     function createPushService() {
-                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                     }
 
                     expect(createPushService).toThrow(invokeTargetIdError);
@@ -202,17 +213,18 @@ describe("push", function () {
                     successCallback,
                     failCallback,
                     simChangeCallback,
-                    pushTransportReadyCallback;
+                    pushTransportReadyCallback,
+                    pushServiceConnectionReadyCallback;
 
                 runs(function () {
-                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                 });
 
                 runs(function () {
                     options.appId = "differentAppId";
 
                     function createPushService() {
-                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                     }
 
                     expect(createPushService).toThrow(appIdError);
@@ -226,17 +238,18 @@ describe("push", function () {
                     successCallback,
                     failCallback,
                     simChangeCallback,
-                    pushTransportReadyCallback;
+                    pushTransportReadyCallback,
+                    pushServiceConnectionReadyCallback;
 
                 runs(function () {
-                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                 });
 
                 runs(function () {
                     options.appId = "hello";
 
                     function createPushService() {
-                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                     }
 
                     expect(createPushService).toThrow(appIdError);
@@ -251,10 +264,11 @@ describe("push", function () {
                     successCallback,
                     failCallback,
                     simChangeCallback,
-                    pushTransportReadyCallback;
+                    pushTransportReadyCallback,
+                    pushServiceConnectionReadyCallback;
 
                 runs(function () {
-                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                    client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                 });
 
                 runs(function () {
@@ -262,7 +276,7 @@ describe("push", function () {
                                 "ppgUrl" : "ppgUrl" };
 
                     function createPushService() {
-                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
+                        client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback);
                     }
 
                     expect(createPushService).toThrow(appIdError);
@@ -411,4 +425,3 @@ describe("push", function () {
         });
     });
 });
-

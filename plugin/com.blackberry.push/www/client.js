@@ -26,6 +26,8 @@ var _self = {},
     noop = function () {},
     SUCCESS = 0,
     INTERNAL_ERROR = 500,
+    PUSH_SERVICE_CONNECTION_CLOSED = 501,
+    PUSH_SERVICE_CONNECTION_PERMISSION_ERROR = 502,    
     INVALID_DEVICE_PIN = 10001,
     INVALID_PROVIDER_APPLICATION_ID = 10002,
     CHANNEL_ALREADY_DESTROYED = 10004,
@@ -48,8 +50,10 @@ var _self = {},
     MISSING_INVOKE_TARGET_ID = 10111,
     SESSION_ALREADY_EXISTS = 10112,
     INVALID_PPG_URL = 10114,
+    CREATE_OPERATION = 0,
     CREATE_CHANNEL_OPERATION = 1,
-    DESTROY_CHANNEL_OPERATION = 2;
+    DESTROY_CHANNEL_OPERATION = 2,
+    LAUNCH_APP_ON_PUSH_OPERATION = 3;
 
 /*
  * Define methods of push.PushService
@@ -58,11 +62,16 @@ var _self = {},
 PushService = function () {
 };
 
-PushService.create = function (options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback) {
+PushService.create = function (options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback, pushServiceConnectionReadyCallback) {
     var args = { "invokeTargetId" : options.invokeTargetId || "",
                  "appId" : options.appId || "",
                  "ppgUrl" : options.ppgUrl || "" },
         createCallback = function (result) {
+            // The pushServiceConnectionReadyCallback callback can be fired when the create call is either successful or fails
+            if (pushServiceConnectionReadyCallback) {
+                window.webworks.exec(pushServiceConnectionReadyCallback, noop, _ID, "registerCallback", {id: "push.create.pushServiceConnectionReadyCallback"});
+            }
+    
             if (result === SUCCESS) {
                 if (simChangeCallback) {
                     window.webworks.exec(simChangeCallback, noop, _ID, "registerCallback", {id: "push.create.simChangeCallback"});
@@ -176,6 +185,8 @@ PushService.prototype.launchApplicationOnPush = function (shouldLaunch, launchAp
  */
 window.webworks.defineReadOnlyField(PushService, "SUCCESS", SUCCESS);
 window.webworks.defineReadOnlyField(PushService, "INTERNAL_ERROR", INTERNAL_ERROR);
+window.webworks.defineReadOnlyField(PushService, "PUSH_SERVICE_CONNECTION_CLOSED", PUSH_SERVICE_CONNECTION_CLOSED);
+window.webworks.defineReadOnlyField(PushService, "PUSH_SERVICE_CONNECTION_PERMISSION_ERROR", PUSH_SERVICE_CONNECTION_PERMISSION_ERROR);
 window.webworks.defineReadOnlyField(PushService, "INVALID_DEVICE_PIN", INVALID_DEVICE_PIN);
 window.webworks.defineReadOnlyField(PushService, "INVALID_PROVIDER_APPLICATION_ID", INVALID_PROVIDER_APPLICATION_ID);
 window.webworks.defineReadOnlyField(PushService, "CHANNEL_ALREADY_DESTROYED", CHANNEL_ALREADY_DESTROYED);
@@ -198,8 +209,10 @@ window.webworks.defineReadOnlyField(PushService, "PPG_SERVER_ERROR", PPG_SERVER_
 window.webworks.defineReadOnlyField(PushService, "MISSING_INVOKE_TARGET_ID", MISSING_INVOKE_TARGET_ID);
 window.webworks.defineReadOnlyField(PushService, "SESSION_ALREADY_EXISTS", SESSION_ALREADY_EXISTS);
 window.webworks.defineReadOnlyField(PushService, "INVALID_PPG_URL", INVALID_PPG_URL);
+window.webworks.defineReadOnlyField(PushService, "CREATE_OPERATION", CREATE_OPERATION);
 window.webworks.defineReadOnlyField(PushService, "CREATE_CHANNEL_OPERATION", CREATE_CHANNEL_OPERATION);
 window.webworks.defineReadOnlyField(PushService, "DESTROY_CHANNEL_OPERATION", DESTROY_CHANNEL_OPERATION);
+window.webworks.defineReadOnlyField(PushService, "LAUNCH_APP_ON_PUSH_OPERATION", LAUNCH_APP_ON_PUSH_OPERATION);
 
 /*
  * Define push.PushPayload
