@@ -69,11 +69,9 @@ task('deploy-test-app', ['build'], require('./scripts/test-app'), true);
 desc("deploy and run test suite on device/simulator" + DESC_NEW_LINE +
     "Usage: jake deploy-test-suite['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
     "Example: jake deploy-test-suite[nextBB10,mybb10,169.254.0.1,device,password]");
-
 task('deploy-test-suite', [], require('./scripts/test-suite'));
 
 desc("deploy and run cordova-mobile-spec on device/simulator" + DESC_NEW_LINE +
-    "Usage: jake deploy-mobile-spec['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
-    "Example: jake deploy-mobile-spec[master,z10,169.254.0.1,device,abc123]");
-
+    "Usage: jake deploy-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch']" + DESC_NEW_LINE +
+    "Example: jake deploy-mobile-spec[master,z10,169.254.0.1,device,abc123,master]");
 task('deploy-mobile-spec', [], require('./scripts/mobile-spec'));
