@@ -117,11 +117,14 @@ module.exports = {
     copyMobileSpec: function (projectPath, src, done) {
         jWorkflow.order()
         .andThen(function (prev, baton) {
+            var version = fs.readFileSync(path.join(projectPath, "www", "VERSION"));
             baton.take();
             ncp(src, path.join(projectPath, "www"), function (err) {
                 if (err) {
                     console.log(err);
                 }
+                //Change back the version
+                fs.writeFileSync(path.join(projectPath, "www", "VERSION"), version);
                 console.log("Copy Mobile Spec Finished");
                 baton.pass();
             });

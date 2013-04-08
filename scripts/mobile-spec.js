@@ -26,19 +26,16 @@ var jWorkflow = require("jWorkflow"),
     projectPath = path.join(baseDir, "test", "mobile-spec/app"),
     projectName = "CordovaMobileSpec";
 
-function overwriteCordovaJS(done) {
-    var src = path.join(baseDir, "test/cordova-blackberry/blackberry10/javascript/cordova.blackberry10.js"),
-        dest = path.join(projectPath, "www/cordova.js");
 
-    if (fs.existsSync(src)) {
-        ncp(src, dest, done);
-    } else {
-        console.log("Error: Can not find ", src);
-        process.exit();
-    }
+function updateCordovaJSVersion() {
+    var content = fs.readFileSync(path.join(projectPath, 'www', 'cordova.js'), 'utf-8'),
+        version = fs.readFileSync(path.join(projectPath, 'www', 'VERSION'), 'utf-8').replace('\n', ''),
+        regex = /VERSION='(.*)'.*$/gm,
+        newContent = content.replace(regex.exec(content)[1],  version);
+    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.js'), newContent, 'utf-8');;
 }
 
-module.exports = function (branch, targetName, targetIP, targetType, targetPassword) {
+module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
     var tasks = jWorkflow.order(),
         preservingProject = false,
         projectFileBackuped = path.join(projectPath, '..', 'project.json'),
@@ -61,7 +58,7 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         })
     .andThen(function (prev, baton) {
         baton.take();
-        prjUtils.setupMobileSpecRepo(branch ? branch : 'master', function () {
+        prjUtils.setupMobileSpecRepo(mobileSpecBranch ? mobileSpecBranch : 'master', function () {
             baton.pass();
         });
     })
@@ -94,20 +91,8 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         });
     })
     .andThen(function (prev, baton) {
-        baton.take();
-        overwriteCordovaJS(function () {
-            baton.pass();
-        });
-    })
-    .andThen(function (prev, baton) {
-        var plugins = [
-            "com.blackberry.jpps",
-            "com.blackberry.utils"
-        ];
-        baton.take();
-        prjUtils.addPlugins(projectPath, plugins, function () {
-            baton.pass();
-        });
+        updateCordovaJSVersion();
+        console.log("Updated cordova version");
     })
     .andThen(function (prev, baton) {
         baton.take();
