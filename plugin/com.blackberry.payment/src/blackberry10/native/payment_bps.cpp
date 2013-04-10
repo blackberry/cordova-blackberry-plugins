@@ -344,6 +344,7 @@ int PaymentBPS::onFailureCommon(bps_event_t *event)
 {
     const int error_id = paymentservice_event_get_error_id(event);
     const char* error_text = paymentservice_event_get_error_text(event);
+    const char* error_info = paymentservice_event_get_error_info(event);
 
     std::stringstream ss;
     Json::Value result;
@@ -351,6 +352,8 @@ int PaymentBPS::onFailureCommon(bps_event_t *event)
     successState["state"] = "FAILURE";
     Json::Value errorObject;
     errorObject["errorID"] = Json::Value(error_id);
+    errorObject["errorCode"] = Json::Value(error_id);
+    errorObject["errorInfo"] = Json::Value(error_info);
     errorObject["errorText"] = Json::Value(error_text);
     result["successState"] = successState;
     result["errorObject"] = errorObject;

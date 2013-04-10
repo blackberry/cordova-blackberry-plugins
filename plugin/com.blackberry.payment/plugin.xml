@@ -22,4 +22,9 @@
     <js-module src="www/client.js">
         <clobbers target="blackberry.payment" />
     </js-module>
+        <platform name="blackberry10">
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="com.blackberry.payment" value="com.blackberry.payment" />
+        </config-file>
+    </platform>
 </plugin>

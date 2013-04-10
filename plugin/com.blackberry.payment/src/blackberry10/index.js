@@ -116,6 +116,7 @@ JNEXT.Payment = function ()
         var result = {}, successState = {}, errorObject = {};
         successState["state"] = state;
         errorObject["errorID"] = errorID;
+        errorObject["errorCode"] = errorID;
         errorObject["errorText"] = errorText;
         result.successState = {};
         result.successState = successState;
