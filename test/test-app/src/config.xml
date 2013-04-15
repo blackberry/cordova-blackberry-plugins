@@ -78,5 +78,5 @@
 
     <rim:permissions><rim:permit>access_shared</rim:permit><rim:permit>read_geolocation</rim:permit><rim:permit>access_internet</rim:permit><rim:permit>use_camera</rim:permit><rim:permit>read_device_identifying_information</rim:permit><rim:permit>bbm_connect</rim:permit><rim:permit>access_pimdomain_calendars</rim:permit><rim:permit>access_pimdomain_contacts</rim:permit><rim:permit>post_notification</rim:permit><rim:permit system="true">_sys_use_consumer_push</rim:permit><rim:permit>run_when_backgrounded</rim:permit></rim:permissions>
 
-    <preferences name="packageCordovaJs" value="enable" />
+    <preference name="packageCordovaJs" value="enable" />
 </widget>
