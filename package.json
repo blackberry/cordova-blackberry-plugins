@@ -18,7 +18,8 @@
     "jasmine-node": "1.0.7",
     "jWorkflow": "*",
     "wrench": "1.3.9",
-    "ncp": "*"
+    "ncp": "*",
+    "jsdom": "0.6.0"
   },
   "bundledDependencies": [
     "connect",

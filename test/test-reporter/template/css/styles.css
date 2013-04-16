@@ -1,0 +1,59 @@
+body {
+	background: black;
+	color: 00FF33;
+}
+
+table {
+	width: 90%;
+	//table-layout:fixed;
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+table td {
+	overflow: hidden;
+}
+
+th {
+	//font:italic bold 12px/30px Georgia, serif;
+}
+
+tr {
+
+}
+.specs-hide {
+	display: none;
+}
+
+.specs-show {
+	display: table-row;
+}
+
+.suite, .specs {
+	text-align: left;
+}
+
+.suite {
+	background: #585858;
+}
+
+.specs {
+	background: black;
+	color: #33FF99;
+}
+
+.SpecsCaption {
+	text-align: center;
+}
+
+.spec-assertion-count {
+	text-align: center;
+}
+
+.suite-fail {
+	background: #800000;
+}
+
+.specs-fail {
+	background: #CC6633;	
+}

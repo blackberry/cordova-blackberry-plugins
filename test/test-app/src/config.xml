@@ -51,9 +51,10 @@
     <access uri="http://smoketest10-vmyyz.labyyz.testnet.rim.net:8080/d" subdomains="true"><feature id="blackberry.app"/></access>
     <access uri="https://atg05-yyz.labyyz.testnet.rim.net/"/>
     <access uri="file:///accounts/1000/appData"/>
+    <access uri="http://169.254.0.2/" subdomains="true"/>
 
-    <icon rim:hover="false" src="img/windowcover.png" />
-    <icon rim:hover="true" src="img/windowcover.png" />
+    <icon rim:hover="false" src="img/windowcover.png"/>
+    <icon rim:hover="true" src="img/windowcover.png"/>
     <license href="http://www.apache.org/licenses/LICENSE-2.0">
         Licensed under the Apache License, Version 2.0 (the "License");
         #you may not use this file except in compliance with the License.
