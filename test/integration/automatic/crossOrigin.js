@@ -1,4 +1,4 @@
-describe("White listing", function () {
+describe("crossOrigin", function () {
 
     var appendedElements = [];
 

@@ -20,12 +20,96 @@
     <script type="text/javascript" src="../js/jasmine.js"></script>
     <script type="text/javascript" src="../js/jasmine-html.js"></script>
     <script type="text/javascript" src="local:///chrome/cordova.js"></script>
-
     <script type="text/javascript">
-        var jasmineEnv = jasmine.getEnv();
-        jasmineEnv.updateInterval = 1000;
+        var jasmineEnv = jasmine.getEnv(),
+            htmlReporter = new jasmine.HtmlReporter(),
+            isAutoLoaded = false;
 
-        var htmlReporter = new jasmine.HtmlReporter();
+        jasmineEnv.updateInterval = 1000;
+        htmlReporter.reportRunnerResults = function(runner) {
+            var suites = runner.suites(),
+                suiteCount = {total: 0, passed: 0, failed: 0},
+                specCount =  {total: 0, passed: 0, failed: 0},
+                assertionCount = {total: 0, passed: 0, failed: 0},
+                report = {
+                    date: Date(),
+                    OS: blackberry.system.softwareVersion,
+                    HardwareID: blackberry.system.hardwareId,
+                    suites: [],
+                    details: {},
+                    featureList: []
+                },
+                checkBoxes;
+
+            checkBoxes = document.getElementById('featureList').elements;
+            for (var i = 0; i < checkBoxes.length; ++i) {
+                report.featureList.push(checkBoxes[i].value);
+            }
+            for (var i = 0; i < suites.length; ++i) {
+                var suite = {
+                        description: '',
+                        passed: true,
+                        assertionCount: {total: 0, passed: 0, failed: 0},
+                        specs: []
+                    },
+                    specs = suites[i].specs();
+
+                suite.description = suites[i].description;
+                suite.assertionCount.total = suites[i].results().totalCount;
+                suite.assertionCount.passed = suites[i].results().passedCount;
+                suite.assertionCount.failed = suites[i].results().failedCount;
+                if (suite.assertionCount.failed !== 0) {
+                    suite.passed = false;
+                }
+                suiteCount.total += 1;
+
+                for (var j = 0; j < specs.length; ++j) {
+                    var spec = {
+                            description: '',
+                            passed: true,
+                            assertions: {
+                                total: 0,
+                                passed: 0,
+                                failed: 0
+                            }
+                        },
+                        results = specs[j].results();
+
+                    spec.description = specs[j].description;
+                    spec.assertions.total = results.totalCount;
+                    spec.assertions.passed = results.passedCount;
+                    spec.assertions.failed = results.failedCount;
+                    assertionCount.total += results.totalCount;
+                    assertionCount.passed += results.passedCount;
+                    assertionCount.failed += results.failedCount;
+                    specCount.total += 1;
+
+                    if (results.failedCount !== 0) {
+                        spec.passed = false;
+                        suite.passed = false;
+                        specCount.failed += 1;
+                    } else {
+                        specCount.passed += 1;
+                    }
+                    suite.specs.push(spec);
+                }
+                if (suite.passed) {
+                    suiteCount.passed += 1;
+                } else {
+                    suiteCount.failed += 1;
+                }
+                report.suites.push(suite);
+            }
+
+            if (console && console.log) {
+                report.assertionCount = assertionCount;
+                report.specCount = specCount;
+                report.suiteCount = suiteCount;
+                report.details = document.documentElement.innerHTML;
+            }
+            console.log(report);
+            sendReport(report);
+        };
 
         jasmineEnv.addReporter(htmlReporter);
 
@@ -33,19 +117,27 @@
             return htmlReporter.specFilter(spec);
         };
 
+
         function execJasmine() {
+            console.log("Running Testing");
             jasmineEnv.execute();
+            console.log("Finish Testing");
         }
 
         function addChosenSpecs() {
             var checkBoxes = document.getElementById('featureList').elements;
             for (var i = 0; i < checkBoxes.length; i++) {
+                console.log("Selected Specs#:", checkBoxes.length);
                 if (checkBoxes[i].checked)
                 {
                     addScript("spec/" + checkBoxes[i].value + ".js");
                 }
             }
-            alert("The selected tests have been added, click the Run Jasmine button to execute the SpecRunner");
+            if (!isAutoLoaded) {
+                alert("The selected tests have been added, click the Run Jasmine button to execute the SpecRunner");    
+            } else {
+                console.log("Load specs silently");
+            }
         }
 
         function addScript(filePath) {
@@ -65,7 +157,43 @@
             }
         }
 
+        function sendReport(report) {
+            var xmlhttp = new XMLHttpRequest();
+            console.log("Sending testing result now...");
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                    console.log(xmlhttp.responseText);
+                }
+            }
+            xmlhttp.open("POST", "http://169.254.0.2:3000/report", true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send(JSON.stringify(report));
+        }
+
+        function startAutoTest() {
+            var xmlhttp = new XMLHttpRequest();
+            console.log("Connecting to test server now...");
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    isAutoLoaded = true;
+                    console.log("Start automated test: all specs will be selected");
+                    setAllBoxes(true);
+                    addChosenSpecs();
+                    setTimeout(function () {
+                        console.log("Start Testing");
+                        execJasmine();
+                        isAutoLoaded = false;  
+                    }, 2000);
+                }
+            }
+            xmlhttp.open("GET", "http://169.254.0.2:3000/runAutoTest", true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send();
+        }
+
         document.addEventListener("webworksready", function () {
+            startAutoTest();
+            
             document.getElementById('addSpecs').onclick = addChosenSpecs;
             document.getElementById('selectAll').onclick = function () {
                 setAllBoxes(true);
@@ -81,7 +209,7 @@
                 }
                 execJasmine();
             };
-            });
+        });
 
   </script>
 

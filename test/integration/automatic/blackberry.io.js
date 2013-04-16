@@ -1,4 +1,4 @@
-describe("FileSystem API", function () {
+describe("blackberry.io", function () {
 
     it("Sandboxed FileSystem write file", function () {
         var errorHandler = jasmine.createSpy().andCallFake(function (e) {

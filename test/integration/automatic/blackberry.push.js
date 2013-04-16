@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-describe("blackberry.push.PushService", function () {
+describe("blackberry.push", function () {
     var constants = { "SUCCESS" : 0,
                       "INTERNAL_ERROR" : 500,
                       "INVALID_DEVICE_PIN" : 10001,

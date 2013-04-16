@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-describe("Enabling Flash", function () {
+describe("enableFlash", function () {
 	it('should have libflashplayer.so loaded in the navigator when the config has the correct feature-id', function () {
         var plugin,
             flashFound = false;
