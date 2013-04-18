@@ -92,7 +92,6 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
             "com.blackberry.invoked",
             "com.blackberry.io",
             "com.blackberry.io.filetransfer",
-            "com.blackberry.jpps",
             "com.blackberry.notification",
             "com.blackberry.payment",
             "com.blackberry.pim.calendar",
@@ -103,8 +102,7 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
             "com.blackberry.ui.contextmenu",
             "com.blackberry.ui.cover",
             "com.blackberry.ui.dialog",
-            "com.blackberry.ui.toast",
-            "com.blackberry.utils"
+            "com.blackberry.ui.toast"
         ];
         baton.take();
         prjUtils.addPlugins(testAppPrj, plugins, function () {
