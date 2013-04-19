@@ -32,7 +32,7 @@ function updateCordovaJSVersion() {
         version = fs.readFileSync(path.join(projectPath, 'www', 'VERSION'), 'utf-8').replace('\n', ''),
         regex = /VERSION='(.*)'.*$/gm,
         newContent = content.replace(regex.exec(content)[1],  version);
-    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.js'), newContent, 'utf-8');;
+    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.js'), newContent, 'utf-8');
 }
 
 module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
