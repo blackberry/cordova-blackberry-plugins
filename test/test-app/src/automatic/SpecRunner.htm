@@ -31,14 +31,20 @@
                 suiteCount = {total: 0, passed: 0, failed: 0},
                 specCount =  {total: 0, passed: 0, failed: 0},
                 assertionCount = {total: 0, passed: 0, failed: 0},
-                report ={
+                report = {
                     date: Date(),
                     OS: blackberry.system.softwareVersion,
                     HardwareID: blackberry.system.hardwareId,
                     suites: [],
-                    details: {}
-                };
+                    details: {},
+                    featureList: []
+                },
+                checkBoxes;
 
+            checkBoxes = document.getElementById('featureList').elements;
+            for (var i = 0; i < checkBoxes.length; ++i) {
+                report.featureList.push(checkBoxes[i].value);
+            }
             for (var i = 0; i < suites.length; ++i) {
                 var suite = {
                         description: '',

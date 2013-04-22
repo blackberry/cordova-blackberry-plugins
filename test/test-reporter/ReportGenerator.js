@@ -22,6 +22,7 @@ var ReportGenerator = {},
     brief_template = fs.readFileSync(path.join(__dirname, 'template/brief-report_templ.html'), 'utf-8'),
     reportDocument = jsdom.jsdom(page_template),
     briefDocument = jsdom.jsdom(brief_template),
+    featureList = [],
     fullReport = path.join(__dirname, 'report/testReport.html'),
     briefReport = path.join(__dirname, 'report/testBrief.html');
 
@@ -113,33 +114,7 @@ function createNewRowForSuite(suite) {
 }
 
 function createNewRowForBrief(suite) {
-    var suites = [
-            'blackberry.app',
-            'blackberry.connection',
-            'blackberry.event',
-            'blackberry.identity',
-            'invokeRequestEvent',
-            'blackberry.invoke',
-            'blackberry.invoke.card',
-            'blackberry.invoked',
-            'blackberry.io.filetransfer',
-            'blackberry.io',
-            'blackberry',
-            'blackberry.pim.contacts',
-            'blackberry.pim.calendar',
-            'blackberry.push',
-            'blackberry.system',
-            'blackberry.ui.contextmenu',
-            'blackberry.ui.dialog',
-            'blackberry.ui.toast',
-            'blackberry.bbm.platform',
-            'crossOrigin',
-            'remoteFunctionCall',
-            'blackberry.notification',
-            'blackberry.sensors',
-            'blackberry.ui.cover',
-            'navigator.geolocation'
-        ],
+    var suites = featureList,
         briefReport = briefDocument.getElementById('BriefReport'),
         resultRow,
         suiteCol,
@@ -179,7 +154,7 @@ function createNewRowForBrief(suite) {
 
 function generateBriefReport(testResult) {
     var i;
-
+    featureList = testResult.featureList;
     for (i = 0; i < testResult.suites.length; ++i) {
         createNewRowForBrief(testResult.suites[i]);
     }
@@ -194,9 +169,6 @@ function generateReport(testResult) {
         testSummary = reportDocument.getElementById('TestSummary'),
         hardwareID = testResult.HardwareID.toLowerCase(),
         module = hardwareID;
-
-    console.log("<<<<<<<<<< HW ID: ", testResult.HardwareID.toLowerCase());
-    console.log("<<<<<<<<<< HW NM: ", module);
 
     summary = "<pre>" +
               "Date        : " + testResult.date + "<br>" +

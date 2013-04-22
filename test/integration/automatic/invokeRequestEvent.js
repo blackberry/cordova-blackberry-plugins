@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-describe("make sure the invoke request event is getting triggered", function () {
+describe("invokeRequestEvent", function () {
     it('open the email card from a mailto: link', function () {
         var delay = 20000,
             flag = false,

@@ -24,7 +24,7 @@ function testNotificationReadOnly(field) {
     expect(window.Notification[field]).toEqual(before);
 }
 
-describe("Notification", function () {
+describe("blackberry.notification", function () {
 
     it("permissions granted", function () {
         expect(testNotificationValue("permission", "granted"));
