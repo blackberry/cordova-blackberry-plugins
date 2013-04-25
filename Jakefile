@@ -17,7 +17,7 @@
 var utils = require('./scripts/utils'),
 	jWorkflow = require('jWorkflow'),
     childProcess = require('child_process'),
-    DESC_NEW_LINE = "\n\t\t\t  # ";
+    DESC_NEW_LINE = "\n\t\t\t   # ";
 
 desc("runs clean, hint, build and test");
 task('default', ['clean', 'hint', 'build', 'test'], function () {});
@@ -75,3 +75,8 @@ desc("deploy and run cordova-mobile-spec on device/simulator" + DESC_NEW_LINE +
     "Usage: jake deploy-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch']" + DESC_NEW_LINE +
     "Example: jake deploy-mobile-spec[master,z10,169.254.0.1,device,abc123,master]");
 task('deploy-mobile-spec', [], require('./scripts/mobile-spec'));
+
+desc("run mobile spec auto test on device" + DESC_NEW_LINE +
+    "Usage: jake autorun-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch','couchdbIP']" + DESC_NEW_LINE +
+    "Example: jake autorun-mobile-spec[blackberry10,z10,169.254.0.1,device,abc123,master,169.254.0.2]");
+task('autorun-mobile-spec', [], require('./scripts/autorun-mobile-spec'));
