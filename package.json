@@ -1,11 +1,11 @@
 {
-  "name": "BB10-WebWorks-Cordova",
+  "name": "codova-blackberry-plugins",
   "version": "0.0.1",
   "description": "BB10 WebWorks Cordova Plugins",
-  "repository": "git://github.rim.net/webworks/BB10-WebWorks-Cordova.git",
+  "repository": "git://github.com/blackberry/cordova-blackberry-plugins.git",
   "author": {
     "name": "Research In Motion",
-    "url": "http://github.rim.net/webworks/BB10-WebWorks-Cordova"
+    "url": "https://github.com/blackberry/cordova-blackberry-plugins"
   },
   "licenses": [{
     "type": "Apache 2.0",
@@ -18,7 +18,9 @@
     "jasmine-node": "1.0.7",
     "jWorkflow": "*",
     "wrench": "1.3.9",
-    "ncp": "*"
+    "ncp": "*",
+    "elementtree": "0.1.5",
+    "shelljs": "0.1.3"
   },
   "bundledDependencies": [
     "connect",
