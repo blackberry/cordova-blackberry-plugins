@@ -36,4 +36,9 @@
     <js-module src="src/blackberry10/ContactPhoto.js" />
     <js-module src="src/blackberry10/ContactNews.js" />
     <js-module src="src/blackberry10/ContactActivity.js" />
+    <platform name="blackberry10">
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts" />
+        </config-file>
+    </platform>
 </plugin>

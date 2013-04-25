@@ -22,4 +22,10 @@
     <js-module src="www/client.js">
         <clobbers target="blackberry.ui.cover" />
     </js-module>
+
+    <platform name="blackberry10">
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="com.blackberry.ui.cover" value="com.blackberry.ui.cover" />
+        </config-file>
+    </platform>
 </plugin>
