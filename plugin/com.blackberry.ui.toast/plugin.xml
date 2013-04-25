@@ -22,4 +22,10 @@
     <js-module src="www/client.js">
         <clobbers target="blackberry.ui.toast" />
     </js-module>
+
+    <platform name="blackberry10">
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="com.blackberry.ui.toast" value="com.blackberry.ui.toast" />
+        </config-file>
+    </platform>
 </plugin>
