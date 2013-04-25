@@ -115,12 +115,9 @@ JNEXT.Payment = function ()
     self.getErrorObject = function (state, errorID, errorText, errorSubCode) {
         var result = {}, successState = {}, errorObject = {};
         successState["state"] = state;
-        //effectively to be deprecated
-        //(publicly exposed will be errorCode, internally can still be errorId)
         errorObject["errorID"] = errorID;
-        errorObject["errorText"] = errorText;
         errorObject["errorCode"] = errorID;
-        errorObject["errorSubCode"] = errorSubCode;
+        errorObject["errorText"] = errorText;
         result.successState = {};
         result.successState = successState;
         result.errorObject = {};
@@ -143,7 +140,7 @@ JNEXT.Payment = function ()
             result;
 
         if (val === "-1") {
-            result = self.getErrorObject("BPS_FAILURE", "-1", "Purchase Failed. Payment Service Error.", "");
+            result = self.getErrorObject("BPS_FAILURE", "-1", "Purchase Failed. Payment Service Error.");
         } else {
             result = JSON.parse(val);
         }
@@ -156,7 +153,7 @@ JNEXT.Payment = function ()
             result;
 
         if (val === "-1") {
-            result = self.getErrorObject("BPS_FAILURE", "-1", "getExistingPurchases Failed. Payment Service Error.", "");
+            result = self.getErrorObject("BPS_FAILURE", "-1", "getExistingPurchases Failed. Payment Service Error.");
         } else {
             result = JSON.parse(val);
         }
@@ -169,7 +166,7 @@ JNEXT.Payment = function ()
             result;
 
         if (val === "-1") {
-            result = self.getErrorObject("BPS_FAILURE", "-1", "cancelSubscription Failed. Payment Service Error.", "");
+            result = self.getErrorObject("BPS_FAILURE", "-1", "cancelSubscription Failed. Payment Service Error.");
         } else {
             result = JSON.parse(val);
         }
@@ -182,7 +179,7 @@ JNEXT.Payment = function ()
             result;
    
         if (val === "-1") {
-            result = self.getErrorObject("BPS_FAILURE", "-1", "getPrice Failed. Payment Service Error.", "");
+            result = self.getErrorObject("BPS_FAILURE", "-1", "getPrice Failed. Payment Service Error.");
         } else {
             result = JSON.parse(val);
         }
@@ -195,7 +192,7 @@ JNEXT.Payment = function ()
             result;
 
         if (val === "-1") {
-            result = self.getErrorObject("BPS_FAILURE", "-1", "checkExisting Failed. Payment Service Error.", "");
+            result = self.getErrorObject("BPS_FAILURE", "-1", "checkExisting Failed. Payment Service Error.");
         } else {
             result = JSON.parse(val);
         }

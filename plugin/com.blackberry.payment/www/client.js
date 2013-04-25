@@ -61,14 +61,11 @@ function invokeClientCallback(result, field, successCb, errorCb, errorMsg) {
     }
 }
 
-//Not sure if thsis one needs to change. gotta figure it out. 
 function getXHRFailCallback(clientFailCb) {
-    return function (code, subCode, msg) {
+    return function (code, msg) {
             if (clientFailCb && typeof clientFailCb === "function") {
                 clientFailCb({
                     errorID: code,
-                    errorCode: code,
-                    errorSubCode: subCode,
                     errorText: msg
                 });
             }
