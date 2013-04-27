@@ -15,9 +15,9 @@
  */
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.connection/",
     _libDir = __dirname + "/../../../lib/",
-    events = require(_libDir + "event"),
-    eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
+    deviceEvents = require(_libDir + "events/deviceEvents"),
     mockedQnx,
+    mockedPluginResult,
     index;
 
 describe("connection index", function () {
@@ -32,11 +32,24 @@ describe("connection index", function () {
                 }
             }
         };
+        GLOBAL.window = { 
+            qnx: mockedQnx
+        };
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult"),
+            callbackOk: jasmine.createSpy("PluginResult.callbackOk")
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
         delete GLOBAL.qnx;
+        delete GLOBAL.window;
+        delete GLOBAL.PluginResult;
+        mockedPluginResult = null;
     });
 
     describe("connection", function () {
@@ -44,9 +57,9 @@ describe("connection index", function () {
             it("can call success", function () {
                 var success = jasmine.createSpy();
 
-                index.type(success, null, null, null);
+                index.type(success);
 
-                expect(success).toHaveBeenCalledWith("wifi");
+                expect(mockedPluginResult.ok).toHaveBeenCalledWith("wifi", false);
             });
 
             it("can call fail", function () {
@@ -55,8 +68,8 @@ describe("connection index", function () {
 
                 index.type(null, fail, null, null);
 
-                expect(fail).toHaveBeenCalledWith(-1, jasmine.any(Object));
-                expect(fail.calls[0].args[1].message).toEqual("Cannot read property 'activeConnection' of undefined");
+                expect(mockedPluginResult.error).toHaveBeenCalledWith(jasmine.any(Object), false);
+                expect(mockedPluginResult.error.calls[0].args[0].message).toEqual("Cannot read property 'activeConnection' of undefined");
             });
 
             it('maps device connection types to constants', function () {
@@ -74,7 +87,7 @@ describe("connection index", function () {
                     var success = jasmine.createSpy();
                     mockedQnx.webplatform.device.activeConnection.type = type;
                     index.type(success);
-                    expect(success).toHaveBeenCalledWith(map[type]);
+                    expect(mockedPluginResult.ok).toHaveBeenCalledWith(map[type], false);
                 });
             });
 
@@ -91,78 +104,49 @@ describe("connection index", function () {
                     var success = jasmine.createSpy();
                     mockedQnx.webplatform.device.activeConnection.technology = technology;
                     index.type(success);
-                    expect(success).toHaveBeenCalledWith(map[technology]);
+                    expect(mockedPluginResult.ok).toHaveBeenCalledWith(map[technology], false);
                 });
             });
         });
 
         describe("connectionChange", function () {
-            it("can register the 'connectionChange' event", function () {
-                var success = jasmine.createSpy(),
-                    utils = require(_libDir + "utils");
 
-                spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                    return eventExt;
-                });
+            var noop = function () {};
 
-                spyOn(eventExt, 'registerEvents');
+            it("startEvent", function () {
+                var eventName = "connectionchange",
+                    env = {webview: {id: 42 }};
 
-                index.registerEvents(success);
+                spyOn(deviceEvents, "addEventListener");
+                spyOn(deviceEvents, "removeEventListener");
 
-                expect(eventExt.registerEvents).toHaveBeenCalledWith({
-                    connectionchange: {
-                        context: jasmine.any(Object),
-                        event: "connectionChange",
-                        trigger: jasmine.any(Function),
-                        triggerEvent: "connectionchange"
-                    }
-                });
+                index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+                expect(deviceEvents.addEventListener).toHaveBeenCalledWith("connectionChange", jasmine.any(Function));
+                expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
+
+                //Will remove if adding twice
+                index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+                expect(deviceEvents.removeEventListener).toHaveBeenCalledWith("connectionChange", jasmine.any(Function));
             });
 
-            it('is triggered with an object containing oldType and newType props', function () {
-                var success = jasmine.createSpy(),
-                    utils = require(_libDir + "utils"),
-                    connectionchangeTrigger,
-                    mockeventdata = {};
+            it("stopEvent", function () {
+                var eventName = "connectionchange",
+                    env = {webview: {id: 42 }};
 
-                spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                    return eventExt;
-                });
+                spyOn(deviceEvents, "addEventListener");
+                spyOn(deviceEvents, "removeEventListener");
 
-                spyOn(events, 'trigger').andCallFake(function () {});
+                index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+                index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+                expect(deviceEvents.removeEventListener).toHaveBeenCalledWith("connectionChange", jasmine.any(Function));
+                expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
 
-                spyOn(eventExt, 'registerEvents');
-                index.registerEvents(success);
-
-                mockedQnx.webplatform.device.activeConnection.type = 'usb';
-
-                connectionchangeTrigger = eventExt.registerEvents.calls[0].args[0].connectionchange.trigger;
-                connectionchangeTrigger(mockeventdata);
-                expect(mockeventdata.oldType).toEqual('wifi');
-                expect(mockeventdata.newType).toEqual('usb');
+                //Will not stop an unstarted event
+                index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+                expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
             });
-
-            it('does not trigger if the active connection type has not changed', function () {
-                var success = jasmine.createSpy(),
-                    utils = require(_libDir + "utils"),
-                    connectionchangeTrigger,
-                    mockeventdata = {};
-
-                spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                    return eventExt;
-                });
-
-                spyOn(events, 'trigger').andCallFake(function () {});
-
-                spyOn(eventExt, 'registerEvents');
-                index.registerEvents(success);
-
-                connectionchangeTrigger = eventExt.registerEvents.calls[0].args[0].connectionchange.trigger;
-                connectionchangeTrigger(mockeventdata);
-                expect(events.trigger).not.toHaveBeenCalled();
-            });
-
 
         });
+
     });
 });

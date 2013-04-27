@@ -19,7 +19,33 @@
 
 var _self = {},
     _ID = "com.blackberry.connection",
+    exec = cordova.require("cordova/exec"),
+    events = ["connectionchange"],
     UNKNOWN = "unknown";
+
+events.map(function (eventName) {
+    var channel = cordova.addDocumentEventHandler(eventName),
+        success = function (data) {
+            channel.fire(data);
+        },
+        fail = function (error) {
+            console.log("Error initializing " + eventName + " listener: ", error);
+        };
+    channel.onHasSubscribersChange = function () {
+        if (this.numHandlers === 1) {
+            exec(success, fail, _ID, "startEvent", {eventName: eventName});
+        } else if (this.numHandlers === 0) {
+            exec(function () {}, function () {}, _ID, "stopEvent", {eventName: eventName});
+        }
+    };
+});
+
+function defineReadOnlyField(obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
+}
 
 Object.defineProperty(_self, "type", {
     get: function () {
@@ -32,7 +58,7 @@ Object.defineProperty(_self, "type", {
             };
 
         try {
-            window.webworks.exec(success, fail, _ID, "type");
+            exec(success, fail, _ID, "type");
         } catch (e) {
             type = UNKNOWN;
             console.error(e);
@@ -45,18 +71,16 @@ Object.defineProperty(_self, "type", {
 /*
  * Define constants for type constants
  */
-window.webworks.defineReadOnlyField(_self, "UNKNOWN", UNKNOWN);
-window.webworks.defineReadOnlyField(_self, "ETHERNET", "ethernet");
-window.webworks.defineReadOnlyField(_self, "WIFI", "wifi");
-window.webworks.defineReadOnlyField(_self, "BLUETOOTH_DUN", "bluetooth_dun");
-window.webworks.defineReadOnlyField(_self, "USB", "usb");
-window.webworks.defineReadOnlyField(_self, "VPN", "vpn");
-window.webworks.defineReadOnlyField(_self, "BB", "rim-bb");
-window.webworks.defineReadOnlyField(_self, "CELL_4G", "4g");
-window.webworks.defineReadOnlyField(_self, "NONE", "none");
-window.webworks.defineReadOnlyField(_self, "CELL_2G", "2g");
-window.webworks.defineReadOnlyField(_self, "CELL_3G", "3g");
-
-window.webworks.exec(function () {}, function () {}, _ID, "registerEvents", null);
+defineReadOnlyField(_self, "UNKNOWN", UNKNOWN);
+defineReadOnlyField(_self, "ETHERNET", "ethernet");
+defineReadOnlyField(_self, "WIFI", "wifi");
+defineReadOnlyField(_self, "BLUETOOTH_DUN", "bluetooth_dun");
+defineReadOnlyField(_self, "USB", "usb");
+defineReadOnlyField(_self, "VPN", "vpn");
+defineReadOnlyField(_self, "BB", "rim-bb");
+defineReadOnlyField(_self, "CELL_4G", "4g");
+defineReadOnlyField(_self, "NONE", "none");
+defineReadOnlyField(_self, "CELL_2G", "2g");
+defineReadOnlyField(_self, "CELL_3G", "3g");
 
 module.exports = _self;
