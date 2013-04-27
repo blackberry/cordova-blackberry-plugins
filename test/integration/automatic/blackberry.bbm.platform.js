@@ -35,7 +35,7 @@ describe("blackberry.bbm.platform", function () {
                         flag = true;
                     }
                 });
-                window.addEventListener("onaccesschanged", onChange);
+                document.addEventListener("onaccesschanged", onChange);
             });
 
             waitsFor(function () {

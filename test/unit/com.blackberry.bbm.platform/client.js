@@ -21,15 +21,10 @@ var root = __dirname + "/../../../",
     apiDir = root + "plugin/com.blackberry.bbm.platform/",
     _ID = "com.blackberry.bbm.platform",
     client = null,
-    mockedWebworks = {
-        exec: jasmine.createSpy(),
-        event: { once : jasmine.createSpy(),
-                 isOn : jasmine.createSpy() }
-    },
     MockedChannel,
     mockedCordova;
 
-describe("bbm.platform", function () {
+describe("bbm.platform client", function () {
     beforeEach(function () {
         MockedChannel = function () {
             return {
@@ -39,24 +34,27 @@ describe("bbm.platform", function () {
         };
 
         mockedCordova = {
-            exec: mockedWebworks.exec,
-            addWindowEventHandler: jasmine.createSpy("cordova.addWindowEventHandler").andReturn(new MockedChannel()),
-            fireWindowEvent: jasmine.createSpy("cordova.fireWindowEvent")
+            exec: jasmine.createSpy(),
+            addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andReturn(new MockedChannel()),
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent"),
+            require: function () {
+                return cordova.exec;
+            }
         };
 
         GLOBAL.window = {
-            webworks: mockedWebworks,
             cordova: mockedCordova
         };
 
         GLOBAL.cordova = mockedCordova;
-        mockedWebworks.exec.reset();
+
         client = require(apiDir + "www/client");
     });
 
     afterEach(function () {
         delete GLOBAL.window;
         delete GLOBAL.cordova;
+        delete require.cache[require.resolve(apiDir + "www/client")];
     });
 
     describe("bbm.platform.register", function () {
@@ -64,29 +62,29 @@ describe("bbm.platform", function () {
             var options = { uuid : "blah" };
 
             client.register(options);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "register", { "options" : options });
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "register", { "options" : options });
         });
     });
 
     describe("bbm.platform.self", function () {
         it("getDisplayPicture calls exec", function () {
             client.self.getDisplayPicture(function (img) { });
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/getDisplayPicture", {});
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/getDisplayPicture", {});
         });
 
         it("setStatus calls exec", function () {
             client.self.setStatus("available", "Hello");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setStatus", { "status" : "available", "statusMessage" : "Hello" });
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setStatus", { "status" : "available", "statusMessage" : "Hello" });
         });
 
         it("setPersonalMessage calls exec", function () {
             client.self.setPersonalMessage("Hello World");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setPersonalMessage", { "personalMessage" : "Hello World" });
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setPersonalMessage", { "personalMessage" : "Hello World" });
         });
 
         it("setDisplayPicture calls exec", function () {
             client.self.setDisplayPicture("/tmp/avatar.gif");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setDisplayPicture", { "displayPicture" : "/tmp/avatar.gif"});
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/setDisplayPicture", { "displayPicture" : "/tmp/avatar.gif"});
         });
     });
 
@@ -100,7 +98,7 @@ describe("bbm.platform", function () {
                 };
 
             client.self.profilebox.addItem(args.options, function (item) { });
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/addItem", args);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/addItem", args);
         });
 
         it("removeItem calls exec", function () {
@@ -111,12 +109,12 @@ describe("bbm.platform", function () {
                 };
 
             client.self.profilebox.removeItem(args.options);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/removeItem", args);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/removeItem", args);
         });
 
         it("clearItems calls exec", function () {
             client.self.profilebox.clearItems();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/clearItems", undefined);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/clearItems", undefined);
         });
 
         it("registerIcon calls exec", function () {
@@ -129,26 +127,26 @@ describe("bbm.platform", function () {
                 };
 
             client.self.profilebox.registerIcon(args.options);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/registerIcon", args);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/registerIcon", args);
         });
 
         it("accessible property calls exec", function () {
             var accessible = client.self.profilebox.accessible;
             accessible = accessible;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/getAccessible", undefined);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/getAccessible", undefined);
         });
 
         it("item property calls exec", function () {
             var item = client.self.profilebox.item;
             item = item;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/getItems", undefined);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/getItems", undefined);
         });
     });
 
     describe("bbm.platform.users", function () {
         it("inviteToDownload calls exec", function () {
             client.users.inviteToDownload();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "users/inviteToDownload", undefined);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "users/inviteToDownload", undefined);
         });
     });
 });

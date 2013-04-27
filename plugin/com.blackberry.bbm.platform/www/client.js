@@ -24,9 +24,10 @@ var _self = {
         users: {}
     },
     noop = function () {},
+    exec = cordova.require("cordova/exec"),
     _ID = "com.blackberry.bbm.platform",
-    _onAccessChangedChannel = cordova.addWindowEventHandler("onaccesschanged"),
-    _onUpdateChannel = cordova.addWindowEventHandler("onupdate");
+    _onAccessChangedChannel = cordova.addDocumentEventHandler("onaccesschanged"),
+    _onUpdateChannel = cordova.addDocumentEventHandler("onupdate");
 
 _onAccessChangedChannel.onHasSubscribersChange = function () {
     var success = function (data) {
@@ -36,9 +37,9 @@ _onAccessChangedChannel.onHasSubscribersChange = function () {
             console.log("Error initializing onaccesschanged listener: ", error);
         };
     if (this.numHandlers === 1) {
-        window.cordova.exec(success, fail, _ID, "startEvent", {eventName: "onaccesschanged"});
+        exec(success, fail, _ID, "startEvent", {eventName: "onaccesschanged"});
     } else if (this.numHandlers === 0) {
-        window.cordova.exec(noop, noop, _ID, "stopEvent", {eventName: "onaccesschanged"});
+        exec(noop, noop, _ID, "stopEvent", {eventName: "onaccesschanged"});
     }
 };
 
@@ -50,9 +51,9 @@ _onUpdateChannel.onHasSubscribersChange = function () {
             console.log("Error initializing onupdate listener: ", error);
         };
     if (this.numHandlers === 1) {
-        window.cordova.exec(success, fail, _ID, "startEvent", {eventName: "onupdate"});
+        exec(success, fail, _ID, "startEvent", {eventName: "onupdate"});
     } else if (this.numHandlers === 0) {
-        window.cordova.exec(noop, noop, _ID, "stopEvent", {eventName: "onupdate"});
+        exec(noop, noop, _ID, "stopEvent", {eventName: "onupdate"});
     }
 };
 
@@ -66,7 +67,7 @@ function getFieldValue(field, args) {
         };
 
     try {
-        window.webworks.exec(success, fail, _ID, field, args);
+        exec(success, fail, _ID, field, args);
     } catch (e) {
         console.error(e);
     }
@@ -122,7 +123,7 @@ defineGetter(_self.self, "self/statusMessage");
 _self.self.getDisplayPicture = function (success, error) {
     var args = {},
         handler = createEventHandler(success, error);
-    return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/getDisplayPicture", args);
+    return exec(handler.onSuccess, handler.onError, _ID, "self/getDisplayPicture", args);
 };
 
 _self.self.setStatus = function (status, statusMessage) {
@@ -138,19 +139,19 @@ _self.self.setPersonalMessage = function (personalMessage) {
 _self.self.setDisplayPicture = function (displayPicture, success, error) {
     var args = {"displayPicture": displayPicture},
         handler = createEventHandler(success, error);
-    return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/setDisplayPicture", args);
+    return exec(handler.onSuccess, handler.onError, _ID, "self/setDisplayPicture", args);
 };
 
 _self.self.profilebox.addItem = function (options, success, error) {
     var args = {"options": options},
         handler = createEventHandler(success, error);
-    return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/addItem", args);
+    return exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/addItem", args);
 };
 
 _self.self.profilebox.removeItem = function (options, success, error) {
     var args = {"options": options},
         handler = createEventHandler(success, error);
-    return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/removeItem", args);
+    return exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/removeItem", args);
 };
 
 _self.self.profilebox.clearItems = function () {
@@ -160,7 +161,7 @@ _self.self.profilebox.clearItems = function () {
 _self.self.profilebox.registerIcon = function (options, success, error) {
     var args = {"options": options},
         handler = createEventHandler(success, error);
-    return window.webworks.exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/registerIcon", args);
+    return exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/registerIcon", args);
 };
 
 _self.users.inviteToDownload = function () {
