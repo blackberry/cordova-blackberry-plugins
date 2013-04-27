@@ -21,6 +21,8 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.app",
     _apiDir = _extDir + "/" + _ID,
     client,
+    MockedChannel,
+    channelRegistry = {},
     mockData = {
         author: "testAuthor",
         authorEmail: "testEmail",
@@ -42,20 +44,35 @@ var _extDir = __dirname + "/../../../plugin",
         version: "testVersion",
         orientation: "portrait-primary",
         windowState: "fullscreen"
-    },
-    mockedWebworks;
+    };
 
 describe("app client", function () {
 
     beforeEach(function () {
-        mockedWebworks = {
-            exec: jasmine.createSpy("plugin/app/client mockWebworks").andCallFake(function (success, fail, service, action, args) {
-                success(mockData);
-            })
+        MockedChannel = function () {
+            return {
+                onHasSubscribersChange: undefined,
+                numHandlers: undefined
+            };
+        };
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy().andCallFake(function (success, fail, ID, func) {
+                if (func === "getReadOnlyFields") {
+                    success(mockData);
+                }
+            }),
+            require: function () {
+                return cordova.exec;
+            },
+            addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
+                channelRegistry[eventName] = new MockedChannel();
+                return channelRegistry[eventName];
+            }),
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent")
         };
         GLOBAL.window = {
-            webworks: mockedWebworks,
-            orientation: 0
+            orientation: 0,
+            cordova: GLOBAL.cordova
         };
         GLOBAL.navigator = {
             language: ""
@@ -65,15 +82,15 @@ describe("app client", function () {
     });
 
     afterEach(function () {
-        mockedWebworks = null;
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
         delete GLOBAL.navigator;
         client = null;
     });
 
     it("exec should have been called once for all app fields", function () {
-        expect(mockedWebworks.exec).toHaveBeenCalled();
-        expect(mockedWebworks.exec.callCount).toEqual(2); // +1 to account for the call to exec for events
+        expect(window.cordova.exec).toHaveBeenCalled();
+        expect(window.cordova.exec.callCount).toEqual(1);
     });
 
     describe("author", function () {
@@ -161,14 +178,14 @@ describe("app client", function () {
     describe("minimize", function () {
         it("should call exec", function () {
             client.minimize();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "minimize");
+            expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "minimize");
         });
     });
 
     describe("exit", function () {
         it("should call exec", function () {
             client.exit();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "exit");
+            expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "exit");
         });
     });
 
@@ -186,25 +203,22 @@ describe("app client", function () {
     
     describe("lockOrientation", function () {
         it("should call exec", function () {
-            mockedWebworks.exec = jasmine.createSpy();
             client.lockOrientation('portrait-primary', false);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "lockOrientation", { orientation: 'portrait-primary', receiveRotateEvents: false });
+            expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "lockOrientation", { orientation: 'portrait-primary', receiveRotateEvents: false });
         });
     });
 
     describe("unlockOrientation", function () {
         it("should call exec", function () {
-            mockedWebworks.exec = jasmine.createSpy();
             client.unlockOrientation();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "unlockOrientation");
+            expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "unlockOrientation");
         });
     });
 
     describe("rotate", function () {
         it("should call exec", function () {
-            mockedWebworks.exec = jasmine.createSpy();
             client.rotate('landscape');
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "rotate", {orientation: 'landscape'});
+            expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "rotate", {orientation: 'landscape'});
         });
     });
 });

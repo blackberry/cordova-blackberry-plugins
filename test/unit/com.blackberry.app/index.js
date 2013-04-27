@@ -16,7 +16,6 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.app/",
     _libDir = __dirname + "/../../../lib/",
     events = require(_libDir + "event"),
-    eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
     index,
     mockedMinimize,
     mockedExit,
@@ -25,6 +24,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.app/",
     mockedUnlockRotation,
     mockedWindowState,
     mockedQnx,
+    mockedPluginResult,
     config;
 
 function getWebPlatformEventName(e) {
@@ -42,36 +42,6 @@ function getWebPlatformEventName(e) {
     }
 }
 
-function testRegisterEvent(e) {
-    var args = {eventName : encodeURIComponent(e)},
-        env = {webviewId: 42},
-        success = jasmine.createSpy(),
-        utils = require(_libDir + "utils"),
-        appEvents = require(_libDir + "events/applicationEvents");
-
-    spyOn(appEvents, "addEventListener");
-
-    spyOn(utils, "loadExtensionModule").andCallFake(function () {
-        return eventExt;
-    });
-
-    index.registerEvents(success);
-    eventExt.add(null, null, args, env);
-    expect(success).toHaveBeenCalled();
-    expect(events.add).toHaveBeenCalled();
-    expect(events.add.mostRecentCall.args[0].event).toEqual(getWebPlatformEventName(e));
-    expect(events.add.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
-}
-
-function testUnRegisterEvent(e) {
-    var args = {eventName : encodeURIComponent(e)},
-        env = {webviewId: 42};
-
-    eventExt.remove(null, null, args, env);
-    expect(events.remove).toHaveBeenCalled();
-    expect(events.remove.mostRecentCall.args[0].event).toEqual(getWebPlatformEventName(e));
-    expect(events.remove.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
-}
 
 describe("app index", function () {
 
@@ -102,6 +72,12 @@ describe("app index", function () {
             qnx: mockedQnx
         };
         GLOBAL.qnx = mockedQnx;
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult")
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         index = require(_apiDir + "index");
     });
 
@@ -121,10 +97,12 @@ describe("app index", function () {
         delete require.cache[require.resolve(_libDir + "config")];
         index = null;
         delete require.cache[require.resolve(_apiDir + "index")];
+        mockedPluginResult = null;
+        delete GLOBAL.PluginResult;
     });
 
     describe("getReadOnlyFields", function () {
-        it("can call success", function () {
+        it("can call ok", function () {
             var success = jasmine.createSpy(),
                 expectedReturn = {
                     author : "Me",
@@ -139,7 +117,7 @@ describe("app index", function () {
                     version : "1.0.0.0"
                 };
             index.getReadOnlyFields(success, null, null, null);
-            expect(success).toHaveBeenCalledWith(expectedReturn);
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(expectedReturn, false);
         });
     });
 
@@ -150,8 +128,8 @@ describe("app index", function () {
                 mockArgs = { orientation : encodeURIComponent("\"landscape-primary\""), recieveRotateEvents: undefined };
 
             index.lockOrientation(success, fail, mockArgs, null);
-            expect(fail).not.toHaveBeenCalled();
-            expect(success).toHaveBeenCalledWith(true);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(true, false);
             expect(mockedRotate).toHaveBeenCalledWith("left_up");
             expect(mockedLockRotation).toHaveBeenCalledWith(true);
         });
@@ -161,8 +139,8 @@ describe("app index", function () {
                 mockArgs = { recieveRotateEvents: false, orientation : encodeURIComponent("\"landscape-primary\"") };
 
             index.lockOrientation(success, fail, mockArgs, null);
-            expect(fail).not.toHaveBeenCalled();
-            expect(success).toHaveBeenCalledWith(true);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(true, false);
             expect(mockedRotate).toHaveBeenCalledWith("left_up");
             expect(mockedLockRotation).toHaveBeenCalledWith(false);
         });
@@ -174,8 +152,8 @@ describe("app index", function () {
                 fail = jasmine.createSpy();
 
             index.unlockOrientation(success, fail, null, null);
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
             expect(mockedUnlockRotation).toHaveBeenCalled();
         });
     });
@@ -186,8 +164,8 @@ describe("app index", function () {
                 fail = jasmine.createSpy();
 
             index.rotate(success, fail, {orientation: encodeURIComponent("\"landscape\"")}, null);
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
             expect(mockedRotate).toHaveBeenCalledWith('left_up');
         });
     });
@@ -199,7 +177,7 @@ describe("app index", function () {
             window.orientation = 0;
 
             index.currentOrientation(success, fail, null, null);
-            expect(success).toHaveBeenCalledWith("portrait-primary");
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("portrait-primary", false);
         });
 
         it("converts 90 degrees from window.orientation to portrait-primary", function () {
@@ -208,7 +186,7 @@ describe("app index", function () {
             window.orientation = 90;
 
             index.currentOrientation(success, fail, null, null);
-            expect(success).toHaveBeenCalledWith("landscape-secondary");
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("landscape-secondary", false);
         });
 
         it("converts 180 degrees from window.orientation to portrait-primary", function () {
@@ -217,7 +195,7 @@ describe("app index", function () {
             window.orientation = 180;
 
             index.currentOrientation(success, fail, null, null);
-            expect(success).toHaveBeenCalledWith("portrait-secondary");
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("portrait-secondary", false);
         });
 
         it("converts -90 degrees from window.orientation to portrait-primary", function () {
@@ -226,7 +204,7 @@ describe("app index", function () {
             window.orientation = -90;
 
             index.currentOrientation(success, fail, null, null);
-            expect(success).toHaveBeenCalledWith("landscape-primary");
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("landscape-primary", false);
         });
 
         it("converts 270 degrees from window.orientation to portrait-primary", function () {
@@ -234,7 +212,7 @@ describe("app index", function () {
                 fail = jasmine.createSpy();
             window.orientation = 270;
             index.currentOrientation(success, fail, null, null);
-            expect(success).toHaveBeenCalledWith("landscape-primary");
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("landscape-primary", false);
         });
     });
 
@@ -255,89 +233,52 @@ describe("app index", function () {
     });
 
     describe("windowState", function () {
-        it("can call success with windowState", function () {
+        it("can call ok with windowState", function () {
             var success = jasmine.createSpy();
             index.windowState(success, null, null, null);
-            expect(success).toHaveBeenCalledWith(mockedWindowState);
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(mockedWindowState, false);
         });
     });
 
     describe("events", function () {
-        beforeEach(function () {
-            spyOn(events, "add");
-            spyOn(events, "remove");
+
+        var noop = function () {};
+
+        it("startEvent", function () {
+            var applicationEvents = require(_libDir + "events/applicationEvents"),
+                eventName = "windowstatechanged",
+                env = {webview: {id: 42 }};
+
+            spyOn(applicationEvents, "addEventListener");
+            spyOn(applicationEvents, "removeEventListener");
+
+            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(applicationEvents.addEventListener).toHaveBeenCalledWith("stateChange", jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
+
+            //Will remove if adding twice
+            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(applicationEvents.removeEventListener).toHaveBeenCalledWith("stateChange", jasmine.any(Function));
         });
 
-        it("can register 'pause' event", function () {
-            testRegisterEvent("pause");
+        it("stopEvent", function () {
+            var applicationEvents = require(_libDir + "events/applicationEvents"),
+                eventName = "windowstatechanged",
+                env = {webview: {id: 42 }};
+
+            spyOn(applicationEvents, "addEventListener");
+            spyOn(applicationEvents, "removeEventListener");
+
+            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(applicationEvents.removeEventListener).toHaveBeenCalledWith("stateChange", jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
+
+            //Will not stop an unstarted event
+            index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
         });
 
-        it("can register 'resume' event", function () {
-            testRegisterEvent("resume");
-        });
-
-        it("can register 'windowstatechanged' event", function () {
-            testRegisterEvent("windowstatechanged");
-        });
-
-        it("can register 'swipedown' event", function () {
-            testRegisterEvent("swipedown");
-        });
-
-        it("can register 'keyboardOpening' event", function () {
-            testRegisterEvent("keyboardOpening");
-        });
-
-        it("can register 'keyboardOpened' event", function () {
-            testRegisterEvent("keyboardOpened");
-        });
-
-        it("can register 'keyboardClosing' event", function () {
-            testRegisterEvent("keyboardClosing");
-        });
-
-        it("can register 'keyboardClosed' event", function () {
-            testRegisterEvent("keyboardClosed");
-        });
-
-        it("can register 'keyboardPosition' event", function () {
-            testRegisterEvent("keyboardPosition");
-        });
-
-        it("can un-register 'pause' event", function () {
-            testUnRegisterEvent("pause");
-        });
-
-        it("can un-register 'resume' event", function () {
-            testUnRegisterEvent("resume");
-        });
-
-        it("can un-register 'windowstatechanged' event", function () {
-            testUnRegisterEvent("windowstatechanged");
-        });
-
-        it("can un-register 'swipedown' event", function () {
-            testUnRegisterEvent("swipedown");
-        });
-
-        it("can un-register 'keyboardOpening' event", function () {
-            testUnRegisterEvent("keyboardOpening");
-        });
-
-        it("can un-register 'keyboardOpened' event", function () {
-            testUnRegisterEvent("keyboardOpened");
-        });
-
-        it("can un-register 'keyboardClosing' event", function () {
-            testUnRegisterEvent("keyboardClosing");
-        });
-
-        it("can un-register 'keyboardClosed' event", function () {
-            testUnRegisterEvent("keyboardClosed");
-        });
-
-        it("can un-register 'keyboardPosition' event", function () {
-            testUnRegisterEvent("keyboardPosition");
-        });
     });
+
 });

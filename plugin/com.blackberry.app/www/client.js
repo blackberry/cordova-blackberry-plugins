@@ -18,15 +18,37 @@
 */
 
 var _self = {},
+    exec = cordova.require("cordova/exec"),
     ID = "com.blackberry.app",
-    readOnlyValues;
+    readOnlyValues,
+    noop = function () {},
+    events = ["swipedown", "pause", "resume", "orientationchange", "keyboardopening", "keyboardopened", 
+              "keyboardclosing", "keyboardclosed", "keyboardposition", "windowstatechanged"];
+
+events.map(function (eventName) {
+    var channel = cordova.addDocumentEventHandler(eventName),
+        success = function (data) {
+            channel.fire(data);
+        },
+        fail = function (error) {
+            console.log("Error initializing " + eventName + " listener: ", error);
+        };
+
+    channel.onHasSubscribersChange = function () {
+        if (this.numHandlers === 1) {
+            exec(success, fail, ID, "startEvent", {eventName: eventName});
+        } else if (this.numHandlers === 0) {
+            exec(noop, noop, ID, "stopEvent", {eventName: eventName});
+        }
+    };
+});
 
 _self.minimize = function () {
-    window.webworks.exec(function () {}, function () {}, ID, "minimize");
+    exec(noop, noop, ID, "minimize");
 };
 
 _self.exit = function () {
-    window.webworks.exec(function () {}, function () {}, ID, "exit");
+    exec(noop, noop, ID, "exit");
 };
 
 function getReadOnlyFields() {
@@ -37,7 +59,7 @@ function getReadOnlyFields() {
             throw data;
         };
     if (!readOnlyValues) {
-        window.webworks.exec(success, fail, ID, "getReadOnlyFields", null);
+        exec(success, fail, ID, "getReadOnlyFields", null);
     }
 }
 
@@ -72,7 +94,7 @@ Object.defineProperty(_self, "orientation", {
             };
 
         try {
-            window.webworks.exec(success, fail, ID, "currentOrientation");
+            exec(success, fail, ID, "currentOrientation");
         } catch (e) {
             console.error(e);
         }
@@ -91,7 +113,7 @@ Object.defineProperty(_self, "windowState", {
             };
 
         try {
-            window.webworks.exec(success, fail, ID, "windowState");
+            exec(success, fail, ID, "windowState");
         } catch (e) {
             console.error(e);
         }
@@ -130,22 +152,20 @@ defineReadOnlyField("licenseURL");
 defineReadOnlyField("version");
 
 function lockOrientation(orientation, receiveRotateEvents) {
-    window.webworks.exec(function () {}, function () {}, ID, "lockOrientation", { orientation: orientation, receiveRotateEvents: receiveRotateEvents });
+    exec(function () {}, function () {}, ID, "lockOrientation", { orientation: orientation, receiveRotateEvents: receiveRotateEvents });
 }
 
 function unlockOrientation() {
-    window.webworks.exec(function () {}, function () {}, ID, "unlockOrientation");
+    exec(function () {}, function () {}, ID, "unlockOrientation");
 }
 
 function rotate(orientation) {
-    window.webworks.exec(function () {}, function () {}, ID, "rotate", {orientation: orientation});
+    exec(function () {}, function () {}, ID, "rotate", {orientation: orientation});
 }
 
 // Orientation Properties
 Object.defineProperty(_self, "lockOrientation", {"value": lockOrientation, "writable": false});
 Object.defineProperty(_self, "unlockOrientation", {"value": unlockOrientation, "writable": false});
 Object.defineProperty(_self, "rotate", {"value": rotate, "writable": false});
-
-window.webworks.exec(function () {}, function () {}, ID, "registerEvents", null);
 
 module.exports = _self;

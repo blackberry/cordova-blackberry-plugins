@@ -14,83 +14,69 @@
  * limitations under the License.
  */
 var _config = require("./../../lib/config"),
-    _event = require("./../../lib/event"),
     _utils = require("./../../lib/utils"),
     _appEvents = require("./../../lib/events/applicationEvents"),
     _orientation,
+    _listeners = {},
     _actionMap = {
         swipedown: {
-            context: _appEvents,
             event: "swipedown",
-            triggerEvent: "swipedown",
-            trigger: function () {
-                _event.trigger("swipedown");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
         pause: {
-            context: _appEvents,
             event: "inactive",
-            triggerEvent: "pause",
-            trigger: function () {
-                _event.trigger("pause");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
         resume: {
-            context: _appEvents,
             event: "active",
-            triggerEvent: "resume",
-            trigger: function () {
-                _event.trigger("resume");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
-        keyboardOpening: {
-            context: _appEvents,
+        orientationchange : {
+            //special case, handled in add
+            event: "rotate",
+            trigger: function () {}
+        },
+        keyboardopening: {
             event: "keyboardOpening",
-            triggerEvent: "keyboardOpening",
-            trigger: function () {
-                _event.trigger("keyboardOpening");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
-        keyboardOpened: {
-            context: _appEvents,
+        keyboardopened: {
             event: "keyboardOpened",
-            triggerEvent: "keyboardOpened",
-            trigger: function () {
-                _event.trigger("keyboardOpened");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
-        keyboardClosing: {
-            context: _appEvents,
+        keyboardclosing: {
             event: "keyboardClosing",
-            triggerEvent: "keyboardClosing",
-            trigger: function () {
-                _event.trigger("keyboardClosing");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
-        keyboardClosed: {
-            context: _appEvents,
+        keyboardclosed: {
             event: "keyboardClosed",
-            triggerEvent: "keyboardClosed",
-            trigger: function () {
-                _event.trigger("keyboardClosed");
-            }
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            } 
         },
-        keyboardPosition: {
-            context: _appEvents,
+        keyboardposition: {
             event: "keyboardPosition",
-            triggerEvent: "keyboardPosition",
-            trigger: function (yPosition) {
-                var _yPosition = JSON.parse(yPosition);
-                _event.trigger("keyboardPosition", _yPosition);
-            }
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(JSON.parse(obj), true);
+            } 
         },
         windowstatechanged: {
-            context: _appEvents,
             event: "stateChange",
-            triggerEvent: "windowstatechanged",
-            trigger: function (state) {
-                _event.trigger("windowstatechanged", state);
-            }
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(obj, true);
+            } 
         }
     };
 
@@ -134,7 +120,7 @@ function edgeToOrientation(edge) {
     }
 }
 
-function translateToDeviceOrientation(orientation, fail) {
+function translateToDeviceOrientation(orientation) {
     // Convert HTML5 orientation syntax into device syntax
     switch (orientation) {
     case 'portrait':
@@ -152,93 +138,134 @@ function translateToDeviceOrientation(orientation, fail) {
         return 'right_up';
 
     default:
-        // Invalid orientation type
-        fail(-1, "invalid orientation type");
-        return;
+        return 'unknown';    
     }
 }
 
-function rotateTrigger(width, height, angle) {
+function rotateTrigger(pluginResult, width, height, angle) {
     _orientation = angleToOrientation(angle);
-    _event.trigger("orientationchange", angleToOrientation(angle));
+    pluginResult.callbackOk(_orientation, true);
 }
 
-function rotateWhenLockedTrigger(edge) {
+function rotateWhenLockedTrigger(pluginResult, edge) {
     _orientation = edgeToOrientation(edge);
-    _event.trigger("orientationchange", edgeToOrientation(edge));
+    pluginResult.callbackOk(_orientation, true);
 }
 
 module.exports = {
-    registerEvents: function (success, fail, args, env) {
-        try {
-            var _eventExt = _utils.loadExtensionModule("event", "index");
-            _eventExt.registerEvents(_actionMap);
 
-            // Seperate these two events from the action map since we want to handle both of these
-            // using the same listener
-            _appEvents.addEventListener("rotate", rotateTrigger);
-            _appEvents.addEventListener("rotateWhenLocked", rotateWhenLockedTrigger);
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            systemEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
 
-            success();
-        } catch (e) {
-            fail(-1, e);
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
         }
+
+        if (_listeners[eventName][env.webview.id]) {
+            if (eventName === "orientationchange") {
+                _appEvents.removeEventListener("rotate", _listeners[eventName][env.webview.id][0]);
+                _appEvents.removeEventListener("rotateWhenLocked", _listeners[eventName][env.webview.id][1]);
+            } else {
+                _appEvents.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
+            }
+        }
+
+        if (eventName === "orientationchange") {
+            listener = [rotateTrigger.bind(null, result), rotateWhenLockedTrigger.bind(null, result)];
+            _appEvents.addEventListener("rotate", listener[0]);
+            _appEvents.addEventListener("rotateWhenLocked", listener[1]);
+        } else {
+            _appEvents.addEventListener(systemEvent, listener);
+        }
+
+        _listeners[eventName][env.webview.id] = listener;
+        result.noResult(true);
     },
 
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName] ? _listeners[eventName][env.webview.id] : undefined,
+            systemEvent = _actionMap[eventName].event;
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            if (eventName  === "orientationchange") {
+                _appEvents.removeEventListener("rotate", listener[0]);
+                _appEvents.removeEventListener("rotateWhenLocked", listener[1]);
+            } else {
+                _appEvents.removeEventListener(systemEvent, listener);
+            }
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
+        }
+    },
+   
     getReadOnlyFields : function (success, fail, args, env) {
-        var ro = {
-            author: _config.author,
-            authorEmail: _config.authorEmail,
-            authorURL: _config.authorURL,
-            copyright: _config.copyright,
-            description: _config.description,
-            id: _config.id,
-            license: _config.license,
-            licenseURL: _config.licenseURL,
-            name: _config.name,
-            version: _config.version
-        };
-        success(ro);
+        var result = new PluginResult(args, env),
+            ro = {
+                author: _config.author,
+                authorEmail: _config.authorEmail,
+                authorURL: _config.authorURL,
+                copyright: _config.copyright,
+                description: _config.description,
+                id: _config.id,
+                license: _config.license,
+                licenseURL: _config.licenseURL,
+                name: _config.name,
+                version: _config.version
+            };
+        result.ok(ro, false);
     },
 
     lockOrientation : function (success, fail, args, env) {
-        var orientation = JSON.parse(decodeURIComponent(args.orientation)),
+        var result = new PluginResult(args, env),
+            orientation = JSON.parse(decodeURIComponent(args.orientation)),
             rotateTo = translateToDeviceOrientation(orientation),
             recieveRotateEvents = args.recieveRotateEvents === undefined  ? true : args.recieveRotateEvents;
 
         // Force rotate to the given orientation then lock it
         qnx.webplatform.getApplication().rotate(rotateTo);
         qnx.webplatform.getApplication().lockRotation(recieveRotateEvents);
-        success(true);
+        result.ok(true, false);
     },
 
     unlockOrientation : function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         qnx.webplatform.getApplication().unlockRotation();
-        success();
+        result.ok(null, false);
     },
 
     rotate : function (success, fail, args, env) {
-        var orientation = translateToDeviceOrientation(JSON.parse(decodeURIComponent(args.orientation)), fail);
+        var result = new PluginResult(args, env),
+            orientation = translateToDeviceOrientation(JSON.parse(decodeURIComponent(args.orientation)), fail);
         qnx.webplatform.getApplication().rotate(orientation);
-        success();
+        result.ok(null, false);
     },
 
     currentOrientation : function (success, fail, args, env) {
-        var orientation = _orientation || angleToOrientation(window.orientation);
-        success(orientation);
+        var result = new PluginResult(args, env),
+            orientation = _orientation || angleToOrientation(window.orientation);
+        result.ok(orientation, false);
     },
 
-    minimize: function (success) {
+    minimize: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         qnx.webplatform.getApplication().minimizeWindow();
-        success();
+        result.ok(null, false);
     },
 
-    exit: function (success) {
+    exit: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         window.qnx.webplatform.getApplication().exit();
-        success();
+        result.ok(null, false);
     },
 
     windowState : function (success, fail, args, env) {
-        success(qnx.webplatform.getApplication().windowState);
+        var result = new PluginResult(args, env);
+        result.ok(qnx.webplatform.getApplication().windowState, false);
     }
 };
