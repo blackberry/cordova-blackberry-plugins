@@ -19,6 +19,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.ui.cover/",
     events = require(_libDir + "event"),
     eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
     index,
+    mockedPluginResult,
     mockedCoverSize,
     mockedUpdateCover;
 
@@ -43,21 +44,30 @@ describe("index ui.cover", function () {
                 }
             }
         };
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult")
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
     });
 
     afterEach(function () {
         delete GLOBAL.window;
+        delete GLOBAL.PluginResult;
         index = null;
         mockedCoverSize = null;
         mockedUpdateCover = null;
+        mockedPluginResult = null;
     });
 
     it("gets coverSize", function () {
         var success = jasmine.createSpy(),
             fail = jasmine.createSpy();
         index.coverSize(success, fail);
-        expect(fail).not.toHaveBeenCalled();
-        expect(success).toHaveBeenCalledWith({width: 334, height: 396});
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith({width: 334, height: 396}, false);
+        expect(mockedPluginResult.error).not.toHaveBeenCalled();
     });
 
     it("resetCover", function () {
@@ -66,8 +76,8 @@ describe("index ui.cover", function () {
             resetCover = {cover: "reset"};
 
         index.resetCover(success, fail, {cover: encodeURIComponent(JSON.stringify(resetCover))});
-        expect(success).toHaveBeenCalled();
-        expect(fail).not.toHaveBeenCalled();
+        expect(mockedPluginResult.ok).toHaveBeenCalled();
+        expect(mockedPluginResult.error).not.toHaveBeenCalled();
         expect(mockedUpdateCover).toHaveBeenCalledWith(resetCover);
     });
 
@@ -82,8 +92,8 @@ describe("index ui.cover", function () {
                 text: [{"label": "cover label", "size": 5, "wrap": true}],
             };
         index.updateCover(success, fail, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
-        expect(success).toHaveBeenCalled();
-        expect(fail).not.toHaveBeenCalled();
+        expect(mockedPluginResult.ok).toHaveBeenCalled();
+        expect(mockedPluginResult.error).not.toHaveBeenCalled();
         expect(mockedUpdateCover).toHaveBeenCalledWith(fakeCover);
     });
 
@@ -98,8 +108,8 @@ describe("index ui.cover", function () {
                 text: [{"label": "cover label", "size": 5, "wrap": true}],
             };
         index.updateCover(success, fail, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
-        expect(success).toHaveBeenCalled();
-        expect(fail).not.toHaveBeenCalled();
+        expect(mockedPluginResult.ok).toHaveBeenCalled();
+        expect(mockedPluginResult.error).not.toHaveBeenCalled();
         expect(mockedUpdateCover).toHaveBeenCalledWith({
             "cover": {
                 type: "file",

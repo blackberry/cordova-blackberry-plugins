@@ -21,7 +21,8 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.ui.cover",
     _apiDir = _extDir + "/" + _ID,
     client,
-    mockedWebworks;
+    channelRegistry = {},
+    MockedChannel;
 
 function isDefinedAndEquals(property, value) {
     expect(property).toBeDefined();
@@ -30,20 +31,29 @@ function isDefinedAndEquals(property, value) {
 
 describe("client ui.cover", function () {
     beforeEach(function () {
-        mockedWebworks = {
-            exec: jasmine.createSpy("mocked webworks exec")
+        MockedChannel = function () {
+            return {
+                onHasSubscribersChange: undefined,
+                numHandlers: undefined
+            };
         };
-        GLOBAL.window = {
-            webworks: mockedWebworks
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy("exec"),
+            require: function () {
+                return cordova.exec;
+            },
+            addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
+                channelRegistry[eventName] = new MockedChannel();
+                return channelRegistry[eventName];
+            }),
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent")
         };
-        delete require.cache[require.resolve(_apiDir + "/www/client")];
         client = require(_apiDir + "/www/client");
     });
 
     afterEach(function () {
-        mockedWebworks = null;
-        delete GLOBAL.window;
-        client = null;
+        delete GLOBAL.cordova;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
     });
 
     it("constants are defined", function () {
@@ -57,12 +67,12 @@ describe("client ui.cover", function () {
 
     it("reset cover calls exec with the correct parameters", function () {
         client.resetCover();
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "resetCover");
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "resetCover");
     });
 
     it("coverSize calls exec with the correct parameters", function () {
         expect(client.coverSize).toEqual(undefined);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "coverSize");
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "coverSize");
     });
 
     it("updateCover calls exec with the correct parameters", function () {
@@ -71,7 +81,7 @@ describe("client ui.cover", function () {
         client.labels.push({"label": "Text Label", "size": 8, "color": "#FF0000", "wrap": false});
         client.showBadges = false;
         client.updateCover();
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "updateCover", {"cover": {
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "updateCover", {"cover": {
             cover: {
                 type: client.TYPE_IMAGE,
                 path: "/path/to/an/image.png"

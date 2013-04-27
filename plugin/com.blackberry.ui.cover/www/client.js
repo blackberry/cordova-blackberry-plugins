@@ -19,6 +19,7 @@
 
 var _ID = "com.blackberry.ui.cover",
     _self = {},
+    exec = cordova.require("cordova/exec"),
     badges = true,
     cover = {
         cover: {
@@ -26,7 +27,25 @@ var _ID = "com.blackberry.ui.cover",
             capture: {}
         },
     },
+    events = ["entercover", "exitcover"],
     textLabels = [];
+
+events.map(function (eventName) {
+    var channel = cordova.addDocumentEventHandler(eventName),
+        success = function (data) {
+            channel.fire(data);
+        },
+        fail = function (error) {
+            console.log("Error initializing " + eventName + " listener: ", error);
+        };
+    channel.onHasSubscribersChange = function () {
+        if (this.numHandlers === 1) {
+            exec(success, fail, _ID, "startEvent", {eventName: eventName});
+        } else if (this.numHandlers === 0) {
+            exec(function () {}, function () {}, _ID, "stopEvent", {eventName: eventName});
+        }
+    };
+});
 
 _self.setContent = function (type, options) {
     switch (type) {
@@ -59,13 +78,13 @@ _self.resetCover = function () {
     delete cover["badges"];
     _self.labels = [];
     _self.showBadges = true;
-    window.webworks.exec(function () {}, function () {}, _ID, "resetCover");
+    exec(function () {}, function () {}, _ID, "resetCover");
 };
 
 _self.updateCover = function () {
     cover["text"] = _self.labels;
     cover["badges"] = _self.showBadges;
-    window.webworks.exec(function () {}, function () {}, _ID, "updateCover", {"cover": cover});
+    exec(function () {}, function () {}, _ID, "updateCover", {"cover": cover});
 };
 
 Object.defineProperty(_self, "coverSize", {
@@ -77,7 +96,7 @@ Object.defineProperty(_self, "coverSize", {
             fail = function (data, response) {
                 throw data;
             };
-        window.webworks.exec(success, fail, _ID, "coverSize");
+        exec(success, fail, _ID, "coverSize");
         return value;
     }
 });
@@ -106,7 +125,5 @@ Object.defineProperty(_self, "TRANSITION_FADE", {"value": "fade", "writable": fa
 Object.defineProperty(_self, "TRANSITION_NONE", {"value": "none", "writable": false});
 Object.defineProperty(_self, "TRANSITION_DEFAULT", {"value": "default", "writable": false});
 Object.defineProperty(_self, "TRANSITION_SLIDE", {"value": "slide", "writable": false});
-
-window.webworks.exec(function () {}, function () {}, _ID, "registerEvents", null);
 
 module.exports = _self;
