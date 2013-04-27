@@ -15,23 +15,19 @@
  */
 
 var _utils = require("./../../lib/utils"),
-    _event = require("./../../lib/event"),
     _appEvents = require("./../../lib/events/applicationEvents"),
+    _listeners = {},
     _actionMap = {
         entercover: {
-            context: _appEvents,
             event: "windowCoverEnter",
-            triggerEvent: "entercover",
-            trigger: function () {
-                _event.trigger("entercover");
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
             }
         },
         exitcover: {
-            context: _appEvents,
             event: "windowCoverExit",
-            triggerEvent: "exitcover",
-            trigger: function () {
-                _event.trigger("exitcover");
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
             }
         }
     };
@@ -44,46 +40,78 @@ function processCover(cover) {
 }
 
 module.exports = {
-    registerEvents: function (success, fail, args, env) {
-        try {
-            var _eventExt = _utils.loadExtensionModule("event", "index");
-            _eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            console.log(e);
-            fail(-1, "Unable to register events");
+
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            systemEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
+
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            //TODO: Change back to erroring out after reset is implemented
+            //result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
+            _appEvents.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
+        }
+
+        _appEvents.addEventListener(systemEvent, listener);
+        _listeners[eventName][env.webview.id] = listener;
+        result.noResult(true);
+    },
+
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName][env.webview.id],
+            systemEvent = _actionMap[eventName].event;
+
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            _appEvents.removeEventListener(systemEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
         }
     },
 
     resetCover: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         try {
             window.qnx.webplatform.getApplication().updateCover({"cover": "reset"});
-            success();
+            result.ok(null, false);
         } catch (e) {
             console.log(e);
-            fail(-1, "Unable to reset cover");
+            result.error("Unable to reset cover");
         }
     },
 
     coverSize: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            coverSize,
+            response;
         try {
-            var coverSize = window.qnx.webplatform.getApplication().coverSize,
-                result = (typeof coverSize === "string") ? JSON.parse(coverSize) : coverSize;
-            success(result);
+            coverSize = window.qnx.webplatform.getApplication().coverSize;
+            response = (typeof coverSize === "string") ? JSON.parse(coverSize) : coverSize;
+            result.ok(response, false);
         } catch (e) {
             console.log(e);
-            fail(-1, "Unable to get coverSize");
+            result.error("Unable to get coverSize");
         }
     },
 
     updateCover: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            processedCover;
         try {
-            var processedCover = processCover(JSON.parse(decodeURIComponent(args.cover)));
+            processedCover = processCover(JSON.parse(decodeURIComponent(args.cover)));
             window.qnx.webplatform.getApplication().updateCover(processedCover);
-            success();
+            result.ok(null, false);
         } catch (e) {
             console.log(e);
-            fail(-1, "Unable to update cover");
+            result.error("Unable to update cover");
         }
     }
 };
