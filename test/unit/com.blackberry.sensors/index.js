@@ -16,7 +16,6 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.sensors/",
     _libDir = __dirname + "/../../../lib/",
     events = require(_libDir + "event"),
-    eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
     index;
 
 describe("sensors index", function () {

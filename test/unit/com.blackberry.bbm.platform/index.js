@@ -16,7 +16,6 @@
 
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.bbm.platform/",
     _libDir = __dirname + "/../../../lib/",
-    eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
     MockPluginResult,
     index = null,
     context = null;

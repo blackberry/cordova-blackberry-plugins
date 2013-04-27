@@ -85,7 +85,6 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
             "com.blackberry.app",
             "com.blackberry.bbm.platform",
             "com.blackberry.connection",
-            "com.blackberry.event",
             "com.blackberry.identity",
             "com.blackberry.invoke",
             "com.blackberry.invoke.card",

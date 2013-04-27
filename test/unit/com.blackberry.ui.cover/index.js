@@ -17,7 +17,6 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.ui.cover/",
     _libDir = __dirname + "/../../../lib/",
     events = require(_libDir + "event"),
-    eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index"),
     index,
     mockedPluginResult,
     mockedCoverSize,

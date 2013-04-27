@@ -57,11 +57,6 @@ module.exports = function (done, id) {
     // index.js
     utils.copyFolder(path.join(_c.ROOT, "plugin", id, "src/blackberry10"), path.join(_c.TEMP, "plugin", id));
 
-    // event dependency
-    if (id !== "com.blackberry.event")  {
-        utils.copyFolder(path.join(_c.ROOT, "plugin/com.blackberry.event/src/blackberry10"), path.join(_c.TEMP, "plugin/com.blackberry.event"));
-    }
-
     // lib
     utils.copyFolder(path.join(_c.ROOT, "test/lib"), path.join(_c.TEMP, "lib"));
 
