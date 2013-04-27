@@ -14,9 +14,10 @@
 * limitations under the License.
 */
 
-var _event = require("../../lib/event"),
-    _utils = require("../../lib/utils"),
-    connectionChangeOldType,
+var _utils = require("../../lib/utils"),
+    _deviceEvents = require("../../lib/events/deviceEvents"),
+    _lastType,
+    _listeners = {},
     _actionMap;
 
 function mapConnectionType(type, technology) {
@@ -65,38 +66,61 @@ function currentConnectionType() {
 
 _actionMap = {
     connectionchange: {
-        context: require("../../lib/events/deviceEvents"),
         event: "connectionChange",
-        triggerEvent: "connectionchange",
-        trigger: function (args) {
+        trigger: function (pluginResult, args) {
             var currentType = currentConnectionType();
-            if (currentType ===  connectionChangeOldType) {
-                return;
+            if (_lastType && currentType !== _lastType) {
+                pluginResult.callbackOk({oldType: _lastType, newType: currentType}, true);
             }
-            args.oldType = connectionChangeOldType;
-            args.newType = connectionChangeOldType = currentType;
-            _event.trigger("connectionchange", args);
+            _lastType = currentType;
         }
     }
 };
 
 module.exports = {
-    registerEvents: function (success, fail, args, env) {
-        connectionChangeOldType = currentConnectionType();
-        try {
-            var _eventExt = _utils.loadExtensionModule("event", "index");
-            _eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            fail(-1, e);
+
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            systemEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
+
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            //TODO: Change back to erroring out after reset is implemented
+            //result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
+            _deviceEvents.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
+        }
+
+        _deviceEvents.addEventListener(systemEvent, listener);
+        _listeners[eventName][env.webview.id] = listener;
+        result.noResult(true);
+    },
+
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName][env.webview.id],
+            systemEvent = _actionMap[eventName].event;
+
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            _deviceEvents.removeEventListener(systemEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
         }
     },
 
-    type: function (success, fail, args) {
+    type: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         try {
-            success(currentConnectionType());
+            result.ok(currentConnectionType(), false);
         } catch (e) {
-            fail(-1, e);
+            result.error(e, false);
         }
     }
 };
