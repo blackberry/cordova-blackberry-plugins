@@ -20,86 +20,82 @@
 var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/com.blackberry.identity",
     _ID = "com.blackberry.identity",
-    client,
-    mockedWebworks = {};
-
-function unloadClient() {
-    // explicitly unload client for it to be loaded again
-    delete require.cache[require.resolve(_apiDir + "/www/client")];
-    client = null;
-}
+    anyFunc = jasmine.any(Function),
+    client;
 
 describe("identity client", function () {
+
     describe("when user has specified correct permission", function () {
+
         beforeEach(function () {
-            mockedWebworks.exec = jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
-                var result = "Unsupported action";
-
-                if (action === "getFields") {
-                    result = {
-                        uuid: "0x12345678",
-                        IMSI: "310150123456789",
-                        IMEI: "AA-BBBBBB-CCCCCC-D"
-                    };
+            GLOBAL.cordova = {
+                exec: jasmine.createSpy().andCallFake(function (success, fail, service, action) {
+                    var result = "Unsupported action";
+                    if (action === "getFields") {
+                        result = {
+                            uuid: "0x12345678",
+                            IMSI: "310150123456789",
+                            IMEI: "AA-BBBBBB-CCCCCC-D"
+                        };
+                    }
+                    success(result);
+                }),
+                require: function () {
+                    return cordova.exec;
                 }
-
-                success(result);
-            });
-            mockedWebworks.defineReadOnlyField = jasmine.createSpy();
-            GLOBAL.window = {
-                webworks: mockedWebworks
             };
-            // client needs to be required for each test
             client = require(_apiDir + "/www/client");
         });
 
         afterEach(function () {
-            unloadClient();
-            delete GLOBAL.window;
+            delete require.cache[require.resolve(_apiDir + "/www/client")];
+            client = null;
+            delete GLOBAL.cordova;
         });
 
         it("exec should have been called once for all fields", function () {
-            expect(mockedWebworks.exec.callCount).toEqual(1);
+            expect(window.cordova.exec.callCount).toEqual(1);
         });
 
         it("uuid should call exec and value should be defined", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "uuid", "0x12345678");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getFields", null);
-            expect(mockedWebworks.exec).not.toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "uuid", null);
+            var anyFunc = jasmine.any(Function);
+            expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
+            expect(cordova.exec).not.toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "uuid", null);
+            expect(client.uuid).toEqual("0x12345678");
         });
 
         it("IMSI value should be defined", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "IMSI", "310150123456789");
-            expect(mockedWebworks.exec).not.toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "IMSI", null);
+            expect(cordova.exec).not.toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "IMSI", null);
+            expect(client.IMSI).toEqual("310150123456789");
         });
 
         it("IMSI value should be defined", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "IMEI", "AA-BBBBBB-CCCCCC-D");
-            expect(mockedWebworks.exec).not.toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "IMEI", null);
+            expect(cordova.exec).not.toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "IMEI", null);
+            expect(client.IMEI).toEqual("AA-BBBBBB-CCCCCC-D");
         });
     });
 
     describe("when user hasn't specified correct permission", function () {
+
         beforeEach(function () {
-            spyOn(console, "error");
-            mockedWebworks.exec = jasmine.createSpy().andThrow("Cannot read PPS object");
             GLOBAL.window = {
-                webworks: mockedWebworks
+                cordova: {
+                    exec: jasmine.createSpy().andThrow("Cannot read PPS object")
+                }
             };
-            // client needs to be required for each test
             client = require(_apiDir + "/www/client");
         });
 
         afterEach(function () {
-            unloadClient();
+            delete require.cache[require.resolve(_apiDir + "/www/client")];
+            client = null;
             delete GLOBAL.window;
         });
 
-        afterEach(unloadClient);
-
         it("uuid should call exec and catch error and return null", function () {
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getFields", null);
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "uuid", null);
+            cordova.exec.andThrow("Cannot read PPS object");
+            expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
+            expect(client.uuid).toEqual(null);
         });
     });
 });

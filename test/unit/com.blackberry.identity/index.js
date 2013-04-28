@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.identity/",
+    mockedPluginResult,
     index;
 
 describe("identity index", function () {
@@ -35,48 +36,50 @@ describe("identity index", function () {
                     }
                 }
             };
+            mockedPluginResult = {
+                ok: jasmine.createSpy("PluginResult.ok"),
+                error: jasmine.createSpy("PluginResult.error"),
+                noResult: jasmine.createSpy("PluginResult.noResult"),
+                callbackOk: jasmine.createSpy("PluginResult.callbackOk")
+            };
+            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         });
 
         afterEach(function () {
             delete GLOBAL.window;
+            delete GLOBAL.PluginResult;
         });
 
-        it("can call success", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy(),
-                mockedDevice = {
-                    devicePin: (new Date()).getTime(),
-                    IMSI: "310150123456789",
-                    IMEI: "AA-BBBBBB-CCCCCC-D"
-                };
+        it("can call ok", function () {
+            var mockedDevice = {
+                devicePin: (new Date()).getTime(),
+                IMSI: "310150123456789",
+                IMEI: "AA-BBBBBB-CCCCCC-D"
+            };
 
             window.qnx.webplatform.device = mockedDevice;
 
-            index.getFields(success, fail);
+            index.getFields();
 
-            expect(success).toHaveBeenCalledWith({
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith({
                 uuid: mockedDevice.devicePin,
                 IMSI: mockedDevice.IMSI,
                 IMEI: mockedDevice.IMEI
-            });
-            expect(fail).not.toHaveBeenCalled();
+            }, false);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("will call fail when the fields are missing", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy();
 
-            index.getFields(success, fail);
+            index.getFields();
 
-            expect(success).not.toHaveBeenCalled();
-            expect(fail).toHaveBeenCalledWith(-1, "Cannot retrieve data from system");
+            expect(mockedPluginResult.ok).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalledWith("Cannot retrieve data from system");
         });
 
 
         it("will call fail when an error occurs", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy(),
-                errMsg = "Something bad happened";
+            var errMsg = "Something bad happened";
 
             Object.defineProperty(window.qnx.webplatform.device, "devicePin", {
                 get: function () {
@@ -84,10 +87,10 @@ describe("identity index", function () {
                 }
             });
 
-            index.getFields(success, fail);
+            index.getFields();
 
-            expect(success).not.toHaveBeenCalled();
-            expect(fail).toHaveBeenCalledWith(-1, errMsg);
+            expect(mockedPluginResult.ok).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalledWith(errMsg);
         });
     });
 });
