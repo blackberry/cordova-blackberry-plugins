@@ -17,6 +17,7 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoked/",
     _libDir = __dirname + "/../../../lib/",
     mockedInvocation,
+    mockedPluginResult,
     index,
     successCB,
     failCB,
@@ -43,6 +44,14 @@ describe("invoked index", function () {
                 }
             }
         };
+        mockedPluginResult = {
+            callbackOk: jasmine.createSpy(),
+            callbackError: jasmine.createSpy(),
+            noResult: jasmine.createSpy(),
+            ok: jasmine.createSpy(),
+            error: jasmine.createSpy()
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         //since multiple tests are requiring invocation events we must unrequire
         var name = require.resolve(_apiDir + "invocationEvents");
@@ -58,135 +67,6 @@ describe("invoked index", function () {
         index = null;
         successCB = null;
         failCB = null;
-    });
-
-    describe("events", function () {
-        var utils,
-            events,
-            eventExt;
-
-        beforeEach(function () {
-            utils = require(_libDir + "utils");
-            events = require(_libDir + "event");
-            eventExt = require(__dirname + "/../../../plugin/com.blackberry.event/index");
-            spyOn(utils, "loadExtensionModule").andCallFake(function () {
-                return eventExt;
-            });
-        });
-
-        afterEach(function () {
-            utils = null;
-            events = null;
-            eventExt = null;
-        });
-
-        it("can register for events", function () {
-            var evts = ["invoked", "onCardResize", "onCardClosed"],
-                args,
-                success = jasmine.createSpy(),
-                env = {webviewId: 42};
-
-            spyOn(events, "add");
-
-            evts.forEach(function (e) {
-                args = {eventName : encodeURIComponent(e)};
-                index.registerEvents(success);
-                eventExt.add(null, null, args, env);
-                expect(success).toHaveBeenCalled();
-                expect(events.add).toHaveBeenCalled();
-                expect(events.add.mostRecentCall.args[0].event).toEqual(e);
-                expect(events.add.mostRecentCall.args[0].trigger).toEqual(jasmine.any(Function));
-            });
-        });
-
-        it("call successCB when all went well", function () {
-            var eventName = "invoked",
-                args = {eventName: encodeURIComponent(eventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add");
-            index.registerEvents(jasmine.createSpy(), jasmine.createSpy());
-            eventExt.add(successCB, failCB, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: jasmine.any(Object),
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "invoked"
-            }, env.webview);
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
-        });
-
-        it("call errorCB when there was an error", function () {
-            var eventName = "invoked",
-                args = {eventName: encodeURIComponent(eventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "add").andCallFake(function () {
-                throw "";
-            });
-
-            index.registerEvents(jasmine.createSpy(), jasmine.createSpy());
-            eventExt.add(successCB, failCB, args, env);
-            expect(events.add).toHaveBeenCalledWith({
-                context: jasmine.any(Object),
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "invoked"
-            }, env.webview);
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalledWith(-1, jasmine.any(String));
-        });
-
-        it("can un-register from events", function () {
-            var evts = ["invoked", "onCardResize", "onCardClosed"],
-                args,
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-
-            evts.forEach(function (e) {
-                args = {eventName : encodeURIComponent(e)};
-                eventExt.remove(null, null, args, env);
-                expect(events.remove).toHaveBeenCalledWith({
-                    context: jasmine.any(Object),
-                    event: e,
-                    trigger: jasmine.any(Function),
-                    triggerEvent: e
-                }, env.webview);
-            });
-        });
-
-        it("call successCB when all went well even when event is not defined", function () {
-            var eventName = "eventnotdefined",
-                args = {eventName: encodeURIComponent(eventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove");
-            eventExt.remove(successCB, failCB, args, env);
-            expect(events.remove).toHaveBeenCalledWith(undefined, env.webview);
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
-        });
-
-        it("call errorCB when there was exception occured", function () {
-            var eventName = "invoked",
-                args = {eventName: encodeURIComponent(eventName)},
-                env = {webview: {id: (new Date()).getTime()}};
-
-            spyOn(events, "remove").andCallFake(function () {
-                throw "";
-            });
-            eventExt.remove(successCB, failCB, args, env);
-            expect(events.remove).toHaveBeenCalledWith({
-                context: jasmine.any(Object),
-                event: eventName,
-                trigger: jasmine.any(Function),
-                triggerEvent: "invoked"
-            }, env.webview);
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalledWith(-1, jasmine.any(String));
-        });
     });
 
     describe("methods", function () {
@@ -206,8 +86,7 @@ describe("invoked index", function () {
         it("can call cardResizeDone with success callback at the end", function () {
             index.cardResizeDone(successCB, failCB);
             expect(mockedInvocation.cardResized).toHaveBeenCalled();
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
 
         it("can call cardStartPeek with success callback at the end", function () {
@@ -218,8 +97,7 @@ describe("invoked index", function () {
 
             index.cardStartPeek(successCB, failCB, args);
             expect(mockedInvocation.cardPeek).toHaveBeenCalledWith(cartType);
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
 
         it("can call cardRequestClosure with success callback at the end", function () {
@@ -234,30 +112,20 @@ describe("invoked index", function () {
 
             index.cardRequestClosure(successCB, failCB, args);
             expect(mockedInvocation.sendCardDone).toHaveBeenCalledWith(request);
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
 
         // Negative
-        it("can call cardResizeDone with fail callback on wrong call", function () {
-            index.cardResizeDone(null, failCB);
-            expect(mockedInvocation.cardResized).toHaveBeenCalled();
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalledWith(errorCode, jasmine.any(Object));
-        });
-
         it("can call cardStartPeek with fail callback when missing required parameter", function () {
             index.cardStartPeek(successCB, failCB);
             expect(mockedInvocation.cardResized).not.toHaveBeenCalled();
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalledWith(errorCode, jasmine.any(Object));
+            expect(mockedPluginResult.error).toHaveBeenCalled();
         });
 
         it("can call cardRequestClosure with fail callback when missing required parameter", function () {
             index.cardRequestClosure(successCB, failCB);
             expect(mockedInvocation.sendCardDone).not.toHaveBeenCalled();
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalledWith(errorCode, jasmine.any(Object));
+            expect(mockedPluginResult.error).toHaveBeenCalled();
         });
     });
 });

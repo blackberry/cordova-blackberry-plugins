@@ -18,20 +18,36 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.invoked";
+    _ID = "com.blackberry.invoked",
+    _noop = function () {},
+    _events = ["invoked", "oncardresize", "oncardclosed"],
+    _channels = _events.map(function (eventName) {
+        var channel = cordova.addWindowEventHandler(eventName),
+            success = function (data) {
+                channel.fire(data);
+            };
+        channel.onHasSubscribersChange = function () {
+            if (this.numHandlers === 1) {
+                window.webworks.exec(success,
+                                     console.log.bind("Error initializing " + eventName + " listener: "),
+                                     _ID, "startEvent", {eventName: eventName});
+            } else if (this.numHandlers === 0) {
+                window.webworks.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
+            }
+        };
+        return channel;
+    });
 
 _self.cardResizeDone = function () {
-    window.webworks.exec(function () {}, function () {}, _ID, "cardResizeDone");
+    window.webworks.exec(_noop, _noop, _ID, "cardResizeDone");
 };
 
 _self.cardStartPeek = function (peekType) {
-    window.webworks.exec(function () {}, function () {}, _ID, "cardStartPeek", {'peekType': peekType});
+    window.webworks.exec(_noop, _noop, _ID, "cardStartPeek", {'peekType': peekType});
 };
 
 _self.cardRequestClosure = function (request) {
-    window.webworks.exec(function () {}, function () {}, _ID, "cardRequestClosure", {request: request});
+    window.webworks.exec(_noop, _noop, _ID, "cardRequestClosure", {request: request});
 };
-
-window.webworks.exec(function () {}, function () {}, _ID, "registerEvents", null);
 
 module.exports = _self;

@@ -24,7 +24,7 @@ describe("blackberry.invoked", function () {
             invocationHandled = false,
             invokedTarget, invokedType, invokedAction, invokedData;
 
-        blackberry.event.addEventListener("invoked", function (invocationInfo) {
+        window.addEventListener("invoked", function (invocationInfo) {
             if (invocationInfo.target) {
                 invokedTarget = invocationInfo.target;
             }

@@ -52,15 +52,15 @@ describe("blackberry.invoked", function () {
         beforeEach(function () {
             onCardResize = jasmine.createSpy("onCardResize event");
             onCardClosed = jasmine.createSpy("onCardClosed event");
-            blackberry.event.addEventListener("onCardResize", onCardResize);
-            blackberry.event.addEventListener("onCardClosed", onCardClosed);
+            window.addEventListener("onCardResize", onCardResize);
+            window.addEventListener("onCardClosed", onCardClosed);
         });
 
         afterEach(function () {
             onCardResize = null;
             onCardClosed = null;
-            blackberry.event.removeEventListener("onCardResize", onCardResize);
-            blackberry.event.removeEventListener("onCardClosed", onCardClosed);
+            window.removeEventListener("onCardResize", onCardResize);
+            window.removeEventListener("onCardClosed", onCardClosed);
             confirm = null;
         });
 

@@ -25,6 +25,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoke.card/",
     mockedCalPicker,
     mockedCalComposer,
     mockedEmailComposer,
+    mockedPluginResult,
     index,
     successCB,
     failCB;
@@ -96,7 +97,14 @@ describe("invoke.card index", function () {
                 }
             }
         };
-
+        mockedPluginResult = {
+            callbackOk: jasmine.createSpy(),
+            callbackError: jasmine.createSpy(),
+            noResult: jasmine.createSpy(),
+            ok: jasmine.createSpy(),
+            error: jasmine.createSpy()
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         GLOBAL.qnx = GLOBAL.window.qnx;
         index = require(_apiDir + "index");
@@ -122,8 +130,7 @@ describe("invoke.card index", function () {
 
     describe("invoke camera", function () {
         it("can invoke camera with mode", function () {
-            var successCB = jasmine.createSpy(),
-                mockedArgs = {
+            var mockedArgs = {
                     "mode": encodeURIComponent(JSON.stringify({mode: "photo"}))
                 };
 
@@ -131,14 +138,13 @@ describe("invoke.card index", function () {
             expect(mockedCamera.open).toHaveBeenCalledWith({
                 mode: "photo"
             }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
     describe("invoke file picker", function () {
         it("can invoke file picker with options", function () {
-            var successCB = jasmine.createSpy(),
-                mockedArgs = {
+            var mockedArgs = {
                     "options": encodeURIComponent(JSON.stringify({mode: "Picker"}))
                 };
 
@@ -146,7 +152,7 @@ describe("invoke.card index", function () {
             expect(mockedFile.open).toHaveBeenCalledWith({
                     mode: "Picker"
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
@@ -168,7 +174,7 @@ describe("invoke.card index", function () {
                     contentUri: decodeURIComponent(contentUri),
                     imageUri: decodeURIComponent(imageUri)
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
@@ -195,7 +201,7 @@ describe("invoke.card index", function () {
             expect(mockedCalPicker.open).toHaveBeenCalledWith({
                 options: { filepath : "/path/to/file.vcs" }
             }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
@@ -220,7 +226,7 @@ describe("invoke.card index", function () {
                     startTime: decodeURIComponent(startTime),
                     duration: decodeURIComponent(duration)
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
@@ -239,7 +245,7 @@ describe("invoke.card index", function () {
                     subject: decodeURIComponent(subject),
                     body: decodeURIComponent(body),
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
     });
 
@@ -270,7 +276,7 @@ describe("invoke.card index", function () {
                 jasmine.any(Function),
                 jasmine.any(Function)
             );
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("can invoke the target picker with meta data", function () {
@@ -296,7 +302,7 @@ describe("invoke.card index", function () {
                 jasmine.any(Function),
                 jasmine.any(Function)
             );
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
 
@@ -321,7 +327,7 @@ describe("invoke.card index", function () {
                 jasmine.any(Function),
                 jasmine.any(Function)
             );
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
     });

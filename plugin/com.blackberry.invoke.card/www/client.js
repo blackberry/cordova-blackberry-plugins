@@ -19,75 +19,41 @@
 
 var _self = {},
     _ID = "com.blackberry.invoke.card",
-    _cameraEventId = "invokeCamera.eventId",
-    _cameraInvokeEventId = "invokeCamera.invokeEventId",
-    _filePickerEventId = "invokeFilePicker.eventId",
-    _filePickerInvokeEventId = "invokeFilePicker.invokeEventId",
-    _icsEventId = "invokeIcsViewer.eventId",
-    _icsInvokeEventId = "invokeIcsViewer.invokeEventId",
-    _calendarPickerEventId = "invokeCalendarPicker.eventId",
-    _calendarPickerInvokeEventId = "invokeCalendarPicker.invokeEventId",
-    _calendarComposerEventId = "invokeCalendarComposer.eventId",
-    _calendarComposerInvokeEventId = "invokeCalendarComposer.invokeEventId",
-    _targetPickerEventId = "invokeTargetPicker.eventId",
-    _emailComposerEventId = "invokeEmailComposer.eventId",
-    _emailComposerInvokeEventId = "invokeEmailComposer.invokeEventId";
+    _noop = function () {};
 
-function doneCancelCallback(done, cancel) {
-    return function (reason, data) {
-        if (reason === "done") {
+function cb(done, cancel, invoke) {
+    return function (data) {
+        var type = data.type,
+            result = data.result;
+
+        switch (type) {
+        case "done":
             if (done && typeof(done) === "function") {
-                done(data);
+                done(result);
             }
-        } else if (reason === "cancel") {
+            break;
+        case "cancel":
             if (cancel && typeof(cancel) === "function") {
-                cancel(data);
+                cancel(result);
             }
+            break;
+        case "invoke":
+            if (invoke && typeof(invoke) === "function") {
+                invoke(result);
+            }
+            break;
         }
     };
 }
 
 _self.invokeMediaPlayer = function (options, done, cancel, invokeCallback) {
-    var eventId = "invokeMediaPlayer.eventId",
-        invokeEventId = "invokeMediaPlayer.invokeEventId",
-        callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, eventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-
-    if (!window.webworks.event.isOn(eventId)) {
-        window.webworks.event.once(_ID, eventId, callback);
-    }
-
-    if (!window.webworks.event.isOn(invokeEventId)) {
-        window.webworks.event.once(_ID, invokeEventId, invoked);
-    }
-
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeMediaPlayer", {options: options || {}});
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeMediaPlayer", {options: options || {}});
 };
 
 _self.invokeCamera = function (mode, done, cancel, invokeCallback) {
-    var callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, _cameraEventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-    if (!window.webworks.event.isOn(_cameraEventId)) {
-        window.webworks.event.once(_ID, _cameraEventId, callback);
-    }
-    if (!window.webworks.event.isOn(_cameraInvokeEventId)) {
-        window.webworks.event.once(_ID, _cameraInvokeEventId, invoked);
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeCamera", {mode: mode || ""});
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeCamera", {mode: mode || ""});
 };
 
 _self.invokeFilePicker = function (options, done, cancel, invokeCallback) {
@@ -107,22 +73,9 @@ _self.invokeFilePicker = function (options, done, cancel, invokeCallback) {
    *    allowOverwrite: true|false
    * }
    */
-    var callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, _filePickerEventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-    if (!window.webworks.event.isOn(_filePickerEventId)) {
-        window.webworks.event.once(_ID, _filePickerEventId, callback);
-    }
-    if (!window.webworks.event.isOn(_filePickerInvokeEventId)) {
-        window.webworks.event.once(_ID, _filePickerInvokeEventId, invoked);
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeFilePicker", {options: options || ""});
+
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeFilePicker", {options: options || ""});
 };
 
 _self.invokeIcsViewer = function (options, done, cancel, invokeCallback) {
@@ -132,22 +85,9 @@ _self.invokeIcsViewer = function (options, done, cancel, invokeCallback) {
     *     accountId: id of the calendar account to open the file in (optional)
     * }
     */
-    var callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, _icsEventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-    if (!window.webworks.event.isOn(_icsEventId)) {
-        window.webworks.event.once(_ID, _icsEventId, callback);
-    }
-    if (!window.webworks.event.isOn(_icsInvokeEventId)) {
-        window.webworks.event.once(_ID, _icsInvokeEventId, invoked);
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeIcsViewer", {options: options || ""});
+
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeIcsViewer", {options: options || ""});
 };
 
 
@@ -157,112 +97,66 @@ _self.invokeCalendarPicker = function (options, done, cancel, invokeCallback) {
    *    filepath: path to file where .vcs will be saved
    * }
    */
-    var callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, _calendarPickerEventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-    if (!window.webworks.event.isOn(_calendarPickerEventId)) {
-        window.webworks.event.once(_ID, _calendarPickerEventId, callback);
-    }
-    if (!window.webworks.event.isOn(_calendarPickerInvokeEventId)) {
-        window.webworks.event.once(_ID, _calendarPickerInvokeEventId, invoked);
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeCalendarPicker", {options: options || ""});
+
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeCalendarPicker", {options: options || ""});
 };
 
 _self.invokeCalendarComposer = function (options, done, cancel, invokeCallback) {
-   /*
-   * options = {
-   *    accountId : account ID //used with syncId or folderId to identify a specific account
-   *    syncId : sync ID
-   *    folderId : folder ID
-   *    subject : event subject
-   *    body : event body
-   *    startTime : event start time e.g: Wed Jun 13 09:39:56 2012
-   *    duration : event duration
-   *    participants : array of pariticipant email addresses
-   * }
-   */
-    var callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, _calendarComposerEventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-    if (!window.webworks.event.isOn(_calendarComposerEventId)) {
-        window.webworks.event.once(_ID, _calendarComposerEventId, callback);
-    }
-    if (!window.webworks.event.isOn(_calendarComposerInvokeEventId)) {
-        window.webworks.event.once(_ID, _calendarComposerInvokeEventId, invoked);
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeCalendarComposer", {options: options || ""});
+   /* options = {
+    *    accountId : account ID //used with syncId or folderId to identify a specific account
+    *    syncId : sync ID
+    *    folderId : folder ID
+    *    subject : event subject
+    *    body : event body
+    *    startTime : event start time e.g: Wed Jun 13 09:39:56 2012
+    *    duration : event duration
+    *    participants : array of pariticipant email addresses
+    * }
+    */
+
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeCalendarComposer", {options: options || ""});
 };
 
 _self.invokeEmailComposer = function (options, done, cancel, invokeCallback) {
-   /*
-   * options = {
-   *    from : accountId this message should be sent from
-   *    subject : message subject
-   *    body : plaintext message body
-   *    calendarevent : calendar event ID
-   *    to : array of recipient emails
-   *    cc : array of emails
-   *    attachment : array of attachment filepaths
-   * }
-   */
-    var callback = doneCancelCallback(done, cancel),
-        invoked = function (error) {
-            if (error !== "") {
-                window.webworks.event.remove(_ID, _emailComposerEventId, callback);
-            }
-            if (typeof invokeCallback === typeof Function) {
-                invokeCallback();
-            }
-        };
-    if (!window.webworks.event.isOn(_emailComposerEventId)) {
-        window.webworks.event.once(_ID, _emailComposerEventId, callback);
-    }
-    if (!window.webworks.event.isOn(_emailComposerInvokeEventId)) {
-        window.webworks.event.once(_ID, _emailComposerInvokeEventId, invoked);
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeEmailComposer", {options: options || ""});
+     /* options = {
+      *    from : accountId this message should be sent from
+      *    subject : message subject
+      *    body : plaintext message body
+      *    calendarevent : calendar event ID
+      *    to : array of recipient emails
+      *    cc : array of emails
+      *    attachment : array of attachment filepaths
+      * }
+      */
+
+    var callback = cb(done, cancel, invokeCallback);
+    window.webworks.exec(callback, _noop, _ID, "invokeEmailComposer", {options: options || ""});
 };
 
 _self.invokeTargetPicker = function (request, title, onSuccess, onError) {
 
-    var callback = function (reason, data) {
-        if (reason === "success") {
+    var callback = function (data) {
+        if (data.status === "success") {
             if (onSuccess && typeof(onSuccess) === "function") {
-                onSuccess(data);
+                onSuccess(data.result);
             }
-        } else if (reason === "error") {
+        } else if (data.status === "error") {
             if (onError && typeof(onError) === "function") {
-                onError(data);
+                onError(data.result);
             }
         }
     };
 
-    if (!window.webworks.event.isOn(_targetPickerEventId)) {
-        window.webworks.event.once(_ID, _targetPickerEventId, callback);
-    }
     try {
         if (request.hasOwnProperty('data')) {
             request.data = window.btoa(request.data);
         }
 
-        window.webworks.exec(function () {}, function () {}, _ID, "invokeTargetPicker", {
+        window.webworks.exec(callback, _noop, _ID, "invokeTargetPicker", {
             request: request,
-            title: title,
-            onSuccess: onSuccess,
-            onError : onError,
+            title: title
         });
     } catch (e) {
         onError(e);
