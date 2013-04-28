@@ -15,18 +15,18 @@
  */
 
 var filetransfer,
-    _event = require("../../lib/event"),
     _webview = require("../../lib/webview"),
     _utils = require("./../../lib/utils"),
     Whitelist = require('../../lib/policy/whitelist').Whitelist,
-    _whitelist = new Whitelist();
+    _whitelist = new Whitelist(),
+    resultObjs = {};
 
 module.exports = {
     upload: function (success, fail, args, env) {
         var key,
             key2,
+            result = new PluginResult(args, env),
             params = {
-                "_eventId": "",
                 "filePath": "",
                 "server": "",
                 "options": {
@@ -41,6 +41,7 @@ module.exports = {
             },
             undefined_params = [];
 
+        resultObjs[result.callbackId] = result;
 
         // decodeURI and check for null value params
         /*jshint forin: false */
@@ -53,12 +54,12 @@ module.exports = {
 
         // validate params
         if (undefined_params.length !== 0) {
-            fail(-1, undefined_params + (undefined_params.length === 1 ? " is " : " are ") + "null");
+            result.error(undefined_params + (undefined_params.length === 1 ? " is " : " are ") + "null", false);
             return;
         }
 
         if (args.options && args.options.chunkedMode !== false && args.options.chunkSize <= 0) {
-            fail(-1, "chunkSize must be a positive number");
+            result.error("chunkSize must be a positive number", false);
             return;
         }
 
@@ -67,7 +68,7 @@ module.exports = {
 
         // check if url is whitelisted
         if (!_whitelist.isAccessAllowed(args.server)) {
-            fail(-1, "URL denied by whitelist: " + args.server);
+            result.error("URL denied by whitelist: " + args.server, false);
             return;
         }
 
@@ -85,12 +86,15 @@ module.exports = {
         }
 
         filetransfer.getInstance().upload(params);
-        success();
+        result.noResult(true);
     },
 
     download: function (success, fail, args, env) {
         var key,
+            result = new PluginResult(args, env),
             undefined_params = [];
+
+        resultObjs[result.callbackId] = result;
 
         /*jshint forin: false */
         for (key in args) {
@@ -102,7 +106,7 @@ module.exports = {
 
         // validate params
         if (undefined_params.length !== 0) {
-            fail(-1, undefined_params + (undefined_params.length === 1 ? " is " : " are ") + "null");
+            result.error(undefined_params + (undefined_params.length === 1 ? " is " : " are ") + "null", false);
             return;
         }
 
@@ -111,14 +115,14 @@ module.exports = {
 
         // check if url is whitelisted
         if (!_whitelist.isAccessAllowed(args.source)) {
-            fail(-1, "URL denied by whitelist: " + args.source);
+            result.error("URL denied by whitelist: " + args.source, false);
             return;
         }
 
         args.windowGroup = _webview.windowGroup();
 
         filetransfer.getInstance().download(args);
-        success();
+        result.noResult(true);
     }
 };
 
@@ -145,9 +149,10 @@ JNEXT.FileTransfer = function () {
 
     self.onEvent = function (strData) {
         var arData = strData.split(" ", 7),
-            _eventId = arData[0],
+            callbackId = arData[0],
             strEventDesc = arData[1],
             strEventResult = arData[2],
+            result = resultObjs[callbackId],
             args = {};
 
         if (strEventDesc === "upload") {
@@ -163,9 +168,6 @@ JNEXT.FileTransfer = function () {
                 args.target = unescape(arData[5]);
                 args.http_status = parseInt(arData[6], 10);
             }
-
-            _event.trigger(_eventId, args);
-
         } else if (strEventDesc === "download") {
             if (strEventResult === "success") {
                 args.result = strEventResult;
@@ -180,8 +182,10 @@ JNEXT.FileTransfer = function () {
                 args.target = unescape(arData[5]);
                 args.http_status = parseInt(arData[6], 10);
             }
-
-            _event.trigger(_eventId, args);
+        }
+        if (result) {
+            result.callbackOk(args, false);
+            delete resultObjs[callbackId];
         }
     };
 

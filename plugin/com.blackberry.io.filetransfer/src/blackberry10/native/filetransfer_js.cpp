@@ -90,7 +90,7 @@ std::string FileTransfer::StartUploadThread(const std::string& jsonObject)
 
     // Create a new struct with upload information from the JSON object
     webworks::FileUploadInfo *upload_info = new webworks::FileUploadInfo;
-    upload_info->eventId = obj["_eventId"].asString();
+    upload_info->eventId = obj["callbackId"].asString();
     upload_info->sourceFile = obj["filePath"].asString();
     upload_info->targetURL = obj["server"].asString();
 
@@ -155,7 +155,7 @@ std::string FileTransfer::StartDownloadThread(const std::string& jsonObject)
 
     // Create a new struct with upload information from the JSON object
     webworks::FileDownloadInfo *download_info = new webworks::FileDownloadInfo;
-    download_info->eventId = obj["_eventId"].asString();
+    download_info->eventId = obj["callbackId"].asString();
     download_info->source = obj["source"].asString();
     download_info->target = obj["target"].asString();
     download_info->windowGroup = obj["windowGroup"].asString();

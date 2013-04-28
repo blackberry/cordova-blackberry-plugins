@@ -20,44 +20,35 @@
 var _ID = "com.blackberry.io.filetransfer",
     _apiDir = __dirname + "/../../../plugin/" + _ID + "/",
     client,
-    mockedWebworks = {},
-    constants = {
-        "FILE_NOT_FOUND_ERR": 1,
-        "INVALID_URL_ERR": 2,
-        "CONNECTION_ERR": 3
-    },
-    defineROFieldArgs = [];
+    successCB;
 
 describe("io.filetransfer client", function () {
     beforeEach(function () {
-        mockedWebworks.exec = jasmine.createSpy();
-        mockedWebworks.defineReadOnlyField = jasmine.createSpy();
-        mockedWebworks.event = {
-            once : jasmine.createSpy(),
-            isOn : jasmine.createSpy()
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy().andCallFake(function (success) {
+                successCB = success;
+            }),
+            require: function () {
+                return cordova.exec;
+            }
         };
-
-        GLOBAL.window = {
-            webworks: mockedWebworks
-        };
-
         client = require(_apiDir + "www/client");
     });
 
     afterEach(function () {
-        delete GLOBAL.window;
+        delete GLOBAL.cordova;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
+        client = null;
     });
 
     describe("io.filetransfer constants", function () {
-        it("should return constant", function () {
-            Object.getOwnPropertyNames(constants).forEach(function (c) {
-                defineROFieldArgs.push([client, c, constants[c]]);
-            });
 
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("FILE_NOT_FOUND_ERR")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_URL_ERR")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CONNECTION_ERR")]);
+        it("should return constant", function () {
+            expect(client.FILE_NOT_FOUND_ERR).toEqual(1);
+            expect(client.INVALID_URL_ERR).toEqual(2);
+            expect(client.CONNECTION_ERR).toEqual(3);
         });
+
     });
 
     describe("io.filetransfer upload", function () {
@@ -66,22 +57,15 @@ describe("io.filetransfer client", function () {
             options = { "c": "d" },
             callback = function () {};
 
-        it("should create a once event handler", function () {
-            client.upload(filePath, server, callback, callback, options);
-            expect(mockedWebworks.event.isOn).toHaveBeenCalledWith(jasmine.any(String));
-            expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, jasmine.any(String), jasmine.any(Function));
-        });
-
-        it("should call webworks.exec", function () {
+        it("should call cordova.exec", function () {
             var expected_args = {
-                "_eventId": jasmine.any(String),
                 "filePath": filePath,
                 "server": server,
                 "options": options
             };
 
             client.upload(filePath, server, callback, callback, options);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "upload", expected_args);
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "upload", expected_args);
         });
 
         it("should call success callback on success event", function () {
@@ -100,7 +84,7 @@ describe("io.filetransfer client", function () {
                 };
 
             client.upload(filePath, server, success, failure, options);
-            mockedWebworks.event.once.argsForCall[0][2](mocked_args);
+            successCB(mocked_args);
 
             expect(success).toHaveBeenCalledWith(expected_args);
             expect(failure).not.toHaveBeenCalled();
@@ -122,7 +106,7 @@ describe("io.filetransfer client", function () {
                 };
 
             client.upload(filePath, server, success, failure, options);
-            mockedWebworks.event.once.argsForCall[0][2](mocked_args);
+            successCB(mocked_args);
 
             expect(success).not.toHaveBeenCalled();
             expect(failure).toHaveBeenCalledWith(expected_args);
@@ -134,21 +118,14 @@ describe("io.filetransfer client", function () {
             target = "b",
             callback = function () {};
 
-        it("should create a once event handler", function () {
-            client.download(source, target, callback, callback);
-            expect(mockedWebworks.event.isOn).toHaveBeenCalledWith(jasmine.any(String));
-            expect(mockedWebworks.event.once).toHaveBeenCalledWith(_ID, jasmine.any(String), jasmine.any(Function));
-        });
-
-        it("should call webworks.exec", function () {
+        it("should call cordova.exec", function () {
             var expected_args = {
-                "_eventId": jasmine.any(String),
                 "source": source,
                 "target": target
             };
 
             client.download(source, target, callback, callback);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "download", expected_args);
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "download", expected_args);
         });
 
         it("should call success callback on success event", function () {
@@ -169,7 +146,7 @@ describe("io.filetransfer client", function () {
                 };
 
             client.download(source, target, success, failure);
-            mockedWebworks.event.once.argsForCall[0][2](mocked_args);
+            successCB(mocked_args);
 
             expect(success).toHaveBeenCalledWith(expected_args);
             expect(failure).not.toHaveBeenCalled();
@@ -192,7 +169,7 @@ describe("io.filetransfer client", function () {
                 };
 
             client.download(source, target, success, failure);
-            mockedWebworks.event.once.argsForCall[0][2](mocked_args);
+            successCB(mocked_args);
 
             expect(success).not.toHaveBeenCalled();
             expect(failure).toHaveBeenCalledWith(expected_args);

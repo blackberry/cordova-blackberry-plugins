@@ -16,6 +16,7 @@
 
 var root = __dirname + "/../../../",
     webview = require(root + "lib/webview"),
+    mockedPluginResult,
     index;
 
 describe("io.filetransfer index", function () {
@@ -24,7 +25,7 @@ describe("io.filetransfer index", function () {
             require: jasmine.createSpy().andReturn(true),
             createObject: jasmine.createSpy().andReturn("0"),
             registerEvents: jasmine.createSpy(),
-            invoke: jasmine.createSpy()
+            invoke: jasmine.createSpy("invoke")
         };
 
         GLOBAL.window = {
@@ -41,14 +42,24 @@ describe("io.filetransfer index", function () {
             }
         };
 
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult"),
+            callbackOk: jasmine.createSpy("PluginResult.callbackOk")
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
         spyOn(webview, "windowGroup").andReturn(42);
         index = require(root + "plugin/com.blackberry.io.filetransfer/index");
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
+        delete require.cache[require.resolve(root + "plugin/com.blackberry.io.filetransfer/index")];
         index = null;
         delete GLOBAL.window;
+        delete GLOBAL.PluginResult;
     });
 
     it("makes sure JNEXT was not initialized on require", function () {
@@ -59,7 +70,7 @@ describe("io.filetransfer index", function () {
     describe("filetransfer upload", function () {
         it("should call JNEXT.invoke with custom params", function () {
             var mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123")),
                     "filePath": encodeURIComponent(JSON.stringify("2")),
                     "server": encodeURIComponent(JSON.stringify("3")),
                     "options": encodeURIComponent(JSON.stringify({
@@ -72,7 +83,6 @@ describe("io.filetransfer index", function () {
                     }))
                 },
                 expected_args = {
-                    "_eventId": "1",
                     "filePath": "2",
                     "server": "3",
                     "options": {
@@ -83,26 +93,24 @@ describe("io.filetransfer index", function () {
                         "chunkedMode": false,
                         "chunkSize": 512,
                         "windowGroup" : 42
-                    }
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                    },
+                    "callbackId": "123"
+                };
 
-            index.upload(successCB, failCB, mocked_args, null);
+            index.upload(null, null, mocked_args, null);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith("0", "upload " + JSON.stringify(expected_args));
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("should call JNEXT.invoke with default params", function () {
             var mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "filePath": encodeURIComponent(JSON.stringify("2")),
-                    "server": encodeURIComponent(JSON.stringify("3"))
+                    "server": encodeURIComponent(JSON.stringify("3")),
+                    "callbackId": encodeURIComponent(JSON.stringify("1"))
                 },
                 expected_default_args = {
-                    "_eventId": "1",
                     "filePath": "2",
                     "server": "3",
                     "options": {
@@ -113,130 +121,117 @@ describe("io.filetransfer index", function () {
                         "chunkedMode": true,
                         "chunkSize": 1024,
                         "windowGroup" : 42
-                    }
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                    },
+                    "callbackId": "1"
+                };
 
-            index.upload(successCB, failCB, mocked_args, null);
+            index.upload(null, null, mocked_args);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith("0", "upload " + JSON.stringify(expected_default_args));
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("should call failure callback with null parameters", function () {
             var mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "filePath": encodeURIComponent(JSON.stringify("")),
-                    "server": encodeURIComponent(JSON.stringify(""))
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                    "server": encodeURIComponent(JSON.stringify("")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123"))
+                };
 
-            index.upload(successCB, failCB, mocked_args, null);
+            index.upload(null, null, mocked_args, null);
 
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalled();
         });
 
         it("should fail if chunkSize is not positive", function () {
             var mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "filePath": encodeURIComponent(JSON.stringify("2")),
                     "server": encodeURIComponent(JSON.stringify("3")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123")),
                     "options": encodeURIComponent(JSON.stringify({
                         "chunkSize": -1
                     }))
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                };
 
-            index.upload(successCB, failCB, mocked_args, null);
+            index.upload(null, null, mocked_args, null);
 
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalled();
         });
 
         it("should translate local path", function () {
             var params,
                 mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "filePath": encodeURIComponent(JSON.stringify("local:///persistent/test.txt")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123")),
                     "server": encodeURIComponent(JSON.stringify("3"))
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                };
 
             JNEXT.invoke = jasmine.createSpy().andCallFake(function () {
                 params = JSON.parse(arguments[1].substring(7, arguments[1].length));
             });
 
-            index.upload(successCB, failCB, mocked_args, null);       
+            index.upload(null, null, mocked_args, null);       
 
             expect(JNEXT.invoke).toHaveBeenCalled();
             expect(params.filePath).toEqual("/ROOT/../app/native/persistent/test.txt");
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
     });
 
     describe("filetransfer download", function () {
         it("should call JNEXT.invoke", function () {
             var mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "source": encodeURIComponent(JSON.stringify("2")),
-                    "target": encodeURIComponent(JSON.stringify("3"))
+                    "target": encodeURIComponent(JSON.stringify("3")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123"))
                 },
                 expected_args = {
-                    "_eventId": "1",
                     "source": "2",
                     "target": "3",
+                    "callbackId": "123",
                     "windowGroup": 42
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                };
 
-            index.download(successCB, failCB, mocked_args, null);
+            index.download(null, null, mocked_args, null);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith("0", "download " + JSON.stringify(expected_args));
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("should call failure callback with null parameters", function () {
             var mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "filePath": encodeURIComponent(JSON.stringify("")),
-                    "server": encodeURIComponent(JSON.stringify(""))
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                    "server": encodeURIComponent(JSON.stringify("")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123"))
+                };
 
-            index.download(successCB, failCB, mocked_args, null);
+            index.download(null, null,  mocked_args, null);
 
-            expect(successCB).not.toHaveBeenCalled();
-            expect(failCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalled();
         });
 
         it("should translate local path", function () {
             var params,
                 mocked_args = {
-                    "_eventId": encodeURIComponent(JSON.stringify("1")),
                     "target": encodeURIComponent(JSON.stringify("local:///persistent/test.txt")),
-                    "source": encodeURIComponent(JSON.stringify("3"))
-                },
-                successCB = jasmine.createSpy(),
-                failCB = jasmine.createSpy();
+                    "source": encodeURIComponent(JSON.stringify("3")),
+                    "callbackId": encodeURIComponent(JSON.stringify("123"))
+                };
 
-            JNEXT.invoke = jasmine.createSpy().andCallFake(function () {
+            JNEXT.invoke = jasmine.createSpy("JNEXT.invoke").andCallFake(function () {
                 params = JSON.parse(arguments[1].substring(9, arguments[1].length));
             });
 
-            index.download(successCB, failCB, mocked_args, null);       
+            index.download(null, null, mocked_args, null);       
 
             expect(JNEXT.invoke).toHaveBeenCalled();
             expect(params.target).toEqual("/ROOT/../app/native/persistent/test.txt");
-            expect(successCB).toHaveBeenCalled();
+            expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
     });
 });
