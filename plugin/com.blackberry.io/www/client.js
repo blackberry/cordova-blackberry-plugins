@@ -18,7 +18,8 @@
  */
 
 var io = {},
-    ID = "com.blackberry.io";
+    ID = "com.blackberry.io",
+    exec = cordova.require("cordova/exec");
 
 function getFieldValue(field) {
     var value,
@@ -30,7 +31,7 @@ function getFieldValue(field) {
         };
 
     try {
-        window.webworks.exec(success, fail, ID, field);
+        exec(success, fail, ID, field);
     } catch (e) {
         console.error(e);
     }
@@ -53,7 +54,7 @@ Object.defineProperty(io, "sandbox", {
 
     set: function (value) {
         try {
-            window.webworks.exec(function () {}, function () {}, ID, "sandbox", {"sandbox": value});
+            exec(function () {}, function () {}, ID, "sandbox", {"sandbox": value});
         } catch (e) {
             console.error(e);
         }
