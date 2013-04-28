@@ -29,33 +29,34 @@ function getHomeDir() {
 
 module.exports = {
     sandbox: function (success, fail, args, env) {
-        var value;
+        var value,
+            result = new PluginResult(args, env);
 
         _webview = _util.requireWebview();
 
         if (args && args["sandbox"]) {
             value = JSON.parse(decodeURIComponent(args["sandbox"]));
             _webview.setSandbox(JSON.parse(value));
-
-            if (success) {
-                success();
-            }
+            result.ok(null, false);
         } else {
             value = _webview.getSandbox();
-            success(value === "1"); // always return "0" or "1" even after explicitly setting value to true or false
+            result.ok(value === "1", false); // always return "0" or "1" even after explicitly setting value to true or false
         }
     },
 
     home: function (success, fail, args, env) {
-        success(getHomeDir());
+        var result = new PluginResult(args, env);
+        result.ok(getHomeDir(), false);
     },
 
     sharedFolder: function (success, fail, args, env) {
-        var home = getHomeDir();
-        success(home + "/../shared");
+        var home = getHomeDir(),
+            result = new PluginResult(args, env);
+        result.ok(home + "/../shared", false);
     },
 
     SDCard: function (success, fail, args, env) {
-        success("/accounts/1000/removable/sdcard");
+        var result = new PluginResult(args, env);
+        result.ok("/accounts/1000/removable/sdcard", false);
     }
 };

@@ -22,7 +22,7 @@ var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/" + _ID,
     client,
     sandbox,
-    mockedWebworks = {
+    mockedCordova = {
         exec: jasmine.createSpy("exec").andCallFake(function (success, fail, service, action, args) {
             if (action === "home") {
                 success("/home");
@@ -37,44 +37,47 @@ var _extDir = __dirname + "/../../../plugin",
                     success(false);
                 }
             }
-        })
+        }),
+        require: function () {
+            return cordova.exec;
+        }
     };
-
-beforeEach(function () {
-    GLOBAL.window = {
-        webworks: mockedWebworks
-    };
-    client = require(_apiDir + "/www/client");
-});
-
-afterEach(function () {
-    delete GLOBAL.window;
-});
 
 describe("io client", function () {
+
+    beforeEach(function () {
+        GLOBAL.cordova = mockedCordova;
+        client = require(_apiDir + "/www/client");
+    });
+
+    afterEach(function () {
+        delete GLOBAL.cordova;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
+    });
+
     it("sandbox getter calls exec", function () {
         expect(client.sandbox).toEqual(false);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sandbox");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sandbox");
     });
 
     it("sandbox setter calls exec", function () {
         client.sandbox = false;
         expect(sandbox).toBeFalsy();
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sandbox", {"sandbox": false});
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sandbox", {"sandbox": false});
     });
 
     it("home calls exec", function () {
         expect(client.home).toEqual("/home");
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "home");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "home");
     });
 
     it("sharedFolder calls exec", function () {
         expect(client.sharedFolder).toEqual("/shared");
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sharedFolder");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sharedFolder");
     });
 
     it("SDCard calls exec", function () {
         expect(client.SDCard).toEqual("/sdcard");
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "SDCard");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "SDCard");
     });
 });
