@@ -19,6 +19,7 @@
 
 var _ID = "com.blackberry.notification",
     _self = {},
+    exec = cordova.require("cordova/exec"),
     noop = function () {},
     Notification,
     globalId = 0,
@@ -62,7 +63,7 @@ Notification = function (title, options) {
         options.tag = generateItemId() + "_itemId";
     }
 
-    window.webworks.exec(options.onshow || noop, options.onerror || noop, _ID, "notify", {'id': id, 'title': title, 'options': options});
+    exec(options.onshow || noop, options.onerror || noop, _ID, "notify", {'id': id, 'title': title, 'options': options});
 
     this.getId = function () {
         return id;
@@ -75,17 +76,20 @@ Notification.requestPermission = function (callback) {
 
 Notification.remove = function (tag) {
     if (tag) {
-        window.webworks.exec(noop, noop, _ID, "remove", {'tag': tag});
+        exec(noop, noop, _ID, "remove", {'tag': tag});
     }
 };
 
 Notification.prototype.close = function () {
     if (this.options && this.options.tag) {
-        window.webworks.exec(noop, noop, _ID, "remove", {'tag': this.options.tag});
+        exec(noop, noop, _ID, "remove", {'tag': this.options.tag});
     }
 };
 
-window.webworks.defineReadOnlyField(Notification, "permission", "granted");
+Object.defineProperty(Notification, "permission", {
+    "value": "granted",
+    "writable": false
+});
 
 // Notification is globally accessible as a window property and complies to W3C Specification http://www.w3.org/TR/notifications/#notificationoptions and fully supported by this implementation,
 // it also can be accessed as property of blackberry.notification.

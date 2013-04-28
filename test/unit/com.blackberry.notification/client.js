@@ -21,31 +21,21 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.notification",
     _apiDir = _extDir + "/" + _ID,
     client,
-    Notification,
-    mockedWebworks;
-
-function unloadClient() {
-    // explicitly unload client for it to be loaded again
-    delete require.cache[require.resolve(_apiDir + "/www/client")];
-    client = null;
-}
+    Notification;
 
 describe("notification client creates Notification object attached to window", function () {
     var onShow,
         onError;
 
     beforeEach(function () {
-        mockedWebworks = {
-            exec: jasmine.createSpy("webworks.exec"),
-            defineReadOnlyField: jasmine.createSpy("webworks.defineReadOnlyField"),
-            event: {
-                isOn : jasmine.createSpy("webworks.event.isOn"),
-                once : jasmine.createSpy("webworks.event.once")
-            }
-        };
         GLOBAL.window = {
-            webworks: mockedWebworks,
             isFinite: isFinite
+        };
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy(),
+            require: function () {
+                return cordova.exec;
+            }
         };
         client = require(_apiDir + "/www/client");
         Notification = window.Notification;
@@ -54,12 +44,13 @@ describe("notification client creates Notification object attached to window", f
     });
 
     afterEach(function () {
-        mockedWebworks = null;
         Notification = null;
-        unloadClient();
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
+        client = null;
         onShow = null;
         onError = null;
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
     });
 
     describe("Namespace, methods and properties", function () {
@@ -68,8 +59,7 @@ describe("notification client creates Notification object attached to window", f
         });
 
         it("should have static permission field that equal to 'granted'", function () {
-            var permission = "granted";
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(jasmine.any(Function), "permission", permission);
+            expect(Notification.permission).toEqual("granted");
         });
 
         it("should have static 'requestPermission' method", function () {
@@ -102,25 +92,25 @@ describe("notification client creates Notification object attached to window", f
             expect(typeof notification.close).toEqual("function");
         });
 
-        it("should call execAync when Notification object is created", function () {
+        it("should call exec when Notification object is created", function () {
             new Notification("N Title");
 
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "notify", jasmine.any(Object));
-            expect(window.webworks.exec.mostRecentCall.args[4].id).toBeDefined();
-            expect(window.webworks.exec.mostRecentCall.args[4].title).toBeDefined();
-            expect(window.webworks.exec.mostRecentCall.args[4].options).toBeDefined();
-            expect(typeof window.webworks.exec.mostRecentCall.args[4].options).toEqual("object");
-            expect(window.webworks.exec.mostRecentCall.args[4].options.tag).toBeDefined();
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "notify", jasmine.any(Object));
+            expect(cordova.exec.mostRecentCall.args[4].id).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].title).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].options).toBeDefined();
+            expect(typeof cordova.exec.mostRecentCall.args[4].options).toEqual("object");
+            expect(cordova.exec.mostRecentCall.args[4].options.tag).toBeDefined();
         });
 
         it("should call exec with all required fields when calling Notification constructor", function () {
             new Notification("N Title");
 
-            expect(window.webworks.exec.mostRecentCall.args[4].id).toBeDefined();
-            expect(window.webworks.exec.mostRecentCall.args[4].title).toBeDefined();
-            expect(window.webworks.exec.mostRecentCall.args[4].options).toBeDefined();
-            expect(typeof window.webworks.exec.mostRecentCall.args[4].options).toEqual("object");
-            expect(window.webworks.exec.mostRecentCall.args[4].options.tag).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].id).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].title).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].options).toBeDefined();
+            expect(typeof cordova.exec.mostRecentCall.args[4].options).toEqual("object");
+            expect(cordova.exec.mostRecentCall.args[4].options.tag).toBeDefined();
         });
 
 
@@ -141,7 +131,7 @@ describe("notification client creates Notification object attached to window", f
         it("should call exec when 'remove' method called", function () {
             Notification.remove("TheTag");
 
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
         });
 
         it("should call exec with tag when 'remove' method called", function () {
@@ -149,15 +139,15 @@ describe("notification client creates Notification object attached to window", f
 
             Notification.remove(tag);
 
-            expect(window.webworks.exec.mostRecentCall.args[4].tag).toBeDefined();
-            expect(window.webworks.exec.mostRecentCall.args[4].tag).toEqual(tag);
+            expect(cordova.exec.mostRecentCall.args[4].tag).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].tag).toEqual(tag);
         });
 
 
         it("should not call exec when not tag passed to 'remove'", function () {
             Notification.remove();
 
-            expect(window.webworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
     });
 
@@ -167,7 +157,7 @@ describe("notification client creates Notification object attached to window", f
 
             notification.close();
 
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
         });
 
         it("should call exec with corresponding tag when 'close' method called", function () {
@@ -176,17 +166,17 @@ describe("notification client creates Notification object attached to window", f
 
             notification.close();
 
-            expect(window.webworks.exec.mostRecentCall.args[4].tag).toBeDefined();
-            expect(window.webworks.exec.mostRecentCall.args[4].tag).toEqual(tag);
+            expect(cordova.exec.mostRecentCall.args[4].tag).toBeDefined();
+            expect(cordova.exec.mostRecentCall.args[4].tag).toEqual(tag);
         });
 
         it("should always call exec with tag set even if no tag was provided to 'close' method", function () {
             var notification = new Notification("TheTitle");
-            window.webworks.exec.reset();
+            cordova.exec.reset();
 
             notification.close();
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
-            expect(window.webworks.exec.mostRecentCall.args[4].tag).toBeDefined();
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
+            expect(cordova.exec.mostRecentCall.args[4].tag).toBeDefined();
         });
     });
 });
