@@ -21,13 +21,12 @@ var _self = {},
     _ID = "com.blackberry.sensors",
     sensorArray = null,
     noop = function () {},
-    //TODO: Change to cordova.exec
-    execFunc = window.webworks.exec,
+    execFunc = cordova.require("cordova/exec"),
     events = ["deviceaccelerometer", "devicemagnetometer", "devicegyroscope", "devicecompass",
               "deviceproximity", "devicelight", "devicegravity", "devicerotationmatrix",
-              "deviceorientation", "deviceazimuthpitchroll", "deviceholster"],
+              "deviceorientation", "deviceazimuthpitchroll", "deviceholster", "devicelinearacceleration"],
     channels = events.map(function (eventName) {
-        var channel = window.cordova.addWindowEventHandler(eventName),
+        var channel = cordova.addDocumentEventHandler(eventName),
             success = function (data) {
                 channel.fire(data);
             },

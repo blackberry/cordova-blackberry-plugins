@@ -21,15 +21,7 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.sensors",
     _apiDir = _extDir + "/" + _ID,
     client,
-    mockedWebworks = {
-        exec: jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
-            if (action === "supportedSensors") {
-                success(["abc"]);
-            }
-        })
-    },
     MockedChannel,
-    mockedCordova,
     channelRegistry = {};
 
 describe("sensors", function () {
@@ -42,24 +34,27 @@ describe("sensors", function () {
             };
         };
 
-        mockedCordova = {
-            addWindowEventHandler: jasmine.createSpy("cordova.addWindowEventHandler").andCallFake(function (eventName) {
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
+                if (action === "supportedSensors") {
+                    success(["abc"]);
+                }
+            }),
+            addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
                 channelRegistry[eventName] = new MockedChannel();
                 return channelRegistry[eventName];
             }),
-            fireWindowEvent: jasmine.createSpy("cordova.fireWindowEvent")
-        };
-
-        GLOBAL.window = {
-            webworks: mockedWebworks,
-            cordova: mockedCordova
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent"),
+            require: function () {
+                return cordova.exec;
+            }
         };
         client = require(_apiDir + "/www/client");
-        mockedWebworks.exec.reset();
     });
 
     afterEach(function () {
-        delete GLOBAL.window;
+        delete GLOBAL.cordova;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
     });
 
     it("defines events", function () {
@@ -71,25 +66,25 @@ describe("sensors", function () {
             var channel;
 
             //test channel creation
-            expect(mockedCordova.addWindowEventHandler).toHaveBeenCalledWith(event);
+            expect(cordova.addDocumentEventHandler).toHaveBeenCalledWith(event);
 
             //test Subscriber add
             channel = channelRegistry[event];
             channel.numHandlers = 1;
             channel.onHasSubscribersChange();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startEvent", {eventName: event});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startEvent", {eventName: event});
 
             //test Subscriber remove
             channel.numHandlers = 0;
             channel.onHasSubscribersChange();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "stopEvent", {eventName: event});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "stopEvent", {eventName: event});
         });
     });
 
     describe("setOptions", function () {
         it("calls exec", function () {
             client.setOptions("devicecompass", { delay : 1000 });
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "setOptions", { options : { delay : 1000, sensor : "devicecompass" } });
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "setOptions", { options : { delay : 1000, sensor : "devicecompass" } });
         });
     });
 
@@ -98,10 +93,10 @@ describe("sensors", function () {
             var supportedSensors;
 
             supportedSensors = client.supportedSensors;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "supportedSensors");
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "supportedSensors");
             // make sure it only gets called once
             supportedSensors = client.supportedSensors;
-            expect(mockedWebworks.exec.callCount).toEqual(1);
+            expect(cordova.exec.callCount).toEqual(1);
         });
     });
 });

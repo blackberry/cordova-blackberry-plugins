@@ -31,7 +31,7 @@ describe("blackberry.sensors", function () {
 
         it('should be able to activate the deviceaccelerometer sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("deviceaccelerometer", onSensor);
+                document.addEventListener("deviceaccelerometer", onSensor);
             });
 
             waitsFor(function () {
@@ -40,13 +40,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("deviceaccelerometer", onSensor);
+                document.removeEventListener("deviceaccelerometer", onSensor);
             });
         });
 
         it('should be able to activate the devicemagnetometer sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicemagnetometer", onSensor);
+                document.addEventListener("devicemagnetometer", onSensor);
             });
 
             waitsFor(function () {
@@ -55,13 +55,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicegyroscope", onSensor);
+                document.removeEventListener("devicegyroscope", onSensor);
             });
         });
 
         it('should be able to activate the devicegyroscope sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicegyroscope", onSensor);
+                document.addEventListener("devicegyroscope", onSensor);
             });
 
             waitsFor(function () {
@@ -70,13 +70,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicegyroscope", onSensor);
+                document.removeEventListener("devicegyroscope", onSensor);
             });
         });
 
         it('should be able to activate the devicecompass sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicecompass", onSensor);
+                document.addEventListener("devicecompass", onSensor);
             });
 
             waitsFor(function () {
@@ -85,13 +85,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicecompass", onSensor);
+                document.removeEventListener("devicecompass", onSensor);
             });
         });
 
         it('should be able to activate the deviceproximity sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("deviceproximity", onSensor);
+                document.addEventListener("deviceproximity", onSensor);
             });
 
             waitsFor(function () {
@@ -100,13 +100,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("deviceproximity", onSensor);
+                document.removeEventListener("deviceproximity", onSensor);
             });
         });
 
         it('should be able to activate the devicelight sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicelight", onSensor);
+                document.addEventListener("devicelight", onSensor);
             });
 
             waitsFor(function () {
@@ -115,13 +115,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicelight", onSensor);
+                document.removeEventListener("devicelight", onSensor);
             });
         });
 
         it('should be able to activate the devicegravity sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicegravity", onSensor);
+                document.removeEventListener("devicegravity", onSensor);
             });
 
             waitsFor(function () {
@@ -130,13 +130,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicegravity", onSensor);
+                document.removeEventListener("devicegravity", onSensor);
             });
         });
 
         it('should be able to activate the devicelinearacceleration sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicelinearacceleration", onSensor);
+                document.addEventListener("devicelinearacceleration", onSensor);
             });
 
             waitsFor(function () {
@@ -145,13 +145,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicelinearacceleration", onSensor);
+                document.removeEventListener("devicelinearacceleration", onSensor);
             });
         });
 
         it('should be able to activate the deviceorientation sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("deviceorientation", onSensor);
+                document.removeEventListener("deviceorientation", onSensor);
             });
 
             waitsFor(function () {
@@ -160,13 +160,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("deviceorientation", onSensor);
+                document.removeEventListener("deviceorientation", onSensor);
             });
         });
 
         it('should be able to activate the devicerotationmatrix sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("devicerotationmatrix", onSensor);
+                document.removeEventListener("devicerotationmatrix", onSensor);
             });
 
             waitsFor(function () {
@@ -175,13 +175,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("devicerotationmatrix", onSensor);
+                document.removeEventListener("devicerotationmatrix", onSensor);
             });
         });
 
         it('should be able to activate the deviceazimuthpitchroll sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("deviceazimuthpitchroll", onSensor);
+                document.removeEventListener("deviceazimuthpitchroll", onSensor);
             });
 
             waitsFor(function () {
@@ -190,13 +190,13 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("deviceazimuthpitchroll", onSensor);
+                document.removeEventListener("deviceazimuthpitchroll", onSensor);
             });
         });
 
         it('should be able to activate the deviceholster sensor and get valid data', function () {
             runs(function () {
-                window.addEventListener("deviceholster", onSensor);
+                document.removeEventListener("deviceholster", onSensor);
             });
 
             waitsFor(function () {
@@ -205,7 +205,7 @@ describe("blackberry.sensors", function () {
 
             runs(function () {
                 expect(onSensor).toHaveBeenCalledWith(jasmine.any(Object));
-                window.removeEventListener("deviceholster", onSensor);
+                document.removeEventListener("deviceholster", onSensor);
             });
         });
     });
