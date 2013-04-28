@@ -19,6 +19,7 @@
 
 var _self = {},
     _ID = "com.blackberry.invoke.card",
+    exec = cordova.require("cordova/exec"),
     _noop = function () {};
 
 function cb(done, cancel, invoke) {
@@ -46,14 +47,21 @@ function cb(done, cancel, invoke) {
     };
 }
 
+function defineReadOnlyField(obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
+}
+
 _self.invokeMediaPlayer = function (options, done, cancel, invokeCallback) {
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeMediaPlayer", {options: options || {}});
+    exec(callback, _noop, _ID, "invokeMediaPlayer", {options: options || {}});
 };
 
 _self.invokeCamera = function (mode, done, cancel, invokeCallback) {
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeCamera", {mode: mode || ""});
+    exec(callback, _noop, _ID, "invokeCamera", {mode: mode || ""});
 };
 
 _self.invokeFilePicker = function (options, done, cancel, invokeCallback) {
@@ -75,7 +83,7 @@ _self.invokeFilePicker = function (options, done, cancel, invokeCallback) {
    */
 
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeFilePicker", {options: options || ""});
+    exec(callback, _noop, _ID, "invokeFilePicker", {options: options || ""});
 };
 
 _self.invokeIcsViewer = function (options, done, cancel, invokeCallback) {
@@ -87,7 +95,7 @@ _self.invokeIcsViewer = function (options, done, cancel, invokeCallback) {
     */
 
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeIcsViewer", {options: options || ""});
+    exec(callback, _noop, _ID, "invokeIcsViewer", {options: options || ""});
 };
 
 
@@ -99,7 +107,7 @@ _self.invokeCalendarPicker = function (options, done, cancel, invokeCallback) {
    */
 
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeCalendarPicker", {options: options || ""});
+    exec(callback, _noop, _ID, "invokeCalendarPicker", {options: options || ""});
 };
 
 _self.invokeCalendarComposer = function (options, done, cancel, invokeCallback) {
@@ -116,7 +124,7 @@ _self.invokeCalendarComposer = function (options, done, cancel, invokeCallback) 
     */
 
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeCalendarComposer", {options: options || ""});
+    exec(callback, _noop, _ID, "invokeCalendarComposer", {options: options || ""});
 };
 
 _self.invokeEmailComposer = function (options, done, cancel, invokeCallback) {
@@ -132,7 +140,7 @@ _self.invokeEmailComposer = function (options, done, cancel, invokeCallback) {
       */
 
     var callback = cb(done, cancel, invokeCallback);
-    window.webworks.exec(callback, _noop, _ID, "invokeEmailComposer", {options: options || ""});
+    exec(callback, _noop, _ID, "invokeEmailComposer", {options: options || ""});
 };
 
 _self.invokeTargetPicker = function (request, title, onSuccess, onError) {
@@ -154,7 +162,7 @@ _self.invokeTargetPicker = function (request, title, onSuccess, onError) {
             request.data = window.btoa(request.data);
         }
 
-        window.webworks.exec(callback, _noop, _ID, "invokeTargetPicker", {
+        exec(callback, _noop, _ID, "invokeTargetPicker", {
             request: request,
             title: title
         });
@@ -164,32 +172,32 @@ _self.invokeTargetPicker = function (request, title, onSuccess, onError) {
 };
 
 //CAMERA PROPERTIES
-window.webworks.defineReadOnlyField(_self, "CAMERA_MODE_PHOTO", 'photo');
-window.webworks.defineReadOnlyField(_self, "CAMERA_MODE_VIDEO", 'video');
-window.webworks.defineReadOnlyField(_self, "CAMERA_MODE_FULL", 'full');
+defineReadOnlyField(_self, "CAMERA_MODE_PHOTO", 'photo');
+defineReadOnlyField(_self, "CAMERA_MODE_VIDEO", 'video');
+defineReadOnlyField(_self, "CAMERA_MODE_FULL", 'full');
 
 //FILE PICKER PROPERTIES
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_MODE_PICKER", 'Picker');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_MODE_SAVER", 'Saver');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_MODE_PICKER_MULTIPLE", 'PickerMultiple');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_MODE_SAVER_MULTIPLE", 'SaverMultiple');
+defineReadOnlyField(_self, "FILEPICKER_MODE_PICKER", 'Picker');
+defineReadOnlyField(_self, "FILEPICKER_MODE_SAVER", 'Saver');
+defineReadOnlyField(_self, "FILEPICKER_MODE_PICKER_MULTIPLE", 'PickerMultiple');
+defineReadOnlyField(_self, "FILEPICKER_MODE_SAVER_MULTIPLE", 'SaverMultiple');
 
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_VIEWER_MODE_LIST", 'ListView');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_VIEWER_MODE_GRID", 'GridView');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_VIEWER_MODE_DEFAULT", 'Default');
+defineReadOnlyField(_self, "FILEPICKER_VIEWER_MODE_LIST", 'ListView');
+defineReadOnlyField(_self, "FILEPICKER_VIEWER_MODE_GRID", 'GridView');
+defineReadOnlyField(_self, "FILEPICKER_VIEWER_MODE_DEFAULT", 'Default');
 
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_SORT_BY_NAME", 'Name');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_SORT_BY_DATE", 'Date');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_SORT_BY_SUFFIX", 'Suffix');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_SORT_BY_SIZE", 'Size');
+defineReadOnlyField(_self, "FILEPICKER_SORT_BY_NAME", 'Name');
+defineReadOnlyField(_self, "FILEPICKER_SORT_BY_DATE", 'Date');
+defineReadOnlyField(_self, "FILEPICKER_SORT_BY_SUFFIX", 'Suffix');
+defineReadOnlyField(_self, "FILEPICKER_SORT_BY_SIZE", 'Size');
 
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_SORT_ORDER_ASCENDING", 'Ascending');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_SORT_ORDER_DESCENDING", 'Descending');
+defineReadOnlyField(_self, "FILEPICKER_SORT_ORDER_ASCENDING", 'Ascending');
+defineReadOnlyField(_self, "FILEPICKER_SORT_ORDER_DESCENDING", 'Descending');
 
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_TYPE_PICTURE", 'picture');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_TYPE_DOCUMENT", 'document');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_TYPE_MUSIC", 'music');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_TYPE_VIDEO", 'video');
-window.webworks.defineReadOnlyField(_self, "FILEPICKER_TYPE_OTHER", 'other');
+defineReadOnlyField(_self, "FILEPICKER_TYPE_PICTURE", 'picture');
+defineReadOnlyField(_self, "FILEPICKER_TYPE_DOCUMENT", 'document');
+defineReadOnlyField(_self, "FILEPICKER_TYPE_MUSIC", 'music');
+defineReadOnlyField(_self, "FILEPICKER_TYPE_VIDEO", 'video');
+defineReadOnlyField(_self, "FILEPICKER_TYPE_OTHER", 'other');
 
 module.exports = _self;

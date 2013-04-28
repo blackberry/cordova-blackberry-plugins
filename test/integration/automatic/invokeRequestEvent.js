@@ -32,7 +32,7 @@ describe("invokeRequestEvent", function () {
         runs(function () {
             flag = false;
 
-            window.addEventListener("onChildCardClosed", function (request) {
+            document.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });

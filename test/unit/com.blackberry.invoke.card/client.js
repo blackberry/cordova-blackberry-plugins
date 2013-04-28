@@ -21,27 +21,22 @@ var _extDir = __dirname + "/../../../plugin/",
     _ID = "com.blackberry.invoke.card",
     _apiDir = _extDir + _ID,
     client,
-    events,
-    mockedWebworks;
+    events;
 
 describe("invoke.card client", function () {
     beforeEach(function () {
         events = {};
-        mockedWebworks = {
-            exec: jasmine.createSpy("webworks.exec"),
-            defineReadOnlyField: jasmine.createSpy()
+        GLOBAL.cordova = {
+            require: jasmine.createSpy().andCallFake(function () {
+                return cordova.exec;
+            }),
+            exec: jasmine.createSpy("cordova.exec")
         };
-
-        GLOBAL.window = {
-            webworks: mockedWebworks
-        };
-
         client = require(_apiDir + "/www/client");
     });
 
     afterEach(function () {
-        mockedWebworks = undefined;
-        delete GLOBAL.window;
+        delete GLOBAL.cordova;
         client = null;
         events = null;
         delete require.cache[require.resolve(_apiDir + "/www/client")];
@@ -59,16 +54,16 @@ describe("invoke.card client", function () {
         });
         it("should call exec with correct mode", function () {
             client.invokeCamera("photo");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCamera", {mode: "photo"});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCamera", {mode: "photo"});
             client.invokeCamera("video");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCamera", {mode: "video"});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCamera", {mode: "video"});
             client.invokeCamera("full");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCamera", {mode: "full"});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCamera", {mode: "full"});
         });
         it("should define photo|video|full", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "CAMERA_MODE_PHOTO", "photo");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "CAMERA_MODE_VIDEO", "video");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "CAMERA_MODE_FULL", "full");
+            expect(client.CAMERA_MODE_PHOTO).toEqual("photo");
+            expect(client.CAMERA_MODE_FULL).toEqual("full");
+            expect(client.CAMERA_MODE_VIDEO).toEqual("video");
         });
     });
 
@@ -88,43 +83,43 @@ describe("invoke.card client", function () {
         it("should call exec with correct mode", function () {
             details = { mode: "Picker" };
             client.invokeFilePicker(details);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
 
             details = { mode: "PickerMultiple" };
             client.invokeFilePicker(details);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
 
             details = { mode: "Saver" };
             client.invokeFilePicker(details);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
 
             details = { mode: "SaverMultiple" };
             client.invokeFilePicker(details);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeFilePicker", {options: details});
         });
         it("should define all file picker constants", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_MODE_PICKER", "Picker");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_MODE_SAVER", "Saver");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_MODE_PICKER_MULTIPLE", "PickerMultiple");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_MODE_SAVER_MULTIPLE", "SaverMultiple");
+            expect(client["FILEPICKER_MODE_PICKER"]).toEqual("Picker");
+            expect(client["FILEPICKER_MODE_SAVER"]).toEqual("Saver");
+            expect(client["FILEPICKER_MODE_PICKER_MULTIPLE"]).toEqual("PickerMultiple");
+            expect(client["FILEPICKER_MODE_SAVER_MULTIPLE"]).toEqual("SaverMultiple");
 
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_VIEWER_MODE_LIST", "ListView");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_VIEWER_MODE_GRID", "GridView");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_VIEWER_MODE_DEFAULT", "Default");
+            expect(client["FILEPICKER_VIEWER_MODE_LIST"]).toEqual("ListView");
+            expect(client["FILEPICKER_VIEWER_MODE_GRID"]).toEqual("GridView");
+            expect(client["FILEPICKER_VIEWER_MODE_DEFAULT"]).toEqual("Default");
 
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_SORT_BY_NAME", "Name");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_SORT_BY_DATE", "Date");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_SORT_BY_SUFFIX", "Suffix");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_SORT_BY_SIZE", "Size");
+            expect(client["FILEPICKER_SORT_BY_NAME"]).toEqual("Name");
+            expect(client["FILEPICKER_SORT_BY_DATE"]).toEqual("Date");
+            expect(client["FILEPICKER_SORT_BY_SUFFIX"]).toEqual("Suffix");
+            expect(client["FILEPICKER_SORT_BY_SIZE"]).toEqual("Size");
 
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_SORT_ORDER_ASCENDING", "Ascending");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_SORT_ORDER_DESCENDING", "Descending");
+            expect(client["FILEPICKER_SORT_ORDER_ASCENDING"]).toEqual("Ascending");
+            expect(client["FILEPICKER_SORT_ORDER_DESCENDING"]).toEqual("Descending");
 
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_TYPE_PICTURE", 'picture');
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_TYPE_DOCUMENT", 'document');
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_TYPE_MUSIC", 'music');
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_TYPE_VIDEO", 'video');
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILEPICKER_TYPE_OTHER", 'other');
+            expect(client["FILEPICKER_TYPE_PICTURE"]).toEqual('picture');
+            expect(client["FILEPICKER_TYPE_DOCUMENT"]).toEqual('document');
+            expect(client["FILEPICKER_TYPE_MUSIC"]).toEqual('music');
+            expect(client["FILEPICKER_TYPE_VIDEO"]).toEqual('video');
+            expect(client["FILEPICKER_TYPE_OTHER"]).toEqual('other');
         });
     });
 
@@ -165,7 +160,7 @@ describe("invoke.card client", function () {
 
         it("should call exec with the correct options", function () {
             client.invokeCalendarPicker(details, done, cancel, invokeCallback);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCalendarPicker", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCalendarPicker", {options: details});
         });
     });
 
@@ -188,7 +183,7 @@ describe("invoke.card client", function () {
 
         it("should call exec with correct details passed", function () {
             client.invokeMediaPlayer(details);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeMediaPlayer", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeMediaPlayer", {options: details});
         });
     });
 
@@ -214,7 +209,7 @@ describe("invoke.card client", function () {
 
         it("should call exec with the correct options", function () {
             client.invokeCalendarComposer(details, done, cancel, invokeCallback);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCalendarComposer", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeCalendarComposer", {options: details});
         });
     });
 
@@ -239,7 +234,7 @@ describe("invoke.card client", function () {
 
         it("should call exec with the correct options", function () {
             client.invokeEmailComposer(details, done, cancel, invokeCallback);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeEmailComposer", {options: details});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeEmailComposer", {options: details});
         });
     });
 
@@ -256,9 +251,9 @@ describe("invoke.card client", function () {
 
         it("should call exec with uri and accountId", function () {
             client.invokeIcsViewer({uri: "file://path"});
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeIcsViewer", {options: {uri: "file://path"}});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeIcsViewer", {options: {uri: "file://path"}});
             client.invokeIcsViewer({uri: "file://path", accountId: 1});
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeIcsViewer", {options: {uri: "file://path", accountId: 1}});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "invokeIcsViewer", {options: {uri: "file://path", accountId: 1}});
         });
     });
 

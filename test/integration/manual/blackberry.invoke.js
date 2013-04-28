@@ -104,18 +104,18 @@ describe("blackberry.invoke", function () {
             onChildCardClosed = jasmine.createSpy("onChildCardClosed event");
             onChildCardStartPeek = jasmine.createSpy("onChildCardStartPeek event");
             onChildCardEndPeek = jasmine.createSpy("onChildCardEndPeek event");
-            window.addEventListener("onChildCardClosed", onChildCardClosed);
-            window.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
-            window.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
+            document.addEventListener("onChildCardClosed", onChildCardClosed);
+            document.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
+            document.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
         });
 
         afterEach(function () {
             onChildCardClosed = null;
             onChildCardStartPeek = null;
             onChildCardEndPeek = null;
-            window.removeEventListener("onChildCardClosed", onChildCardClosed);
-            window.removeEventListener("onChildCardStartPeek", onChildCardStartPeek);
-            window.removeEventListener("onChildCardEndPeek", onChildCardEndPeek);
+            document.removeEventListener("onChildCardClosed", onChildCardClosed);
+            document.removeEventListener("onChildCardStartPeek", onChildCardStartPeek);
+            document.removeEventListener("onChildCardEndPeek", onChildCardEndPeek);
             confirm = null;
         });
 

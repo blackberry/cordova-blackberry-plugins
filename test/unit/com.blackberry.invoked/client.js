@@ -20,28 +20,19 @@
 var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.invoked",
     _apiDir = _extDir + "/" + _ID,
-    client,
-    mockedWebworks = {
-        exec: jasmine.createSpy("webworks.exec")
-    };
+    client;
 
 describe("invoked client", function () {
     beforeEach(function () {
-        GLOBAL.window = {
-            webworks: mockedWebworks
-        };
         GLOBAL.cordova = {
-            addWindowEventHandler: jasmine.createSpy().andReturn({
+            addDocumentEventHandler: jasmine.createSpy().andReturn({
                 onHasSubscribersChange: jasmine.createSpy(),
                 fire: jasmine.createSpy()
-            })
-            //fireWindowEvent: jasmine.createSpy(),
-            /*
+            }),
             require: jasmine.createSpy().andCallFake(function () {
-                return {
-                    create: jasmine.createSpy().andReturn(new MockedChannel())
-                };
-            })*/
+                return cordova.exec;
+            }),
+            exec: jasmine.createSpy("cordova.exec")
         };
         delete require.cache[require.resolve(_apiDir + "/www/client")];
         client = require(_apiDir + "/www/client");
@@ -49,6 +40,7 @@ describe("invoked client", function () {
 
     afterEach(function () {
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
         client = null;
     });
 
@@ -56,7 +48,7 @@ describe("invoked client", function () {
         it("should call exec for cardResizeDone", function () {
             expect(client.cardResizeDone).toBeDefined();
             client.cardResizeDone();
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardResizeDone");
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardResizeDone");
         });
     });
 
@@ -66,7 +58,7 @@ describe("invoked client", function () {
         it("should call exec for cardStartPeek", function () {
             expect(client.cardStartPeek).toBeDefined();
             client.cardStartPeek(peekType);
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardStartPeek", {'peekType': peekType});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardStartPeek", {'peekType': peekType});
         });
     });
 
@@ -80,7 +72,7 @@ describe("invoked client", function () {
         it("should call exec for cardRequestClosure", function () {
             expect(client.cardRequestClosure).toBeDefined();
             client.cardRequestClosure(request);
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardRequestClosure", {'request': request});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardRequestClosure", {'request': request});
         });
     });
 });
