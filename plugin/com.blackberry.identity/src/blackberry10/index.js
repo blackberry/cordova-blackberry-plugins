@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var ERROR_ID = -1,
-    ERRON_MSG_PPS = "Cannot retrieve data from system";
+var ERRON_MSG_PPS = "Cannot retrieve data from system";
 
 module.exports = {
     getFields: function (success, fail, args, env) {
-        var fields = { };
+        var result = new PluginResult(args, env),
+            fields = { };
 
         //IMSI is likely to fail since few devs will have access
         //TO compensate we will eat the error
@@ -33,12 +33,12 @@ module.exports = {
             fields.IMEI = window.qnx.webplatform.device.IMEI;
 
             if (fields.uuid || fields.IMSI || fields.IMEI) {
-                success(fields);
+                result.ok(fields, false);
             } else {
-                fail(ERROR_ID, ERRON_MSG_PPS);
+                result.error(ERRON_MSG_PPS);
             }
         } catch (err) {
-            fail(ERROR_ID, err.message);
+            result.error(err.message);
         }
     }
 };

@@ -19,7 +19,15 @@
 
 var _self = {},
     _ID = "com.blackberry.identity",
+    exec = cordova.require("cordova/exec"),
     _fields;
+
+function defineReadOnlyField(obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
+}
 
 function getFieldValue(field) {
     var value,
@@ -32,7 +40,7 @@ function getFieldValue(field) {
 
     if (!_fields) {
         try {
-            window.webworks.exec(success, fail, _ID, "getFields", null);
+            exec(success, fail, _ID, "getFields", null);
         } catch (e) {
             console.error(e);
         }
@@ -43,8 +51,8 @@ function getFieldValue(field) {
     return value;
 }
 
-window.webworks.defineReadOnlyField(_self, "uuid", getFieldValue("uuid"));
-window.webworks.defineReadOnlyField(_self, "IMSI", getFieldValue("IMSI"));
-window.webworks.defineReadOnlyField(_self, "IMEI", getFieldValue("IMEI"));
+defineReadOnlyField(_self, "uuid", getFieldValue("uuid"));
+defineReadOnlyField(_self, "IMSI", getFieldValue("IMSI"));
+defineReadOnlyField(_self, "IMEI", getFieldValue("IMEI"));
 
 module.exports = _self;
