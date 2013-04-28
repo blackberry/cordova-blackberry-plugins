@@ -24,13 +24,13 @@ module.exports = {
                 trigger(_application.invocation.getRequest());
                 _startupMode = _application.invocation.LAUNCH;
             }
-            window.qnx.webplatform.getApplication().invocation.addEventListener("Invoked", trigger);
+            _application.invocation.addEventListener("Invoked", trigger);
             break;
-        case "onCardResize":
-            window.qnx.webplatform.getApplication().invocation.addEventListener("cardResize", trigger);
+        case "oncardresize":
+            _application.invocation.addEventListener("cardResize", trigger);
             break;
-        case "onCardClosed":
-            window.qnx.webplatform.getApplication().invocation.addEventListener("cardClosed", trigger);
+        case "oncardclosed":
+            _application.invocation.addEventListener("cardClosed", trigger);
             break;
         default:
             console.log("Ignore registration for unknown event: " + event);
@@ -40,13 +40,13 @@ module.exports = {
     removeEventListener: function (event, trigger) {
         switch (event) {
         case "invoked":
-            window.qnx.webplatform.getApplication().invocation.removeEventListener("Invoked", trigger);
+            _application.invocation.removeEventListener("Invoked", trigger);
             break;
-        case "onCardResize":
-            window.qnx.webplatform.getApplication().invocation.removeEventListener("cardResize", trigger);
+        case "oncardresize":
+            _application.invocation.removeEventListener("cardResize", trigger);
             break;
-        case "onCardClosed":
-            window.qnx.webplatform.getApplication().invocation.removeEventListener("cardClosed", trigger);
+        case "oncardclosed":
+            _application.invocation.removeEventListener("cardClosed", trigger);
             break;
         default:
             console.log("Ignore un-registration for unknown event: " + event);

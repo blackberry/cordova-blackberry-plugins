@@ -13,82 +13,106 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _event = require("./../../lib/event"),
-    _actionMap = {
+var _actionMap = {
         invoked: {
             context: require("./invocationEvents"),
             event: "invoked",
-            triggerEvent: "invoked",
-            trigger: function (request) {
+            trigger: function (pluginResult, request) {
                 var onInvokedInfo = JSON.parse(request);
 
                 // Workaround for double invoke bug
                 if (onInvokedInfo.uri !== "invoke://localhost") {
-                    _event.trigger("invoked", onInvokedInfo);
+                    pluginResult.callbackOk(onInvokedInfo, true);
                 }
             }
         },
-        onCardResize: {
+        oncardresize: {
             context: require("./invocationEvents"),
-            event: "onCardResize",
-            triggerEvent: "onCardResize",
-            trigger: function (info) {
-                _event.trigger("onCardResize", info);
+            event: "oncardresize",
+            trigger: function (pluginResult, info) {
+                pluginResult.callbackOk(info, true);
             }
         },
-        onCardClosed: {
+        oncardclosed: {
             context: require("./invocationEvents"),
-            event: "onCardClosed",
-            triggerEvent: "onCardClosed",
-            trigger: function (info) {
-                _event.trigger("onCardClosed", info);
+            event: "oncardclosed",
+            trigger: function (pluginResult, info) {
+                pluginResult.callbackOk(info, true);
             }
         }
-    };
+    },
+    _listeners = {};
 
 module.exports = {
-    cardResizeDone: function (success, fail, args) {
+    cardResizeDone: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         try {
             window.qnx.webplatform.getApplication().invocation.cardResized();
-            success();
+            result.noResult(true);
         } catch (e) {
-            fail(-1, e);
+            result.error(e, false);
         }
     },
 
-    cardStartPeek: function (success, fail, args) {
-        var cardPeek;
+    cardStartPeek: function (success, fail, args, env) {
+        var cardPeek,
+            result = new PluginResult(args, env);
 
         try {
             cardPeek = decodeURIComponent(args["peekType"]);
             window.qnx.webplatform.getApplication().invocation.cardPeek(cardPeek);
-            success();
+            result.noResult(true);
         } catch (e) {
-            fail(-1, e);
+            result.error(e, false);
         }
     },
 
-    cardRequestClosure: function (success, fail, args) {
-        var request;
+    cardRequestClosure: function (success, fail, args, env) {
+        var request,
+            result = new PluginResult(args, env);
 
         try {
             request = JSON.parse(decodeURIComponent(args["request"]));
             window.qnx.webplatform.getApplication().invocation.sendCardDone(request);
-            success();
+            result.noResult(true);
         } catch (e) {
-            fail(-1, e);
+            result.error(e, false);
         }
     },
 
-    registerEvents: function (success, fail, args, env) {
-        try {
-            var utils = require("./../../lib/utils"),
-                eventExt = utils.loadExtensionModule("event", "index");
+    startEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            context = _actionMap[eventName].context,
+            invokedEvent = _actionMap[eventName].event,
+            listener = _actionMap[eventName].trigger.bind(null, result);
 
-            eventExt.registerEvents(_actionMap);
-            success();
-        } catch (e) {
-            fail(-1, e);
+        if (!_listeners[eventName]) {
+            _listeners[eventName] = {};
+        }
+
+        if (_listeners[eventName][env.webview.id]) {
+            result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
+        } else {
+            context.addEventListener(invokedEvent, listener);
+            _listeners[eventName][env.webview.id] = listener;
+            result.noResult(true);
+        }
+    },
+
+    stopEvent: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+            listener = _listeners[eventName][env.webview.id],
+            context = _actionMap[eventName].context,
+            invokedEvent = _actionMap[eventName].event;
+
+        if (!listener) {
+            result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
+        } else {
+            context.removeEventListener(invokedEvent, listener);
+            delete _listeners[eventName][env.webview.id];
+            result.noResult(false);
         }
     }
 };

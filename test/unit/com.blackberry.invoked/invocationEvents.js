@@ -80,25 +80,25 @@ describe("invoked invocationEvents", function () {
     });
 
     describe("onCardResize", function () {
-        it("add proper event to invocation for 'onCardResize'", function () {
-            invocationEvents.addEventListener("onCardResize", trigger);
+        it("add proper event to invocation for 'oncardresize'", function () {
+            invocationEvents.addEventListener("oncardresize", trigger);
             expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardResize", trigger);
         });
 
-        it("remove proper event from invocation for 'onCardResize", function () {
-            invocationEvents.removeEventListener("onCardResize", trigger);
+        it("remove proper event from invocation for 'oncardresize", function () {
+            invocationEvents.removeEventListener("oncardresize", trigger);
             expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardResize", trigger);
         });
     });
 
     describe("onCardClosed", function () {
-        it("add proper event to invocation for 'onCardClosed'", function () {
-            invocationEvents.addEventListener("onCardClosed", trigger);
+        it("add proper event to invocation for 'oncardclosed'", function () {
+            invocationEvents.addEventListener("oncardclosed", trigger);
             expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardClosed", trigger);
         });
 
-        it("remove proper event from invocation for 'onCardClosed", function () {
-            invocationEvents.removeEventListener("onCardClosed", trigger);
+        it("remove proper event from invocation for 'oncardclosed", function () {
+            invocationEvents.removeEventListener("oncardclosed", trigger);
             expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardClosed", trigger);
         });
     });

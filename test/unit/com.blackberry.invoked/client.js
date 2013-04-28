@@ -30,6 +30,19 @@ describe("invoked client", function () {
         GLOBAL.window = {
             webworks: mockedWebworks
         };
+        GLOBAL.cordova = {
+            addWindowEventHandler: jasmine.createSpy().andReturn({
+                onHasSubscribersChange: jasmine.createSpy(),
+                fire: jasmine.createSpy()
+            })
+            //fireWindowEvent: jasmine.createSpy(),
+            /*
+            require: jasmine.createSpy().andCallFake(function () {
+                return {
+                    create: jasmine.createSpy().andReturn(new MockedChannel())
+                };
+            })*/
+        };
         delete require.cache[require.resolve(_apiDir + "/www/client")];
         client = require(_apiDir + "/www/client");
     });
@@ -69,10 +82,6 @@ describe("invoked client", function () {
             client.cardRequestClosure(request);
             expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cardRequestClosure", {'request': request});
         });
-    });
-
-    it("should register for events by calling registerEvents method", function () {
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "registerEvents", null);
     });
 });
 

@@ -75,7 +75,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -109,7 +109,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -130,11 +130,15 @@ describe("blackberry.invoke.card", function () {
             errorSpy = jasmine.createSpy(),
             reason;
 
-        blackberry.invoke.card.invokeMediaPlayer({contentTitle: "Test Title"}, function (path) {
-        },
-        function (reason) {
-            flag = true;
-        }, errorSpy);
+        blackberry.invoke.card.invokeMediaPlayer({
+                contentTitle: "Test Title",
+                contentUri: "local:///audio/test.mp3"
+            },
+            function (path) {
+            },
+            function (reason) {
+                flag = true;
+            }, errorSpy);
 
         expect(errorSpy).not.toHaveBeenCalled();
 
@@ -143,7 +147,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -177,7 +181,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -211,7 +215,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -245,7 +249,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
@@ -279,7 +283,7 @@ describe("blackberry.invoke.card", function () {
         runs(function () {
             flag = false;
 
-            blackberry.event.addEventListener("onChildCardClosed", function (request) {
+            window.addEventListener("onChildCardClosed", function (request) {
                 reason = request.reason;
                 flag = true;
             });
