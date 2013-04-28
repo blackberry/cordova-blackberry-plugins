@@ -21,7 +21,6 @@ var onSuccess,
 
 describe("blackberry.invoked", function () {
     beforeEach(function () {
-        spyOn(window.webworks.event, 'isOn').andReturn(false);
         onSuccessFlag = false;
         onErrorFlag = false;
         onSuccess = jasmine.createSpy("success callback").andCallFake(
@@ -52,15 +51,15 @@ describe("blackberry.invoked", function () {
         beforeEach(function () {
             onCardResize = jasmine.createSpy("onCardResize event");
             onCardClosed = jasmine.createSpy("onCardClosed event");
-            window.addEventListener("onCardResize", onCardResize);
-            window.addEventListener("onCardClosed", onCardClosed);
+            document.addEventListener("onCardResize", onCardResize);
+            document.addEventListener("onCardClosed", onCardClosed);
         });
 
         afterEach(function () {
             onCardResize = null;
             onCardClosed = null;
-            window.removeEventListener("onCardResize", onCardResize);
-            window.removeEventListener("onCardClosed", onCardClosed);
+            document.removeEventListener("onCardResize", onCardResize);
+            document.removeEventListener("onCardClosed", onCardClosed);
             confirm = null;
         });
 

@@ -21,28 +21,14 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.invoke",
     _apiDir = _extDir + "/" + _ID,
     client,
-    mockedWebworks,
     mockedChannel,
     MockedChannel;
 
 describe("invoke client", function () {
     beforeEach(function () {
-        mockedWebworks = {
-            exec: jasmine.createSpy("webworks.exec").andCallFake(function (success, error, service, action, args) {
-                if (action === "invoke") {
-                    if (success) {
-                        success();
-                    } else {
-                        error();
-                    }
-                }
-            }),
-            defineReadOnlyField: jasmine.createSpy()
-        };
 
         GLOBAL.window = {
-            btoa: jasmine.createSpy("window.btoa").andReturn("base64 string"),
-            webworks: mockedWebworks
+            btoa: jasmine.createSpy("window.btoa").andReturn("base64 string")
         };
 
         mockedChannel = {
@@ -64,15 +50,32 @@ describe("invoke client", function () {
         };
 
         GLOBAL.cordova = {
-            addWindowEventHandler: jasmine.createSpy().andReturn({
+            addDocumentEventHandler: jasmine.createSpy().andReturn({
                 onHasSubscribersChange: jasmine.createSpy()
             }),
+            
             fireWindowEvent: jasmine.createSpy(),
-            require: jasmine.createSpy().andCallFake(function () {
-                return {
-                    create: jasmine.createSpy().andReturn(new MockedChannel())
-                };
+
+            require: jasmine.createSpy().andCallFake(function (module) {
+                if (module === "cordova/channel") {
+                    return {
+                        create: jasmine.createSpy().andReturn(new MockedChannel())
+                    };
+                } else if (module === "cordova/exec") {
+                    return cordova.exec;
+                }
+            }),
+
+            exec: jasmine.createSpy("exec").andCallFake(function (success, error, service, action) {
+                if (action === "invoke") {
+                    if (success) {
+                        success();
+                    } else {
+                        error();
+                    }
+                }
             })
+
         };
 
         delete require.cache[require.resolve(_apiDir + "/www/client")];
@@ -80,7 +83,6 @@ describe("invoke client", function () {
     });
 
     afterEach(function () {
-        delete GLOBAL.window.webworks;
         delete GLOBAL.window;
         delete GLOBAL.cordova;
         client = null;
@@ -89,10 +91,10 @@ describe("invoke client", function () {
     describe("invoke", function () {
 
         it("blackberry.invoke constants should be properly defined", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILE_TRANSFER_PRESERVE", "PRESERVE");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILE_TRANSFER_COPY_RO", "COPY_RO");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILE_TRANSFER_COPY_RW", "COPY_RW");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(client, "FILE_TRANSFER_LINK", "LINK");
+            expect(client["FILE_TRANSFER_PRESERVE"]).toEqual("PRESERVE");
+            expect(client["FILE_TRANSFER_COPY_RO"]).toEqual("COPY_RO");
+            expect(client["FILE_TRANSFER_COPY_RW"]).toEqual("COPY_RW");
+            expect(client["FILE_TRANSFER_LINK"]).toEqual("LINK");
         });
 
         it("should call error callback if request is not valid", function () {
@@ -110,7 +112,7 @@ describe("invoke client", function () {
 
             client.invoke(request, callback);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), undefined, _ID, "invoke", {"request": request});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), undefined, _ID, "invoke", {"request": request});
         });
 
         it("should encode data to base64 string", function () {
@@ -123,7 +125,7 @@ describe("invoke client", function () {
             client.invoke(request, callback);
 
             expect(window.btoa).toHaveBeenCalledWith("my string");
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), undefined, _ID, "invoke", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), undefined, _ID, "invoke", {
                 "request": {
                     target: request.target,
                     data: "base64 string"
@@ -173,7 +175,7 @@ describe("invoke client", function () {
     describe("query", function () {
 
         beforeEach(function () {
-            mockedWebworks.exec.andCallFake(function (success, error, id, action, args) {
+            cordova.exec.andCallFake(function (success, error, id, action, args) {
                 //Validate the args
                 if (args && args.request && (args.request["type"] || args.request["uri"]) &&
                         args.request["target_type"]) {
@@ -195,7 +197,7 @@ describe("invoke client", function () {
 
             client.query(request, onSuccess, onError);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "query", {"request": request });
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "query", {"request": request });
         });
 
         it("should call success callback if the invocation is successful", function () {
@@ -208,7 +210,7 @@ describe("invoke client", function () {
                 onError = jasmine.createSpy("client onError");
 
             client.query(request, onSuccess, onError);
-            expect(window.webworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "query", {"request": request});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "query", {"request": request});
             expect(onSuccess).toHaveBeenCalledWith(jasmine.any(Object));
             expect(onError).not.toHaveBeenCalled();
         });
@@ -234,23 +236,23 @@ describe("invoke client", function () {
         it("can successfully register as an interrupter", function () {
             var handler = function () {};
             client.interrupter = handler;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'startEvent', {eventName: 'invocation.interrupted'});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'startEvent', {eventName: 'invocation.interrupted'});
         });
 
         it("can successfully clear an interrupter", function () {
             mockedChannel.numHandlers = 1;
             client.interrupter = null;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'stopEvent', {eventName: 'invocation.interrupted'});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'stopEvent', {eventName: 'invocation.interrupted'});
         });
 
         it("can successfully register an interrupter multiple times and only the last one is registered", function () {
             var handler = function () {};
             client.interrupter = handler;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'startEvent', {eventName: 'invocation.interrupted'});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'startEvent', {eventName: 'invocation.interrupted'});
 
             client.interrupter = handler;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'stopEvent', {eventName: 'invocation.interrupted'});
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'startEvent', {eventName: 'invocation.interrupted'});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'stopEvent', {eventName: 'invocation.interrupted'});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'startEvent', {eventName: 'invocation.interrupted'});
         });
 
 
@@ -266,7 +268,7 @@ describe("invoke client", function () {
         it("should call exec for closeChildCard", function () {
             expect(client.closeChildCard).toBeDefined();
             client.closeChildCard();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "closeChildCard");
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "closeChildCard");
         });
     });
 });

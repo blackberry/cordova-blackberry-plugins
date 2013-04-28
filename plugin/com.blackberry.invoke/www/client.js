@@ -18,26 +18,39 @@
  */
 
 var channel = cordova.require("cordova/channel"),
+    exec = cordova.require("cordova/exec"),
     _self = {},
     _ID = "com.blackberry.invoke",
     _invokeInterrupter,
     _invokeHandler,
     _noop = function () {},
     _events = ["onchildcardstartpeek", "onchildcardendpeek", "onchildcardclosed"],
-    _channels = _events.map(function (eventName) {
-        var channel = cordova.addWindowEventHandler(eventName);
-        channel.onHasSubscribersChange = function () {
-            if (this.numHandlers === 1) {
-                window.webworks.exec(cordova.fireWindowEvent.bind(null, eventName),
-                                     console.log.bind("Error initializing " + eventName + " listener: "),
-                                     _ID, "startEvent", {eventName: eventName});
-            } else if (this.numHandlers === 0) {
-                window.webworks.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
-            }
-        };
-        return channel;
-    }),
     _invokeInterruptChannel = channel.create("invocation.interrupted");
+
+_events.map(function (eventName) {
+    var channel = cordova.addDocumentEventHandler(eventName),
+        success = function (data) {
+            channel.fire(data);
+        },
+        fail = function (error) {
+            console.log("Error initializing " + eventName + " listener: ", error);
+        };
+
+    channel.onHasSubscribersChange = function () {
+        if (this.numHandlers === 1) {
+            exec(success, fail, _ID, "startEvent", {eventName: eventName});
+        } else if (this.numHandlers === 0) {
+            exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
+        }
+    };
+});
+
+function defineReadOnlyField(obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
+}
 
 _self.invoke = function (request, onSuccess, onError) {
     var data,
@@ -65,26 +78,26 @@ _self.invoke = function (request, onSuccess, onError) {
         }
     }
 
-    window.webworks.exec(onSuccess, onError, _ID, "invoke", {request: request});
+    exec(onSuccess, onError, _ID, "invoke", {request: request});
 };
 
 _self.query = function (request, onSuccess, onError) {
-    window.webworks.exec(onSuccess, onError, _ID, "query", {request: request});
+    exec(onSuccess, onError, _ID, "query", {request: request});
 };
 
 _self.closeChildCard = function () {
-    window.webworks.exec(_noop, _noop, _ID, "closeChildCard");
+    exec(_noop, _noop, _ID, "closeChildCard");
 };
 
 _invokeInterruptChannel.onHasSubscribersChange = function () {
     var eventName = "invocation.interrupted";
 
     if (this.numHandlers === 1) {
-        window.webworks.exec(_invokeInterruptChannel.fire.bind(_invokeInterruptChannel),
+        exec(_invokeInterruptChannel.fire.bind(_invokeInterruptChannel),
                              console.log.bind("Error initializing " + eventName + " listener: "),
                              _ID, "startEvent", {eventName: eventName});
     } else if (this.numHandlers === 0) {
-        window.webworks.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
+        exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
     }
 };
 
@@ -107,7 +120,7 @@ Object.defineProperty(_self, "interrupter", {
         if (handler) {
             _invokeInterrupter = function (request) {
                 returnRequest = handler(request);
-                window.webworks.exec(_noop, _noop, _ID, "returnInterruption", {request : returnRequest});
+                exec(_noop, _noop, _ID, "returnInterruption", {request : returnRequest});
             };
 
             _invokeInterruptChannel.subscribe(_invokeInterrupter);
@@ -116,9 +129,9 @@ Object.defineProperty(_self, "interrupter", {
 
 });
 
-window.webworks.defineReadOnlyField(_self, "FILE_TRANSFER_PRESERVE", 'PRESERVE');
-window.webworks.defineReadOnlyField(_self, "FILE_TRANSFER_COPY_RO", 'COPY_RO');
-window.webworks.defineReadOnlyField(_self, "FILE_TRANSFER_COPY_RW", 'COPY_RW');
-window.webworks.defineReadOnlyField(_self, "FILE_TRANSFER_LINK", 'LINK');
+defineReadOnlyField(_self, "FILE_TRANSFER_PRESERVE", 'PRESERVE');
+defineReadOnlyField(_self, "FILE_TRANSFER_COPY_RO", 'COPY_RO');
+defineReadOnlyField(_self, "FILE_TRANSFER_COPY_RW", 'COPY_RW');
+defineReadOnlyField(_self, "FILE_TRANSFER_LINK", 'LINK');
 
 module.exports = _self;
