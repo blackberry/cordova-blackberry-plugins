@@ -17,61 +17,72 @@
 var LIB_FOLDER = "../../lib/",
     contextmenu,
     _overlayWebView,
-    _event = require(LIB_FOLDER + 'event'),
     _utils = require(LIB_FOLDER + 'utils');
 
 function enabled(success, fail, args, env) {
-    var _enabled;
+    var result = new PluginResult(args, env),
+        _enabled;
     if (typeof args.enabled !== 'undefined') {
         _enabled = JSON.parse(decodeURIComponent(args.enabled));
         if (typeof(_enabled) === 'boolean') {
             _overlayWebView.contextMenu.enabled = _enabled;
         }
-        success();
+        result.ok(true, false);
     } else {
-        success(_overlayWebView.contextMenu.enabled);
+        result.ok(_overlayWebView.contextMenu.enabled, false);
     }
 }
-/*
- * Returns true if it was able to override the item, false if there
- * was an error doing so.
- */
+
 function overrideItem(success, fail, args, env) {
+    var result = new PluginResult(args, env);
     args.action = JSON.parse(decodeURIComponent(args.action));
     args.handler = function (actionId) {
-        _event.trigger("contextmenu.executeMenuAction", actionId);
+        result.callbackOk(null, true);
     };
-    success(_overlayWebView.contextMenu.overrideItem(args.action, args.handler));
+    if (_overlayWebView.contextMenu.overrideItem(args.action, args.handler)) {
+        result.noResult(true);
+    } else {
+        result.error("Item could not be overriden", false);
+    }
 }
 
-/*
- * Returns true if the item could be cleared successfully and
- * false otherwise.
- */
 function clearOverride(success, fail, args, env) {
-    var actionId = JSON.parse(decodeURIComponent(args.actionId));
-    success(_overlayWebView.contextMenu.clearOverride(actionId));
+    var result = new PluginResult(args, env),
+        actionId = JSON.parse(decodeURIComponent(args.actionId));
+    result.ok(_overlayWebView.contextMenu.clearOverride(actionId), false);
 }
 
 function addItem(success, fail, args, env) {
+    var result = new PluginResult(args, env);
     args.contexts = JSON.parse(decodeURIComponent(args.contexts));
     args.action = JSON.parse(decodeURIComponent(args.action));
     args.handler = function (actionId, elementId) {
-        _event.trigger("contextmenu.executeMenuAction", actionId, elementId);
+        result.callbackOk(elementId, true);
     };
-    _overlayWebView.contextMenu.addItem(success, fail, args, env);
+    _overlayWebView.contextMenu.addItem(function (data) {
+        result.noResult(true);
+    }, function (e) {
+        result.error(e, false);
+    }, args, env);
 }
 
 function removeItem(success, fail, args, env) {
+    var result = new PluginResult(args, env);
     args.contexts = JSON.parse(decodeURIComponent(args.contexts));
     args.actionId = JSON.parse(decodeURIComponent(args.actionId));
-    _overlayWebView.contextMenu.removeItem(success, fail, args, env);
+    _overlayWebView.contextMenu.removeItem(function (data) {
+        result.ok(data, false);
+    }, function (e) {
+        result.error(e, false);
+    }, args, env);
 }
 
 function defineCustomContext(success, fail, args, env) {
+    var result = new PluginResult(args, env);
     args.context = JSON.parse(decodeURIComponent(args.context));
     args.options = JSON.parse(decodeURIComponent(args.options));
     _overlayWebView.contextMenu.defineCustomContext(args.context, args.options);
+    result.ok(null, false);
 }
 
 contextmenu = {

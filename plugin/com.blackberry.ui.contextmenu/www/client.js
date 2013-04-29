@@ -18,9 +18,8 @@
  */
 
 var contextmenu = {},
-    _ID = "com.blackberry.ui.contextmenu",
-    _storedCallbacks = {},
-    _listeningForCallbacks = false;
+    exec = cordova.require("cordova/exec"),
+    _ID = "com.blackberry.ui.contextmenu";
 
 function defineReadOnlyContext(field) {
     Object.defineProperty(contextmenu, "CONTEXT_" + field, {"value": field, "writable": false});
@@ -28,14 +27,6 @@ function defineReadOnlyContext(field) {
 
 function defineReadOnlyActions(name, value) {
     Object.defineProperty(contextmenu, "ACTION_" + name, {"value": value, "writable": false});
-}
-
-function listen() {
-    window.blackberry.event.addEventListener('contextmenu.executeMenuAction', function (actionId, elementId) {
-        if (typeof _storedCallbacks[actionId] === 'function') {
-            _storedCallbacks[actionId](elementId);
-        }
-    });
 }
 
 // Define the enabled property that an API developer can access
@@ -50,7 +41,7 @@ Object.defineProperty(contextmenu, "enabled", {
                 throw data;
             };
         try {
-            window.webworks.exec(success, fail, _ID, "enabled");
+            exec(success, fail, _ID, "enabled");
         } catch (error) {
             console.log(error);
         }
@@ -58,7 +49,7 @@ Object.defineProperty(contextmenu, "enabled", {
     },
     set: function (value) {
         try {
-            window.webworks.exec(function () {}, function () {}, _ID, "enabled", {"enabled": value});
+            exec(function () {}, function () {}, _ID, "enabled", {"enabled": value});
         } catch (error) {
             console.error(error);
         }
@@ -71,11 +62,7 @@ contextmenu.clearOverride = function (actionId) {
         return 'Clearing override on a menu item requires an actionId';
     }
 
-    if (_storedCallbacks[actionId]) {
-        delete _storedCallbacks[actionId];
-    }
-
-    window.webworks.exec(function () {}, function () {}, _ID, 'clearOverride', { actionId: actionId});
+    exec(function () {}, function () {}, _ID, 'clearOverride', { actionId: actionId});
 };
 
 contextmenu.overrideItem = function (action, callback) {
@@ -84,12 +71,9 @@ contextmenu.overrideItem = function (action, callback) {
         return 'Overriding a menu item requires an actionId';
     }
 
-    _storedCallbacks[action.actionId] = callback;
-    if (!_listeningForCallbacks) {
-        _listeningForCallbacks = true;
-        listen();
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, 'overrideItem', {action: action});
+    exec(function (elementId) {
+        callback(elementId);
+    }, function () {}, _ID, 'overrideItem', {action: action});
 };
 
 
@@ -103,12 +87,9 @@ contextmenu.addItem = function (contexts, action, callback) {
         return 'Adding a custom menu item requires an actionId';
     }
 
-    _storedCallbacks[action.actionId] = callback;
-    if (!_listeningForCallbacks) {
-        _listeningForCallbacks = true;
-        listen();
-    }
-    window.webworks.exec(function () {}, function () {}, _ID, 'addItem', {contexts: contexts, action: action});
+    exec(function (elementId) {
+        callback(elementId);
+    }, function () {}, _ID, 'addItem', {contexts: contexts, action: action});
 };
 
 contextmenu.removeItem = function (contexts, actionId) {
@@ -121,12 +102,11 @@ contextmenu.removeItem = function (contexts, actionId) {
         return 'Removing a custom menu item requires an actionId';
     }
 
-    window.webworks.exec(function () {}, function () {}, _ID, 'removeItem', {contexts: contexts, actionId: actionId});
-    delete _storedCallbacks[actionId];
+    exec(function () {}, function () {}, _ID, 'removeItem', {contexts: contexts, actionId: actionId});
 };
 
 contextmenu.defineCustomContext = function (customContext, options) {
-    window.webworks.exec(function () {}, function () {}, _ID, 'defineCustomContext', {context: customContext, options: options});
+    exec(function () {}, function () {}, _ID, 'defineCustomContext', {context: customContext, options: options});
 };
 
 defineReadOnlyContext("ALL");
