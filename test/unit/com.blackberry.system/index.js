@@ -22,35 +22,44 @@ var libDir = __dirname + "/../../../lib/",
     events = require(libDir + "event"),
     eventExt = require(extDir + "com.blackberry.event/index"),
     utils = require(libDir + "utils"),
-    sysIndex,
-    successCB,
-    failCB;
+    mockedPluginResult,
+    mockApplication = {},
+    sysIndex;
 
 describe("system index", function () {
+
     beforeEach(function () {
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult")
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+        GLOBAL.window = {
+            qnx: {
+                webplatform: {
+                    device: {
+                        getTimezones: jasmine.createSpy().andCallFake(function (callback) {
+                            callback(["America/New_York", "America/Los_Angeles"]);
+                        }),
+                        timezone: "hello123"
+                    },
+                    getApplication: jasmine.createSpy().andReturn(mockApplication)
+                }
+            }
+        };
         sysIndex = require(apiDir + "index");
     });
 
     afterEach(function () {
+        delete require.cache[require.resolve(apiDir + "index")];
         sysIndex = null;
+        delete GLOBAL.window;
+        delete GLOBAL.PluginResult;
     });
 
     describe("Events", function () {
-        var mockedPluginResult,
-            noop = function () {};
-
-        beforeEach(function () {
-            mockedPluginResult = {
-                error: jasmine.createSpy("PluginResult.error"),
-                noResult: jasmine.createSpy("PluginResult.noResult")
-            };
-
-            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
-        });
-
-        afterEach(function () {
-            delete GLOBAL.PluginResult;
-        });
+        var noop = function () {};
 
         it("startEvent", function () {
             var applicationEvents = require(libDir + "events/applicationEvents"),
@@ -73,8 +82,10 @@ describe("system index", function () {
                 eventName = "perimeterunlocked",
                 env = {webview: {id: 42 }};
 
+            spyOn(applicationEvents, "addEventListener");
             spyOn(applicationEvents, "removeEventListener");
 
+            sysIndex.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             sysIndex.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             expect(applicationEvents.removeEventListener).toHaveBeenCalledWith("windowUnlock", jasmine.any(Function));
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
@@ -87,43 +98,20 @@ describe("system index", function () {
     });
 
     it("hasCapability", function () {
-        var success = jasmine.createSpy();
-
-        sysIndex.hasCapability(success, undefined, {"capability": "network.wlan"}, undefined);
-
-        expect(success).toHaveBeenCalledWith(true);
+        sysIndex.hasCapability(undefined, undefined, {"capability": "network.wlan"}, undefined);
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith(true, false);
     });
 
     describe("qnx.webplatform.device properties", function () {
-        beforeEach(function () {
-            sysIndex = require(apiDir + "index");
-            GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        device: {
-                        }
-                    }
-                }
-            };
-        });
-
-        afterEach(function () {
-            delete GLOBAL.window;
-            sysIndex = null;
-        });
 
         it("can call fail if a property isn't present", function () {
-            ["hardwareid", "scmbundle", "devicename"].forEach(function (propertyName) {
-                var fail = jasmine.createSpy();
-                sysIndex.getDeviceProperties(null, fail, null, null);
-                expect(fail).toHaveBeenCalledWith(-1, jasmine.any(String));
-            });
+            delete window.qnx.webplatform.device; 
+            sysIndex.getDeviceProperties();
+            expect(mockedPluginResult.error).toHaveBeenCalledWith(jasmine.any(String), false);
         });
 
         it("can call success with getDeviceProperties", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy(),
-                hardwareId = "0x8500240a",
+            var hardwareId = "0x8500240a",
                 softwareVersion = "10.0.6.99",
                 name = "Device";
 
@@ -131,52 +119,30 @@ describe("system index", function () {
             window.qnx.webplatform.device.scmBundle = softwareVersion;
             window.qnx.webplatform.device.deviceName = name;
 
-            sysIndex.getDeviceProperties(success, fail, null, null);
+            sysIndex.getDeviceProperties();
 
-            expect(success).toHaveBeenCalledWith({
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith({
                 "hardwareId" : hardwareId,
                 "softwareVersion" : softwareVersion,
                 "name": name
-            });
+            }, false);
         });
 
     });
 
 
     describe("device region", function () {
-        var mockApplication;
-        beforeEach(function () {
-            sysIndex = require(apiDir + "index");
-            mockApplication = {};
-            GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        getApplication: jasmine.createSpy().andReturn(mockApplication)
-                    }
-                }
-            };
-        });
-
-        afterEach(function () {
-            delete GLOBAL.window;
-            sysIndex = null;
-        });
 
         it("calls success when there is no error retrieving data", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy();
-
             mockApplication.systemRegion = (new Date()).getTime();
 
-            sysIndex.region(success, fail);
-            expect(success).toHaveBeenCalledWith(window.qnx.webplatform.getApplication().systemRegion);
-            expect(fail).not.toHaveBeenCalled();
+            sysIndex.region();
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(window.qnx.webplatform.getApplication().systemRegion, false);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("calls fail when there is an error", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy(),
-                errMsg = "Something bad happened";
+            var errMsg = "Something bad happened";
 
             Object.defineProperty(mockApplication, "systemRegion", {
                 get: function () {
@@ -184,9 +150,9 @@ describe("system index", function () {
                 }
             });
 
-            sysIndex.region(success, fail);
-            expect(success).not.toHaveBeenCalled();
-            expect(fail).toHaveBeenCalledWith(-1, errMsg);
+            sysIndex.region();
+            expect(mockedPluginResult.ok).not.toHaveBeenCalled();
+            expect(mockedPluginResult.error).toHaveBeenCalledWith(errMsg, false);
         });
     });
 
@@ -199,8 +165,6 @@ describe("system index", function () {
                 ERROR_ID = -1;
 
             beforeEach(function () {
-                successCB = jasmine.createSpy("Success Callback");
-                failCB = jasmine.createSpy("Fail Callback");
                 mockedFontFamily = jasmine.createSpy("getSystemFontFamily").andReturn(fontFamily);
                 mockedFontSize = jasmine.createSpy("getSystemFontSize").andReturn(fontSize);
                 GLOBAL.window = {
@@ -219,82 +183,42 @@ describe("system index", function () {
 
             afterEach(function () {
                 delete GLOBAL.window;
-                successCB = null;
-                failCB = null;
                 mockedFontFamily = null;
                 mockedFontSize = null;
                 delete GLOBAL.window;
             });
 
             it("can call fontFamily and fontSize the qnx.weblplatform Application", function () {
-                sysIndex.getFontInfo(successCB, null, null, null);
+                sysIndex.getFontInfo();
                 expect(mockedFontFamily).toHaveBeenCalled();
                 expect(mockedFontSize).toHaveBeenCalled();
             });
 
             it("can call success callback when getFontInfo call succeed", function () {
-                sysIndex.getFontInfo(successCB, failCB, null, null);
-                expect(successCB).toHaveBeenCalledWith({'fontFamily': fontFamily, 'fontSize': fontSize});
-                expect(failCB).not.toHaveBeenCalled();
+                sysIndex.getFontInfo();
+                expect(mockedPluginResult.ok).toHaveBeenCalledWith({'fontFamily': fontFamily, 'fontSize': fontSize}, false);
+                expect(mockedPluginResult.error).not.toHaveBeenCalled();
             });
-
+/*
             it("can call fail callback when getFontInfo call failed", function () {
-                sysIndex.getFontInfo(null, failCB, null, null);
-                expect(successCB).not.toHaveBeenCalledWith({'fontFamily': fontFamily, 'fontSize': fontSize});
-                expect(failCB).toHaveBeenCalledWith(ERROR_ID, jasmine.any(Object));
-            });
+                sysIndex.getFontInfo();
+                expect(mockedPluginResult.ok).not.toHaveBeenCalledWith({'fontFamily': fontFamily, 'fontSize': fontSize}, false);
+                expect(mockedPluginResult.error).toHaveBeenCalledWith(ERROR_ID, jasmine.any(Object), false);
+            });*/
         });
     });
 
     describe("getCurrentTimezone", function () {
-        beforeEach(function () {
-            GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        device: {
-                            timezone: "hello123"
-                        }
-                    }
-                }
-            };
-        });
-
-        afterEach(function () {
-            delete GLOBAL.window;
-        });
-
         it("return timezone from PPS", function () {
-            var successCb = jasmine.createSpy();
-            sysIndex.getCurrentTimezone(successCb);
-
-            expect(successCb).toHaveBeenCalledWith("hello123");
+            sysIndex.getCurrentTimezone();
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("hello123", false);
         });
     });
 
     describe("getTimezones", function () {
-        beforeEach(function () {
-            GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        device: {
-                            getTimezones: jasmine.createSpy().andCallFake(function (callback) {
-                                callback(["America/New_York", "America/Los_Angeles"]);
-                            })
-                        }
-                    }
-                }
-            };
-        });
-
-        afterEach(function () {
-            delete GLOBAL.window;
-        });
-
         it("return timezones from native", function () {
-            var successCb = jasmine.createSpy();
-            sysIndex.getTimezones(successCb);
-
-            expect(successCb).toHaveBeenCalledWith(["America/New_York", "America/Los_Angeles"]);
+            sysIndex.getTimezones();
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(["America/New_York", "America/Los_Angeles"], false);
         });
     });
 
@@ -317,28 +241,23 @@ describe("system index", function () {
                     }
                 }
             };
-            successCB = jasmine.createSpy("Success Callback");
-            failCB = jasmine.createSpy("Fail Callback");
         });
 
         afterEach(function () {
             mockApplication.newWallpaper = null;
             mockApplication = null;
             delete GLOBAL.window;
-
-            successCB = null;
-            failCB = null;
         });
 
         it("calls setWallpaper with success callback at the end for NOT local path", function () {
             var filePath = "/accounts/1000/shared/camera/IMG_00000001.jpg",
                 request = {wallpaper: encodeURIComponent(JSON.stringify(filePath))};
 
-            sysIndex.setWallpaper(successCB, failCB, request);
+            sysIndex.setWallpaper(null, null, request);
 
             expect(mockApplication.newWallpaper).toHaveBeenCalledWith(filePath);
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("calls setWallpaper with success callback at the end for local path", function () {
@@ -347,14 +266,14 @@ describe("system index", function () {
                 request = {wallpaper: encodeURIComponent(JSON.stringify(localPath))},
                 tranlatedPath;
 
-            sysIndex.setWallpaper(successCB, failCB, request);
+            sysIndex.setWallpaper(null, null, request);
             tranlatedPath = mockApplication.newWallpaper.mostRecentCall.args[0];
 
             // Checking if the image name is at the end of translated path
             expect(tranlatedPath.indexOf(imageName)).toEqual(tranlatedPath.length - imageName.length);
 
-            expect(successCB).toHaveBeenCalled();
-            expect(failCB).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("calls setWallpaper with path no prefixed 'file://' for NOT local path", function () {
@@ -362,7 +281,7 @@ describe("system index", function () {
                 filePath = "/accounts/1000/shared/camera/IMG_00000001.jpg",
                 request = {wallpaper: encodeURIComponent(JSON.stringify(filePathPrefix + filePath))};
 
-            sysIndex.setWallpaper(successCB, failCB, request);
+            sysIndex.setWallpaper(null, null, request);
 
             expect(mockApplication.newWallpaper).toHaveBeenCalledWith(filePath);
         });
@@ -373,7 +292,7 @@ describe("system index", function () {
                 request = {wallpaper: encodeURIComponent(JSON.stringify(localPath))},
                 tranlatedPath;
 
-            sysIndex.setWallpaper(successCB, failCB, request);
+            sysIndex.setWallpaper(null, null, request);
             tranlatedPath = mockApplication.newWallpaper.mostRecentCall.args[0];
 
             // Checking the tranlated path not prefixed with 'file://'
@@ -407,14 +326,10 @@ describe("system index", function () {
         });
 
         it("returns status from webplatform", function () {
-            var successCb = jasmine.createSpy(),
-                failCb = jasmine.createSpy();
-
-            sysIndex.deviceLockedStatus(successCb, failCb);
-
+            sysIndex.deviceLockedStatus();
             expect(mockApplication.isDeviceLocked).toHaveBeenCalledWith(jasmine.any(Function));
-            expect(successCb).toHaveBeenCalledWith("notLocked");
-            expect(failCb).not.toHaveBeenCalled();
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("notLocked", false);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
     });
 });

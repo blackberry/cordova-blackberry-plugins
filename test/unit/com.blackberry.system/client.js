@@ -21,18 +21,11 @@ var extDir = __dirname + "/../../../plugin",
     ID = "com.blackberry.system",
     apiDir = extDir + "/" + ID,
     sysClient = null,
-    mockedWebworks,
-    mockedCordova,
     MockedChannel,
     channelRegistry = {};
 
 describe("system client", function () {
     beforeEach(function () {
-
-        mockedWebworks = {
-            exec : jasmine.createSpy("webworks.exec"),
-            defineReadOnlyField: jasmine.createSpy("webworks.defineReadOnlyField")
-        };
 
         MockedChannel = function () {
             return {
@@ -41,29 +34,23 @@ describe("system client", function () {
             };
         };
 
-        mockedCordova = {
-            addWindowEventHandler: jasmine.createSpy("cordova.addWindowEventHandler").andCallFake(function (eventName) {
+        GLOBAL.cordova = {
+            addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
                 channelRegistry[eventName] = new MockedChannel();
                 return channelRegistry[eventName];
             }),
-            fireWindowEvent: jasmine.createSpy("cordova.fireWindowEvent")
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent"),
+            exec: jasmine.createSpy("cordova.exec"),
+            require: function () {
+                return cordova.exec;
+            }
         };
 
-        //Set up mocking, no need to "spyOn" since spies are included in mock
-        GLOBAL.window = {
-            webworks: mockedWebworks,
-            cordova: mockedCordova
-        };
-        GLOBAL.cordova = mockedCordova;
-
-        delete require.cache[require.resolve(apiDir + "/www/client")];
         sysClient = require(apiDir + "/www/client");
     });
 
     afterEach(function () {
-        delete GLOBAL.window;
         delete GLOBAL.cordova;
-
         delete require.cache[require.resolve(apiDir + "/www/client")];
         sysClient = null;
     });
@@ -74,55 +61,57 @@ describe("system client", function () {
             var channel;
 
             //test channel creation
-            expect(mockedCordova.addWindowEventHandler).toHaveBeenCalledWith(event);
+            expect(cordova.addDocumentEventHandler).toHaveBeenCalledWith(event);
 
             //test Subscriber add
             channel = channelRegistry[event];
             channel.numHandlers = 1;
             channel.onHasSubscribersChange();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "startEvent", {eventName: event});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "startEvent", {eventName: event});
 
             //test Subscriber remove
             channel.numHandlers = 0;
             channel.onHasSubscribersChange();
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "stopEvent", {eventName: event});
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "stopEvent", {eventName: event});
         });
     });
 
     it("hasCapability", function () {
         var result;
 
-        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
+        cordova.exec.andCallFake(function (success) {
             success(true);
         });
 
         result = sysClient.hasCapability("abc.def");
 
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "hasCapability", {"capability": "abc.def"});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "hasCapability", {"capability": "abc.def"});
         expect(result).toBeTruthy();
     });
 
     it("getFontInfo", function () {
         var result;
 
-        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
+        cordova.exec.andCallFake(function (success, fail, service, action, args) {
             success(true);
         });
 
         result = sysClient.getFontInfo();
 
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getFontInfo", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getFontInfo", undefined);
         expect(result).toBeTruthy();
     });
 
     it("getCurrentTimezone", function () {
-        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
+        var result;
+
+        cordova.exec.andCallFake(function (success, fail, service, action, args) {
             success("America/New_York");
         });
 
-        var result = sysClient.getCurrentTimezone();
+        result = sysClient.getCurrentTimezone();
 
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getCurrentTimezone", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getCurrentTimezone", undefined);
         expect(result).toBe("America/New_York");
     });
 
@@ -130,13 +119,13 @@ describe("system client", function () {
         var timezones = ["America/New_York", "America/Los_Angeles"],
             result;
 
-        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
+        cordova.exec.andCallFake(function (success, fail, service, action, args) {
             success(timezones);
         });
 
         result = sysClient.getTimezones();
 
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getTimezones", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getTimezones", undefined);
         expect(result).toBe(timezones);
     });
 
@@ -145,16 +134,16 @@ describe("system client", function () {
 
         sysClient.setWallpaper(filePath);
 
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "setWallpaper", {"wallpaper": filePath});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "setWallpaper", {"wallpaper": filePath});
     });
 
     it("deviceLockedStatus", function () {
-        mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
+        cordova.exec.andCallFake(function (success, fail, service, action, args) {
             success("notLocked");
         });
 
         expect(sysClient.deviceLockedStatus).toEqual("notLocked");
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "deviceLockedStatus", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "deviceLockedStatus", undefined);
     });
 
     describe("device properties and ReadOnlyFields", function () {
@@ -166,31 +155,25 @@ describe("system client", function () {
         };
 
         beforeEach(function () {
-            mockedWebworks.exec.andCallFake(function (success, fail, service, action, args) {
+            cordova.exec.andCallFake(function (success, fail, service, action, args) {
                 success(mockDeviceProperties);
             });
-            // client needs to be required for each test
             delete require.cache[require.resolve(apiDir + "/www/client")];
             sysClient = require(apiDir + "/www/client");
         });
 
-        afterEach(function () {
-            delete require.cache[require.resolve(apiDir + "/www/client")];
-            sysClient = null;
-        });
-
         it("defines ALLOW", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "ALLOW", 0);
+            expect(sysClient.ALLOW).toEqual(0);
         });
 
         it("defines DENY", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "DENY", 1);
+            expect(sysClient.DENY).toEqual(1);
         });
 
         it("sets readonly fields", function () {
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "hardwareId", "123");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "softwareVersion", "456");
-            expect(mockedWebworks.defineReadOnlyField).toHaveBeenCalledWith(sysClient, "name", "789");
+            expect(sysClient.hardwareId).toEqual("123");
+            expect(sysClient.softwareVersion).toEqual("456");
+            expect(sysClient.name).toEqual("789");
         });
     });
 
@@ -198,7 +181,7 @@ describe("system client", function () {
 
         describe("region", function () {
             beforeEach(function () {
-                mockedWebworks.exec.andCallFake(function (success, fail, namespace, field) {
+                cordova.exec.andCallFake(function (success, fail, namespace, field) {
                     if (field === "language") {
                         success("fr_CA");
                     } else if (field === "region") {
@@ -209,7 +192,7 @@ describe("system client", function () {
 
             it("region", function () {
                 expect(sysClient.region).toEqual("en_US");
-                expect(mockedWebworks.exec.argsForCall).toContain([jasmine.any(Function), jasmine.any(Function), ID, "region", undefined]);
+                expect(cordova.exec.argsForCall).toContain([jasmine.any(Function), jasmine.any(Function), ID, "region", undefined]);
             });
         });
 

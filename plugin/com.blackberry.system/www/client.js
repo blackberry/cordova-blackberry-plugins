@@ -21,11 +21,10 @@ var _self = {},
     ID = "com.blackberry.system",
     deviceProperties,
     noop = function () {},
-    //TODO: change to require("cordova/exec");
-    execFunc = window.webworks.exec,
+    execFunc = cordova.require("cordova/exec"),
     events = ["batterystatus", "batterylow", "battercritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
     channels = events.map(function (eventName) {
-        var thisChannel = cordova.addWindowEventHandler(eventName),
+        var thisChannel = cordova.addDocumentEventHandler(eventName),
             success = function (data) {
                 thisChannel.fire(data);
             },
@@ -81,6 +80,13 @@ function defineGetter(field, getterArg) {
     });
 }
 
+function defineReadOnlyField(obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
+}
+
 _self.hasCapability = function (capability) {
     return getFieldValue("hasCapability", {"capability": capability});
 };
@@ -107,10 +113,10 @@ defineGetter("language", function () {
 });
 defineGetter("deviceLockedStatus");
 
-window.webworks.defineReadOnlyField(_self, "ALLOW", 0);
-window.webworks.defineReadOnlyField(_self, "DENY", 1);
-window.webworks.defineReadOnlyField(_self, "hardwareId", getDeviceProperty("hardwareId"));
-window.webworks.defineReadOnlyField(_self, "softwareVersion", getDeviceProperty("softwareVersion"));
-window.webworks.defineReadOnlyField(_self, "name", getDeviceProperty("name"));
+defineReadOnlyField(_self, "ALLOW", 0);
+defineReadOnlyField(_self, "DENY", 1);
+defineReadOnlyField(_self, "hardwareId", getDeviceProperty("hardwareId"));
+defineReadOnlyField(_self, "softwareVersion", getDeviceProperty("softwareVersion"));
+defineReadOnlyField(_self, "name", getDeviceProperty("name"));
 
 module.exports = _self;
