@@ -84,7 +84,6 @@ var Whitelist = require("../../lib/policy/whitelist").Whitelist,
             }
         }
     },
-    ERROR_ID = -1,
     _listeners = {};
 
 module.exports = {
@@ -101,12 +100,14 @@ module.exports = {
         }
 
         if (_listeners[eventName][env.webview.id]) {
-            result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
-        } else {
-            context.addEventListener(systemEvent, listener);
-            _listeners[eventName][env.webview.id] = listener;
-            result.noResult(true);
+            //TODO: Change back to erroring out after reset is implemented
+            //result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
+            context.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
         }
+
+        context.addEventListener(systemEvent, listener);
+        _listeners[eventName][env.webview.id] = listener;
+        result.noResult(true);
     },
 
     stopEvent: function (success, fail, args, env) {
@@ -125,8 +126,9 @@ module.exports = {
         }
     },
 
-    hasCapability: function (success, fail, args) {
-        var SUPPORTED_CAPABILITIES = [
+    hasCapability: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            SUPPORTED_CAPABILITIES = [
                 "input.touch",
                 "location.gps",
                 "media.audio.capture",
@@ -139,86 +141,95 @@ module.exports = {
             // preserve dot for capabiliity
             capability = args.capability.replace(/[^a-zA-Z.]+/g, "");
 
-        success(SUPPORTED_CAPABILITIES.indexOf(capability) >= 0);
+        result.ok(SUPPORTED_CAPABILITIES.indexOf(capability) >= 0, false);
     },
 
-    getFontInfo: function (success, fail) {
-        var fontFamily,
+    getFontInfo: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            fontFamily,
             fontSize;
 
         try {
             fontFamily = window.qnx.webplatform.getApplication().getSystemFontFamily();
             fontSize = window.qnx.webplatform.getApplication().getSystemFontSize();
 
-            success({'fontFamily': fontFamily, 'fontSize': fontSize});
+            result.ok({'fontFamily': fontFamily, 'fontSize': fontSize}, false);
         } catch (e) {
-            fail(ERROR_ID, e);
+            result.error(e, false);
         }
     },
 
-    getDeviceProperties: function (success, fail) {
+    getDeviceProperties: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            returnObj;
         try {
-            var returnObj = {
+            returnObj = {
                 "hardwareId" : window.qnx.webplatform.device.hardwareId,
                 "softwareVersion" : window.qnx.webplatform.device.scmBundle,
                 "name" : window.qnx.webplatform.device.deviceName
             };
-            success(returnObj);
+            result.ok(returnObj, false);
         } catch (err) {
-            fail(ERROR_ID, err.message);
+            result.error(err.message, false);
         }
     },
 
-    region: function (success, fail) {
-        var region;
-
+    region: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            region;
         try {
             region = window.qnx.webplatform.getApplication().systemRegion;
-            success(region);
+            result.ok(region, false);
         } catch (e) {
-            fail(ERROR_ID, e.message);
+            result.error(e.message, false);
         }
     },
 
-    getCurrentTimezone: function (success, fail) {
+    getCurrentTimezone: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         try {
-            success(window.qnx.webplatform.device.timezone);
+            result.ok(window.qnx.webplatform.device.timezone, false);
         } catch (err) {
-            fail(ERROR_ID, err.message);
+            result.error(err.message, false);
         }
     },
 
-    getTimezones: function (success, fail) {
+    getTimezones: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
         try {
-            window.qnx.webplatform.device.getTimezones(success);
+            window.qnx.webplatform.device.getTimezones(function (zones) {
+                result.ok(zones, false);
+            });
         } catch (err) {
-            fail(ERROR_ID, err.message);
+            result.error(err.message, false);
         }
     },
 
-    setWallpaper: function (success, fail, args) {
+    setWallpaper: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            path;
         try {
-            var path = _utils.translatePath(JSON.parse(decodeURIComponent(args.wallpaper)));
-
+            path = _utils.translatePath(JSON.parse(decodeURIComponent(args.wallpaper)));
             // Removing file:// form the path because newWallpaper can't handle it.
             path = path.replace(/file:\/\//, '');
             window.qnx.webplatform.getApplication().newWallpaper(path);
-            success();
+            result.ok(null, false);
         } catch (err) {
-            fail(ERROR_ID, err.message);
+            result.error(err.message, false);
         }
     },
 
-    deviceLockedStatus: function (success, fail) {
-        var callback;
+    deviceLockedStatus: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            callback;
 
         try {
             callback = function (state) {
-                success(state);
+                result.ok(state, false);
             };
             window.qnx.webplatform.getApplication().isDeviceLocked(callback);
         } catch (err) {
-            fail(ERROR_ID, err.message);
+            result.error(err.message, false);
         }
     }
 };
