@@ -17,40 +17,29 @@
 var root = __dirname + "/../../../../",
     ID = "com.blackberry.ui.toast",
     apiDir = root + "plugin/" + ID + "/",
-    client = null,
-    danielCraig,
-    mockBlackberry,
-    mockedWebworks;
+    client = null;
 
 describe("ui.toast", function () {
     beforeEach(function () {
-        danielCraig = jasmine.createSpy();
-
-        mockedWebworks = {
-            exec: jasmine.createSpy(),
-            event: {
-                add: function (feature, name, callback) {
-                    danielCraig();
-                    return;
-                }
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy("exec"),
+            require: function () {
+                return cordova.exec;
             }
-        };
-
-        GLOBAL.window = {
-            webworks: mockedWebworks
         };
         client = require(apiDir + "/www/client");
     });
 
     afterEach(function () {
-        delete GLOBAL.window;
+        delete GLOBAL.cordova;
+        delete require.cache[require.resolve(apiDir + "/www/client")];
     });
 
     it("creates a simple toast", function () {
         var message = "this is a simple toast";
 
         client.show(message);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message });
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message });
     });
 
     it("creates a complex toast with click and dismiss handlers", function () {
@@ -60,7 +49,7 @@ describe("ui.toast", function () {
             dismissCallback = jasmine.createSpy();
 
         client.show(message, { buttonText : buttonText, buttonCallback : buttonCallback, dismissCallback: dismissCallback});
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: { buttonText : buttonText, buttonCallback : buttonCallback, dismissCallback: dismissCallback}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: { buttonText : buttonText, buttonCallback : buttonCallback, dismissCallback: dismissCallback}});
     });
 
     it("creates a complex toast with only click handler", function () {
@@ -69,7 +58,7 @@ describe("ui.toast", function () {
             buttonCallback = jasmine.createSpy();
 
         client.show(message,  {buttonText : buttonText, buttonCallback : buttonCallback});
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {  buttonText : buttonText, buttonCallback : buttonCallback}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {  buttonText : buttonText, buttonCallback : buttonCallback}});
     });
 
     it("creates a complex toast with only dismiss handler", function () {
@@ -78,7 +67,7 @@ describe("ui.toast", function () {
             dismissCallback = jasmine.createSpy();
 
         client.show(message,  {buttonText : buttonText, dismissCallback : dismissCallback});
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message : message, options: {buttonText : buttonText, dismissCallback : dismissCallback}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message : message, options: {buttonText : buttonText, dismissCallback : dismissCallback}});
     });
 
     it("creates a complex toast with no handlers", function () {
@@ -86,6 +75,6 @@ describe("ui.toast", function () {
             buttonText = "button!";
 
         client.show(message, {buttonText : buttonText});
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {buttonText: buttonText}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {buttonText: buttonText}});
     });
 });
