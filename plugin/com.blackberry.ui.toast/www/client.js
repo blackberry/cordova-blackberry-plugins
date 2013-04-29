@@ -18,6 +18,7 @@
  */
 
 var toast = {},
+    exec = cordova.require("cordova/exec"),
     ID = "com.blackberry.ui.toast";
 
 toast.show = function (message, options) {
@@ -38,7 +39,7 @@ toast.show = function (message, options) {
         //TODO: Add an errorCallback to the options for this API and call it here
         fail = function (message) { };
 
-    window.webworks.exec(success, fail, ID, 'show', {message : message, options : options});
+    exec(success, fail, ID, 'show', {message : message, options : options});
 
     return toastId;
 };
