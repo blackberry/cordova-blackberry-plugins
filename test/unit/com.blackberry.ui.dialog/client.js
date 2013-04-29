@@ -21,68 +21,50 @@ var root = __dirname + "/../../../",
     apiDir = root + "plugin/com.blackberry.ui.dialog/",
     client = null,
     ID = "com.blackberry.ui.dialog",
-    mockedWebworks = {
-        exec: jasmine.createSpy(),
-        defineReadOnlyField: jasmine.createSpy(),
-        event: { once : jasmine.createSpy(),
-                 isOn : jasmine.createSpy() }
-    },
-    constants = {
-        "D_OK" : 0,
-        "D_SAVE" : 1,
-        "D_DELETE" : 2,
-        "D_YES_NO" : 3,
-        "D_OK_CANCEL" : 4,
-        "D_PROMPT" : 5
-    },
     defineROFieldArgs = [];
 
-describe("ui.dialog", function () {
+describe("ui.dialog client", function () {
     beforeEach(function () {
-        //Set up mocking, no need to "spyOn" since spies are included in mock
-        GLOBAL.window = {
-            webworks: mockedWebworks
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy(),
+            require: function () {
+                return cordova.exec;
+            }
         };
         client = require(apiDir + "www/client");
     });
 
     afterEach(function () {
-        delete GLOBAL.window;
+        delete require.cache[require.resolve(apiDir + "/www/client")];
+        delete GLOBAL.cordova;
     });
 
     it("should return constant for appropriate dialog styles", function () {
-        // fill up the constants map
-        Object.getOwnPropertyNames(constants).forEach(function (c) {
-            defineROFieldArgs.push([client, c, constants[c]]);
-        });
-
-        expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("D_OK")]);
-        expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("D_SAVE")]);
-        expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("D_DELETE")]);
-        expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("D_YES_NO")]);
-        expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("D_OK_CANCEL")]);
-        expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("D_PROMPT")]);
+        expect(client["D_OK"]).toEqual(0);
+        expect(client["D_SAVE"]).toEqual(1);
+        expect(client["D_DELETE"]).toEqual(2);
+        expect(client["D_YES_NO"]).toEqual(3);
+        expect(client["D_OK_CANCEL"]).toEqual(4);
+        expect(client["D_PROMPT"]).toEqual(5);
     });
 
     it("creates a dialog", function () {
         var message = "hello world",
             buttons = [ ],
-            callback,
+            callback = function () {},
             settings = {};
 
         client.customAskAsync(message, buttons, callback, settings);
-        expect(mockedWebworks.event.once).toHaveBeenCalledWith(ID, jasmine.any(String), callback);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "customAskAsync", { "eventId" : jasmine.any(String), "message" : message, "buttons" : buttons, "callback" : callback, "settings" : settings });
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "customAskAsync", { "message" : message, "buttons" : buttons, "callback" : callback, "settings" : settings });
     });
 
     it("creates a standard dialog", function () {
         var message = "hello world",
             type = 0,
-            callback,
+            callback = function () {},
             settings = {};
 
         client.standardAskAsync(message, type, callback, settings);
-        expect(mockedWebworks.event.once).toHaveBeenCalledWith(ID, jasmine.any(String), callback);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "standardAskAsync", { "eventId" : jasmine.any(String), "message" : message, "type" : type, "callback" : callback, "settings" : settings });
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "standardAskAsync", { "message" : message, "type" : type, "callback" : callback, "settings" : settings });
     });
 });
