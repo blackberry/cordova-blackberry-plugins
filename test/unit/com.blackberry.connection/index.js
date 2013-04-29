@@ -16,24 +16,22 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.connection/",
     _libDir = __dirname + "/../../../lib/",
     deviceEvents = require(_libDir + "events/deviceEvents"),
-    mockedQnx,
+    mockedWp,
     mockedPluginResult,
     index;
 
 describe("connection index", function () {
     beforeEach(function () {
-        GLOBAL.qnx = mockedQnx = {
-            webplatform: {
-                device: {
-                    activeConnection: {
-                        type: 'wifi',
-                        technology: ''
-                    }
+        GLOBAL.wp = mockedWp = {
+            device: {
+                activeConnection: {
+                    type: 'wifi',
+                    technology: ''
                 }
             }
         };
-        GLOBAL.window = { 
-            qnx: mockedQnx
+        GLOBAL.window = {
+            wp: mockedWp
         };
         mockedPluginResult = {
             ok: jasmine.createSpy("PluginResult.ok"),
@@ -46,7 +44,7 @@ describe("connection index", function () {
     });
 
     afterEach(function () {
-        delete GLOBAL.qnx;
+        delete GLOBAL.wp;
         delete GLOBAL.window;
         delete GLOBAL.PluginResult;
         mockedPluginResult = null;
@@ -64,7 +62,7 @@ describe("connection index", function () {
 
             it("can call fail", function () {
                 var fail = jasmine.createSpy();
-                delete mockedQnx.webplatform.device;
+                delete wp.device;
 
                 index.type(null, fail, null, null);
 
@@ -81,11 +79,11 @@ describe("connection index", function () {
                     'vpn': 'vpn',
                     'bb': 'rim-bb',
                     'unknown': 'unknown',
-                    'none': 'none',
+                    'none': 'none'
                 };
                 Object.getOwnPropertyNames(map).forEach(function (type) {
                     var success = jasmine.createSpy();
-                    mockedQnx.webplatform.device.activeConnection.type = type;
+                    mockedWp.device.activeConnection.type = type;
                     index.type(success);
                     expect(mockedPluginResult.ok).toHaveBeenCalledWith(map[type], false);
                 });
@@ -99,10 +97,10 @@ describe("connection index", function () {
                     'lte': '4g'
                 };
 
-                mockedQnx.webplatform.device.activeConnection.type = 'cellular';
+                mockedWp.device.activeConnection.type = 'cellular';
                 Object.getOwnPropertyNames(map).forEach(function (technology) {
                     var success = jasmine.createSpy();
-                    mockedQnx.webplatform.device.activeConnection.technology = technology;
+                    mockedWp.device.activeConnection.technology = technology;
                     index.type(success);
                     expect(mockedPluginResult.ok).toHaveBeenCalledWith(map[technology], false);
                 });

@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _application = window.qnx.webplatform.getApplication(),
-    _startupMode = _application.invocation.getStartupMode();
+var _invocation = window.wp.core.invocation,
+    _startupMode = window.wp.core.invocation.getStartupMode();
 
 module.exports = {
     addEventListener: function (event, trigger) {
         switch (event) {
         case "invoked":
-            if (_startupMode !== _application.invocation.LAUNCH) {
-                trigger(_application.invocation.getRequest());
-                _startupMode = _application.invocation.LAUNCH;
+            if (_startupMode !== wp.core.invocation.LAUNCH) {
+                trigger(wp.core.invocation.getRequest());
+                _startupMode = wp.core.invocation.LAUNCH;
             }
-            _application.invocation.addEventListener("Invoked", trigger);
+            _invocation.on("Invoked", trigger);
             break;
         case "oncardresize":
-            _application.invocation.addEventListener("cardResize", trigger);
+            _invocation.on("cardResize", trigger);
             break;
         case "oncardclosed":
-            _application.invocation.addEventListener("cardClosed", trigger);
+            _invocation.on("cardClosed", trigger);
             break;
         default:
             console.log("Ignore registration for unknown event: " + event);
@@ -40,13 +40,13 @@ module.exports = {
     removeEventListener: function (event, trigger) {
         switch (event) {
         case "invoked":
-            _application.invocation.removeEventListener("Invoked", trigger);
+            _invocation.un("Invoked", trigger);
             break;
         case "oncardresize":
-            _application.invocation.removeEventListener("cardResize", trigger);
+            _invocation.un("cardResize", trigger);
             break;
         case "oncardclosed":
-            _application.invocation.removeEventListener("cardClosed", trigger);
+            _invocation.un("cardClosed", trigger);
             break;
         default:
             console.log("Ignore un-registration for unknown event: " + event);

@@ -17,6 +17,7 @@
         "expect",
         "global",
         //Webworks
+        "wp",
         "qnx",
         "chrome",
         "blackberry",

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-var toast,
-    _overlayWebView;
+var toast;
 
 function show(success, fail, args, env) {
     var result = new PluginResult(args, env),
@@ -30,15 +29,11 @@ function show(success, fail, args, env) {
     };
 
     // Return the toastId to the client from WP created toast
-    result.ok({reason: "created", toastId: _overlayWebView.toast.show(message, options)}, true);
+    result.ok({reason: "created", toastId: wp.ui.toast.show(message, options)}, true);
 }
 
 toast = {
     show : show
 };
-
-qnx.webplatform.getController().addEventListener('overlayWebView.initialized', function (webview) {
-    _overlayWebView = webview;
-});
 
 module.exports = toast;

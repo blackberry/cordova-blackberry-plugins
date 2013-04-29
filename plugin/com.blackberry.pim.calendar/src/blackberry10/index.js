@@ -28,7 +28,7 @@ function getCurrentTimezone() {
     var timezone = null;
 
     try {
-        timezone = window.qnx.webplatform.device.timezone;
+        timezone = window.wp.device.timezone;
     } catch (e) {
         // do nothing
     }

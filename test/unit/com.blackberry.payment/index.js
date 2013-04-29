@@ -153,9 +153,8 @@ function testCheckExisting(mockSuccess) {
 
 describe("payment index", function () {
     beforeEach(function () {
-        GLOBAL.window = GLOBAL;
-        GLOBAL.window.qnx = {
-            webplatform: {
+        GLOBAL.window = {
+            wp: {
                 getController: function () {
                     return {
                         windowGroup: mockWindowGroup

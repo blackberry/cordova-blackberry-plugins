@@ -23,19 +23,19 @@ var _config = require("./../../lib/config"),
             event: "swipedown",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         pause: {
             event: "inactive",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         resume: {
             event: "active",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         orientationchange : {
             //special case, handled in add
@@ -46,37 +46,37 @@ var _config = require("./../../lib/config"),
             event: "keyboardOpening",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardopened: {
             event: "keyboardOpened",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardclosing: {
             event: "keyboardClosing",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardclosed: {
             event: "keyboardClosed",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardposition: {
             event: "keyboardPosition",
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(JSON.parse(obj), true);
-            } 
+            }
         },
         windowstatechanged: {
             event: "stateChange",
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(obj, true);
-            } 
+            }
         }
     };
 
@@ -138,7 +138,7 @@ function translateToDeviceOrientation(orientation) {
         return 'right_up';
 
     default:
-        return 'unknown';    
+        return 'unknown';
     }
 }
 
@@ -203,7 +203,7 @@ module.exports = {
             result.noResult(false);
         }
     },
-   
+
     getReadOnlyFields : function (success, fail, args, env) {
         var result = new PluginResult(args, env),
             ro = {
@@ -228,21 +228,21 @@ module.exports = {
             recieveRotateEvents = args.recieveRotateEvents === undefined  ? true : args.recieveRotateEvents;
 
         // Force rotate to the given orientation then lock it
-        qnx.webplatform.getApplication().rotate(rotateTo);
-        qnx.webplatform.getApplication().lockRotation(recieveRotateEvents);
+        wp.getApplication().rotate(rotateTo);
+        wp.getApplication().lockRotation(recieveRotateEvents);
         result.ok(true, false);
     },
 
     unlockOrientation : function (success, fail, args, env) {
         var result = new PluginResult(args, env);
-        qnx.webplatform.getApplication().unlockRotation();
+        wp.getApplication().unlockRotation();
         result.ok(null, false);
     },
 
     rotate : function (success, fail, args, env) {
         var result = new PluginResult(args, env),
             orientation = translateToDeviceOrientation(JSON.parse(decodeURIComponent(args.orientation)), fail);
-        qnx.webplatform.getApplication().rotate(orientation);
+        wp.getApplication().rotate(orientation);
         result.ok(null, false);
     },
 
@@ -254,18 +254,18 @@ module.exports = {
 
     minimize: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
-        qnx.webplatform.getApplication().minimizeWindow();
+        wp.getApplication().minimizeWindow();
         result.ok(null, false);
     },
 
     exit: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
-        window.qnx.webplatform.getApplication().exit();
+        wp.getApplication().exit();
         result.ok(null, false);
     },
 
     windowState : function (success, fail, args, env) {
         var result = new PluginResult(args, env);
-        result.ok(qnx.webplatform.getApplication().windowState, false);
+        result.ok(wp.getApplication().windowState, false);
     }
 };

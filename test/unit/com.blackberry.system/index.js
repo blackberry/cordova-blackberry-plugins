@@ -35,8 +35,7 @@ describe("system index", function () {
         };
         GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         GLOBAL.window = {
-            qnx: {
-                webplatform: {
+                wp: {
                     device: {
                         getTimezones: jasmine.createSpy().andCallFake(function (callback) {
                             callback(["America/New_York", "America/Los_Angeles"]);
@@ -45,8 +44,7 @@ describe("system index", function () {
                     },
                     getApplication: jasmine.createSpy().andReturn(mockApplication)
                 }
-            }
-        };
+            };
         sysIndex = require(apiDir + "index");
     });
 
@@ -106,7 +104,7 @@ describe("system index", function () {
     describe("qnx.webplatform.device properties", function () {
 
         it("can call fail if a property isn't present", function () {
-            delete window.qnx.webplatform.device; 
+            delete window.wp.device;
             sysIndex.getDeviceProperties();
             expect(mockedPluginResult.error).toHaveBeenCalledWith(jasmine.any(String), false);
         });
@@ -116,9 +114,9 @@ describe("system index", function () {
                 softwareVersion = "10.0.6.99",
                 name = "Device";
 
-            window.qnx.webplatform.device.hardwareId = hardwareId;
-            window.qnx.webplatform.device.scmBundle = softwareVersion;
-            window.qnx.webplatform.device.deviceName = name;
+            window.wp.device.hardwareId = hardwareId;
+            window.wp.device.scmBundle = softwareVersion;
+            window.wp.device.deviceName = name;
 
             sysIndex.getDeviceProperties();
 
@@ -138,7 +136,7 @@ describe("system index", function () {
             mockApplication.systemRegion = (new Date()).getTime();
 
             sysIndex.region();
-            expect(mockedPluginResult.ok).toHaveBeenCalledWith(window.qnx.webplatform.getApplication().systemRegion, false);
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(window.wp.getApplication().systemRegion, false);
             expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
@@ -169,27 +167,24 @@ describe("system index", function () {
                 mockedFontFamily = jasmine.createSpy("getSystemFontFamily").andReturn(fontFamily);
                 mockedFontSize = jasmine.createSpy("getSystemFontSize").andReturn(fontSize);
                 GLOBAL.window = {
-                    qnx: {
-                        webplatform: {
-                            getApplication: function () {
-                                return {
-                                    getSystemFontFamily: mockedFontFamily,
-                                    getSystemFontSize: mockedFontSize
-                                };
-                            }
+                    wp: {
+                        getApplication: function () {
+                            return {
+                                getSystemFontFamily: mockedFontFamily,
+                                getSystemFontSize: mockedFontSize
+                            };
                         }
                     }
                 };
             });
 
             afterEach(function () {
-                delete GLOBAL.window;
                 mockedFontFamily = null;
                 mockedFontSize = null;
                 delete GLOBAL.window;
             });
 
-            it("can call fontFamily and fontSize the qnx.weblplatform Application", function () {
+            it("can call fontFamily and fontSize", function () {
                 sysIndex.getFontInfo();
                 expect(mockedFontFamily).toHaveBeenCalled();
                 expect(mockedFontSize).toHaveBeenCalled();
@@ -236,17 +231,14 @@ describe("system index", function () {
                 }
             };
             GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        getApplication: jasmine.createSpy().andReturn(mockApplication)
-                    }
+                wp: {
+                    getApplication: jasmine.createSpy().andReturn(mockApplication)
                 }
             };
         });
 
         afterEach(function () {
-            mockApplication.newWallpaper = null;
-            mockApplication = null;
+            mockApplication.newWallpaper.reset();
             delete GLOBAL.window;
         });
 
@@ -312,17 +304,14 @@ describe("system index", function () {
             });
 
             GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        getApplication: jasmine.createSpy().andReturn(mockApplication)
-                    }
+                wp: {
+                    getApplication: jasmine.createSpy().andReturn(mockApplication)
                 }
             };
         });
 
         afterEach(function () {
-            mockApplication.isDeviceLocked = null;
-            mockApplication = null;
+            mockApplication.isDeviceLocked.reset();
             delete GLOBAL.window;
         });
 

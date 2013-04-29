@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var _application = window.qnx.webplatform.getApplication();
+var invocation = window.wp.core.invocation;
 
 module.exports = {
     addEventListener: function (event, trigger) {
         switch (event) {
         case "onchildcardstartpeek":
-            _application.invocation.addEventListener("cardPeekStarted", trigger);
+            invocation.on("cardPeekStarted", trigger);
             break;
         case "onchildcardendpeek":
-            _application.invocation.addEventListener("cardPeekEnded", trigger);
+            invocation.on("cardPeekEnded", trigger);
             break;
         case "onchildcardclosed":
-            _application.invocation.addEventListener("childCardClosed", trigger);
+            invocation.on("childCardClosed", trigger);
             break;
         case "invocation.interrupted":
-            _application.invocation.interrupter = trigger;
+            invocation.interrupter = trigger;
             break;
         default:
             console.log("Ignore registration for unknown event: " + event);
@@ -38,16 +38,16 @@ module.exports = {
     removeEventListener: function (event, trigger) {
         switch (event) {
         case "onchildcardstartpeek":
-            _application.invocation.removeEventListener("cardPeekStarted", trigger);
+            invocation.un("cardPeekStarted", trigger);
             break;
         case "onchildcardendpeek":
-            _application.invocation.removeEventListener("cardPeekEnded", trigger);
+            invocation.un("cardPeekEnded", trigger);
             break;
         case "onchildcardclosed":
-            _application.invocation.removeEventListener("childCardClosed", trigger);
+            invocation.un("childCardClosed", trigger);
             break;
         case "invocation.interrupted":
-            _application.invocation.interrupter = undefined;
+            invocation.interrupter = undefined;
             break;
         default:
             console.log("Ignore un-registration for unknown event: " + event);

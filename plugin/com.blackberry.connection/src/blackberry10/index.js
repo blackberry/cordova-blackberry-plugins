@@ -55,7 +55,7 @@ function mapConnectionType(type, technology) {
 }
 
 function currentConnectionType() {
-    var connInfo = qnx.webplatform.device.activeConnection;
+    var connInfo = wp.device.activeConnection;
     if (connInfo === null) {
         connInfo = {
             type: 'none'

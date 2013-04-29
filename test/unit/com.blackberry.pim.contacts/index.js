@@ -43,15 +43,15 @@ describe("pim.contacts index", function () {
             registerEvents: jasmine.createSpy("JNEXT.registerEvent")
         };
         GLOBAL.window = {
-            qnx: {
-                webplatform: {
-                    getApplication: jasmine.createSpy().andReturn({
-                        invocation: {
-                            addEventListener: jasmine.createSpy(),
-                            removeEventListener: jasmine.createSpy()
-                        },
-                        getEnv: jasmine.createSpy().andReturn("personal")
-                    })
+            wp: {
+                getApplication: jasmine.createSpy().andReturn({
+                    getEnv: jasmine.createSpy().andReturn("personal")
+                }),
+                core: {
+                    invocation: {
+                        on: jasmine.createSpy(),
+                        un: jasmine.createSpy()
+                    }
                 }
             },
             parseInt: jasmine.createSpy().andCallFake(function (obj) {
@@ -165,7 +165,7 @@ describe("pim.contacts index", function () {
 
         args["isWork"] = false;
 
-        expect(window.qnx.webplatform.getApplication().getEnv).toHaveBeenCalledWith("PERIMETER");
+        expect(window.wp.getApplication().getEnv).toHaveBeenCalledWith("PERIMETER");
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "save " + JSON.stringify(args));
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
@@ -278,7 +278,7 @@ describe("pim.contacts index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        expect(window.qnx.webplatform.getApplication().invocation.addEventListener).toHaveBeenCalledWith("childCardClosed", jasmine.any(Function));
+        expect(window.wp.core.invocation.on).toHaveBeenCalledWith("childCardClosed", jasmine.any(Function));
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "invokePicker " + JSON.stringify(args.options));
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });

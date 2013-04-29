@@ -29,15 +29,13 @@ describe("io.filetransfer index", function () {
         };
 
         GLOBAL.window = {
-            qnx : {
-                webplatform : {
-                    getApplication : function () {
-                        return {
-                            getEnv : function () {
-                                return "ROOT";
-                            }
-                        };
-                    }
+            wp: {
+                getApplication : function () {
+                    return {
+                        getEnv : function () {
+                            return "ROOT";
+                        }
+                    };
                 }
             }
         };
@@ -173,7 +171,7 @@ describe("io.filetransfer index", function () {
                 params = JSON.parse(arguments[1].substring(7, arguments[1].length));
             });
 
-            index.upload(null, null, mocked_args, null);       
+            index.upload(null, null, mocked_args, null);
 
             expect(JNEXT.invoke).toHaveBeenCalled();
             expect(params.filePath).toEqual("/ROOT/../app/native/persistent/test.txt");
@@ -227,7 +225,7 @@ describe("io.filetransfer index", function () {
                 params = JSON.parse(arguments[1].substring(9, arguments[1].length));
             });
 
-            index.download(null, null, mocked_args, null);       
+            index.download(null, null, mocked_args, null);
 
             expect(JNEXT.invoke).toHaveBeenCalled();
             expect(params.target).toEqual("/ROOT/../app/native/persistent/test.txt");

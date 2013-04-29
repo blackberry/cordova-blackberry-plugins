@@ -20,15 +20,15 @@ var root = __dirname + "/../../../",
     index;
 
 describe("ui.toast index", function () {
-    var mockedOverlayWebview,
-        mockQnx,
+    var mockedWp,
+        mockedUI,
         mockedToast,
         mockedPluginResult,
         storedDismissHandler,
         storedCallbackHandler;
 
     beforeEach(function () {
-        mockedOverlayWebview = {
+        mockedUI = {
             toast : {
                 show : jasmine.createSpy("uiWebView.toast.show").andCallFake(function (message, options) {
                     storedCallbackHandler = options.callbackHandler;
@@ -38,21 +38,20 @@ describe("ui.toast index", function () {
             }
         };
 
-        mockQnx = {
-            webplatform: {
-                getController: function () {
-                    return {
-                        addEventListener: function (eventType, callback) {
-                            callback(mockedOverlayWebview);
-                        }
-                    };
-                },
-                createUIWebView: function () {
-                    return {
-                        toast : mockedToast
-                    };
-                }
-            }
+        mockedWp = {
+            getController: function () {
+                return {
+                    on: function (eventType, callback) {
+                        callback();
+                    }
+                };
+            },
+            createWebView: function () {
+                return {
+                    toast : mockedToast
+                };
+            },
+            ui: mockedUI
         };
 
         mockedPluginResult = {
@@ -61,10 +60,10 @@ describe("ui.toast index", function () {
         };
 
         GLOBAL.window = {
-            qnx: mockQnx
+            wp: mockedWp
         };
 
-        GLOBAL.qnx = mockQnx;
+        GLOBAL.wp = mockedWp;
 
         GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
@@ -73,7 +72,7 @@ describe("ui.toast index", function () {
 
     afterEach(function () {
         delete GLOBAL.window;
-        delete GLOBAL.qnx;
+        delete GLOBAL.wp;
         delete GLOBAL.PluginResult;
     });
 
@@ -85,7 +84,7 @@ describe("ui.toast index", function () {
             };
 
         index.show(noop, noop, mockArgs, null);
-        expect(mockedOverlayWebview.toast.show).toHaveBeenCalledWith("This is a toast", { buttonText : 'Test', callbackHandler: jasmine.any(Function), dismissHandler: jasmine.any(Function)});
+        expect(wp.ui.toast.show).toHaveBeenCalledWith("This is a toast", { buttonText : 'Test', callbackHandler: jasmine.any(Function), dismissHandler: jasmine.any(Function)});
         expect(mockedPluginResult.ok).toHaveBeenCalledWith({reason: "created", toastId: jasmine.any(Number)}, true);
 
         //test Callback Handler

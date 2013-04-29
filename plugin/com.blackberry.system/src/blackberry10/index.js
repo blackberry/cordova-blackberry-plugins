@@ -150,8 +150,8 @@ module.exports = {
             fontSize;
 
         try {
-            fontFamily = window.qnx.webplatform.getApplication().getSystemFontFamily();
-            fontSize = window.qnx.webplatform.getApplication().getSystemFontSize();
+            fontFamily = window.wp.getApplication().getSystemFontFamily();
+            fontSize = window.wp.getApplication().getSystemFontSize();
 
             result.ok({'fontFamily': fontFamily, 'fontSize': fontSize}, false);
         } catch (e) {
@@ -164,9 +164,9 @@ module.exports = {
             returnObj;
         try {
             returnObj = {
-                "hardwareId" : window.qnx.webplatform.device.hardwareId,
-                "softwareVersion" : window.qnx.webplatform.device.scmBundle,
-                "name" : window.qnx.webplatform.device.deviceName
+                "hardwareId" : window.wp.device.hardwareId,
+                "softwareVersion" : window.wp.device.scmBundle,
+                "name" : window.wp.device.deviceName
             };
             result.ok(returnObj, false);
         } catch (err) {
@@ -178,7 +178,7 @@ module.exports = {
         var result = new PluginResult(args, env),
             region;
         try {
-            region = window.qnx.webplatform.getApplication().systemRegion;
+            region = window.wp.getApplication().systemRegion;
             result.ok(region, false);
         } catch (e) {
             result.error(e.message, false);
@@ -188,7 +188,7 @@ module.exports = {
     getCurrentTimezone: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
         try {
-            result.ok(window.qnx.webplatform.device.timezone, false);
+            result.ok(window.wp.device.timezone, false);
         } catch (err) {
             result.error(err.message, false);
         }
@@ -197,7 +197,7 @@ module.exports = {
     getTimezones: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
         try {
-            window.qnx.webplatform.device.getTimezones(function (zones) {
+            window.wp.device.getTimezones(function (zones) {
                 result.ok(zones, false);
             });
         } catch (err) {
@@ -212,7 +212,7 @@ module.exports = {
             path = _utils.translatePath(JSON.parse(decodeURIComponent(args.wallpaper)));
             // Removing file:// form the path because newWallpaper can't handle it.
             path = path.replace(/file:\/\//, '');
-            window.qnx.webplatform.getApplication().newWallpaper(path);
+            window.wp.getApplication().newWallpaper(path);
             result.ok(null, false);
         } catch (err) {
             result.error(err.message, false);
@@ -227,7 +227,7 @@ module.exports = {
             callback = function (state) {
                 result.ok(state, false);
             };
-            window.qnx.webplatform.getApplication().isDeviceLocked(callback);
+            window.wp.getApplication().isDeviceLocked(callback);
         } catch (err) {
             result.error(err.message, false);
         }

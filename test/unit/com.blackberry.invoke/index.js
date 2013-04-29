@@ -43,8 +43,8 @@ describe("invoke index", function () {
         };
         mockedController = {
             dispatchEvent : jasmine.createSpy(),
-            addEventListener : jasmine.createSpy(),
-            removeEventListener : jasmine.createSpy()
+            on: jasmine.createSpy(),
+            un: jasmine.createSpy()
         };
         mockedApplication = {
             invocation: mockedInvocation,
@@ -55,14 +55,17 @@ describe("invoke index", function () {
         };
         GLOBAL.window = {};
         GLOBAL.window.qnx = {
-            callExtensionMethod : function () {},
-            webplatform: {
-                getApplication: function () {
-                    return mockedApplication;
-                },
-                getController : function () {
-                    return mockedController;
-                }
+            callExtensionMethod : function () {}
+        };
+        GLOBAL.window.wp = {
+            core: {
+                invocation: mockedInvocation
+            },
+            getApplication: function () {
+                return mockedApplication;
+            },
+            getController : function () {
+                return mockedController;
             }
         };
 
