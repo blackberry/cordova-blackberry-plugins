@@ -20,40 +20,35 @@
 var _ID = "com.blackberry.ui.contextmenu",
     _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/" + _ID,
-    client = null,
-    mockedWebworks = {
-        exec: jasmine.createSpy("exec").andCallFake(function (success, fail, service, action, args) {
-            success(true);
-        })
-    },
-    mockedEvent = {
-        addEventListener : jasmine.createSpy()
-    };
+    client = null;
 
 describe("com.blackberry.ui.contextmenu client", function () {
 
     beforeEach(function () {
-        GLOBAL.window = {
-            webworks: mockedWebworks,
-            blackberry : {
-                event : mockedEvent
-            },
+        GLOBAL.cordova = {
+            exec: jasmine.createSpy("exec").andCallFake(function (success) {
+                success(true);
+            }),
+            require: function () {
+                return cordova.exec;
+            }
         };
         client = require(_apiDir + "/www/client");
     });
 
     afterEach(function () {
-        delete GLOBAL.window;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
+        delete GLOBAL.cordova;
     });
 
     it("enabled context menu calls exec", function () {
         client.enabled = true;
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "enabled", {"enabled": true});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "enabled", {"enabled": true});
     });
 
     it("disabled context menu calls exec", function () {
         client.enabled = false;
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "enabled", {"enabled": false});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "enabled", {"enabled": false});
     });
 
     it('expect context menu contexts to be defined properly', function () {
@@ -109,20 +104,19 @@ describe("com.blackberry.ui.contextmenu client", function () {
         };
 
         client.defineCustomContext("myContext", options);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "defineCustomContext", {context: "myContext", options: options});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "defineCustomContext", {context: "myContext", options: options});
     });
 
     it("Can override an item with an action and handler", function () {
         var myItem = {actionId: 'OpenLink', label: 'This is a lable'},
             handler = jasmine.createSpy();
         client.overrideItem(myItem, handler);
-        expect(mockedEvent.addEventListener).toHaveBeenCalledWith('contextmenu.executeMenuAction', jasmine.any(Function));
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'overrideItem', {action: myItem});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'overrideItem', {action: myItem});
     });
 
     it("Can clear an item with an actionId", function () {
         var actionId = 'OpenLink';
         client.clearOverride(actionId);
-        expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'clearOverride', {actionId: actionId});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'clearOverride', {actionId: actionId});
     });
 });
