@@ -100,12 +100,14 @@ module.exports = {
         }
 
         if (_listeners[eventName][env.webview.id]) {
-            result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
-        } else {
-            context.addEventListener(systemEvent, listener);
-            _listeners[eventName][env.webview.id] = listener;
-            result.noResult(true);
+            //TODO: Change back to erroring out after reset is implemented
+            //result.error("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
+            context.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
         }
+
+        context.addEventListener(systemEvent, listener);
+        _listeners[eventName][env.webview.id] = listener;
+        result.noResult(true);
     },
 
     stopEvent: function (success, fail, args, env) {
