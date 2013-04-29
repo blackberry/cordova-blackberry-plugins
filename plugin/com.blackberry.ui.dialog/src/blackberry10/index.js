@@ -15,8 +15,6 @@
  */
 function validateIdMessageSettings(args) {
     
-    args.eventId = JSON.parse(decodeURIComponent(args.eventId));
-
     if (args.settings) {
         args.settings = JSON.parse(decodeURIComponent(args.settings));
     }
@@ -35,60 +33,63 @@ function validateIdMessageSettings(args) {
 }
 
 var dialog,
-    _event = require("../../lib/event"),
     overlayWebView = require('../../lib/overlayWebView'),
     _webview = require("../../lib/webview");
     
 module.exports = {
     customAskAsync: function (success, fail, args, env) {
+        var pluginResult = new PluginResult(args, env),
+            messageObj;
+
         if (validateIdMessageSettings(args) === 1) {
-            fail(-1, "message is undefined");
+            pluginResult.error("message is undefined", false);
             return;
         }
 
         if (args.buttons) {
             args.buttons = JSON.parse(decodeURIComponent(args.buttons));
         } else {
-            fail(-1, "buttons is undefined");
+            pluginResult.error("buttons is undefined", false);
             return;
         }
 
         if (!Array.isArray(args.buttons)) {
-            fail(-1, "buttons is not an array");
+            pluginResult.error("buttons is not an array", false);
             return;
         }
 
-        var messageObj = {
+        messageObj = {
             title : args.settings.title,
             htmlmessage :  args.message,
             dialogType : "CustomAsk",
             optionalButtons : args.buttons
         };
         overlayWebView.showDialog(messageObj, function (result) {
-            _event.trigger(args.eventId, result); 
+            pluginResult.callbackOk(result, false);
         });
-        success();
+        pluginResult.noResult(true);
     },
 
     standardAskAsync: function (success, fail, args, env) {
-        var buttons,
+        var pluginResult = new PluginResult(args, env),
+            buttons,
             returnValue = {},
             messageObj = {};
 
         if (validateIdMessageSettings(args) === 1) {
-            fail(-1, "message is undefined");
+            pluginResult.error("message is undefined", false);
             return;
         }
         
         if (args.type) {
             args.type = JSON.parse(decodeURIComponent(args.type));
         } else {
-            fail(-1, "type is undefined");
+            pluginResult.error("type is undefined", false);
             return;
         }
 
         if (args.type < 0 || args.type > 5) {
-            fail(-1, "invalid dialog type: " + args.type);
+            pluginResult.error("invalid dialog type: " + args.type, false);
             return;
         }
         
@@ -124,7 +125,7 @@ module.exports = {
                     }
                     returnValue.promptText = (result.oktext) ? decodeURIComponent(result.oktext) : null;
                 }
-                _event.trigger(args.eventId, returnValue); 
+                pluginResult.callbackOk(returnValue, false);
             });
         } else {
             messageObj = {
@@ -140,9 +141,9 @@ module.exports = {
                 } else {
                     returnValue.return = buttons[args.type][1];
                 }
-                _event.trigger(args.eventId, returnValue); 
+                pluginResult.callbackOk(returnValue, false);
             });
         }
-        success();
+        pluginResult.noResult(true);
     }
 };

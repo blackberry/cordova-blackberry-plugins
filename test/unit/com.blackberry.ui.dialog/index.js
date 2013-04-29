@@ -17,32 +17,34 @@
 var root = __dirname + "/../../../",
     webview = require(root + "lib/webview"),
     overlayWebView = require(root + "lib/overlayWebView"),
-    events = require(root + "lib/event"),
+    mockedPluginResult,
     index;
 
 describe("ui.dialog index", function () {
     beforeEach(function () {
-        //Set up mocking, no need to "spyOn" since spies are included in mock
-
         GLOBAL.JNEXT = {
             invoke : jasmine.createSpy(),
             require : jasmine.createSpy()
         };
-        spyOn(events, "trigger");
+        mockedPluginResult = {
+            callbackOk: jasmine.createSpy("PluginResult.callbackOk"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult")
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         index = require(root + "plugin/com.blackberry.ui.dialog/index");
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
+        delete GLOBAL.PluginResult;
+        delete require.cache[require.resolve(root + "plugin/com.blackberry.ui.dialog/index")];
     });
 
     it("makes sure that the dialog is called properly", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
+        var args = {};
 
         spyOn(webview, "windowGroup").andReturn(42);
-        args.eventId = "12345";
         args.message = "Hello World";
         args.buttons = [ "Yes", "No" ];
         args.settings = { title: "Hi" };
@@ -51,58 +53,40 @@ describe("ui.dialog index", function () {
         args.settings = encodeURIComponent(JSON.stringify(args.settings));
 
         spyOn(overlayWebView, "showDialog");
-        index.customAskAsync(successCB, failCB, args);
+        index.customAskAsync(null, null, args);
 
         expect(overlayWebView.showDialog).toHaveBeenCalled();
     });
 
     it("makes sure that a message is specified", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
-
-        args.eventId = "12345";
-        index.customAskAsync(successCB, failCB, args);
-
-        expect(failCB).toHaveBeenCalled();
+        index.customAskAsync(null, null, {});
+        expect(mockedPluginResult.error).toHaveBeenCalled();
     });
 
     it("makes sure that buttons are specified", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
-
-        args.eventId = "12345";
+        var args = {};
         args.message = "Hello World";
         args.message = encodeURIComponent(args.message);
-        index.customAskAsync(successCB, failCB, args);
-
-        expect(failCB).toHaveBeenCalled();
+        index.customAskAsync(null, null, args);
+        expect(mockedPluginResult.error).toHaveBeenCalled();
     });
     it("makes sure that buttons is an array", function () {
         var successCB = jasmine.createSpy(),
             failCB = jasmine.createSpy(),
             args = {buttons : 3};
-
-        args.eventId = "12345";
         args.message = "Hello World";
         args.message = encodeURIComponent(args.message);
-        index.customAskAsync(successCB, failCB, args);
-
-        expect(failCB).toHaveBeenCalledWith(-1, "buttons is not an array");
+        index.customAskAsync(null, null, args);
+        expect(mockedPluginResult.error).toHaveBeenCalledWith("buttons is not an array", false);
     });
 
     it("makes sure that the dialog is called properly for standard dialogs", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
+        var args = {};
 
         spyOn(webview, "windowGroup").andReturn(42);
-        args.eventId = "12345";
         args.message = "Hello World";
         args.type = 0;
         args.settings = { title: "Hi" };
-        args.eventId = encodeURIComponent(JSON.stringify(args.eventId));
         args.message = encodeURIComponent(args.message);
         args.type = encodeURIComponent(args.type);
         args.settings = encodeURIComponent(JSON.stringify(args.settings));
@@ -112,54 +96,38 @@ describe("ui.dialog index", function () {
                 "ok": true
             });
         });
-        index.standardAskAsync(successCB, failCB, args);
+        index.standardAskAsync(null, null, args);
 
         expect(overlayWebView.showDialog).toHaveBeenCalled();
-        expect(successCB).toHaveBeenCalledWith();
-        expect(events.trigger).toHaveBeenCalledWith("12345", {
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
+        expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith({
             "return": escape("Ok")
-        });
+        }, false);
     });
 
     it("makes sure that a message is specified for standard dialogs", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
-
-        args.eventId = "12345";
-        args.type = 1;
-        args.type = encodeURIComponent(args.type);
-        index.standardAskAsync(successCB, failCB, args);
-
-        expect(failCB).toHaveBeenCalledWith(-1, "message is undefined");
+        var args = { type: encodeURIComponent(1) };
+        index.standardAskAsync(null, null, args);
+        expect(mockedPluginResult.error).toHaveBeenCalledWith("message is undefined", false);
     });
 
     it("makes sure the type is specified for standard dialogs", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
-
-        args.eventId = "12345";
+        var args = {};
         args.message = "Hello World";
         args.message = encodeURIComponent(args.message);
-        index.standardAskAsync(successCB, failCB, args);
-
-        expect(failCB).toHaveBeenCalledWith(-1, "type is undefined");
+        index.standardAskAsync(null, null, args);
+        expect(mockedPluginResult.error).toHaveBeenCalledWith("type is undefined", false);
     });
 
     it("makes sure the type is valid for standard dialogs", function () {
-        var successCB = jasmine.createSpy(),
-            failCB = jasmine.createSpy(),
-            args = {};
-
-        args.eventId = "12345";
+        var args = {};
         args.message = "Hello World";
         args.type = 6;
         args.message = encodeURIComponent(args.message);
         args.type = encodeURIComponent(args.type);
 
-        index.standardAskAsync(successCB, failCB, args);
+        index.standardAskAsync(null, null, args);
 
-        expect(failCB).toHaveBeenCalledWith(-1, "invalid dialog type: 6");
+        expect(mockedPluginResult.error).toHaveBeenCalledWith("invalid dialog type: 6", false);
     });
 });

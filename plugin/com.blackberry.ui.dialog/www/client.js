@@ -18,41 +18,37 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.ui.dialog";
+    _ID = "com.blackberry.ui.dialog",
+    exec = cordova.require("cordova/exec");
 
-function S4() {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-}
-
-function guid() {
-    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+function defineReadOnlyField(obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
 }
 
 _self.customAskAsync = function (message, buttons, callback, settings) {
-    var args = { "eventId" : guid(), "message" : message, "buttons" : buttons, "callback" : callback};
+    var args = { "message" : message, "buttons" : buttons, "callback" : callback};
     if (settings) {
         args.settings = settings;
     }
-    
-    window.webworks.event.once(_ID, args.eventId, callback);
-    window.webworks.exec(function () {}, function () {}, _ID, "customAskAsync", args);
+    exec(callback, function () {}, _ID, "customAskAsync", args);
 };
 
 _self.standardAskAsync = function (message, type, callback, settings) {
-    var args = { "eventId" : guid(), "message" : message, "type" : type, "callback" : callback };
+    var args = { "message" : message, "type" : type, "callback" : callback };
     if (settings) {
         args.settings = settings;
     }
-
-    window.webworks.event.once(_ID, args.eventId, callback);
-    window.webworks.exec(function () {}, function () {}, _ID, "standardAskAsync", args);
+    exec(callback, function () {}, _ID, "standardAskAsync", args);
 };
 
-window.webworks.defineReadOnlyField(_self, "D_OK", 0);
-window.webworks.defineReadOnlyField(_self, "D_SAVE", 1);
-window.webworks.defineReadOnlyField(_self, "D_DELETE", 2);
-window.webworks.defineReadOnlyField(_self, "D_YES_NO", 3);
-window.webworks.defineReadOnlyField(_self, "D_OK_CANCEL", 4);
-window.webworks.defineReadOnlyField(_self, "D_PROMPT", 5);
+defineReadOnlyField(_self, "D_OK", 0);
+defineReadOnlyField(_self, "D_SAVE", 1);
+defineReadOnlyField(_self, "D_DELETE", 2);
+defineReadOnlyField(_self, "D_YES_NO", 3);
+defineReadOnlyField(_self, "D_OK_CANCEL", 4);
+defineReadOnlyField(_self, "D_PROMPT", 5);
 
 module.exports = _self;
