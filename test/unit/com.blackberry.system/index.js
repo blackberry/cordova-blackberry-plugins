@@ -66,15 +66,17 @@ describe("system index", function () {
                 eventName = "perimeterunlocked",
                 env = {webview: {id: 42 }};
 
+            spyOn(applicationEvents, "removeEventListener");
             spyOn(applicationEvents, "addEventListener");
 
             sysIndex.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             expect(applicationEvents.addEventListener).toHaveBeenCalledWith("windowUnlock", jasmine.any(Function));
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
 
-            //Will not start it twice
+            //Will start twice, and remove old event
             sysIndex.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
-            expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " already running for webview " + env.webview.id);
+            expect(applicationEvents.removeEventListener).toHaveBeenCalledWith("windowUnlock", jasmine.any(Function));
+            expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });
 
         it("stopEvent", function () {
