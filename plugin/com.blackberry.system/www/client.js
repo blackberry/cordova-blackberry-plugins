@@ -22,7 +22,7 @@ var _self = {},
     deviceProperties,
     noop = function () {},
     execFunc = cordova.require("cordova/exec"),
-    events = ["batterystatus", "batterylow", "battercritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
+    events = ["batterystatus", "batterylow", "batterycritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
     channels = events.map(function (eventName) {
         var thisChannel = cordova.addDocumentEventHandler(eventName),
             success = function (data) {
@@ -86,6 +86,10 @@ function defineReadOnlyField(obj, field, value) {
         "writable": false
     });
 }
+
+_self.hasPermission = function (module) {
+    return getFieldValue("hasPermission", {"module": module});
+};
 
 _self.hasCapability = function (capability) {
     return getFieldValue("hasCapability", {"capability": capability});
