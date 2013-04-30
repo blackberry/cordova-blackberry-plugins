@@ -56,7 +56,7 @@ describe("system client", function () {
     });
 
     it("defines events", function () {
-        var events = ["batterystatus", "batterylow", "battercritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"];
+        var events = ["batterystatus", "batterylow", "batterycritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"];
         events.forEach(function (event) {
             var channel;
 
