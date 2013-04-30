@@ -54,7 +54,7 @@ describe("identity client", function () {
         });
 
         it("exec should have been called once for all fields", function () {
-            expect(window.cordova.exec.callCount).toEqual(1);
+            expect(cordova.exec.callCount).toEqual(1);
         });
 
         it("uuid should call exec and value should be defined", function () {
@@ -78,9 +78,10 @@ describe("identity client", function () {
     describe("when user hasn't specified correct permission", function () {
 
         beforeEach(function () {
-            GLOBAL.window = {
-                cordova: {
-                    exec: jasmine.createSpy().andThrow("Cannot read PPS object")
+            GLOBAL.cordova = {
+                exec: jasmine.createSpy().andThrow("Cannot read PPS object"),
+                require: function () {
+                    return cordova.exec;
                 }
             };
             client = require(_apiDir + "/www/client");
@@ -88,8 +89,7 @@ describe("identity client", function () {
 
         afterEach(function () {
             delete require.cache[require.resolve(_apiDir + "/www/client")];
-            client = null;
-            delete GLOBAL.window;
+            delete GLOBAL.cordova;
         });
 
         it("uuid should call exec and catch error and return null", function () {
