@@ -112,10 +112,11 @@ JNEXT.Payment = function ()
     var self = this,
         hasInstance = false;
 
-    self.getErrorObject = function (state, errorID, errorText) {
+    self.getErrorObject = function (state, errorID, errorText, errorSubCode) {
         var result = {}, successState = {}, errorObject = {};
         successState["state"] = state;
         errorObject["errorID"] = errorID;
+        errorObject["errorCode"] = errorID;
         errorObject["errorText"] = errorText;
         result.successState = {};
         result.successState = successState;

@@ -33,6 +33,7 @@ function getMockErrorObj(msg) {
         },
         errorObject: {
             errorID: "-1",
+            errorCode: "-1",
             errorText: msg
         }
     };

@@ -46,7 +46,7 @@ function onPurchaseSuccess(purchasedItem) {
 
 function onPurchaseError(error) {
       console.log(error);
-      alert("Error occurred: " + error.errorText + ", " + error.errorID);
+      alert("Error occurred: " + error.errorText + ", " + error.errorID + ", " error.errorInfo);
 }
 
 
@@ -66,7 +66,7 @@ function onCancelSubSuccess(data) {
 
 function onCancelSubError(error) {
     console.log(error);
-    alert("Error occurred: " + error.errorText + ", " + error.errorID);
+    alert("Error occurred: " + error.errorText + ", " + error.errorID + ", " error.errorInfo);
 }
 
 
@@ -86,7 +86,7 @@ function onGetExistingPurchasesSuccess(purchases) {
 
 function onGetExistingPurchasesError(error) {
     alert("getExistingPurchases fail");
-    alert("Error occurred: " + error.errorText + ", " + error.errorID);
+    alert("Error occurred: " + error.errorText + ", " + error.errorID + ", " error.errorInfo);
 }
 
 function getPrice() {
@@ -105,13 +105,13 @@ function onGetPriceSuccess(data) {
         var initialPeriod = data.initialPeriod;
         var renewalPrice = data.renewalPrice;
         var renewalPeriod = data.renewalPeriod;
-        alert("Subscription Info: " + initialPeriod + "," + renewalPrice + "," + renewalPeriod);
+        alert("Subscription Info: " + initialPeriod + "," + renewalPrice + "," + renewalPeriod + ", " error.errorInfo);
     }
 }
 
 function onGetPriceError(error) {
     console.log(error);
-    alert("Error occurred: " + error.errorText + ", " + error.errorID);
+    alert("Error occurred: " + error.errorText + ", " + error.errorID + ", " error.errorInfo);
 }
 
 
@@ -130,7 +130,7 @@ function onCheckAppSubscriptionSuccess(data) {
 
 function onCheckAppSubscriptionError(error) {
   console.log(error);
-  alert("Error occurred: " + error.errorText + ", " + error.errorID);
+  alert("Error occurred: " + error.errorText + ", " + error.errorID + ", " error.errorInfo);
 }
 
 function checkExisting() {
@@ -148,5 +148,5 @@ function onCheckExistingSuccess(data) {
 
 function onCheckExistingError(error) {
     console.log(error);
-    alert("Error occurred: " + error.errorText + ", " + error.errorID);
+    alert("Error occurred: " + error.errorText + ", " + error.errorID + ", " error.errorInfo);
 }
