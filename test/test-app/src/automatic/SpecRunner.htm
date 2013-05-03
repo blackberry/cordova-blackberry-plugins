@@ -134,7 +134,7 @@
                 }
             }
             if (!isAutoLoaded) {
-                alert("The selected tests have been added, click the Run Jasmine button to execute the SpecRunner");    
+                alert("The selected tests have been added, click the Run Jasmine button to execute the SpecRunner");
             } else {
                 console.log("Load specs silently");
             }
@@ -182,7 +182,7 @@
                     setTimeout(function () {
                         console.log("Start Testing");
                         execJasmine();
-                        isAutoLoaded = false;  
+                        isAutoLoaded = false;
                     }, 2000);
                 }
             }
@@ -193,7 +193,7 @@
 
         document.addEventListener("webworksready", function () {
             startAutoTest();
-            
+
             document.getElementById('addSpecs').onclick = addChosenSpecs;
             document.getElementById('selectAll').onclick = function () {
                 setAllBoxes(true);
@@ -246,7 +246,6 @@
         <input type="checkbox" value="crossOrigin">crossOrigin</input><br />
         <input type="checkbox" value="enableFlash">enableFlash</input><br />
         <input type="checkbox" value="navigator.geolocation">navigator.geolocation</input><br />
-        <input type="checkbox" value="remoteFunctionCall">remoteFunctionCall</input><br />
     </form>
     <br />
 
