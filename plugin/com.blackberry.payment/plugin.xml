@@ -24,6 +24,9 @@
     </js-module>
 
     <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" />
+        <lib-file src="src/blackberry10/native/device/libpaymentjnext.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libpaymentjnext.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.payment" value="com.blackberry.payment" />
         </config-file>

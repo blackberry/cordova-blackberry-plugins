@@ -24,6 +24,9 @@
     </js-module>
 
     <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" />
+        <lib-file src="src/blackberry10/native/device/libpushjnext.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libpushjnext.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.push" value="com.blackberry.push" />
         </config-file>
