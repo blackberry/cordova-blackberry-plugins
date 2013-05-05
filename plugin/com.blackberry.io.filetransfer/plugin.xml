@@ -24,6 +24,9 @@
     </js-module>
 
     <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" />
+        <lib-file src="src/blackberry10/native/device/libfiletransfer.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libfiletransfer.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.io.filetransfer" value="com.blackberry.io.filetransfer" />
         </config-file>

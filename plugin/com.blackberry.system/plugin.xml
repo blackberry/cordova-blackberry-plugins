@@ -24,6 +24,7 @@
     </js-module>
 
     <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" />
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.system" value="com.blackberry.system" />
         </config-file>

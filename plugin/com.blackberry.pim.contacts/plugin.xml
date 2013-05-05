@@ -37,6 +37,21 @@
     <js-module src="src/blackberry10/ContactNews.js" />
     <js-module src="src/blackberry10/ContactActivity.js" />
     <platform name="blackberry10">
+        <source-file src="src/blackberry10/ContactActivity.js" />
+        <source-file src="src/blackberry10/ContactAddress.js" />
+        <source-file src="src/blackberry10/ContactError.js" />
+        <source-file src="src/blackberry10/ContactField.js" />
+        <source-file src="src/blackberry10/ContactFindOptions.js" />
+        <source-file src="src/blackberry10/ContactName.js" />
+        <source-file src="src/blackberry10/ContactNews.js" />
+        <source-file src="src/blackberry10/ContactOrganization.js" />
+        <source-file src="src/blackberry10/ContactPhoto.js" />
+        <source-file src="src/blackberry10/ContactPickerOptions.js" />
+        <source-file src="src/blackberry10/contactUtils.js" />
+        <source-file src="src/blackberry10/contactConsts.js" />
+        <source-file src="src/blackberry10/index.js" />
+        <lib-file src="src/blackberry10/native/device/libpimcontacts.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libpimcontacts.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts" />
         </config-file>

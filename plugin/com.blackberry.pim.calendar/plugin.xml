@@ -32,6 +32,13 @@
     <js-module src="src/blackberry10/CalendarFindOptions.js" />
     <js-module src="src/blackberry10/CalendarError.js" />
     <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" />
+        <source-file src="src/blackberry10/CalendarError.js" />
+        <source-file src="src/blackberry10/CalendarFindOptions.js" />
+        <source-file src="src/blackberry10/CalendarRepeatRule.js" />
+        <source-file src="src/blackberry10/calendarUtils.js" />
+        <lib-file src="src/blackberry10/native/device/libpimcalendar.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libpimcalendar.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.pim.calendar" value="com.blackberry.pim.calendar" />
         </config-file>

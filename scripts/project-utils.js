@@ -149,16 +149,11 @@ module.exports = {
 
     addPlugins: function (projectPath, plugins, done) {
         var pluginsPath = path.join(baseDir, 'plugin'),
-            fetchPlugin = "cordova/plugin fetch %s",
-            installPlugin = "cordova/plugin install %s",
+            addPlugin = "cordova/plugin add %s",
             task = jWorkflow.order();
 
         plugins.forEach(function (plugin) {
-            var cmd = util.format(fetchPlugin, path.join(pluginsPath, plugin));
-            task.andThen(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}));
-        });
-        plugins.forEach(function (plugin) {
-            var cmd = util.format(installPlugin, plugin);
+            var cmd = util.format(addPlugin, path.join(pluginsPath, plugin));
             task.andThen(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}));
         });
         task.start(function () {
