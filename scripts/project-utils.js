@@ -64,7 +64,7 @@ module.exports = {
     },
 
     createProject: function (projectPath, name, done) {
-        var create = util.format("./bin/create %s %s %s", projectPath, name, name);
+        var create = util.format(path.join("bin", "create") + " %s %s %s", projectPath, name, name);
 
         // Delete existing project folder
         if (fs.existsSync(projectPath)) {
@@ -80,7 +80,7 @@ module.exports = {
     },
 
     configProject: function (projectPath, targetName, targetIP, targetType, targetPassword, done) {
-        var cmd = "./cordova/target add %s %s %s";
+        var cmd = path.join('cordova', 'target') + " add %s %s %s";
         // No validation for targetName, type, ip, password here, target command will
         // take care the validation
         if (targetName && targetType && targetIP) {
@@ -137,7 +137,7 @@ module.exports = {
     },
 
     buildProject: function (projectPath, done) {
-        var cmd = "./cordova/build";
+        var cmd = path.join('cordova', 'build');
 
         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
         .start(function () {
@@ -149,7 +149,7 @@ module.exports = {
 
     addPlugins: function (projectPath, plugins, done) {
         var pluginsPath = path.join(baseDir, 'plugin'),
-            addPlugin = "cordova/plugin add %s",
+            addPlugin = path.join("cordova", "plugin") + " add %s",
             task = jWorkflow.order();
 
         plugins.forEach(function (plugin) {
