@@ -34,17 +34,21 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         projectFileBackuped = path.join(testAppPrj, '..', 'project.json'),
         projectFile = path.join(testAppPrj, 'project.json');
 
-    if (!targetIP && !targetType && !targetPassword && 
+    if (!targetIP && !targetType && !targetPassword &&
         fs.existsSync(path.join(testAppPrj, 'project.json'))) {
         preservingProject = true;
     }
 
     deployTest = jWorkflow.order();
     deployTest.andThen(function (prev, baton) {
-        baton.take();
-        prjUtils.setupRepo(branch ? branch : 'master', function () {
+        if (process.env.fast === "true") {
             baton.pass();
-        });
+        } else {
+            baton.take();
+            prjUtils.setupRepo(branch ? branch : 'master', function () {
+                baton.pass();
+            });
+        }
     })
     .andThen(function (prev, baton) {
         baton.take();
@@ -63,10 +67,10 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         if (!preservingProject) {
             prjUtils.configProject(testAppPrj, targetName, targetIP, targetType, targetPassword, function () {
                 baton.pass();
-            });    
+            });
         } else {
             baton.pass();
-        }  
+        }
     })
     .andThen(function (prev, baton) {
         baton.take();
@@ -118,5 +122,5 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
     .start(function () {
         console.log("DONE");
     });
-    
+
 };
