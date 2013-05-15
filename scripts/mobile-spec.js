@@ -26,13 +26,10 @@ var jWorkflow = require("jWorkflow"),
     projectPath = path.join(baseDir, "test", "mobile-spec/app"),
     projectName = "CordovaMobileSpec";
 
-
 function updateCordovaJSVersion() {
-    var content = fs.readFileSync(path.join(projectPath, 'www', 'cordova.js'), 'utf-8'),
-        version = fs.readFileSync(path.join(projectPath, 'www', 'VERSION'), 'utf-8').replace('\n', ''),
-        regex = /VERSION='(.*)'.*$/gm,
-        newContent = content.replace(regex.exec(content)[1],  version);
-    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.js'), newContent, 'utf-8');
+    var version = fs.readFileSync(path.join(projectPath, 'www', 'VERSION'), 'utf-8').replace('\n', ''),
+        content = fs.readFileSync(path.join(projectPath, 'www', 'cordova-' + version + '.js'), 'utf-8');
+    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.blackberry10.js'), content, 'utf-8');
 }
 
 module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
