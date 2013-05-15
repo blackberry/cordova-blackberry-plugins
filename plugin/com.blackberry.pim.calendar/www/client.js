@@ -24,8 +24,9 @@
  *   Methods:
  */
 
-var _self = {},
-    _ID = "blackberry.pim.calendar",
+var exec = cordova.require("cordova/exec"),
+    _self = {},
+    _ID = "com.blackberry.pim.calendar",
     CalendarEvent = require("./CalendarEvent"),
     CalendarError = require("./CalendarError"),
     CalendarFindOptions = require("./CalendarFindOptions"),
@@ -42,8 +43,8 @@ function getFolderKeyList(folders) {
     if (folders && Array.isArray(folders)) {
         folders.forEach(function (folder) {
             folderKeys.push({
-                "id": parseInt(folder.id, 10),
-                "accountId": parseInt(folder.accountId, 10)
+                "id": window.parseInt(folder.id, 10),
+                "accountId": window.parseInt(folder.accountId, 10)
             });
         });
     }
@@ -78,7 +79,7 @@ _self.getCalendarAccounts = function () {
         },
         accounts = [];
 
-    window.webworks.exec(success, fail, _ID, "getCalendarAccounts");
+    exec(success, fail, _ID, "getCalendarAccounts");
 
     obj.forEach(function (account) {
         accounts.push(new CalendarAccount(account));
@@ -96,7 +97,7 @@ _self.getDefaultCalendarAccount = function () {
             throw data;
         };
 
-    window.webworks.exec(success, fail, _ID, "getDefaultCalendarAccount");
+    exec(success, fail, _ID, "getDefaultCalendarAccount");
 
     // not a valid account - default account not accessible by app
     if (!obj || parseInt(obj.id, 10) <= 0) {
@@ -116,7 +117,7 @@ _self.getCalendarFolders = function () {
         },
         folders = [];
 
-    window.webworks.exec(success, fail, _ID, "getCalendarFolders");
+    exec(success, fail, _ID, "getCalendarFolders");
 
     obj.forEach(function (props) {
         folders.push(new CalendarFolder(props));
@@ -134,7 +135,7 @@ _self.getDefaultCalendarFolder = function () {
             throw data;
         };
 
-    window.webworks.exec(success, fail, _ID, "getDefaultCalendarFolder");
+    exec(success, fail, _ID, "getDefaultCalendarFolder");
 
     // not a valid folder - default folder not accessible by app
     if (!obj || obj.type <= 0) {
@@ -158,7 +159,7 @@ _self.getEvent = function (eventId, folder) {
         };
 
 
-    window.webworks.exec(success, fail, _ID, "getEvent", {
+    exec(success, fail, _ID, "getEvent", {
         "eventId": eventId,
         "accountId": folder.accountId
     });
@@ -171,9 +172,6 @@ _self.getEvent = function (eventId, folder) {
 };
 
 _self.findEvents = function (findOptions, onFindSuccess, onFindError) {
-    var callback,
-        eventId;
-
     if (!onFindSuccess || typeof onFindSuccess !== "function") {
         calendarUtils.invokeErrorCallback(onFindError, CalendarError.INVALID_ARGUMENT_ERROR);
         return;
@@ -188,45 +186,26 @@ _self.findEvents = function (findOptions, onFindSuccess, onFindError) {
         findOptions.filter.folders = getFolderKeyList(findOptions.filter.folders);
     }
 
-    callback = function (args) {
-        var result,
-            events,
-            tmp,
-            realEvents = [];
+    exec(
+        function (searchResult) {
+            var realEvents = [];
 
-        try {
-            tmp = unescape(args.result);
-            result = JSON.parse(tmp);
-            events = result.events;
-        } catch (e) {
-            result = {
-                "_success": false,
-                "code": CalendarError.UNKNOWN_ERROR
-            };
-        }
-
-        if (result._success) {
-            if (events) {
-                events.forEach(function (event) {
-                    event["folder"] = result.folders[event.accountId + "-" + event.folderId];
-                    realEvents.push(new CalendarEvent(calendarUtils.populateEvent(event)));
-                });
-            }
+            searchResult.events.forEach(function (event) {
+                event["folder"] = searchResult.folders[event.accountId + "-" + event.folderId];
+                realEvents.push(new CalendarEvent(calendarUtils.populateEvent(event)));
+            });
 
             onFindSuccess(realEvents);
-        } else {
-            calendarUtils.invokeErrorCallback(onFindError, result.code);
+        },
+        function (code) {
+            calendarUtils.invokeErrorCallback(onFindError, code);
+        },
+        _ID,
+        "find",
+        {
+            "options": findOptions
         }
-    };
-
-    eventId = calendarUtils.guid();
-
-    window.webworks.event.once(_ID, eventId, callback);
-
-    window.webworks.exec(function () {}, function () {}, _ID, "find", {
-        "_eventId": eventId,
-        "options": findOptions
-    });
+    );
 };
 
 _self.CalendarEvent = CalendarEvent;

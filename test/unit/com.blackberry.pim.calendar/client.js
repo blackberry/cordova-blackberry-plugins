@@ -19,32 +19,47 @@
 var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/com.blackberry.pim.calendar",
     _ID = "com.blackberry.pim.calendar",
-    calendar = require(_apiDir + "/www/client"),
-    CalendarFindOptions = calendar.CalendarFindOptions,
-    CalendarEvent = calendar.CalendarEvent,
-    CalendarRepeatRule = calendar.CalendarRepeatRule,
-    CalendarErr = calendar.CalendarError,
-    CalendarFolder = calendar.CalendarFolder,
-    CalendarEventFilter = calendar.CalendarEventFilter,
-    Attendee = calendar.Attendee,
-    mockedWebworks = {
-        exec: jasmine.createSpy("webworks.exec"),
-        event: {
-            once: jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                callback({
-                    result: escape(JSON.stringify({
-                        _success: true,
-                        contacts: []
-                    }))
-                });
-            })
+    calendar,
+    CalendarFindOptions,
+    CalendarEvent,
+    CalendarRepeatRule,
+    CalendarErr,
+    CalendarFolder,
+    CalendarEventFilter,
+    Attendee,
+    mockedExec = jasmine.createSpy("exec").andCallFake(function (success, fail, service, action, args) {
+        if (action === "getCalendarAccounts") {
+            success([
+                {id: 1, name: "account1", enterprise: false},
+                {id: 2, name: "account2", enterprise: true}
+            ]);
+        } else if (action === "getDefaultCalendarAccount") {
+            success({id: 1, name: "account1", enterprise: false});
+        } else if (action === "getCalendarFolders") {
+            success([
+                {id: 1, name: "folder1"},
+                {id: 2, name: "folder2"}
+            ]);
+        } else if (action === "getDefaultCalendarFolder") {
+            success({id: 1, name: "default folder"});
+        } else if (action === "getEvent") {
+            success({id: 1});
         }
-    };
+    });
 
 describe("pim.calendar/client", function () {
     beforeEach(function () {
-        GLOBAL.window = GLOBAL;
-        GLOBAL.window.webworks = mockedWebworks;
+        GLOBAL.cordova = {
+            require: jasmine.createSpy().andReturn(mockedExec)
+        };
+        GLOBAL.window = {
+            parseInt: jasmine.createSpy().andCallFake(function (obj) {
+                return Number(obj);
+            }),
+            isNaN: jasmine.createSpy().andCallFake(function (obj) {
+                return obj === "abc";
+            })
+        };
         calendar = require(_apiDir + "/www/client");
         CalendarFindOptions = calendar.CalendarFindOptions;
         CalendarEvent = calendar.CalendarEvent;
@@ -56,6 +71,7 @@ describe("pim.calendar/client", function () {
     });
 
     afterEach(function () {
+        delete GLOBAL.cordova;
         delete GLOBAL.window;
     });
 
@@ -82,17 +98,6 @@ describe("pim.calendar/client", function () {
     });
 
     describe("Testing getCalendarAccounts", function () {
-        beforeEach(function () {
-            GLOBAL.window.webworks.exec = jasmine.createSpy("webworks.exec").andCallFake(
-                function (success, fail, service, action, args) {
-                    success([
-                        {id: 1, name: "account1", enterprise: false},
-                        {id: 2, name: "account2", enterprise: true}
-                    ]);
-                }
-            );
-        });
-
         it("has method getCalendarAccounts", function () {
             expect(calendar.getCalendarAccounts).toBeDefined();
         });
@@ -116,17 +121,6 @@ describe("pim.calendar/client", function () {
     });
 
     describe("Testing getCalendarFolders", function () {
-        beforeEach(function () {
-            GLOBAL.window.webworks.exec = jasmine.createSpy("webworks.exec").andCallFake(
-                function (success, fail, service, action, args) {
-                    success([
-                        {id: 1, name: "folder1"},
-                        {id: 2, name: "folder2"}
-                    ]);
-                }
-            );
-        });
-
         it("has method getCalendarFolders", function () {
             expect(calendar.getCalendarFolders).toBeDefined();
         });
@@ -138,16 +132,6 @@ describe("pim.calendar/client", function () {
     });
 
     describe("Testing getDefaultCalendarFolder", function () {
-        beforeEach(function () {
-            GLOBAL.window.webworks.exec = jasmine.createSpy("webworks.execSync").andCallFake(
-                function (success, fail, service, action, args) {
-                    success([
-                        {id: 1, name: "default folder"}
-                    ]);
-                }
-            );
-        });
-
         it("has method getDefaultCalendarFolder", function () {
             expect(calendar.getDefaultCalendarFolder).toBeDefined();
         });
@@ -189,7 +173,9 @@ describe("pim.calendar/client", function () {
                     expect(error).toBeDefined();
                 });
             calendar.findEvents(findOptions, onSuccess, onError);
-            expect(window.webworks.exec).toHaveBeenCalled();
+            expect(mockedExec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "find", {
+                "options": findOptions
+            });
         });
     });
 });

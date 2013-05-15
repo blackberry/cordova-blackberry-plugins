@@ -21,21 +21,28 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.pim.calendar",
     CalendarEvent,
     CalendarError,
-    mockedWebworks = {
-        event: {}
-    };
+    mockedExec = jasmine.createSpy("exec");
 
 describe("pim.calendar CalendarEvent", function () {
     beforeEach(function () {
-        GLOBAL.window = GLOBAL;
-        GLOBAL.window.webworks = mockedWebworks;
+        GLOBAL.window = {
+            parseInt: jasmine.createSpy().andCallFake(function (obj) {
+                return Number(obj);
+            }),
+            isNaN: jasmine.createSpy().andCallFake(function (obj) {
+                return obj === "abc";
+            })
+        };
+        GLOBAL.cordova = {
+            require: jasmine.createSpy().andReturn(mockedExec)
+        };
         CalendarEvent = require(_apiDir + "/www/CalendarEvent");
         CalendarError = require(_apiDir + "/CalendarError");
-        mockedWebworks.exec = jasmine.createSpy("webworks.exec");
     });
 
     afterEach(function () {
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
     });
 
     describe("constructor", function () {
@@ -139,25 +146,11 @@ describe("pim.calendar CalendarEvent", function () {
                     "end": end
                 }),
                 onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: true,
-                            event: {
-                                "id": "1"
-                            }
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
+                onSaveError = jasmine.createSpy("onSaveError");
 
             evt.save(onSaveSuccess, onSaveError);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
-            expect(onSaveSuccess).toHaveBeenCalledWith(new CalendarEvent({"id": "1"}));
-            expect(onSaveError).not.toHaveBeenCalled();
+            expect(mockedExec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
         });
 
         it("calls the error callback if start/end date is missing", function () {
@@ -189,34 +182,6 @@ describe("pim.calendar CalendarEvent", function () {
             expect(onSaveSuccess).not.toHaveBeenCalled();
             expect(onSaveError).toHaveBeenCalledWith({"code": CalendarError.INVALID_ARGUMENT_ERROR});
         });
-
-        it("calls the error callback if success flag is false", function () {
-            var start = new Date("Jan 1, 2014, 12:00"),
-                end = new Date("Jan 1, 2014, 12:30"),
-                evt = new CalendarEvent({
-                    "start": start,
-                    "end": end
-                }),
-                onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: false,
-                            code: CalendarError.UNKNOWN_ERROR
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
-
-            evt.save(onSaveSuccess, onSaveError);
-
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
-            expect(onSaveSuccess).not.toHaveBeenCalled();
-            expect(onSaveError).toHaveBeenCalledWith(new CalendarError(CalendarError.UNKNOWN_ERROR));
-        });
-
     });
 
     describe("remove", function () {
@@ -232,23 +197,11 @@ describe("pim.calendar CalendarEvent", function () {
                     }
                 }),
                 onRemoveSuccess = jasmine.createSpy("onRemoveSuccess"),
-                onRemoveError = jasmine.createSpy("onRemoveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: true,
-                            id : 0
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
+                onRemoveError = jasmine.createSpy("onRemoveError");
 
             evt.remove(onRemoveSuccess, onRemoveError);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
-            expect(onRemoveSuccess).toHaveBeenCalledWith();
-            expect(onRemoveError).not.toHaveBeenCalled();
+            expect(mockedExec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
         });
 
         it("calls the error callback if event has no id", function () {

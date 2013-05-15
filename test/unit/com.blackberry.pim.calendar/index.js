@@ -19,15 +19,26 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.pim.calendar/",
     _libDir = __dirname + "/../../../lib/",
     utils = require(_libDir + "utils"),
-    events = require(_libDir + "event"),
     CalendarFindOptions = require(_apiDir + "CalendarFindOptions"),
-    CalendarEvent = require(_apiDir + "www/CalendarEvent"),
+    CalendarEvent,
     CalendarError = require(_apiDir + "CalendarError"),
     index,
-    mockJnextObjId = 123;
+    mockJnextObjId = 123,
+    mockedPluginResult = {
+        callbackOk: jasmine.createSpy(),
+        callbackError: jasmine.createSpy(),
+        noResult: jasmine.createSpy(),
+        ok: jasmine.createSpy(),
+        error: jasmine.createSpy()
+    },
+    mockedExec = jasmine.createSpy("exec");
 
 describe("pim.calendar/index", function () {
     beforeEach(function () {
+        GLOBAL.cordova = {
+            require: jasmine.createSpy().andReturn(mockedExec)
+        };
+        CalendarEvent = require(_apiDir + "www/CalendarEvent");
         GLOBAL.JNEXT = {
             require: jasmine.createSpy("JNEXT.require").andCallFake(function () {
                 return true;
@@ -76,12 +87,13 @@ describe("pim.calendar/index", function () {
                 }
             }
         };
-        spyOn(events, "trigger");
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
         GLOBAL.JNEXT = null;
+        GLOBAL.cordova = null;
         index = null;
     });
 
@@ -99,7 +111,6 @@ describe("pim.calendar/index", function () {
                 detail: CalendarFindOptions.DETAIL_AGENDA
             },
             args = {
-                _eventId: encodeURIComponent(JSON.stringify("abc")),
                 options: encodeURIComponent(JSON.stringify(findOptions))
             };
 
@@ -113,11 +124,10 @@ describe("pim.calendar/index", function () {
 
         args["options"]["sourceTimezone"] = window.qnx.webplatform.device.timezone;
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "find " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
+
     it("find - without correct permission specified", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
@@ -132,20 +142,12 @@ describe("pim.calendar/index", function () {
         spyOn(utils, "hasPermission").andReturn(false);
 
         index.find(successCb, failCb, {
-            _eventId: encodeURIComponent(JSON.stringify("abc")),
             fields: encodeURIComponent(JSON.stringify(["name"])),
             options: encodeURIComponent(JSON.stringify(findOptions))
         });
 
-        expect(events.trigger).toHaveBeenCalledWith(jasmine.any(String), {
-            "result": escape(JSON.stringify({
-                "_success": false,
-                "code": CalendarError.PERMISSION_DENIED_ERROR
-            }))
-        });
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("save - with correct permission specified", function () {
@@ -163,8 +165,6 @@ describe("pim.calendar/index", function () {
             }
         }
 
-        args["_eventId"] = encodeURIComponent(JSON.stringify("abc"));
-
         index.save(successCb, failCb, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
@@ -174,10 +174,8 @@ describe("pim.calendar/index", function () {
         args["sourceTimezone"] = window.qnx.webplatform.device.timezone;
         args["targetTimezone"] = "";
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "save " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("save - without correct permission specified", function () {
@@ -200,27 +198,18 @@ describe("pim.calendar/index", function () {
             }
         }
 
-        args["_eventId"] = encodeURIComponent(JSON.stringify("abc"));
-
         index.save(successCb, failCb, args);
 
-        expect(events.trigger).toHaveBeenCalledWith(jasmine.any(String), {
-            "result": escape(JSON.stringify({
-                "_success": false,
-                "code": CalendarError.PERMISSION_DENIED_ERROR
-            }))
-        });
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
+
     it("remove - with correct permission specified", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
             args = {
                 accountId : encodeURIComponent(JSON.stringify(1)),
                 calEventId : encodeURIComponent(JSON.stringify(2)),
-                _eventId : encodeURIComponent(JSON.stringify("abc")),
                 removeAll : encodeURIComponent(JSON.stringify(true))
             };
 
@@ -234,10 +223,8 @@ describe("pim.calendar/index", function () {
 
         args["sourceTimezone"] = window.qnx.webplatform.device.timezone;
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "remove " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("remove - without correct permission specified", function () {
@@ -249,19 +236,11 @@ describe("pim.calendar/index", function () {
         index.remove(successCb, failCb, {
             accountId : encodeURIComponent(JSON.stringify(1)),
             calEventId : encodeURIComponent(JSON.stringify(2)),
-            _eventId : encodeURIComponent(JSON.stringify("abc")),
             removeAll : encodeURIComponent(JSON.stringify(true))
         });
 
-        expect(events.trigger).toHaveBeenCalledWith(jasmine.any(String), {
-            "result": escape(JSON.stringify({
-                "_success": false,
-                "code": CalendarError.PERMISSION_DENIED_ERROR
-            }))
-        });
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getDefaultCalendarAccount - without correct permission specified", function () {
@@ -273,10 +252,8 @@ describe("pim.calendar/index", function () {
 
         index.getDefaultCalendarAccount(successCb, failCb, args);
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalledWith(null);
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getDefaultCalendarAccount - with correct permission specified", function () {
@@ -288,12 +265,10 @@ describe("pim.calendar/index", function () {
 
         index.getDefaultCalendarAccount(successCb, failCb, args);
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDefaultCalendarAccount");
-        expect(successCb).toHaveBeenCalledWith({
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith({
             id: "1"
-        });
-        expect(failCb).not.toHaveBeenCalled();
+        }, false);
     });
 
     it("getCalendarAccounts - without correct permission specified", function () {
@@ -305,10 +280,8 @@ describe("pim.calendar/index", function () {
 
         index.getCalendarAccounts(successCb, failCb, args);
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalledWith(null);
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getCalendarAccounts - with correct permission specified", function () {
@@ -320,12 +293,10 @@ describe("pim.calendar/index", function () {
 
         index.getCalendarAccounts(successCb, failCb, args);
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getCalendarAccounts");
-        expect(successCb).toHaveBeenCalledWith([{
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith([{
             id: "1"
-        }]);
-        expect(failCb).not.toHaveBeenCalled();
+        }], false);
     });
 
     it("getEvent - without correct permission specified", function () {
@@ -340,10 +311,8 @@ describe("pim.calendar/index", function () {
 
         index.getEvent(successCb, failCb, args);
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalledWith(null);
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getEvent - with correct permission specified", function () {
@@ -362,12 +331,10 @@ describe("pim.calendar/index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getEvent " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalledWith({
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith({
             id: "123"
-        });
-        expect(failCb).not.toHaveBeenCalled();
+        }, false);
     });
 
     it("getDefaultCalendarFolder  - with correct permission specified", function () {
@@ -377,9 +344,7 @@ describe("pim.calendar/index", function () {
         spyOn(utils, "hasPermission").andReturn(true);
  
         index.getDefaultCalendarFolder(successCb, failCb, {});
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDefaultCalendarFolder");
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.ok).toHaveBeenCalled();
     });
 });
