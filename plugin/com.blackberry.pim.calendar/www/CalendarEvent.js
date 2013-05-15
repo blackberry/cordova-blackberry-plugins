@@ -16,7 +16,8 @@
  specific language governing permissions and limitations
  under the License.
  */
-var CalendarEvent,
+var exec = cordova.require("cordova/exec"),
+    CalendarEvent,
     _ID = "com.blackberry.pim.calendar",
     calendarUtils = require("./calendarUtils"),
     CalendarError = require("./CalendarError"),
@@ -168,28 +169,19 @@ CalendarEvent.prototype.save = function (onSaveSuccess, onSaveError) {
         args.parentId = window.parseInt(this.parentId);
     }
 
-    args._eventId = calendarUtils.guid();
-
-    saveCallback = function (args) {
-        var result = JSON.parse(unescape(args.result)),
-            errorObj,
-            newEvent;
-
-        if (result._success) {
+    exec(
+        function (result) {
             if (successCallback) {
-                newEvent = new CalendarEvent(calendarUtils.populateEvent(result.event));
-                successCallback(newEvent);
+                successCallback(new CalendarEvent(calendarUtils.populateEvent(result.event)));
             }
-        } else {
+        }, 
+        function (code) {
             if (errorCallback) {
-                errorObj = new CalendarError(result.code);
-                errorCallback(errorObj);
+                errorCallback(new CalendarError(code));
             }
-        }
-    };
-
-    window.webworks.event.once(_ID, args._eventId, saveCallback);
-    window.webworks.exec(function () {}, function () {}, _ID, "save", args);
+        },
+        _ID, "save", args
+    );
 };
 
 CalendarEvent.prototype.remove = function (onRemoveSuccess, onRemoveError, removeAll) {
@@ -208,7 +200,6 @@ CalendarEvent.prototype.remove = function (onRemoveSuccess, onRemoveError, remov
 
     args.accountId = window.parseInt(this.folder.accountId);
     args.calEventId = window.parseInt(this.id);
-    args._eventId = calendarUtils.guid();
 
     // if event is not recurring, always remove all
     removeAll = !(this.recurrence && typeof removeAll === "boolean" && !removeAll);
@@ -220,26 +211,19 @@ CalendarEvent.prototype.remove = function (onRemoveSuccess, onRemoveError, remov
         args.dateToRemove = calendarUtils.preprocessDate(this.start);
     }
 
-    removeCallback = function (args) {
-        var result = JSON.parse(unescape(args.result)),
-            errorObj;
-
-        if (result._success) {
-            if (successCallback) {
-                successCallback();
-            }
-        } else {
-            if (errorCallback) {
-                errorObj = new CalendarError(result.code);
-                errorCallback(errorObj);
-            }
-        }
-    };
-
     // accountId is set only if the event is persisted in the device, if accountId is not set, there is nothing to do because the event has not been persisted;
     if (args.accountId) {
-        window.webworks.event.once(_ID, args._eventId, removeCallback);
-        window.webworks.exec(function () {}, function () {}, _ID, "remove", args);
+        exec(
+            function () {
+                if (successCallback) {
+                    successCallback();
+                }
+            }, function (code) {
+                if (errorCallback) {
+                    errorCallback(new CalendarError(code));
+                }
+            }, _ID, "remove", args
+        );
     } else {
         if (successCallback) {
             successCallback();
