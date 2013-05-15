@@ -916,7 +916,6 @@ describe("blackberry.pim.contacts", function () {
         it("open contact picker then close it", function () {
             var delay = 20000,
                 reason,
-                callback,
                 called = false,
                 onDone = jasmine.createSpy("onDone"),
                 onCancel = jasmine.createSpy("onCancel"),
@@ -924,20 +923,19 @@ describe("blackberry.pim.contacts", function () {
                     called = true;
                 }),
                 onCardClosed = jasmine.createSpy("onCardClosed").andCallFake(function (request) {
-                    blackberry.event.removeEventListener("onChildCardClosed", callback);
                     reason = request.reason;
                     called = true;
                 });
 
             contacts.invokeContactPicker({ mode: ContactPickerOptions.MODE_SINGLE }, onDone, onCancel, onInvoke);
 
-            waits(delay / 4);
+            waits(1000);
 
             runs(function () {
                 expect(onInvoke).toHaveBeenCalled();
 
                 called = false;
-                blackberry.event.addEventListener("onChildCardClosed", onCardClosed);
+                document.addEventListener("onChildCardClosed", onCardClosed);
                 blackberry.invoke.closeChildCard();
 
                 waitsFor(function () {

@@ -150,6 +150,7 @@ function validateFindArguments(findOptions) {
             }
         }
     }
+
     return !error;
 }
 
@@ -192,10 +193,6 @@ function validateContactsPickerOptions(options) {
     return isValid;
 }
 
-function S4() {
-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-}
-
 self = module.exports = {
     populateContact: function (contact) {
         if (contact.name) {
@@ -227,9 +224,6 @@ self = module.exports = {
     validateFindArguments: validateFindArguments,
     validateContactsPickerFilter: validateContactsPickerFilter,
     validateContactsPickerOptions: validateContactsPickerOptions,
-    guid: function () {
-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-    },
     deepclone: function (obj) {
         var newObj = obj instanceof Array ? [] : {},
             key;
