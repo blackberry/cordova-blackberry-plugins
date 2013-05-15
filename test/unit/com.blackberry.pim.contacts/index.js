@@ -16,17 +16,20 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.pim.contacts/",
     _libDir = __dirname + "/../../../lib/",
     utils = require(_libDir + "utils"),
-    events = require(_libDir + "event"),
     ContactFindOptions = require(_apiDir + "ContactFindOptions"),
-    Contact = require(_apiDir + "www/Contact"),
+    Contact,
     ContactName = require(_apiDir + "ContactName"),
     ContactError = require(_apiDir + "ContactError"),
     ContactPickerOptions = require(_apiDir + "ContactPickerOptions"),
     index,
-    mockJnextObjId = 123;
+    mockJnextObjId = 123,
+    mockedPluginResult;
 
 describe("pim.contacts index", function () {
     beforeEach(function () {
+        GLOBAL.cordova = {
+            require: jasmine.createSpy().andReturn(jasmine.createSpy())
+        };
         GLOBAL.JNEXT = {
             require: jasmine.createSpy("JNEXT.require").andCallFake(function () {
                 return true;
@@ -50,15 +53,32 @@ describe("pim.contacts index", function () {
                         getEnv: jasmine.createSpy().andReturn("personal")
                     })
                 }
-            }
+            },
+            parseInt: jasmine.createSpy().andCallFake(function (obj) {
+                return Number(obj);
+            }),
+            isNaN: jasmine.createSpy().andCallFake(function (obj) {
+                return obj === "abc";
+            })
         };
-        spyOn(events, "trigger");
+        mockedPluginResult = {
+            callbackOk: jasmine.createSpy(),
+            callbackError: jasmine.createSpy(),
+            noResult: jasmine.createSpy(),
+            ok: jasmine.createSpy(),
+            error: jasmine.createSpy()
+        };
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
+        Contact = require(_apiDir + "www/Contact");
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
         delete GLOBAL.window;
+        delete GLOBAL.cordova;
+        delete GLOBAL.PluginResult;
         index = null;
     });
 
@@ -82,7 +102,6 @@ describe("pim.contacts index", function () {
 
         spyOn(utils, "hasPermission").andReturn(true);
 
-        args._eventId = encodeURIComponent(JSON.stringify("abc"));
         args.fields = encodeURIComponent(JSON.stringify(["name"]));
         args.options = encodeURIComponent(JSON.stringify(findOptions));
 
@@ -92,10 +111,8 @@ describe("pim.contacts index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "find " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("find - without correct permission specified", function () {
@@ -112,20 +129,12 @@ describe("pim.contacts index", function () {
         spyOn(utils, "hasPermission").andReturn(false);
 
         index.find(successCb, failCb, {
-            _eventId: encodeURIComponent(JSON.stringify("abc")),
             fields: encodeURIComponent(JSON.stringify(["name"])),
             options: encodeURIComponent(JSON.stringify(findOptions))
         });
 
-        expect(events.trigger).toHaveBeenCalledWith(jasmine.any(String), {
-            "result": escape(JSON.stringify({
-                "_success": false,
-                "code": ContactError.PERMISSION_DENIED_ERROR
-            }))
-        });
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.callbackError).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("save - with correct permission specified", function () {
@@ -141,12 +150,12 @@ describe("pim.contacts index", function () {
         spyOn(utils, "hasPermission").andReturn(true);
 
         for (key in contact) {
-            if (contact.hasOwnProperty(key)) {
-                args[key] = encodeURIComponent(JSON.stringify(contact[key]));
+            if (key !== "id") {
+                if (contact.hasOwnProperty(key)) {
+                    args[key] = encodeURIComponent(JSON.stringify(contact[key]));
+                }
             }
         }
-
-        args["_eventId"] = encodeURIComponent(JSON.stringify("abc"));
 
         index.save(successCb, failCb, args);
 
@@ -156,11 +165,9 @@ describe("pim.contacts index", function () {
 
         args["isWork"] = false;
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(window.qnx.webplatform.getApplication().getEnv).toHaveBeenCalledWith("PERIMETER");
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "save " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("save - without correct permission specified", function () {
@@ -181,19 +188,9 @@ describe("pim.contacts index", function () {
             }
         }
 
-        args["_eventId"] = encodeURIComponent(JSON.stringify("abc"));
-
         index.save(successCb, failCb, args);
-
-        expect(events.trigger).toHaveBeenCalledWith(jasmine.any(String), {
-            "result": escape(JSON.stringify({
-                "_success": false,
-                "code": ContactError.PERMISSION_DENIED_ERROR
-            }))
-        });
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.callbackError).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("remove - with correct permission specified", function () {
@@ -204,7 +201,6 @@ describe("pim.contacts index", function () {
         spyOn(utils, "hasPermission").andReturn(true);
 
         args.contactId = encodeURIComponent(JSON.stringify(1));
-        args._eventId = encodeURIComponent(JSON.stringify("abc"));
 
         index.remove(successCb, failCb, args);
 
@@ -212,10 +208,8 @@ describe("pim.contacts index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "remove " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("remove - without correct permission specified", function () {
@@ -229,15 +223,8 @@ describe("pim.contacts index", function () {
             _eventId: encodeURIComponent(JSON.stringify("abc"))
         });
 
-        expect(events.trigger).toHaveBeenCalledWith(jasmine.any(String), {
-            "result": escape(JSON.stringify({
-                "_success": false,
-                "code": ContactError.PERMISSION_DENIED_ERROR
-            }))
-        });
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.callbackError).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getContact - without correct permission specified", function () {
@@ -251,10 +238,8 @@ describe("pim.contacts index", function () {
 
         index.getContact(successCb, failCb, args);
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalledWith(null);
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.error).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getContact - with correct permission specified", function () {
@@ -272,12 +257,10 @@ describe("pim.contacts index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        expect(events.trigger).not.toHaveBeenCalled();
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getContact " + JSON.stringify(args));
-        expect(successCb).toHaveBeenCalledWith({
+        expect(mockedPluginResult.ok).toHaveBeenCalledWith({
             id: "123"
-        });
-        expect(failCb).not.toHaveBeenCalled();
+        }, false);
     });
 
     it("invokeContactPicker - with correct permission specified", function () {
@@ -297,8 +280,7 @@ describe("pim.contacts index", function () {
 
         expect(window.qnx.webplatform.getApplication().invocation.addEventListener).toHaveBeenCalledWith("childCardClosed", jasmine.any(Function));
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "invokePicker " + JSON.stringify(args.options));
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("invokeContactPicker - without correct permission specified", function () {
@@ -312,8 +294,7 @@ describe("pim.contacts index", function () {
         });
 
         expect(JNEXT.invoke).not.toHaveBeenCalled();
-        expect(successCb).toHaveBeenCalled();
-        expect(failCb).not.toHaveBeenCalled();
+        expect(mockedPluginResult.callbackError).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("has getContactAccounts", function () {

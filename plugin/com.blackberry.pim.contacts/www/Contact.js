@@ -27,7 +27,7 @@ function saveArgumentsError(contact, onSuccess, onError) {
         return "onSuccess should be a function";
     }
 
-    if (contact.id !== null && isNaN(contact.id)) {
+    if (contact.id !== null && window.isNaN(contact.id)) {
         return "id is required and must be a number";
     }
 
@@ -144,7 +144,7 @@ function validateRemoveArguments(id, onSuccess, onError) {
         return false;
     }
 
-    if (id === null || id === "" || isNaN(id)) {
+    if (id === null || id === "" || window.isNaN(id)) {
         return false;
     }
 
@@ -232,38 +232,23 @@ Contact.prototype.save = function (onSaveSuccess, onSaveError) {
         args.id = window.parseInt(this.id);
     }
 
-    args._eventId = contactUtils.guid();
-
-    saveCallback = function (args) {
-        var result = JSON.parse(unescape(args.result)),
-            newContact,
-            errorObj;
-
-        if (result._success) {
-            if (successCallback) {
-                result.id = result.id.toString();
-                contactUtils.populateContact(result);
-
-                newContact = new Contact(result);
-                successCallback(newContact);
-            }
-        } else {
-            if (errorCallback && typeof(errorCallback) === "function") {
-                errorObj = new ContactError(result.code);
-                errorCallback(errorObj);
-            }
+    cordova.require("cordova/exec")(function (result) {
+        if (successCallback) {
+            result.id = result.id.toString();
+            contactUtils.populateContact(result);
+            successCallback(new Contact(result));
         }
-    };
-
-    window.webworks.event.once(_ID, args._eventId, saveCallback);
-    window.webworks.exec(function () {}, function () {}, _ID, "save", args);
+    }, function (code) {
+        if (errorCallback && typeof(errorCallback) === "function") {
+            errorCallback(new ContactError(code));
+        }
+    }, _ID, "save", args);
 };
 
 Contact.prototype.remove = function (onRemoveSuccess, onRemoveError) {
     var args = {},
         successCallback = onRemoveSuccess,
-        errorCallback = onRemoveError,
-        removeCallback;
+        errorCallback = onRemoveError;
 
     if (!validateRemoveArguments(this.id, successCallback, errorCallback)) {
         if (errorCallback && typeof(errorCallback) === "function") {
@@ -274,26 +259,16 @@ Contact.prototype.remove = function (onRemoveSuccess, onRemoveError) {
     }
 
     args.contactId = window.parseInt(this.id);
-    args._eventId = contactUtils.guid();
 
-    removeCallback = function (args) {
-        var result = JSON.parse(unescape(args.result)),
-            errorObj;
-
-        if (result._success) {
-            if (successCallback) {
-                successCallback();
-            }
-        } else {
-            if (errorCallback && typeof(errorCallback) === "function") {
-                errorObj = new ContactError(result.code);
-                errorCallback(errorObj);
-            }
+    cordova.require("cordova/exec")(function (result) {
+        if (successCallback && typeof(successCallback) === "function") {
+            successCallback();
         }
-    };
-
-    window.webworks.event.once(_ID, args._eventId, removeCallback);
-    window.webworks.exec(function () {}, function () {}, _ID, "remove", args);
+    }, function (code) {
+        if (errorCallback && typeof(errorCallback) === "function") {
+            errorCallback(new ContactError(code));
+        }
+    }, _ID, "remove", args);
 };
 
 Contact.prototype.clone = function () {

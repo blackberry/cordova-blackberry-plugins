@@ -18,20 +18,27 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.pim.contacts",
     Contact,
     ContactError,
-    mockedWebworks = {
-        event: {}
-    };
+    mockedExec = jasmine.createSpy("exec");
 
 describe("pim.contacts Contact", function () {
     beforeEach(function () {
-        GLOBAL.window = GLOBAL;
-        GLOBAL.window.webworks = mockedWebworks;
+        GLOBAL.cordova = {
+            require: jasmine.createSpy().andReturn(mockedExec)
+        };
+        GLOBAL.window = {
+            parseInt: jasmine.createSpy().andCallFake(function (obj) {
+                return Number(obj);
+            }),
+            isNaN: jasmine.createSpy().andCallFake(function (obj) {
+                return obj === "abc";
+            })
+        };
         Contact = require(_apiDir + "/www/Contact");
         ContactError = require(_apiDir + "/ContactError");
-        mockedWebworks.exec = jasmine.createSpy("webworks.exec");
     });
 
     afterEach(function () {
+        delete GLOBAL.cordova;
         delete GLOBAL.window;
     });
 
@@ -78,73 +85,32 @@ describe("pim.contacts Contact", function () {
     });
 
     describe("save", function () {
-        it("calls the success callback", function () {
+        it("calls exec", function () {
             var contact = new Contact(),
                 onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: true,
-                            id : 0
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
+                onSaveError = jasmine.createSpy("onSaveError");
 
             contact.save(onSaveSuccess, onSaveError);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
-            expect(onSaveSuccess).toHaveBeenCalledWith(new Contact({"id": "0"}));
-            expect(onSaveError).not.toHaveBeenCalled();
-        });
-
-        it("calls the error callback", function () {
-            var contact = new Contact(),
-                onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: false,
-                            code : ContactError.UNKNOWN_ERROR
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
-
-            contact.save(onSaveSuccess, onSaveError);
-
-            expect(onSaveSuccess).not.toHaveBeenCalled();
-            expect(onSaveError).toHaveBeenCalledWith({"code": ContactError.UNKNOWN_ERROR});
+            expect(mockedExec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
         });
 
         it("calls the error callback when onSaveSuccess is omitted", function () {
             var contact = new Contact(),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once");
-
-            GLOBAL.window.webworks.event.once = once;
+                onSaveError = jasmine.createSpy("onSaveError");
 
             contact.save(null, onSaveError);
 
-            expect(once).not.toHaveBeenCalled();
             expect(onSaveError).toHaveBeenCalledWith({"code": ContactError.INVALID_ARGUMENT_ERROR, message : 'onSuccess should be a function'});
         });
 
         it("calls the error callback when arguments are incorrect", function () {
             var contact = new Contact({"phoneNumbers": [{"value": "1234567890"}]}),
                 onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once");
-
-            GLOBAL.window.webworks.event.once = once;
+                onSaveError = jasmine.createSpy("onSaveError");
 
             contact.save(onSaveSuccess, onSaveError);
 
-            expect(once).not.toHaveBeenCalled();
             expect(onSaveSuccess).not.toHaveBeenCalled();
             expect(onSaveError).toHaveBeenCalledWith({"code": ContactError.INVALID_ARGUMENT_ERROR, message: "phoneNumbers.type at index 0 should be a string"});
         });
@@ -152,14 +118,10 @@ describe("pim.contacts Contact", function () {
         it("calls the error callback when the id is incorrect", function () {
             var contact = new Contact({"id": "abc"}),
                 onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
-                onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once");
-
-            GLOBAL.window.webworks.event.once = once;
+                onSaveError = jasmine.createSpy("onSaveError");
 
             contact.save(onSaveSuccess, onSaveError);
 
-            expect(once).not.toHaveBeenCalled();
             expect(onSaveSuccess).not.toHaveBeenCalled();
             expect(onSaveError).toHaveBeenCalledWith({"code": ContactError.INVALID_ARGUMENT_ERROR, message : 'id is required and must be a number'});
         });
@@ -171,17 +133,13 @@ describe("pim.contacts Contact", function () {
                 }),
                 onSaveSuccess = jasmine.createSpy("onSaveSuccess"),
                 onSaveError = jasmine.createSpy("onSaveError"),
-                once = jasmine.createSpy("webworks.event.once"),
                 result;
-
-            GLOBAL.window.webworks.event.once = once;
 
             contact.save(onSaveSuccess, onSaveError);
 
-            expect(once).toHaveBeenCalledWith(_ID, jasmine.any(String), jasmine.any(Function));
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
+            expect(mockedExec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "save", jasmine.any(Object));
 
-            result = mockedWebworks.exec.mostRecentCall.args[4];
+            result = mockedExec.mostRecentCall.args[4];
             expect(result.birthday).toBe("Thu Jan 01 1970");
             expect(result.anniversary).toBe("Sun Jul 01 1990");
         });
@@ -230,55 +188,19 @@ describe("pim.contacts Contact", function () {
 
     describe("remove", function () {
         it("calls the success callback", function () {
-            var contact = new Contact({"id": "0"}),
+            var contact = new Contact({"id": "1"}),
                 onRemoveSuccess = jasmine.createSpy("onRemoveSuccess"),
-                onRemoveError = jasmine.createSpy("onRemoveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: true,
-                            id : 0
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
+                onRemoveError = jasmine.createSpy("onRemoveError");
 
             contact.remove(onRemoveSuccess, onRemoveError);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
-            expect(onRemoveSuccess).toHaveBeenCalledWith();
-            expect(onRemoveError).not.toHaveBeenCalled();
-        });
-
-        it("calls the error callback", function () {
-            var contact = new Contact({"id": "0"}),
-                onRemoveSuccess = jasmine.createSpy("onRemoveSuccess"),
-                onRemoveError = jasmine.createSpy("onRemoveError"),
-                once = jasmine.createSpy("webworks.event.once").andCallFake(function (service, eventId, callback) {
-                    callback({
-                        result: escape(JSON.stringify({
-                            _success: false,
-                            code : ContactError.UNKNOWN_ERROR
-                        }))
-                    });
-                });
-
-            GLOBAL.window.webworks.event.once = once;
-
-            contact.remove(onRemoveSuccess, onRemoveError);
-
-            expect(onRemoveSuccess).not.toHaveBeenCalled();
-            expect(onRemoveError).toHaveBeenCalledWith({"code": ContactError.UNKNOWN_ERROR});
+            expect(mockedExec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "remove", jasmine.any(Object));
         });
 
         it("calls the error callback when the id is incorrect", function () {
             var contact = new Contact({"id": null}),
                 onRemoveSuccess = jasmine.createSpy("onRemoveSuccess"),
-                onRemoveError = jasmine.createSpy("onRemoveError"),
-                once = jasmine.createSpy("webworks.event.once");
-
-            GLOBAL.window.webworks.event.once = once;
+                onRemoveError = jasmine.createSpy("onRemoveError");
 
             contact.remove(onRemoveSuccess, onRemoveError);
             expect(onRemoveSuccess).not.toHaveBeenCalled();
@@ -287,10 +209,7 @@ describe("pim.contacts Contact", function () {
 
         it("calls the error callback when onRemoveSuccess is omitted", function () {
             var contact = new Contact({"id": null}),
-                onRemoveError = jasmine.createSpy("onRemoveError"),
-                once = jasmine.createSpy("webworks.event.once");
-
-            GLOBAL.window.webworks.event.once = once;
+                onRemoveError = jasmine.createSpy("onRemoveError");
 
             contact.remove(null, onRemoveError);
 

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
  
-var _self = {},
+var exec = cordova.require("cordova/exec"),
+    _self = {},
     _ID = "com.blackberry.pim.contacts",
     contactConsts = require("./contactConsts"),
     Contact = require("./Contact"),
@@ -29,9 +30,7 @@ var _self = {},
     ContactActivity = require("./ContactActivity"),
     ContactPickerOptions = require("./ContactPickerOptions"),
     ContactAccount = require("./ContactAccount"),
-    contactUtils = require("./contactUtils"),
-    _contactInvokeEventId = "invokeContactPicker.invokeEventId",
-    _contactPickerEventId = "invokeContactPicker.eventId";
+    contactUtils = require("./contactUtils");
 
 function invokeCallback(callback, args) {
     if (callback && typeof callback === "function") {
@@ -61,34 +60,26 @@ _self.find = function (contactFields, findOptions, onFindSuccess, onFindError) {
         return;
     }
 
-    callback = function (args) {
-        var result = JSON.parse(unescape(args.result)),
-            contacts = result.contacts,
-            realContacts = [];
-
-        if (result._success) {
-            if (contacts) {
-                contacts.forEach(function (contact) {
-                    contact.id = contact.id.toString();
-                    contactUtils.populateContact(contact);
-                    realContacts.push(new Contact(contact));
-                });
-            }
+    exec(
+        function (searchResult) {
+            var realContacts = [];
+            searchResult.forEach(function (contact) {
+                contact.id = contact.id.toString();
+                contactUtils.populateContact(contact);
+                realContacts.push(new Contact(contact));
+            });
             onFindSuccess(realContacts);
-        } else {
-            invokeCallback(onFindError, new ContactError(result.code));
+        }, 
+        function (code) {
+            invokeCallback(onFindError, new ContactError(code));
+        },
+        _ID,
+        "find",
+        {
+            "fields": contactFields,
+            "options": findOptions
         }
-    };
-
-    eventId = contactUtils.guid();
-
-    window.webworks.event.once(_ID, eventId, callback);
-
-    window.webworks.exec(function () {}, function () {}, _ID, "find", {
-        "_eventId": eventId,
-        "fields": contactFields,
-        "options": findOptions
-    });
+    );
 };
 
 _self.getContact = function (contactId) {
@@ -104,7 +95,7 @@ _self.getContact = function (contactId) {
             throw data;
         };
 
-    window.webworks.exec(success, fail, _ID, "getContact", {
+    exec(success, fail, _ID, "getContact", {
         "contactId": contactId
     });
 
@@ -156,13 +147,11 @@ _self.invokeContactPicker = function (options, onDone, onCancel, onInvoke) {
                 break;
             }
         },
-        invokeCallback = function (args) {
-            var result = JSON.parse(unescape(args.result)),
-                error;
+        invokeCallback = function (result) {
+            var  error;
 
             if (!result._success) {
                 error = new ContactError(result.code);
-                window.webworks.event.remove(_ID, _contactPickerEventId, doneCancelCallback);
             }
 
             if (onInvoke && typeof(onInvoke) === "function") {
@@ -181,15 +170,13 @@ _self.invokeContactPicker = function (options, onDone, onCancel, onInvoke) {
         }
     }
 
-    if (!window.webworks.event.isOn(_contactPickerEventId)) {
-        window.webworks.event.once(_ID, _contactPickerEventId, doneCancelCallback);
-    }
-
-    if (!window.webworks.event.isOn(_contactInvokeEventId)) {
-        window.webworks.event.once(_ID, _contactInvokeEventId, invokeCallback);
-    }
-
-    window.webworks.exec(function () {}, function () {}, _ID, "invokeContactPicker", {options: options || ""});
+    exec(function (result) {
+        if (result.type === "invoke") {
+            invokeCallback(result.result);
+        } else if (result.type === "doneCancel") {
+            doneCancelCallback(result.data, result.reason);
+        }
+    }, function () {}, _ID, "invokeContactPicker", {options: options || ""});
 };
 
 _self.getContactAccounts = function () {
@@ -202,7 +189,7 @@ _self.getContactAccounts = function () {
         },
         accounts = [];
 
-    window.webworks.exec(success, fail, _ID, "getContactAccounts");
+    exec(success, fail, _ID, "getContactAccounts");
 
     obj.forEach(function (account) {
         accounts.push(new ContactAccount(account));
