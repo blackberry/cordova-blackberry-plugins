@@ -41,7 +41,8 @@ int TimezoneUtils::offsetFromUtcToTz(QDateTime date, QString timezoneId, bool ig
         *error = true;
         return 0;
     }
-    cal->set(date.date().year(), date.date().month(), date.date().day(), date.time().hour(), date.time().minute());
+    // ICU calendar month is 0..11, and QDate::month value is 1..12, thus MUST month-1 here
+    cal->set(date.date().year(), date.date().month()-1, date.date().day(), date.time().hour(), date.time().minute());
     UDate udate = cal->getTime(errorCode);
     if (errorCode > 0) {
         *error = true;

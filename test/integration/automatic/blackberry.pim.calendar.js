@@ -779,6 +779,72 @@ describe("blackberry.pim.calendar", function () {
                 expect(errorCb).toHaveBeenCalled();
             });
         });
+
+        it('Can create an event with correct start/end datetime for different timezone: PR 321994', function() {
+            var events = [],
+                called = false,
+                i = 0,
+                // all time in timezone 'Europe/Sarajevo'
+                startTimes = [
+                    'Mar 21, 2013, 15:00', // 0: CET: 5hr time diffence to EDT
+                    'Mar 31, 2013, 09:00', // 1: CEST effects now: 6hr time diffence to EDT
+                    'Mar 31, 2013, 02:00', // 2: CEST
+                    'Mar 31, 2013, 03:00', // 3: CEST
+                    'Oct 27, 2013, 09:00', // 4: CET
+                    'Oct 27, 2013, 02:00', // 5: CET
+                    'Oct 27, 2013, 03:00', // 6: CET
+                    'Nov 03, 2013, 15:00', // 7: CET
+                    'Nov 03, 2013, 16:00', // 8: CET: 6hr time differenc to EST
+                    'Nov 03, 2013, 17:00'  // 9: CET
+                ],
+                expectedStart = [
+                    'Mar 21, 2013, 10:00', // 0: EDT
+                    'Mar 31, 2013, 03:00', // 1: EDT
+                    'Mar 30, 2013, 20:00', // 2: EDT
+                    'Mar 30, 2013, 21:00', // 3: EDT 
+                    'Oct 27, 2013, 04:00', // 4: EDT
+                    'Oct 26, 2013, 21:00', // 5: EDT
+                    'Oct 26, 2013, 22:00', // 6: EDT
+                    'Nov 03, 2013, 09:00', // 7: EST
+                    'Nov 03, 2013, 10:00', // 8: EST
+                    'Nov 03, 2013, 11:00'  // 9: EST
+                ],
+                success = jasmine.createSpy().andCallFake(function(saved) {
+                    expect(saved).toBeDefined();
+                    expect(saved.start.toISOString()).toEqual(new Date(expectedStart[i]).toISOString());
+                    called = true;
+                }),
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toEqual(CalendarError.INVALIDE_ARGUMENT_ERROR);
+                    called = true;
+                });
+
+            startTimes.forEach(function(dt) {
+                var start = new Date(dt),
+                    end = new Date(start.valueOf() + 3600 * 2 * 1000),
+                    event = cal.createEvent({
+                        "summary": "WebWorksTest: event start time test#",
+                        "location": "Somewhere",
+                        "start": start,
+                        "end": end,
+                        "timezone": "Europe/Sarajevo"
+                    });
+                runs(function() {
+                    event.summary = event.summary + i;
+                    event.save(success, fail);
+                });
+                waitsFor(function () {
+                    return called;
+                }, "Save event failed", timeout);
+                runs(function() {
+                    expect(success).toHaveBeenCalled();
+                    expect(fail).not.toHaveBeenCalled();
+                    called = false;
+                    ++i;
+                });
+            });
+        });
     });
 
     describe("Events with attendees", function () {
