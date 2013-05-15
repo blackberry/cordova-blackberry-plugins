@@ -22,7 +22,7 @@ module.exports = {
     },
     MOBILE_SPEC_REPOS: {
         "dir": path.normalize(__dirname + "/../test/cordova-mobile-spec"),
-        "url": "https://github.com/apache/cordova-mobile-spec.git"
+        "url": "https://github.com/blackberry/cordova-mobile-spec.git"
     },
     ROOT: path.normalize(__dirname + "/../"),
     TEMP: path.normalize(__dirname + "/../temp/"),
