@@ -49,7 +49,6 @@
     ],
 
     "node" : false,
-    "es5" : true,
     "browser" : true,
     "unused": false,
     "boss" : false,
