@@ -58,7 +58,6 @@ describe("identity client", function () {
         });
 
         it("uuid should call exec and value should be defined", function () {
-            var anyFunc = jasmine.any(Function);
             expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
             expect(cordova.exec).not.toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "uuid", null);
             expect(client.uuid).toEqual("0x12345678");
@@ -76,7 +75,6 @@ describe("identity client", function () {
     });
 
     describe("when user hasn't specified correct permission", function () {
-
         beforeEach(function () {
             GLOBAL.cordova = {
                 exec: jasmine.createSpy().andThrow("Cannot read PPS object"),
@@ -93,9 +91,9 @@ describe("identity client", function () {
         });
 
         it("uuid should call exec and catch error and return null", function () {
-            cordova.exec.andThrow("Cannot read PPS object");
+            var uuid = client.uuid;
+            expect(uuid).toEqual(null);
             expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
-            expect(client.uuid).toEqual(null);
         });
     });
 });

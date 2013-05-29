@@ -49,7 +49,6 @@ function processJnextSaveOrRemoveData(result, JnextData) {
 function processJnextFindData(eventId, eventHandler, JnextData) {
     var data = JnextData,
         i,
-        l,
         more = false,
         resultsObject = {},
         birthdayInfo;
@@ -63,11 +62,11 @@ function processJnextFindData(eventId, eventHandler, JnextData) {
     }
 
     // Concatenate results; do not add the same contacts
-    for (i = 0, l = eventHandler.searchResult.length; i < l; i++) {
+    for (i = 0; i < eventHandler.searchResult.length; i++) {
         resultsObject[eventHandler.searchResult[i].id] = true;
     }
 
-    for (i = 0, l = data.events.length; i < l; i++) {
+    for (i = 0; i < data.events.length; i++) {
         if (resultsObject[data.events[i].id]) {
             // Already existing
         } else {
