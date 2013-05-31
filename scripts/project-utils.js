@@ -33,31 +33,37 @@ var path = require('path'),
 
 module.exports = {
     setupRepo: function (branch, done) {
-        var clone = util.format("git clone %s %s", conf.CORDOVA_BB10_REPOS.url, cordovaDir),
-            checkout = util.format("git checkout %s", branch ? branch : 'master'),
+        var workflow = jWorkflow.order(),
+            clone = util.format("git clone %s %s", conf.CORDOVA_BB10_REPOS.url, cordovaDir),
+            checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
+            fetchAll = "git fetch --all --prune",
             npmInstall = "npm install";
-        // Delete existing cordova repos folder
+        // fetch all if cordova repos folder exists
         if (fs.existsSync(cordovaDir)) {
-            wrench.rmdirSyncRecursive(cordovaDir);
+            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
+        } else {
+            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
         }
-        jWorkflow.order(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}))
-            .andThen(utils.execCommandWithJWorkflow(checkout, {cwd: cordovaDir}))
-            .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}))
-            .start(function () {
-                done();
-            });
+        workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: cordovaDir}))
+        .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}))
+        .start(function () {
+            done();
+        });
     },
 
     setupMobileSpecRepo: function (branch, done) {
-        var clone = util.format("git clone %s %s", mobileSpecURL, mobileSpecDir),
-            checkout = util.format("git checkout %s", branch ? branch : 'master');
+        var workflow = jWorkflow.order(),
+            clone = util.format("git clone %s %s", mobileSpecURL, mobileSpecDir),
+            checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
+            fetchAll = "git fetch --all --prune";
 
-        // Delete existing cordova repos folder
+        // fetch all if the repos exists 
         if (fs.existsSync(mobileSpecDir)) {
-            wrench.rmdirSyncRecursive(mobileSpecDir);
+            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
+        } else {
+            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
         }
-        jWorkflow.order(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}))
-        .andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
+        workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
         .start(function () {
             done();
         });
@@ -137,7 +143,7 @@ module.exports = {
     },
 
     buildProject: function (projectPath, done) {
-        var cmd = path.join('cordova', 'build');
+        var cmd = path.join('cordova', 'run');
 
         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
         .start(function () {
