@@ -62,21 +62,21 @@ task('test', [], function () {
 }, true);
 
 desc("deploy and run test app on device/simulator" + DESC_NEW_LINE +
-    "Usage: jake deploy-test-app['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
-    "Example: jake deploy-test-app[nextBB10,mybb10,169.254.0.1,device,password]");
+    "Usage: jake deploy-test-app['remote/branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
+    "Example: jake deploy-test-app[origin/master,Z10,169.254.0.1,device,password]");
 task('deploy-test-app', ['build'], require('./scripts/test-app'), true);
 
 desc("deploy and run test suite on device/simulator" + DESC_NEW_LINE +
-    "Usage: jake deploy-test-suite['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
-    "Example: jake deploy-test-suite[nextBB10,mybb10,169.254.0.1,device,password]");
+    "Usage: jake deploy-test-suite['remote/branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
+    "Example: jake deploy-test-suite[origin/master,Z10,169.254.0.1,device,password]");
 task('deploy-test-suite', [], require('./scripts/test-suite'));
 
 desc("deploy and run cordova-mobile-spec on device/simulator" + DESC_NEW_LINE +
-    "Usage: jake deploy-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch']" + DESC_NEW_LINE +
-    "Example: jake deploy-mobile-spec[master,z10,169.254.0.1,device,abc123,master]");
+    "Usage: jake deploy-mobile-spec['remote/branch','targetname','ip','targettype','password','remote/branch']" + DESC_NEW_LINE +
+    "Example: jake deploy-mobile-spec[origin/master,z10,169.254.0.1,device,abc123,origin/master]");
 task('deploy-mobile-spec', [], require('./scripts/mobile-spec'));
 
 desc("run mobile spec auto test on device" + DESC_NEW_LINE +
-    "Usage: jake autorun-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch','couchdbIP']" + DESC_NEW_LINE +
-    "Example: jake autorun-mobile-spec[blackberry10,z10,169.254.0.1,device,abc123,master,169.254.0.2]");
+    "Usage: jake autorun-mobile-spec['remote/branch','targetname','ip','targettype','password','remote/branch','couchdbIP']" + DESC_NEW_LINE +
+    "Example: jake autorun-mobile-spec[origin/master,z10,169.254.0.1,device,abc123,origin/master,169.254.0.2]");
 task('autorun-mobile-spec', [], require('./scripts/autorun-mobile-spec'));
