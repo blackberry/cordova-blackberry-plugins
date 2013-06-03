@@ -94,7 +94,6 @@ describe("identity client", function () {
             var uuid = client.uuid;
             expect(uuid).toEqual(null);
             expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
-            expect(cordova.exec).toThrow("Cannot read PPS object");
         });
     });
 });

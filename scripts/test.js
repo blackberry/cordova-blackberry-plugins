@@ -21,7 +21,7 @@ var fs = require('fs'),
     _c = require('./conf');
 
 module.exports = function (done, custom) {
-    var jasmin = require('jasmine-node'),
+    var jasmine = require('jasmine-node'),
         plugins = (custom !==  null && fs.existsSync(custom)) ? [custom] : fs.readdirSync(path.join(_c.ROOT, "plugin")),
         specs = [],
         onComplete = function (runner) {
@@ -34,7 +34,7 @@ module.exports = function (done, custom) {
         };
 
     //setup cordova-blackberry repos
-    projectUtils.setupRepo('master', function() {
+    projectUtils.setupRepo('master', function () {
         // copy lib to temp folder
         utils.copyFolder(path.join(_c.CORDOVA_BB10_REPOS.dir, "blackberry10/framework/lib"), path.join(_c.TEMP, "lib"));
         // test files
@@ -54,7 +54,7 @@ module.exports = function (done, custom) {
             }
         });
 
-        jasmin.executeSpecsInFolder({
+        jasmine.executeSpecsInFolder({
             'specFolders': specs,
             'onComplete': onComplete,
             'isVerbose': false,

@@ -74,7 +74,6 @@ function _lintCPP() {
 
 module.exports = function (files, complete) {
     utils.copyFolder(path.join(_c.ROOT, "plugin"), path.join(_c.TEMP, "plugin"));
-    utils.copyFolder(path.join(_c.ROOT, "test/lib"), path.join(_c.TEMP, "lib"));
     utils.copyFolder(path.join(_c.ROOT, "scripts"), path.join(_c.TEMP, "scripts"));
     utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
     copyFile(path.join(_c.ROOT, ".jshintignore"), path.join(_c.TEMP, ".jshintignore"));
