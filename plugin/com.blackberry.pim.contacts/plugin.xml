@@ -50,8 +50,6 @@
         <source-file src="src/blackberry10/contactUtils.js" />
         <source-file src="src/blackberry10/contactConsts.js" />
         <source-file src="src/blackberry10/index.js" />
-        <lib-file src="src/blackberry10/native/device/libpimcontacts.so" arch="device"/>
-        <lib-file src="src/blackberry10/native/simulator/libpimcontacts.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts" />
         </config-file>
