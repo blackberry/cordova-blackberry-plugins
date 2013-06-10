@@ -19,7 +19,7 @@ var _extDir = __dirname + "/../../../plugin/",
     overlayWebView,
     mockedPluginResult,
     mockedContextMenu = {
-        addItem: jasmine.createSpy().andCallFake(function (success, fail, args, env) {
+        addItem: jasmine.createSpy().andCallFake(function (success, fail, args) {
             if (args && typeof args.handler === 'function') {
                 args.handler('Copy', '1');
             }
@@ -54,23 +54,24 @@ describe("com.blackberry.ui.contextmenu index", function () {
         GLOBAL.window = {
             qnx: mockedQnx
         };
-        contextmenu = require(_extDir + "com.blackberry.ui.contextmenu");
-        overlayWebView = require(_libDir + "overlayWebView");
-        overlayWebView.create();
-        overlayWebView.contextMenu = mockedContextMenu;
         mockedPluginResult = {
             ok: jasmine.createSpy("PluginResult.ok"),
             error: jasmine.createSpy("PluginResult.error"),
             noResult: jasmine.createSpy("PluginResult.noResult"),
             callbackOk: jasmine.createSpy("PluginResult.callbackOk")
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
+        contextmenu = require(_extDir + "com.blackberry.ui.contextmenu");
+        overlayWebView = require(_libDir + "overlayWebView");
+        overlayWebView.create();
+        overlayWebView.contextMenu = mockedContextMenu;
     });
 
     afterEach(function () {
         delete GLOBAL.qnx;
         delete GLOBAL.window;
-        delete GLOBAL.PluginResult;
+        delete require.cache[require.resolve(_extDir + "com.blackberry.ui.contextMenu")];
+        delete require.cache[require.resolve(_libDir + "overlayWebView")];
     });
 
     it("can set the enabled property to false properly", function () {
@@ -78,7 +79,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 enabled: false
             },
             env = {};
-        contextmenu.enabled(null, null, args, env);
+        contextmenu.enabled(mockedPluginResult, args, env);
         expect(overlayWebView.contextMenu.enabled).toEqual(false);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
     });
@@ -89,7 +90,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
             },
             env = {};
 
-        contextmenu.enabled(null, null, args, env);
+        contextmenu.enabled(mockedPluginResult, args, env);
         expect(overlayWebView.contextMenu.enabled).toEqual(true);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
     });
@@ -100,7 +101,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
             },
             env = {};
 
-        contextmenu.enabled(null, null, args, env);
+        contextmenu.enabled(mockedPluginResult, args, env);
         expect(mockedContextMenu.enabled).toEqual(true);
         args = {
             enabled: "false"
@@ -113,7 +114,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
     it("can add a custom menu item", function () {
         var args = {
                 contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'})),
+                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'}))
             },
             env = {},
             expectedArgs = {
@@ -122,7 +123,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 handler: jasmine.any(Function)
             };
 
-        contextmenu.addItem(null, null, args, env);
+        contextmenu.addItem(mockedPluginResult, args, env);
         expect(mockedContextMenu.addItem).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), expectedArgs, env);
     });
 
@@ -133,7 +134,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
             },
             env = {};
 
-        contextmenu.addItem(null, null, args, env);
+        contextmenu.addItem(mockedPluginResult, args, env);
         expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith("1", true);
     });
 
@@ -149,7 +150,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 actionId: id
             };
 
-        contextmenu.removeItem(null, null, args, env);
+        contextmenu.removeItem(mockedPluginResult, args, env);
         expect(mockedContextMenu.removeItem).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), expectedArgs, env);
     });
 
@@ -164,7 +165,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
             },
             env = {};
 
-        contextmenu.defineCustomContext(null, null, args, env);
+        contextmenu.defineCustomContext(mockedPluginResult, args, env);
         expect(mockedContextMenu.defineCustomContext).toHaveBeenCalledWith("myContext", {
             includeContextItems: ['IMAGE'],
             includePlatformItems: false,
@@ -185,7 +186,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 action: encodeURIComponent(JSON.stringify({actionId: 'Paste'}))
             },
             env = {};
-        contextmenu.overrideItem(null, null, args, env);
+        contextmenu.overrideItem(mockedPluginResult, args, env);
         expect(mockedContextMenu.overrideItem).toHaveBeenCalledWith({ actionId: 'Paste'}, jasmine.any(Function));
     });
 
@@ -194,7 +195,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 action: encodeURIComponent(JSON.stringify({actionId: 'MenuService-Share'}))
             },
             env = {};
-        contextmenu.overrideItem(null, null, args, env);
+        contextmenu.overrideItem(mockedPluginResult, args, env);
         expect(mockedContextMenu.overrideItem).toHaveBeenCalledWith({ actionId: 'MenuService-Share'}, jasmine.any(Function));
     });
 
@@ -203,7 +204,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 actionId: encodeURIComponent(JSON.stringify('Copy'))
             },
             env = {};
-        contextmenu.clearOverride(null, null, args, env);
+        contextmenu.clearOverride(mockedPluginResult, args, env);
         expect(mockedContextMenu.clearOverride).toHaveBeenCalledWith('Copy');
     });
 
@@ -212,7 +213,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                 actionId: encodeURIComponent(JSON.stringify('MenuService-Share'))
             },
             env = {};
-        contextmenu.clearOverride(null, null, args, env);
+        contextmenu.clearOverride(mockedPluginResult, args, env);
         expect(mockedContextMenu.clearOverride).toHaveBeenCalledWith('MenuService-Share');
     });
 

@@ -50,11 +50,10 @@ var _returnCallback,
     _listeners = {};
 
 module.exports = {
-    invoke: function (success, fail, args, env) {
+    invoke: function (result, args, env) {
         // if request contains invalid args, the invocation framework will provide error in callback
         // no validation done here
-        var result = new PluginResult(args, env),
-            request = JSON.parse(decodeURIComponent(args["request"])),
+        var request = JSON.parse(decodeURIComponent(args.request)),
             callback = function (error) {
                 if (error) {
                     result.callbackError(error, false);
@@ -67,9 +66,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    query: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            request = JSON.parse(decodeURIComponent(args["request"])),
+    query: function (result, args, env) {
+        var request = JSON.parse(decodeURIComponent(args.request)),
             callback = function (error, response) {
                 if (error) {
                     result.callbackError(error, false);
@@ -110,9 +108,7 @@ module.exports = {
         result.noResult(true);
     },
 
-    closeChildCard: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
-
+    closeChildCard: function (result, args, env) {
         try {
             window.qnx.webplatform.getApplication().invocation.closeChildCard();
             result.ok();
@@ -121,9 +117,8 @@ module.exports = {
         }
     },
 
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
             context = _actionMap[eventName].context,
             invokeEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -141,9 +136,8 @@ module.exports = {
         }
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             invokeEvent = _actionMap[eventName].event;
@@ -157,9 +151,8 @@ module.exports = {
         }
     },
 
-    returnInterruption : function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            request;
+    returnInterruption : function (result, args, env) {
+        var request;
 
         try {
             request = JSON.parse(decodeURIComponent(args.request));

@@ -22,10 +22,6 @@ describe("identity index", function () {
         index = require(_apiDir + "index");
     });
 
-    afterEach(function () {
-        index = null;
-    });
-
     describe("getFields", function () {
         beforeEach(function () {
             GLOBAL.window = {
@@ -42,12 +38,10 @@ describe("identity index", function () {
                 noResult: jasmine.createSpy("PluginResult.noResult"),
                 callbackOk: jasmine.createSpy("PluginResult.callbackOk")
             };
-            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
         });
 
         afterEach(function () {
             delete GLOBAL.window;
-            delete GLOBAL.PluginResult;
         });
 
         it("can call ok", function () {
@@ -59,7 +53,7 @@ describe("identity index", function () {
 
             window.qnx.webplatform.device = mockedDevice;
 
-            index.getFields();
+            index.getFields(mockedPluginResult);
 
             expect(mockedPluginResult.ok).toHaveBeenCalledWith({
                 uuid: mockedDevice.devicePin,
@@ -71,7 +65,7 @@ describe("identity index", function () {
 
         it("will call fail when the fields are missing", function () {
 
-            index.getFields();
+            index.getFields(mockedPluginResult);
 
             expect(mockedPluginResult.ok).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalledWith("Cannot retrieve data from system");
@@ -87,7 +81,7 @@ describe("identity index", function () {
                 }
             });
 
-            index.getFields();
+            index.getFields(mockedPluginResult);
 
             expect(mockedPluginResult.ok).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalledWith(errMsg);

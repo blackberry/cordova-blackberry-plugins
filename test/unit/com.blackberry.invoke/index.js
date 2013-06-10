@@ -21,6 +21,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoke/",
     mockedApplication,
     mockedController,
     mockedPluginResult,
+    mockedQnx,
     index,
     successCB,
     failCB,
@@ -53,8 +54,8 @@ describe("invoke index", function () {
                 }),
             removeEventListener : jasmine.createSpy()
         };
-        GLOBAL.window = {};
-        GLOBAL.window.qnx = {
+
+        mockedQnx = {
             callExtensionMethod : function () {},
             webplatform: {
                 getApplication: function () {
@@ -66,6 +67,10 @@ describe("invoke index", function () {
             }
         };
 
+        GLOBAL.window = {
+            qnx: mockedQnx
+        };
+
         mockedPluginResult = {
             callbackOk: jasmine.createSpy(),
             callbackError: jasmine.createSpy(),
@@ -74,32 +79,23 @@ describe("invoke index", function () {
             error: jasmine.createSpy()
         };
 
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
-
-        GLOBAL.qnx = GLOBAL.window.qnx;
+        GLOBAL.qnx = mockedQnx;
         index = require(_apiDir + "index");
-        successCB = jasmine.createSpy("success callback");
-        failCB = jasmine.createSpy("fail callback");
     });
 
     afterEach(function () {
-        mockedInvocation = null;
-        GLOBAL.window.qnx = null;
-        delete GLOBAL.PluginResult;
-        index = null;
-        successCB = null;
-        failCB = null;
+        delete GLOBAL.window;
+        delete GLOBAL.qnx;
     });
 
     describe("invoke", function () {
 
         it("can invoke with target", function () {
-            var successCB = jasmine.createSpy(),
-                mockedArgs = {
+            var mockedArgs = {
                     "request": encodeURIComponent(JSON.stringify({target: "abc.xyz"}))
                 };
 
-            index.invoke(successCB, null, mockedArgs);
+            index.invoke(mockedPluginResult, mockedArgs);
             expect(mockedInvocation.invoke).toHaveBeenCalledWith({
                 target: "abc.xyz"
             }, jasmine.any(Function));
@@ -113,7 +109,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify({uri: "http://www.rim.com"}))
                 };
 
-            index.invoke(successCB, null, mockedArgs);
+            index.invoke(mockedPluginResult, mockedArgs);
             expect(mockedInvocation.invoke).toHaveBeenCalledWith({
                 uri: "http://www.rim.com"
             }, jasmine.any(Function));
@@ -127,7 +123,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify({uri: "http://www.rim.com", file_transfer_mode: "PRESERVE"}))
                 };
 
-            index.invoke(successCB, null, mockedArgs);
+            index.invoke(mockedPluginResult, mockedArgs);
             expect(mockedInvocation.invoke).toHaveBeenCalledWith({
                 uri: "http://www.rim.com",
                 file_transfer_mode : "PRESERVE"
@@ -144,9 +140,7 @@ describe("invoke index", function () {
             VIEWER = 4;
 
         it("can query the invocation framework", function () {
-            var success = jasmine.createSpy(),
-                fail = jasmine.createSpy(),
-                request = {
+            var request = {
                     "action": "bb.action.OPEN",
                     "type": "image/*",
                     "target_type": ["APPLICATION", "VIEWER", "CARD"]
@@ -155,7 +149,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             delete request["target_type"];
             request["target_type_mask"] = APPLICATION | VIEWER | CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
@@ -175,7 +169,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             delete request["target_type"];
             request["target_type_mask"] = APPLICATION;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
@@ -195,7 +189,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             delete request["target_type"];
             request["target_type_mask"] = VIEWER;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
@@ -215,7 +209,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             delete request["target_type"];
             request["target_type_mask"] = CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
@@ -235,7 +229,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             delete request["target_type"];
             request["target_type_mask"] = APPLICATION | VIEWER | CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
@@ -255,7 +249,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
             expect(mockedPluginResult.callbackOk).toHaveBeenCalled();
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -273,7 +267,7 @@ describe("invoke index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.query(success, fail, args);
+            index.query(mockedPluginResult, args);
             request["target_type"] = ["INVALID_ENTRY"];
             request["target_type_mask"] = APPLICATION | VIEWER | CARD;
             expect(mockedInvocation.queryTargets).toHaveBeenCalledWith(request, jasmine.any(Function));
@@ -293,7 +287,7 @@ describe("invoke index", function () {
 
         describe("methods", function () {
             it("can call closeChildCard with success callback at the end", function () {
-                index.closeChildCard(successCB, failCB);
+                index.closeChildCard(mockedPluginResult);
                 expect(mockedInvocation.closeChildCard).toHaveBeenCalled();
                 expect(mockedPluginResult.ok).toHaveBeenCalled();
                 expect(mockedPluginResult.error).not.toHaveBeenCalled();
@@ -320,7 +314,7 @@ describe("invoke index", function () {
 
                 spyOn(invocationEvents, "addEventListener");
 
-                index.startEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("onchildcardclosed"))}, env);
+                index.startEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify("onchildcardclosed"))}, env);
 
                 expect(invocationEvents.addEventListener).toHaveBeenCalledWith("onchildcardclosed", jasmine.any(Function));
                 expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -335,7 +329,7 @@ describe("invoke index", function () {
 
                 spyOn(invocationEvents, "removeEventListener");
 
-                index.stopEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("onchildcardclosed"))}, env);
+                index.stopEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify("onchildcardclosed"))}, env);
 
                 expect(invocationEvents.removeEventListener).toHaveBeenCalledWith("onchildcardclosed", jasmine.any(Function));
                 expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
@@ -366,7 +360,7 @@ describe("invoke index", function () {
 
                 spyOn(invocationEvents, "addEventListener");
 
-                index.startEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("invocation.interrupted"))}, env);
+                index.startEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify("invocation.interrupted"))}, env);
                 expect(invocationEvents.addEventListener).toHaveBeenCalledWith("invocation.interrupted", jasmine.any(Function));
                 expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
             });
@@ -380,7 +374,7 @@ describe("invoke index", function () {
 
                 spyOn(invocationEvents, "removeEventListener");
 
-                index.stopEvent(successCB, failCB, {eventName: encodeURIComponent(JSON.stringify("invocation.interrupted"))}, env);
+                index.stopEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify("invocation.interrupted"))}, env);
                 expect(invocationEvents.removeEventListener).toHaveBeenCalledWith("invocation.interrupted", jasmine.any(Function));
                 expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
             });

@@ -18,6 +18,12 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.payment/",
     index,
     mockJnextObjId = 123,
     mockWindowGroup = "bar1234",
+    mockedPluginResult = {
+        ok: jasmine.createSpy("PluginResult.ok"),
+        error: jasmine.createSpy("PluginResult.error"),
+        noResult: jasmine.createSpy("PluginResult.noResult"),
+        callbackOk: jasmine.createSpy("PluginResult.callbackOk")
+    },
     bpsSuccess,
     mockSuccessResult = {
         successState: {
@@ -39,130 +45,125 @@ function getMockErrorObj(msg) {
 }
 
 function testPurchase(mockSuccess) {
-    var successCb = jasmine.createSpy("success"),
-        failCb = jasmine.createSpy("fail"),
-        args = {};
-
-    args.digitalGoodID = encodeURIComponent(JSON.stringify("12345"));
-    args.digitalGoodSKU = encodeURIComponent(JSON.stringify("abcde"));
-    args.digitalGoodName = encodeURIComponent(JSON.stringify("foo"));
-    args.metaData = encodeURIComponent(JSON.stringify("xyz"));
-    args.purchaseAppName = encodeURIComponent(JSON.stringify("app name"));
-    args.purchaseAppIcon = encodeURIComponent(JSON.stringify("app icon"));
-    args.extraParameters = encodeURIComponent(JSON.stringify(""));
+    var args = {
+            digitalGoodID: encodeURIComponent(JSON.stringify("12345")),
+            digitalGoodSKU: encodeURIComponent(JSON.stringify("abcde")),
+            digitalGoodName: encodeURIComponent(JSON.stringify("foo")),
+            metaData: encodeURIComponent(JSON.stringify("xyz")),
+            purchaseAppName: encodeURIComponent(JSON.stringify("app name")),
+            purchaseAppIcon: encodeURIComponent(JSON.stringify("app icon")),
+            extraParameters: encodeURIComponent(JSON.stringify(""))
+        },
+        jNextArgs = {
+        };
 
     bpsSuccess = mockSuccess;
 
-    index.purchase(successCb, failCb, args);
+    index.purchase(mockedPluginResult, args);
 
     Object.getOwnPropertyNames(args).forEach(function (key) {
-        args[key] = JSON.parse(decodeURIComponent(args[key]));
+        jNextArgs[key] = JSON.parse(decodeURIComponent(args[key]));
     });
 
-    args.windowGroup = mockWindowGroup;
+    jNextArgs.windowGroup = mockWindowGroup;
 
-    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "purchase " + JSON.stringify(args));
-    expect(successCb).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("Purchase Failed. Payment Service Error."));
+    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "purchase " + JSON.stringify(jNextArgs));
+    expect(mockedPluginResult.ok).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("Purchase Failed. Payment Service Error."));
+    expect(mockedPluginResult.error).not.toHaveBeenCalled();
 }
 
 function testCancelSubscription(mockSuccess) {
-    var successCb = jasmine.createSpy("success"),
-        failCb = jasmine.createSpy("fail"),
-        args = {};
-
-    args.transactionID = encodeURIComponent(JSON.stringify("12345"));
+    var transactionID = "12345",
+        args = {
+            transactionID: encodeURIComponent(JSON.stringify(transactionID))
+        },
+        jNextArgs = {
+            transactionID: transactionID,
+            windowGroup: mockWindowGroup
+        };
 
     bpsSuccess = mockSuccess;
 
-    index.cancelSubscription(successCb, failCb, args);
+    index.cancelSubscription(mockedPluginResult, args);
 
-    Object.getOwnPropertyNames(args).forEach(function (key) {
-        args[key] = JSON.parse(decodeURIComponent(args[key]));
-    });
-
-    args.windowGroup = mockWindowGroup;
-
-    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "cancelSubscription " + JSON.stringify(args));
-    expect(successCb).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("cancelSubscription Failed. Payment Service Error."));
+    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "cancelSubscription " + JSON.stringify(jNextArgs));
+    expect(mockedPluginResult.ok).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("cancelSubscription Failed. Payment Service Error."));
+    expect(mockedPluginResult.error).not.toHaveBeenCalled();
 }
 
 function testGetPrice(mockSuccess) {
-    var successCb = jasmine.createSpy("success"),
-        failCb = jasmine.createSpy("fail"),
-        args = {};
-
-    args.id = encodeURIComponent(JSON.stringify("123"));
-    args.sku = encodeURIComponent(JSON.stringify("abc"));
+    var args = {
+            id: encodeURIComponent(JSON.stringify("123")),
+            sku: encodeURIComponent(JSON.stringify("abc"))
+        },
+        jNextArgs = {
+            id: "123",
+            sku: "abc",
+            windowGroup: mockWindowGroup
+        };
 
     bpsSuccess = mockSuccess;
 
-    index.getPrice(successCb, failCb, args);
+    index.getPrice(mockedPluginResult, args);
 
-    Object.getOwnPropertyNames(args).forEach(function (key) {
-        args[key] = JSON.parse(decodeURIComponent(args[key]));
-    });
-
-    args.windowGroup = mockWindowGroup;
-
-    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getPrice " + JSON.stringify(args));
-    expect(successCb).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("getPrice Failed. Payment Service Error."));
+    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getPrice " + JSON.stringify(jNextArgs));
+    expect(mockedPluginResult.ok).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("getPrice Failed. Payment Service Error."));
+    expect(mockedPluginResult.error).not.toHaveBeenCalled();
 }
 
 function testGetExistingPurchases(mockSuccess) {
-    var successCb = jasmine.createSpy("success"),
-        failCb = jasmine.createSpy("fail"),
-        args = {};
-
-    args.refresh = encodeURIComponent(JSON.stringify(true));
+    var refresh = true,
+        args = {
+            refresh: encodeURIComponent(JSON.stringify(refresh))
+        },
+        jNextArgs = {
+            refresh: refresh,
+            windowGroup: mockWindowGroup
+        };
 
     bpsSuccess = mockSuccess;
 
-    index.getExistingPurchases(successCb, failCb, args);
+    index.getExistingPurchases(mockedPluginResult, args);
 
-    Object.getOwnPropertyNames(args).forEach(function (key) {
-        args[key] = JSON.parse(decodeURIComponent(args[key]));
-    });
-
-    args.windowGroup = mockWindowGroup;
-
-    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getExistingPurchases " + JSON.stringify(args));
-    expect(successCb).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("getExistingPurchases Failed. Payment Service Error."));
+    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getExistingPurchases " + JSON.stringify(jNextArgs));
+    expect(mockedPluginResult.ok).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("getExistingPurchases Failed. Payment Service Error."));
+    expect(mockedPluginResult.error).not.toHaveBeenCalled();
 }
 
 function testCheckExisting(mockSuccess) {
-    var successCb = jasmine.createSpy("success"),
-        failCb = jasmine.createSpy("fail"),
-        args = {};
-
-    args.id = encodeURIComponent(JSON.stringify("123"));
-    args.sku = encodeURIComponent(JSON.stringify("abc"));
+    var args = {
+            id: encodeURIComponent(JSON.stringify("123")),
+            sku: encodeURIComponent(JSON.stringify("abc"))
+        },
+        jNextArgs = {
+            id: "123",
+            sku: "abc",
+            windowGroup: mockWindowGroup
+        };
 
     bpsSuccess = mockSuccess;
 
-    index.checkExisting(successCb, failCb, args);
+    index.checkExisting(mockedPluginResult, args);
 
-    Object.getOwnPropertyNames(args).forEach(function (key) {
-        args[key] = JSON.parse(decodeURIComponent(args[key]));
-    });
-
-    args.windowGroup = mockWindowGroup;
-
-    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "checkExisting " + JSON.stringify(args));
-    expect(successCb).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("checkExisting Failed. Payment Service Error."));
+    expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "checkExisting " + JSON.stringify(jNextArgs));
+    expect(mockedPluginResult.ok).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("checkExisting Failed. Payment Service Error."));
+    expect(mockedPluginResult.error).not.toHaveBeenCalled();
 }
 
 describe("payment index", function () {
     beforeEach(function () {
-        GLOBAL.window = GLOBAL;
-        GLOBAL.window.qnx = {
-            webplatform: {
-                getController: function () {
-                    return {
-                        windowGroup: mockWindowGroup
-                    };
+        GLOBAL.window = {
+            qnx: {
+                webplatform: {
+                    getController: function () {
+                        return {
+                            windowGroup: mockWindowGroup
+                        };
+                    }
                 }
             }
         };
+
         GLOBAL.JNEXT = {
             require: jasmine.createSpy("JNEXT.require").andCallFake(function () {
                 return true;
@@ -179,37 +180,39 @@ describe("payment index", function () {
             }),
             registerEvents: jasmine.createSpy("JNEXT.registerEvent")
         };
+
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
-        index = null;
+        delete GLOBAL.window;
+        delete GLOBAL.JNEXT;
+        delete require.cache[require.resolve(_apiDir + "index")];
     });
 
     describe("developmentMode", function () {
         it("calling it with arg invoke jnext setDevelopmentMode", function () {
-            var successCb = jasmine.createSpy("success"),
-                failCb = jasmine.createSpy("fail"),
-                args = {};
+            var args = {
+                developmentMode: encodeURIComponent(JSON.stringify(true))
+            };
 
-            args.developmentMode = encodeURIComponent(JSON.stringify(true));
-
-            index.developmentMode(successCb, failCb, args);
+            index.developmentMode(mockedPluginResult, args);
 
             Object.getOwnPropertyNames(args).forEach(function (key) {
                 args[key] = JSON.parse(decodeURIComponent(args[key]));
             });
 
             expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "setDevelopmentMode " + JSON.stringify(args));
+            expect(mockedPluginResult.ok).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
 
         it("calling it without arg invoke jnext getDevelopmentMode", function () {
-            var successCb = jasmine.createSpy("success"),
-                failCb = jasmine.createSpy("fail");
-
-            index.developmentMode(successCb, failCb);
+            index.developmentMode(mockedPluginResult);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDevelopmentMode");
+            expect(mockedPluginResult.ok).toHaveBeenCalled();
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
     });
 

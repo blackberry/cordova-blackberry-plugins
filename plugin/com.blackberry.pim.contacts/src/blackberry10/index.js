@@ -151,9 +151,8 @@ function processJnextFindData(eventId, eventHandler, JnextData) {
 }
 
 module.exports = {
-    find: function (success, fail, args, env) {
+    find: function (result, args, env) {
         var findOptions = {},
-            result = new PluginResult(args, env),
             key;
 
         for (key in args) {
@@ -177,9 +176,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    getContact: function (success, fail, args, env) {
+    getContact: function (pluginResult, args, env) {
         var findOptions = {},
-            pluginResult = new PluginResult(args, env),
             results;
 
         if (!_utils.hasPermission(config, "access_pimdomain_contacts")) {
@@ -202,9 +200,8 @@ module.exports = {
         }
     },
 
-    save: function (success, fail, args, env) {
+    save: function (result, args, env) {
         var attributes = {},
-            result = new PluginResult(args, env),
             key,
             nativeEmails = [];
 
@@ -243,9 +240,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    remove: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            attributes = { "contactId" : JSON.parse(decodeURIComponent(args.contactId)) };
+    remove: function (result, args, env) {
+        var attributes = { "contactId" : JSON.parse(decodeURIComponent(args.contactId)) };
 
         if (!checkPermission(result)) {
             return;
@@ -262,9 +258,8 @@ module.exports = {
         }
     },
 
-    invokeContactPicker: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            options = JSON.parse(decodeURIComponent(args["options"])),
+    invokeContactPicker: function (result, args, env) {
+        var options = JSON.parse(decodeURIComponent(args["options"])),
             callback = function (args, reason) {
                 result.callbackOk({
                     "type": "doneCancel",
@@ -297,9 +292,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    getContactAccounts: function (success, fail, args, env) {
-        var result = {},
-            pluginResult = new PluginResult(args, env);
+    getContactAccounts: function (pluginResult, args, env) {
+        var result = {};
 
         if (!_utils.hasPermission(config, "access_pimdomain_contacts")) {
             pluginResult.callbackError(ContactError.PERMISSION_DENIED_ERROR, false);
@@ -310,7 +304,7 @@ module.exports = {
             pluginResult.ok(result.accounts, false);
         } else {
             pluginResult.error("Failed to get accounts", false);
-        }        
+        }
     }
 };
 
@@ -319,7 +313,7 @@ module.exports = {
 ///////////////////////////////////////////////////////////////////
 
 JNEXT.PimContacts = function ()
-{   
+{
     var self = this,
         hasInstance = false;
 
@@ -391,20 +385,20 @@ JNEXT.PimContacts = function ()
         }
 
         self.m_id = JNEXT.createObject("libpimcontacts.PimContacts");
-        
+
         if (self.m_id === "") {
             return false;
         }
 
         JNEXT.registerEvents(self);
     };
-   
+
     self.onEvent = function (strData) {
         var arData = strData.split(" "),
             strEventDesc = arData[0],
             eventHandler,
             args = {};
-            
+
         if (strEventDesc === "result") {
             args.result = escape(strData.split(" ").slice(2).join(" "));
             eventHandler = self.eventHandlers[arData[1]];
@@ -419,7 +413,7 @@ JNEXT.PimContacts = function ()
 
         }
     };
-    
+
     self.m_id = "";
     self.eventHandlers = {};
 

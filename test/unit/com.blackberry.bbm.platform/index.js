@@ -31,8 +31,6 @@ describe("bbm.platform index", function () {
         MockPluginResult.prototype.error = jasmine.createSpy("PluginResult.error");
         MockPluginResult.prototype.noResult = jasmine.createSpy("PluginResult.noResult");
 
-        GLOBAL.PluginResult = MockPluginResult;
-
         GLOBAL.JNEXT = {
             require: jasmine.createSpy().andReturn(true),
             createObject: jasmine.createSpy().andReturn("1"),
@@ -49,29 +47,27 @@ describe("bbm.platform index", function () {
     });
 
     afterEach(function () {
-        delete GLOBAL.PluginResult;
         delete GLOBAL.JNEXT;
-        index = null;
-        delete require.cache[require.resolve(_apiDir + "index")];
+        require.cache = {};
     });
 
     describe("bbm.platform", function () {
         describe("register", function () {
-            it("can call success", function () {
+            it("will call noResult initially", function () {
                 var options = { "uuid": "464d3ba0-caba-11e1-9b23-0800200c9a66" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.register(null, null, args, null);
+                index.register(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "register " + JSON.stringify(options));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("can call fail", function () {
+            it("will call error with invalid UUID", function () {
                 var options = { "uuid": "9b23-0800200c9a66" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.register(null, null, args, null);
+                index.register(new MockPluginResult(), args);
 
                 expect(MockPluginResult.prototype.error).toHaveBeenCalledWith("UUID is not valid length");
             });
@@ -82,75 +78,59 @@ describe("bbm.platform index", function () {
         describe("self profile", function () {
 
             it("appVersion", function () {
-                var success = jasmine.createSpy();
-
-                index.self.appVersion(success, null, null, null);
+                index.self.appVersion(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "appVersion");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("bbmsdkVersion", function () {
-                var success = jasmine.createSpy();
-
-                index.self.bbmsdkVersion(success, null, null, null);
+                index.self.bbmsdkVersion(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "bbmsdkVersion");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("displayName", function () {
-                var success = jasmine.createSpy();
-
-                index.self.displayName(success, null, null, null);
+                index.self.displayName(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "displayName");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("handle", function () {
-                var success = jasmine.createSpy();
-
-                index.self.handle(success, null, null, null);
+                index.self.handle(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "handle");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("personalMessage", function () {
-                var success = jasmine.createSpy();
-
-                index.self.personalMessage(success, null, null, null);
+                index.self.personalMessage(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "personalMessage");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("ppid", function () {
-                var success = jasmine.createSpy();
-
-                index.self.ppid(success, null, null, null);
+                index.self.ppid(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "ppid");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("status", function () {
-                var success = jasmine.createSpy();
-
-                index.self.status(success, null, null, null);
+                index.self.status(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "status");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("statusMessage", function () {
-                var success = jasmine.createSpy();
-
-                index.self.statusMessage(success, null, null, null);
+                index.self.statusMessage(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "statusMessage");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
 
@@ -158,7 +138,7 @@ describe("bbm.platform index", function () {
             it("can call getDisplayPicture", function () {
                 var args = {};
 
-                index.self.getDisplayPicture(null, null, args, null);
+                index.self.getDisplayPicture(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getDisplayPicture");
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
@@ -168,8 +148,7 @@ describe("bbm.platform index", function () {
 
         describe("setStatus", function () {
             it("can call setStatus and succeed", function () {
-                var success = jasmine.createSpy(),
-                    args,
+                var args,
                     status = "available",
                     statusMessage = "Hello World";
 
@@ -177,15 +156,15 @@ describe("bbm.platform index", function () {
                 statusMessage = encodeURIComponent(statusMessage);
                 args = { "status": JSON.stringify(status), "statusMessage": JSON.stringify(statusMessage) };
 
-                index.self.setStatus(success, null, args, null);
+                index.self.setStatus(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.setStatus " + JSON.stringify(args));
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
-            it("can call setStatus and fail", function () {
-                var fail = jasmine.createSpy(),
-                    args,
+            it("can call setStatus and result.error", function () {
+                var args,
                     status = "hello",
                     statusMessage = "";
 
@@ -193,36 +172,39 @@ describe("bbm.platform index", function () {
                 statusMessage = encodeURIComponent(statusMessage);
                 args = { "status": JSON.stringify(status), "statusMessage": JSON.stringify(statusMessage) };
 
-                index.self.setStatus(null, fail, args, null);
+                index.self.setStatus(new MockPluginResult(), args);
 
-                expect(fail).toHaveBeenCalled();
+                expect(JNEXT.invoke).not.toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).not.toHaveBeenCalled();
             });
         });
 
         describe("setPersonalMessage", function () {
             it("can call setPersonalMessage and succeed", function () {
-                var success = jasmine.createSpy(),
-                    args,
+                var args,
                     personalMessage = "Hello World";
 
                 args = { "personalMessage": encodeURIComponent(JSON.stringify(personalMessage)) };
 
-                index.self.setPersonalMessage(success, null, args, null);
+                index.self.setPersonalMessage(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.setPersonalMessage " + personalMessage);
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
             });
 
-            it("can call setPersonalMessage and fail", function () {
-                var fail = jasmine.createSpy(),
-                    args,
+            it("can call setPersonalMessage and error", function () {
+                var args,
                     personalMessage = "";
 
                 args = { "personalMessage": encodeURIComponent(JSON.stringify(personalMessage)) };
 
-                index.self.setPersonalMessage(null, fail, args, null);
+                index.self.setPersonalMessage(new MockPluginResult(), args);
 
-                expect(fail).toHaveBeenCalled();
+                expect(JNEXT.invoke).not.toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).not.toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalled();
             });
         });
 
@@ -231,20 +213,21 @@ describe("bbm.platform index", function () {
                 var displayPicture = "/tmp/avatar.gif",
                     args = {"displayPicture": encodeURIComponent(JSON.stringify(displayPicture))};
 
-                index.self.setDisplayPicture(null, null, args, null);
+                index.self.setDisplayPicture(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.setDisplayPicture " + displayPicture);
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("can call setDisplayPicture and fail", function () {
+            it("can call setDisplayPicture and error", function () {
                 var args,
                     displayPicture = "";
 
                 args = {"displayPicture": encodeURIComponent(JSON.stringify(displayPicture))};
 
-                index.self.setDisplayPicture(null, null, args, null);
+                index.self.setDisplayPicture(new MockPluginResult(), args);
 
+                expect(JNEXT.invoke).not.toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
@@ -252,22 +235,23 @@ describe("bbm.platform index", function () {
 
     describe("bbm.platform.users.profilebox", function () {
         describe("addItem", function () {
-            it("can call addItem and succeed", function () {
+            it("calls JNext and noResult", function () {
                 var options = { "text": "hello", "cookie": "hello" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.self.profilebox.addItem(null, null, args, null);
+                index.self.profilebox.addItem(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.addItem " + JSON.stringify(options));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("can call addItem and fail", function () {
+            it("calls result.error", function () {
                 var options = { "text": "", "cookie": "" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.self.profilebox.addItem(null, null, args, null);
+                index.self.profilebox.addItem(new MockPluginResult(), args);
 
+                expect(JNEXT.invoke).not.toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
@@ -277,29 +261,28 @@ describe("bbm.platform index", function () {
                 var options = { "text": "", "cookie" : "", "id": "abc123" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.self.profilebox.removeItem(null, null, args, null);
+                index.self.profilebox.removeItem(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.removeItem " + JSON.stringify(options));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("can call removeItem and fail", function () {
+            it("can call removeItem and error", function () {
                 var options = { "text": "", "cookie": "" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.self.profilebox.removeItem(null, null, args, null);
+                index.self.profilebox.removeItem(new MockPluginResult(), args);
 
+                expect(JNEXT.invoke).not.toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
 
         describe("clearItems", function () {
             it("can call clearItems and succeed", function () {
-                var success = jasmine.createSpy();
+                index.self.profilebox.clearItems(new MockPluginResult());
 
-                index.self.profilebox.clearItems(success, null, null, null);
-
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
 
@@ -308,41 +291,38 @@ describe("bbm.platform index", function () {
                 var options = { "icon": "/tmp/icon.png", "iconId": 123 },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.self.profilebox.registerIcon(null, null, args, null);
+                index.self.profilebox.registerIcon(new MockPluginResult(), args);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.registerIcon " + JSON.stringify(options));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
             });
 
-            it("can call registerIcon and fail", function () {
+            it("can call registerIcon and error", function () {
                 var options = { "icon": "" },
                     args = { "options": encodeURIComponent(JSON.stringify(options)) };
 
-                index.self.profilebox.registerIcon(null, null, args, null);
+                index.self.profilebox.registerIcon(new MockPluginResult(), args);
 
+                expect(JNEXT.invoke).not.toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));
             });
         });
 
         describe("getAccessible", function () {
             it("can call getAccessible and succeed", function () {
-                var success = jasmine.createSpy();
-
-                index.self.profilebox.getAccessible(success, null, null, null);
+                index.self.profilebox.getAccessible(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.getAccessible");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
 
         describe("getItems", function () {
             it("can call getItems and succeed", function () {
-                var success = jasmine.createSpy();
-
-                index.self.profilebox.getItems(success, null, null, null);
+                index.self.profilebox.getItems(new MockPluginResult());
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.getItems");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
     });
@@ -375,12 +355,9 @@ describe("bbm.platform index", function () {
         });
 
         it("calls users inviteToDownload", function () {
-            var success = jasmine.createSpy("success"),
-                fail = jasmine.createSpy("fail");
-
-            index.users.inviteToDownload(success, fail, null);
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            index.users.inviteToDownload(new MockPluginResult());
+            expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
+            expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
             expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "users.inviteToDownload");
         });
     });
@@ -398,8 +375,7 @@ describe("bbm.platform index", function () {
                     trigger = listener;
                 });
 
-
-                index.startEvent(null, null, args, env);
+                index.startEvent(new MockPluginResult(), args, env);
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
                 expect(context.addEventListener).toHaveBeenCalledWith(eventName, jasmine.any(Function));
@@ -407,7 +383,7 @@ describe("bbm.platform index", function () {
                 trigger({});
                 expect(MockPluginResult.prototype.callbackOk).toHaveBeenCalled();
 
-                index.stopEvent(null, null, args, env);
+                index.stopEvent(new MockPluginResult(), args, env);
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalledWith(true);
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
                 expect(context.removeEventListener).toHaveBeenCalledWith(eventName, jasmine.any(Function));

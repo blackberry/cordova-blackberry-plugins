@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -62,11 +62,11 @@ function invokeClientCallback(result, field, successCb, errorCb, errorMsg) {
 }
 
 function getXHRFailCallback(clientFailCb) {
-    return function (code, msg) {
+    return function (err) {
             if (clientFailCb && typeof clientFailCb === "function") {
                 clientFailCb({
-                    errorID: code,
-                    errorText: msg
+                    errorID: err.code,
+                    errorText: err.msg
                 });
             }
         };

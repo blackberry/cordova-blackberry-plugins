@@ -22,10 +22,9 @@ var filetransfer,
     resultObjs = {};
 
 module.exports = {
-    upload: function (success, fail, args, env) {
+    upload: function (result, args, env) {
         var key,
             key2,
-            result = new PluginResult(args, env),
             params = {
                 "filePath": "",
                 "server": "",
@@ -89,9 +88,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    download: function (success, fail, args, env) {
+    download: function (result, args, env) {
         var key,
-            result = new PluginResult(args, env),
             undefined_params = [];
 
         resultObjs[result.callbackId] = result;

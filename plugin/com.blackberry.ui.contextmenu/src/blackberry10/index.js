@@ -19,9 +19,9 @@ var LIB_FOLDER = "../../lib/",
     _overlayWebView,
     _utils = require(LIB_FOLDER + 'utils');
 
-function enabled(success, fail, args, env) {
-    var result = new PluginResult(args, env),
-        _enabled;
+function enabled(result, args) {
+    var _enabled;
+
     if (typeof args.enabled !== 'undefined') {
         _enabled = JSON.parse(decodeURIComponent(args.enabled));
         if (typeof(_enabled) === 'boolean') {
@@ -33,8 +33,7 @@ function enabled(success, fail, args, env) {
     }
 }
 
-function overrideItem(success, fail, args, env) {
-    var result = new PluginResult(args, env);
+function overrideItem(result, args) {
     args.action = JSON.parse(decodeURIComponent(args.action));
     args.handler = function (actionId) {
         result.callbackOk(null, true);
@@ -46,14 +45,12 @@ function overrideItem(success, fail, args, env) {
     }
 }
 
-function clearOverride(success, fail, args, env) {
-    var result = new PluginResult(args, env),
-        actionId = JSON.parse(decodeURIComponent(args.actionId));
+function clearOverride(result, args) {
+    var actionId = JSON.parse(decodeURIComponent(args.actionId));
     result.ok(_overlayWebView.contextMenu.clearOverride(actionId), false);
 }
 
-function addItem(success, fail, args, env) {
-    var result = new PluginResult(args, env);
+function addItem(result, args, env) {
     args.contexts = JSON.parse(decodeURIComponent(args.contexts));
     args.action = JSON.parse(decodeURIComponent(args.action));
     args.handler = function (actionId, elementId) {
@@ -66,8 +63,7 @@ function addItem(success, fail, args, env) {
     }, args, env);
 }
 
-function removeItem(success, fail, args, env) {
-    var result = new PluginResult(args, env);
+function removeItem(result, args, env) {
     args.contexts = JSON.parse(decodeURIComponent(args.contexts));
     args.actionId = JSON.parse(decodeURIComponent(args.actionId));
     _overlayWebView.contextMenu.removeItem(function (data) {
@@ -77,8 +73,7 @@ function removeItem(success, fail, args, env) {
     }, args, env);
 }
 
-function defineCustomContext(success, fail, args, env) {
-    var result = new PluginResult(args, env);
+function defineCustomContext(result, args) {
     args.context = JSON.parse(decodeURIComponent(args.context));
     args.options = JSON.parse(decodeURIComponent(args.options));
     _overlayWebView.contextMenu.defineCustomContext(args.context, args.options);

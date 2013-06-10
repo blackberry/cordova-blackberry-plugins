@@ -85,9 +85,8 @@ function processJnextFindData(eventId, eventHandler, JnextData) {
 }
 
 module.exports = {
-    find: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            parsedArgs = {},
+    find: function (result, args, env) {
+        var parsedArgs = {},
             key;
 
         for (key in args) {
@@ -118,9 +117,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    save: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            attributes = {},
+    save: function (result, args, env) {
+        var attributes = {},
             key;
 
         for (key in args) {
@@ -152,9 +150,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    remove: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            attributes = {
+    remove: function (result, args, env) {
+        var attributes = {
                 "accountId" : JSON.parse(decodeURIComponent(args.accountId)),
                 "calEventId" : JSON.parse(decodeURIComponent(args.calEventId)),
                 "removeAll" : JSON.parse(decodeURIComponent(args.removeAll))
@@ -181,9 +178,7 @@ module.exports = {
         result.noResult(true);
     },
 
-    getDefaultCalendarAccount: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
-
+    getDefaultCalendarAccount: function (result, args, env) {
         if (!_utils.hasPermission(config, "access_pimdomain_calendars")) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
             return;
@@ -192,9 +187,7 @@ module.exports = {
         result.ok(pimCalendar.getInstance().getDefaultCalendarAccount(), false);
     },
 
-    getCalendarAccounts: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
-
+    getCalendarAccounts: function (result, args, env) {
         if (!_utils.hasPermission(config, "access_pimdomain_calendars")) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
             return;
@@ -203,9 +196,8 @@ module.exports = {
         result.ok(pimCalendar.getInstance().getCalendarAccounts(), false);
     },
 
-    getEvent: function (success, fail, args, env) {
-        var pluginResult = new PluginResult(args, env),
-            findOptions = {},
+    getEvent: function (pluginResult, args, env) {
+        var findOptions = {},
             results,
             event = null;
 
@@ -232,9 +224,7 @@ module.exports = {
         }
     },
 
-    getCalendarFolders: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
-
+    getCalendarFolders: function (result, args, env) {
         if (!checkPermission()) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
             return;
@@ -243,9 +233,7 @@ module.exports = {
         result.ok(pimCalendar.getInstance().getCalendarFolders(), false);
     },
 
-    getDefaultCalendarFolder: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
-
+    getDefaultCalendarFolder: function (result, args, env) {
         if (!checkPermission()) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
             return;
