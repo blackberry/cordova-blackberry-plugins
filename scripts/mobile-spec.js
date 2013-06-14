@@ -26,12 +26,6 @@ var jWorkflow = require("jWorkflow"),
     projectPath = path.join(baseDir, "test", "mobile-spec/app"),
     projectName = "CordovaMobileSpec";
 
-function updateCordovaJSVersion() {
-    var version = fs.readFileSync(path.join(projectPath, 'www', 'VERSION'), 'utf-8').replace('\n', ''),
-        content = fs.readFileSync(path.join(projectPath, 'www', 'cordova-' + version + '.js'), 'utf-8');
-    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.blackberry10.js'), content, 'utf-8');
-}
-
 module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
     var tasks = jWorkflow.order(),
         preservingProject = false,
@@ -86,10 +80,6 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         prjUtils.copyMobileSpec(projectPath, conf.MOBILE_SPEC_REPOS.dir, function () {
             baton.pass();
         });
-    })
-    .andThen(function (prev, baton) {
-        updateCordovaJSVersion();
-        console.log("Updated cordova version");
     })
     .andThen(function (prev, baton) {
         baton.take();
