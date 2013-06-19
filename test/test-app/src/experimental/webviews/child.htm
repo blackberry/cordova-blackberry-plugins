@@ -7,7 +7,7 @@
         <script>
             (function () {
                 window.addEventListener("load", function (e) {
-                    document.addEventListener("webworksready", function () {
+                    document.addEventListener("deviceready", function () {
                         document.body.innerHTML += (new Date()) + ":\n blackberry.app.name = " + blackberry.app.name + "<br />";
 
                         blackberry.event.addEventListener("webviewready", function (e) {

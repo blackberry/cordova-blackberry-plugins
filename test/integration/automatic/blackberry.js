@@ -22,6 +22,6 @@ describe("blackberry", function () {
 
 describe("webworks", function () {
 	it('should exist', function () {
-		expect(window.webworks).toBeDefined();
-	});	
+		expect(cordova).toBeDefined();
+	});
 });

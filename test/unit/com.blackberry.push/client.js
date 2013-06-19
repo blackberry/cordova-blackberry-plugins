@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,7 +21,6 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.push",
     _apiDir = _extDir + "/" + _ID,
     client,
-    mockedWebworks = {},
     constants = {
         "SUCCESS" : 0,
         "INTERNAL_ERROR" : 500,
@@ -49,70 +48,38 @@ var _extDir = __dirname + "/../../../plugin",
         "INVALID_PPG_URL" : 10114,
         "CREATE_CHANNEL_OPERATION" : 1,
         "DESTROY_CHANNEL_OPERATION" : 2
-    },
-    constantsLength = 0,
-    defineROFieldArgs = [];
+    };
 
 function unloadClient() {
     // explicitly unload client for it to be loaded again
     delete require.cache[require.resolve(_apiDir + "/www/client")];
-    client = null;
 }
 
 describe("push", function () {
     beforeEach(function () {
-        mockedWebworks.exec = jasmine.createSpy();
-        mockedWebworks.defineReadOnlyField = jasmine.createSpy();
-        GLOBAL.window = {
-            webworks: mockedWebworks
+        GLOBAL.cordova = {
+            require: function () {
+                return cordova.exec;
+            },
+            exec: jasmine.createSpy("exec")
         };
-        // client needs to be required for each test
         client = require(_apiDir + "/www/client");
-        Object.getOwnPropertyNames(constants).forEach(function (c) {
-            defineROFieldArgs.push([client.PushService, c, constants[c]]);
-            constantsLength += 1;
-        });
-        spyOn(console, "error");
     });
 
     afterEach(function () {
         unloadClient();
-        defineROFieldArgs = [];
-        delete GLOBAL.window;
+        delete GLOBAL.cordova;
     });
 
     describe("push constants", function () {
-        it("call defineReadOnlyField for each constant", function () {
-            expect(mockedWebworks.defineReadOnlyField.callCount).toEqual(constantsLength);
-        });
-
         it("call defineReadOnlyField with right params", function () {
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("SUCCESS")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INTERNAL_ERROR")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_DEVICE_PIN")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_PROVIDER_APPLICATION_ID")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CHANNEL_ALREADY_DESTROYED")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CHANNEL_ALREADY_DESTROYED_BY_PROVIDER")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_PPG_SUBSCRIBER_STATE")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("PPG_SUBSCRIBER_NOT_FOUND")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("EXPIRED_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("PPG_SUBSCRIBER_LIMIT_REACHED")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_OS_VERSION_OR_DEVICE_MODEL_NUMBER")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CHANNEL_SUSPENDED_BY_PROVIDER")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CREATE_SESSION_NOT_DONE")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("MISSING_PPG_URL")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("PUSH_TRANSPORT_UNAVAILABLE")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("OPERATION_NOT_SUPPORTED")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CREATE_CHANNEL_NOT_DONE")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("MISSING_PORT_FROM_PPG")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("MISSING_SUBSCRIPTION_RETURN_CODE_FROM_PPG")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("PPG_SERVER_ERROR")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("MISSING_INVOKE_TARGET_ID")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("SESSION_ALREADY_EXISTS")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("INVALID_PPG_URL")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("CREATE_CHANNEL_OPERATION")]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain(defineROFieldArgs[Object.getOwnPropertyNames(constants).indexOf("DESTROY_CHANNEL_OPERATION")]);
+            Object.getOwnPropertyNames(constants).forEach(function (c) {
+                var propertyDescriptor = Object.getOwnPropertyDescriptor(client.PushService, c);
+                if (!propertyDescriptor) console.log("No property descriptor found for ", c, client.PushService, client.PushService[c]);
+                expect(propertyDescriptor.value).toEqual(constants[c]);
+                expect(propertyDescriptor.writable).toEqual(false);
+
+            });
         });
     });
 
@@ -148,7 +115,7 @@ describe("push", function () {
                     pushTransportReadyCallback;
 
                 client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
-                expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startService", options);
+                expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "startService", options);
             });
 
             it("allows multiple calls with the same parameters", function () {
@@ -166,7 +133,7 @@ describe("push", function () {
                 runs(function () {
                     options.appId = "";
                     client.PushService.create(options, successCallback, failCallback, simChangeCallback, pushTransportReadyCallback);
-                    expect(mockedWebworks.exec.callCount).toEqual(2);
+                    expect(cordova.exec.callCount).toEqual(2);
                 });
             });
 
@@ -191,7 +158,7 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(invokeTargetIdError);
-                    expect(mockedWebworks.exec.callCount).toEqual(1);
+                    expect(cordova.exec.callCount).toEqual(1);
                 });
             });
 
@@ -216,7 +183,7 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(appIdError);
-                    expect(mockedWebworks.exec.callCount).toEqual(1);
+                    expect(cordova.exec.callCount).toEqual(1);
                 });
             });
 
@@ -240,7 +207,7 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(appIdError);
-                    expect(mockedWebworks.exec.callCount).toEqual(1);
+                    expect(cordova.exec.callCount).toEqual(1);
                 });
             });
 
@@ -266,7 +233,7 @@ describe("push", function () {
                     }
 
                     expect(createPushService).toThrow(appIdError);
-                    expect(mockedWebworks.exec.callCount).toEqual(1);
+                    expect(cordova.exec.callCount).toEqual(1);
                 });
             });
         });
@@ -277,7 +244,7 @@ describe("push", function () {
                     pushService = new client.PushService();
 
                 pushService.createChannel(createChannelCallback);
-                expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "createChannel", null);
+                expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "createChannel", null);
             });
         });
 
@@ -287,7 +254,7 @@ describe("push", function () {
                     pushService = new client.PushService();
 
                 pushService.destroyChannel(destroyChannelCallback);
-                expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "destroyChannel", null);
+                expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "destroyChannel", null);
             });
         });
 
@@ -301,42 +268,38 @@ describe("push", function () {
                     pushService = new client.PushService(),
                     pushPayload;
 
-                mockedWebworks.exec = jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
+                cordova.exec.andCallFake(function (success, fail, service, action, args) {
                     success(returnPayload);
                 });
                 pushPayload = pushService.extractPushPayload(invokeObject);
 
                 expect(pushPayload).toBeDefined();
                 expect(pushPayload).toEqual(jasmine.any(client.PushPayload));
-                expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "extractPushPayload", calledObject);
+                expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "extractPushPayload", calledObject);
             });
 
             it("checks that there is a data field in the invoke object", function () {
                 var invokeObject = { "action" : "bb.action.PUSH" },
                     pushService = new client.PushService();
 
-                mockedWebworks.exec = jasmine.createSpy();
-
                 function extractPayload() {
                     pushService.extractPushPayload(invokeObject);
                 }
 
                 expect(extractPayload).toThrow(extractPayloadError);
-                expect(mockedWebworks.exec).not.toHaveBeenCalled();
+                expect(cordova.exec).not.toHaveBeenCalled();
             });
 
             it("checks that the invoke action is bb.action.PUSH", function () {
                 var invokeObject = { "data" : "ABC" },
                     pushService = new client.PushService();
 
-                mockedWebworks.exec = jasmine.createSpy();
-
                 function extractPayload() {
                     pushService.extractPushPayload(invokeObject);
                 }
 
                 expect(extractPayload).toThrow(extractPayloadError);
-                expect(mockedWebworks.exec).not.toHaveBeenCalled();
+                expect(cordova.exec).not.toHaveBeenCalled();
             });
 
             it("checks that the returned payload is valid", function () {
@@ -345,7 +308,7 @@ describe("push", function () {
                     returnPayload = { "valid" : false },
                     pushService = new client.PushService();
 
-                mockedWebworks.exec = jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
+                cordova.exec.andCallFake(function (success, fail, service, action, args) {
                     success(returnPayload);
                 });
 
@@ -354,7 +317,7 @@ describe("push", function () {
                 }
 
                 expect(extractPayload).toThrow(extractPayloadError);
-                expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "extractPushPayload", calledObject);
+                expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "extractPushPayload", calledObject);
             });
         });
 
@@ -366,7 +329,7 @@ describe("push", function () {
                     pushService = new client.PushService();
 
                 pushService.launchApplicationOnPush(shouldLaunch, launchApplicationCallback);
-                expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "launchApplicationOnPush", shouldLaunchObj);
+                expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "launchApplicationOnPush", shouldLaunchObj);
             });
         });
     });
@@ -382,7 +345,8 @@ describe("push", function () {
 
         it("calls defineReadOnlyField on the instance members", function () {
             var payloadObject = {},
-                pushPayload;
+                pushPayload,
+                dataPropertyDescriptor;
 
             payloadObject.data = "world";
             payloadObject.headers = { webworks : "blackberry" };
@@ -394,20 +358,20 @@ describe("push", function () {
             expect(pushPayload).toBeDefined();
             expect(pushPayload).toEqual(jasmine.any(client.PushPayload));
 
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain([pushPayload, "data", payloadObject.data]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain([pushPayload, "headers", payloadObject.headers]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain([pushPayload, "id", payloadObject.id]);
-            expect(mockedWebworks.defineReadOnlyField.argsForCall).toContain([pushPayload, "isAcknowledgeRequired", payloadObject.isAcknowledgeRequired]);
+            ["data", "headers", "id", "isAcknowledgeRequired"].forEach(function (attribute) {
+                dataPropertyDescriptor = Object.getOwnPropertyDescriptor(pushPayload, attribute);
+                expect(dataPropertyDescriptor.value).toEqual(payloadObject[attribute]);
+                expect(dataPropertyDescriptor.writable).toEqual(false);
+            });
         });
 
         it("can acknowledge the push notification", function () {
             var shouldAcceptPush = true,
-                pushPayload = new client.PushPayload("hello"),
+                pushPayload = new client.PushPayload({id: "id"}),
                 args = { "id": "id", "shouldAcceptPush": shouldAcceptPush };
 
-            pushPayload.id = "id";
             pushPayload.acknowledge(shouldAcceptPush);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "acknowledge", args);
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "acknowledge", args);
         });
     });
 });
