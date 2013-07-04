@@ -155,7 +155,7 @@ function rotateWhenLockedTrigger(pluginResult, edge) {
 module.exports = {
 
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
 
@@ -185,7 +185,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             listener = _listeners[eventName] ? _listeners[eventName][env.webview.id] : undefined,
             systemEvent = _actionMap[eventName].event;
         if (!listener) {
@@ -219,7 +219,7 @@ module.exports = {
     },
 
     lockOrientation : function (result, args, env) {
-        var orientation = JSON.parse(decodeURIComponent(args.orientation)),
+        var orientation = args.orientation,
             rotateTo = translateToDeviceOrientation(orientation),
             recieveRotateEvents = args.recieveRotateEvents === undefined  ? true : args.recieveRotateEvents;
 
@@ -235,7 +235,7 @@ module.exports = {
     },
 
     rotate : function (result, args, env) {
-        var orientation = JSON.parse(decodeURIComponent(args.orientation)),
+        var orientation = args.orientation,
             rotateTo = translateToDeviceOrientation(orientation);
 
         if (rotateTo === UNKNOWN_ORIENTATION) {

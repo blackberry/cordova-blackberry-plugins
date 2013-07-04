@@ -69,7 +69,7 @@ module.exports = {
         var request;
 
         try {
-            request = JSON.parse(decodeURIComponent(args.request));
+            request = args.request;
             window.qnx.webplatform.getApplication().invocation.sendCardDone(request);
             result.noResult(true);
         } catch (e) {
@@ -78,7 +78,7 @@ module.exports = {
     },
 
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             invokedEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -97,7 +97,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             invokedEvent = _actionMap[eventName].event;

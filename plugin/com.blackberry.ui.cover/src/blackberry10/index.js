@@ -42,7 +42,7 @@ function processCover(cover) {
 module.exports = {
 
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
 
@@ -62,7 +62,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             systemEvent = _actionMap[eventName].event;
 
@@ -101,7 +101,7 @@ module.exports = {
     updateCover: function (result, args, env) {
         var processedCover;
         try {
-            processedCover = processCover(JSON.parse(decodeURIComponent(args.cover)));
+            processedCover = processCover(args.cover);
             window.qnx.webplatform.getApplication().updateCover(processedCover);
             result.ok(null, false);
         } catch (e) {

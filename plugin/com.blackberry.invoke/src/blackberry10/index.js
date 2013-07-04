@@ -53,7 +53,7 @@ module.exports = {
     invoke: function (result, args, env) {
         // if request contains invalid args, the invocation framework will provide error in callback
         // no validation done here
-        var request = JSON.parse(decodeURIComponent(args.request)),
+        var request = args.request,
             callback = function (error) {
                 if (error) {
                     result.callbackError(error, false);
@@ -67,7 +67,7 @@ module.exports = {
     },
 
     query: function (result, args, env) {
-        var request = JSON.parse(decodeURIComponent(args.request)),
+        var request = args.request,
             callback = function (error, response) {
                 if (error) {
                     result.callbackError(error, false);
@@ -118,7 +118,7 @@ module.exports = {
     },
 
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             invokeEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -137,7 +137,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             invokeEvent = _actionMap[eventName].event;
@@ -155,7 +155,7 @@ module.exports = {
         var request;
 
         try {
-            request = JSON.parse(decodeURIComponent(args.request));
+            request = args.request;
             if (typeof _returnCallback === 'function') {
                 _returnCallback(request);
             }

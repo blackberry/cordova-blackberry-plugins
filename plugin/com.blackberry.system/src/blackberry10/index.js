@@ -89,7 +89,7 @@ var Whitelist = require("../../lib/policy/whitelist").Whitelist,
 module.exports = {
 
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -110,7 +110,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event;
@@ -200,7 +200,7 @@ module.exports = {
     setWallpaper: function (result, args, env) {
         var path;
         try {
-            path = _utils.translatePath(JSON.parse(decodeURIComponent(args.wallpaper)));
+            path = _utils.translatePath(args.wallpaper);
             // Removing file:// form the path because newWallpaper can't handle it.
             path = path.replace(/file:\/\//, '');
             window.qnx.webplatform.getApplication().newWallpaper(path);

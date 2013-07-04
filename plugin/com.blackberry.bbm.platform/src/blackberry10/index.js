@@ -40,7 +40,7 @@ var bbm = require("./BBMJNEXT").bbm,
 
 module.exports = {
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -61,7 +61,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener;
@@ -78,8 +78,6 @@ module.exports = {
 
     register: function (result, args, env) {
         if (args) {
-            args.options = JSON.parse(decodeURIComponent(args.options));
-
             if (!args.options.uuid || args.options.uuid.length === 0) {
                 result.error("Must specifiy UUID");
             }
@@ -132,36 +130,27 @@ module.exports = {
         },
 
         setStatus: function (result, args, env) {
-            if (args) {
-                args.status = JSON.parse(decodeURIComponent(args.status));
-                args.statusMessage = JSON.parse(decodeURIComponent(args.statusMessage));
-
-                if (args.status !== "available" && args.status !== "busy") {
-                    result.error("Status is not valid");
-                } else {
-                    bbm.getInstance().self.setStatus(args);
-                    result.ok();
-                }
+            if (!args || (args.status !== "available" && args.status !== "busy") ) {
+                result.error("Status is not valid");
+            } else {
+                bbm.getInstance().self.setStatus(args);
+                result.ok();
             }
         },
 
         setPersonalMessage: function (result, args, env) {
-            if (args) {
-                args.personalMessage = JSON.parse(decodeURIComponent(args.personalMessage));
-
-                if (args.personalMessage.length === 0) {
-                    result.error("Personal message must not be empty");
-                } else {
-                    bbm.getInstance().self.setPersonalMessage(args.personalMessage);
-                    result.ok();
-                }
+            if (!args || !args.personalMessage ||  args.personalMessage.length === 0) {
+                result.error("Personal message must not be empty");
+            } else {
+                bbm.getInstance().self.setPersonalMessage(args.personalMessage);
+                result.ok();
             }
         },
 
         setDisplayPicture: function (result, args, env) {
-            args.displayPicture = JSON.parse(decodeURIComponent(args.displayPicture));
-
-            if (args.displayPicture.length === 0) {
+            if (!args) {
+                result.error("Invalid Arguments");
+            } else if (args.displayPicture.length === 0) {
                 result.error("Display picture must not be empty");
             } else if (!_whitelist.isAccessAllowed(args.displayPicture)) {
                 result.error("URL denied by whitelist: " + args.displayPicture);
@@ -174,9 +163,9 @@ module.exports = {
 
         profilebox: {
             addItem: function (result, args, env) {
-                args.options = JSON.parse(decodeURIComponent(args.options));
-
-                if (!args.options.text || args.options.text.length === 0) {
+                if (!args || ! args.options) {
+                    result.error("Invalid Arguments: options must exist.");
+                } else if (!args.options.text || args.options.text.length === 0) {
                     result.error("must specify text");
                 } else if (!args.options.cookie || args.options.cookie.length === 0) {
                     result.error("Must specify cookie");
@@ -189,9 +178,9 @@ module.exports = {
             },
 
             removeItem: function (result, args, env) {
-                args.options = JSON.parse(decodeURIComponent(args.options));
-
-                if (!args.options.id || args.options.id.length === 0 || typeof args.options.id !== "string") {
+                if (!args || ! args.options) {
+                    result.error("Invalid Arguments: options must exist.");
+                } else if (!args.options.id || args.options.id.length === 0 || typeof args.options.id !== "string") {
                     result.error("Must specify valid item id");
                 } else {
                     bbm.getInstance().self.profilebox.removeItem(args.options, result);
@@ -205,9 +194,9 @@ module.exports = {
             },
 
             registerIcon: function (result, args, env) {
-                args.options = JSON.parse(decodeURIComponent(args.options));
-
-                if (!args.options.iconId || args.options.iconId <= 0) {
+                if (!args || ! args.options) {
+                    result.error("Invalid Arguments: options must exist.");
+                } else if (!args.options.iconId || args.options.iconId <= 0) {
                     result.error("Must specify valid ID for icon");
                 } else if (!args.options.icon || args.options.icon.length === 0) {
                     result.error("Must specify icon to register");

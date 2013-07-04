@@ -23,7 +23,7 @@ function enabled(result, args) {
     var _enabled;
 
     if (typeof args.enabled !== 'undefined') {
-        _enabled = JSON.parse(decodeURIComponent(args.enabled));
+        _enabled = args.enabled;
         if (typeof(_enabled) === 'boolean') {
             _overlayWebView.contextMenu.enabled = _enabled;
         }
@@ -34,7 +34,6 @@ function enabled(result, args) {
 }
 
 function overrideItem(result, args) {
-    args.action = JSON.parse(decodeURIComponent(args.action));
     args.handler = function (actionId) {
         result.callbackOk(null, true);
     };
@@ -46,13 +45,10 @@ function overrideItem(result, args) {
 }
 
 function clearOverride(result, args) {
-    var actionId = JSON.parse(decodeURIComponent(args.actionId));
-    result.ok(_overlayWebView.contextMenu.clearOverride(actionId), false);
+    result.ok(_overlayWebView.contextMenu.clearOverride(args.actionId), false);
 }
 
 function addItem(result, args, env) {
-    args.contexts = JSON.parse(decodeURIComponent(args.contexts));
-    args.action = JSON.parse(decodeURIComponent(args.action));
     args.handler = function (actionId, elementId) {
         result.callbackOk(elementId, true);
     };
@@ -64,8 +60,6 @@ function addItem(result, args, env) {
 }
 
 function removeItem(result, args, env) {
-    args.contexts = JSON.parse(decodeURIComponent(args.contexts));
-    args.actionId = JSON.parse(decodeURIComponent(args.actionId));
     _overlayWebView.contextMenu.removeItem(function (data) {
         result.ok(data, false);
     }, function (e) {
@@ -74,8 +68,6 @@ function removeItem(result, args, env) {
 }
 
 function defineCustomContext(result, args) {
-    args.context = JSON.parse(decodeURIComponent(args.context));
-    args.options = JSON.parse(decodeURIComponent(args.options));
     _overlayWebView.contextMenu.defineCustomContext(args.context, args.options);
     result.ok(null, false);
 }

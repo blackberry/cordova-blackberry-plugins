@@ -30,7 +30,7 @@ function trigger(pluginResult, type, arg) {
 
 module.exports = {
     invokeMediaPlayer: function (pluginResult, args, env) {
-        var options = JSON.parse(decodeURIComponent(args.options)),
+        var options = args.options,
             done = function (data) {
                 trigger(pluginResult, "done", data);
             },
@@ -46,7 +46,7 @@ module.exports = {
     },
 
     invokeCamera: function (pluginResult, args, env) {
-        var mode = JSON.parse(decodeURIComponent(args.mode)),
+        var mode = args.mode,
             done = function (path) {
                 trigger(pluginResult, "done", path);
             },
@@ -62,7 +62,7 @@ module.exports = {
     },
 
     invokeFilePicker: function (pluginResult, args, env) {
-        var options = JSON.parse(decodeURIComponent(args.options)),
+        var options = args.options,
             done = function (path) {
                 trigger(pluginResult, "done", path);
             },
@@ -78,7 +78,7 @@ module.exports = {
     },
 
     invokeIcsViewer: function (pluginResult, args, env) {
-        var options = JSON.parse(decodeURIComponent(args.options)),
+        var options = args.options,
             done = function (path) {
                 trigger(pluginResult, "done", path);
             },
@@ -95,7 +95,7 @@ module.exports = {
 
 
     invokeCalendarPicker: function (pluginResult, args, env) {
-        var options = JSON.parse(decodeURIComponent(args.options)),
+        var options = args.options,
             done = function (file) {
                 trigger(pluginResult, "done", file);
             },
@@ -111,7 +111,7 @@ module.exports = {
     },
 
     invokeCalendarComposer: function (pluginResult, args, env) {
-        var options = JSON.parse(decodeURIComponent(args.options)),
+        var options = args.options,
             done = function (data) {
                 trigger(pluginResult, "done", data);
             },
@@ -127,7 +127,7 @@ module.exports = {
     },
 
     invokeEmailComposer: function (pluginResult, args, env) {
-        var options = JSON.parse(decodeURIComponent(args.options)),
+        var options = args.options,
             done = function (data) {
                 trigger(pluginResult, "done", data);
             },
@@ -143,8 +143,8 @@ module.exports = {
     },
 
     invokeTargetPicker: function (pluginResult, args, env) {
-        var title = JSON.parse(decodeURIComponent(args.title)),
-            request = JSON.parse(decodeURIComponent(args.request)),
+        var title = args.title,
+            request = args.request,
             invocation = window.qnx.webplatform.getApplication().invocation,
             onError,
             onSuccess;

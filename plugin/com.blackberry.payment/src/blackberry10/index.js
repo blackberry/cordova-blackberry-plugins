@@ -19,13 +19,13 @@ var paymentJNext,
 module.exports = {
     purchase: function (result, args) {
         var purchase_arguments_t = {
-                "digitalGoodID" : JSON.parse(decodeURIComponent(args.digitalGoodID)),
-                "digitalGoodSKU" : JSON.parse(decodeURIComponent(args.digitalGoodSKU)),
-                "digitalGoodName" : JSON.parse(decodeURIComponent(args.digitalGoodName)),
-                "metaData" : JSON.parse(decodeURIComponent(args.metaData)),
-                "purchaseAppName" : JSON.parse(decodeURIComponent(args.purchaseAppName)),
-                "purchaseAppIcon" : JSON.parse(decodeURIComponent(args.purchaseAppIcon)),
-                "extraParameters" : JSON.parse(decodeURIComponent(args.extraParameters)),
+                "digitalGoodID" : args.digitalGoodID,
+                "digitalGoodSKU" : args.digitalGoodSKU,
+                "digitalGoodName" : args.digitalGoodName,
+                "metaData" : args.metaData,
+                "purchaseAppName" : args.purchaseAppName,
+                "purchaseAppIcon" : args.purchaseAppIcon,
+                "extraParameters" : args.extraParameters,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
@@ -37,7 +37,7 @@ module.exports = {
     },
     cancelSubscription: function (result, args) {
         var cancelSubscription_arguments_t = {
-                "transactionID" : JSON.parse(decodeURIComponent(args.transactionID)),
+                "transactionID" : args.transactionID,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
@@ -50,8 +50,8 @@ module.exports = {
     },
     getPrice: function (result, args) {
         var getPrice_arguments_t = {
-                "id" : JSON.parse(decodeURIComponent(args.id)),
-                "sku" : JSON.parse(decodeURIComponent(args.sku)),
+                "id" : args.id,
+                "sku" : args.sku,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
@@ -64,7 +64,7 @@ module.exports = {
     },
     getExistingPurchases: function (result, args) {
         var getExistingPurchases_arguments_t = {
-                "refresh" : JSON.parse(decodeURIComponent(args.refresh)),
+                "refresh" : args.refresh,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
@@ -76,8 +76,8 @@ module.exports = {
     },
     checkExisting: function (result, args) {
         var check_existing_args = {
-                "id" : JSON.parse(decodeURIComponent(args.id)),
-                "sku" : JSON.parse(decodeURIComponent(args.sku)),
+                "id" : args.id,
+                "sku" : args.sku,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
@@ -92,7 +92,7 @@ module.exports = {
             developmentMode_args;
 
         if (args && args.developmentMode) {
-            value = JSON.parse(decodeURIComponent(args.developmentMode));
+            value = args.developmentMode;
             developmentMode_args = {
                 "developmentMode" : value
             };

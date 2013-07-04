@@ -29,19 +29,15 @@ function getHomeDir() {
 
 module.exports = {
     sandbox: function (result, args, env) {
-        var value;
-
         _webview = _util.requireWebview();
 
         //If sandbox arg is sent down this is the setter
         if (args && args.sandbox) {
-            value = JSON.parse(decodeURIComponent(args.sandbox));
-            _webview.setSandbox(value);
+            _webview.setSandbox(!!args.sandbox);
             result.ok(null, false);
         } else {
-            value = _webview.getSandbox();
-            // Since this is getter, always return "0" or "1" even after explicitly setting value to true or false
-            result.ok(value === "1", false);
+            // Since this is getter, it will always return "0" or "1" even after explicitly setting value to true or false
+            result.ok(_webview.getSandbox() === "1", false);
         }
     },
 

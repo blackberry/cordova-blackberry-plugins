@@ -86,35 +86,21 @@ function processJnextFindData(eventId, eventHandler, JnextData) {
 
 module.exports = {
     find: function (result, args, env) {
-        var parsedArgs = {},
-            key;
-
-        for (key in args) {
-            if (args.hasOwnProperty(key)) {
-                parsedArgs[key] = JSON.parse(decodeURIComponent(args[key]));
-            }
-        }
-
         if (!checkPermission()) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
-            return;
-        }
-
-        if (!calendarUtils.validateFindArguments(parsedArgs.options)) {
+        } else if (!calendarUtils.validateFindArguments(args.options)) {
             result.error(CalendarError.INVALID_ARGUMENT_ERROR, false);
-            return;
+        } else {
+            args.options = args.options || {};
+            args.options.sourceTimezone = getCurrentTimezone();
+
+            if (!args.options.sourceTimezone) {
+                result.error(CalendarError.UNKNOWN_ERROR, false);
+            } else {
+                pimCalendar.getInstance().find(args, result, processJnextFindData);
+                result.noResult(true);
+            }
         }
-
-        parsedArgs.options = parsedArgs.options || {};
-
-        parsedArgs.options.sourceTimezone = getCurrentTimezone();
-        if (!parsedArgs.options.sourceTimezone) {
-            result.error(CalendarError.UNKNOWN_ERROR, false);
-            return;
-        }
-
-        pimCalendar.getInstance().find(parsedArgs, result, processJnextFindData);
-        result.noResult(true);
     },
 
     save: function (result, args, env) {
@@ -123,7 +109,7 @@ module.exports = {
 
         for (key in args) {
             if (args.hasOwnProperty(key)) {
-                attributes[key] = JSON.parse(decodeURIComponent(args[key]));
+                attributes[key] = args[key];
             }
         }
 
@@ -152,9 +138,9 @@ module.exports = {
 
     remove: function (result, args, env) {
         var attributes = {
-                "accountId" : JSON.parse(decodeURIComponent(args.accountId)),
-                "calEventId" : JSON.parse(decodeURIComponent(args.calEventId)),
-                "removeAll" : JSON.parse(decodeURIComponent(args.removeAll))
+                "accountId" : args.accountId,
+                "calEventId" : args.calEventId,
+                "removeAll" : args.removeAll
             };
 
         if (!checkPermission()) {
@@ -163,7 +149,7 @@ module.exports = {
         }
 
         if (args.hasOwnProperty("dateToRemove")) {
-            attributes.dateToRemove = JSON.parse(decodeURIComponent(args.dateToRemove));
+            attributes.dateToRemove = args.dateToRemove;
         }
 
         attributes.sourceTimezone = getCurrentTimezone();
@@ -181,19 +167,17 @@ module.exports = {
     getDefaultCalendarAccount: function (result, args, env) {
         if (!_utils.hasPermission(config, "access_pimdomain_calendars")) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
-            return;
+        } else {
+            result.ok(pimCalendar.getInstance().getDefaultCalendarAccount(), false);
         }
-
-        result.ok(pimCalendar.getInstance().getDefaultCalendarAccount(), false);
     },
 
     getCalendarAccounts: function (result, args, env) {
         if (!_utils.hasPermission(config, "access_pimdomain_calendars")) {
             result.error(CalendarError.PERMISSION_DENIED_ERROR, false);
-            return;
+        } else {
+            result.ok(pimCalendar.getInstance().getCalendarAccounts(), false);
         }
-
-        result.ok(pimCalendar.getInstance().getCalendarAccounts(), false);
     },
 
     getEvent: function (pluginResult, args, env) {
@@ -206,8 +190,8 @@ module.exports = {
             return;
         }
 
-        findOptions.eventId = JSON.parse(decodeURIComponent(args.eventId));
-        findOptions.accountId = JSON.parse(decodeURIComponent(args.accountId));
+        findOptions.eventId = args.eventId;
+        findOptions.accountId = args.accountId;
 
         results = pimCalendar.getInstance().getEvent(findOptions);
 

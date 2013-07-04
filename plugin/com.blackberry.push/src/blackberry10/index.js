@@ -18,9 +18,9 @@ var _push,
 
 module.exports = {
     startService: function (result, args, env) {
-        var pushOptions = { "invokeTargetId" : JSON.parse(decodeURIComponent(args.invokeTargetId)),
-                            "appId" : JSON.parse(decodeURIComponent(args.appId)),
-                            "ppgUrl" : JSON.parse(decodeURIComponent(args.ppgUrl)) };
+        var pushOptions = { "invokeTargetId" : args.invokeTargetId,
+                            "appId" : args.appId,
+                            "ppgUrl" : args.ppgUrl };
 
         _results["push.create.callback"] = result;
         _push.getInstance().startService(pushOptions);
@@ -40,27 +40,27 @@ module.exports = {
     },
 
     extractPushPayload: function (result, args, env) {
-        var invokeData = { "data" : JSON.parse(decodeURIComponent(args.data)) };
+        var invokeData = { "data" : args.data };
 
         result.ok(_push.getInstance().extractPushPayload(invokeData));
     },
 
     launchApplicationOnPush: function (result, args, env) {
         _results["push.launchApplicationOnPush.callback"] = result;
-        _push.getInstance().launchApplicationOnPush(JSON.parse(decodeURIComponent(args.shouldLaunch)));
+        _push.getInstance().launchApplicationOnPush(args.shouldLaunch);
         result.noResult(true);
     },
 
     acknowledge: function (result, args, env) {
-        var acknowledgeData = { "id" : JSON.parse(decodeURIComponent(args.id)),
-                                "shouldAcceptPush" : JSON.parse(decodeURIComponent(args.shouldAcceptPush)) };
+        var acknowledgeData = { "id" : args.id,
+                                "shouldAcceptPush" : args.shouldAcceptPush };
 
         _push.getInstance().acknowledge(acknowledgeData);
         result.ok();
     },
 
     registerCallback: function (result, args, env) {
-        var id = JSON.parse(decodeURIComponent(args.id));
+        var id = args.id;
 
         _results[id] = result;
         result.noResult(true);

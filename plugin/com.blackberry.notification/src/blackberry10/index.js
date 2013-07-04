@@ -23,7 +23,7 @@ module.exports = {
 
         for (key in sourceArgs) {
             if (sourceArgs.hasOwnProperty(key)) {
-                args[key] = JSON.parse(decodeURIComponent(sourceArgs[key]));
+                args[key] = sourceArgs[key];
             }
         }
 
@@ -65,7 +65,7 @@ module.exports = {
         if (!args || !args.tag) {
             result.error("No tag provided for notification removal");
         } else {
-            tag = JSON.parse(decodeURIComponent(args.tag));
+            tag = args.tag;
             _notification.remove(tag);
             result.ok();
         }

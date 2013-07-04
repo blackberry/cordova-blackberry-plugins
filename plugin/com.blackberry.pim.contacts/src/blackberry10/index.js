@@ -157,7 +157,7 @@ module.exports = {
 
         for (key in args) {
             if (args.hasOwnProperty(key)) {
-                findOptions[key] = JSON.parse(decodeURIComponent(args[key]));
+                findOptions[key] = args[key];
             }
         }
 
@@ -185,7 +185,7 @@ module.exports = {
             return;
         }
 
-        findOptions.contactId = JSON.parse(decodeURIComponent(args.contactId));
+        findOptions.contactId = args.contactId;
         findOptions.contactId = findOptions.contactId.toString();
 
         results = pimContacts.getInstance().getContact(findOptions);
@@ -211,7 +211,7 @@ module.exports = {
 
         for (key in args) {
             if (args.hasOwnProperty(key)) {
-                attributes[key] = JSON.parse(decodeURIComponent(args[key]));
+                attributes[key] = args[key];
             }
         }
 
@@ -241,7 +241,7 @@ module.exports = {
     },
 
     remove: function (result, args, env) {
-        var attributes = { "contactId" : JSON.parse(decodeURIComponent(args.contactId)) };
+        var attributes = { "contactId" : args.contactId };
 
         if (!checkPermission(result)) {
             return;
@@ -259,7 +259,7 @@ module.exports = {
     },
 
     invokeContactPicker: function (result, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
+        var options = args["options"],
             callback = function (args, reason) {
                 result.callbackOk({
                     "type": "doneCancel",
@@ -401,14 +401,15 @@ JNEXT.PimContacts = function ()
 
         if (strEventDesc === "result") {
             args.result = escape(strData.split(" ").slice(2).join(" "));
+            args.result = JSON.parse(decodeURIComponent(args.result));
             eventHandler = self.eventHandlers[arData[1]];
 
             if (eventHandler.action === "save" || eventHandler.action === "remove") {
-                eventHandler.handler(eventHandler.result, JSON.parse(decodeURIComponent(args.result)));
+                eventHandler.handler(eventHandler.result, args.result);
             } else if (eventHandler.action === "find") {
-                eventHandler.handler(arData[1], eventHandler, JSON.parse(decodeURIComponent(args.result)));
+                eventHandler.handler(arData[1], eventHandler, args.result);
             } else if (eventHandler.action === "invokePicker") {
-                eventHandler.handler(JSON.parse(decodeURIComponent(args.result)));
+                eventHandler.handler(args.result);
             }
 
         }

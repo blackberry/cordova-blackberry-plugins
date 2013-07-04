@@ -45,7 +45,6 @@ module.exports = {
         // decodeURI and check for null value params
         /*jshint forin: false */
         for (key in args) {
-            args[key] = JSON.parse(decodeURIComponent(args[key]));
             if (!args[key]) {
                 undefined_params.push(key);
             }
@@ -96,7 +95,6 @@ module.exports = {
 
         /*jshint forin: false */
         for (key in args) {
-            args[key] = JSON.parse(decodeURIComponent(args[key]));
             if (!args[key]) {
                 undefined_params.push(key);
             }

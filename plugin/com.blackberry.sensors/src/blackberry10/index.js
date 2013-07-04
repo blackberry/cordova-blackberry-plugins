@@ -119,7 +119,7 @@ var sensors = require("./sensorsJNEXT").sensors,
 
 module.exports = {
     startEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -138,7 +138,7 @@ module.exports = {
     },
 
     stopEvent: function (result, args, env) {
-        var eventName = JSON.parse(decodeURIComponent(args.eventName)),
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event;
@@ -154,7 +154,7 @@ module.exports = {
 
     setOptions: function (result, args) {
         if (args.options) {
-            args.options = JSON.parse(decodeURIComponent(args.options));
+            args.options = args.options;
 
             if (!args.options.sensor) {
                 result.error("Must specify a sensor");
