@@ -1,3 +1,4 @@
+
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -17,19 +18,14 @@
  under the License.
 -->
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-    id="com.blackberry.io.filetransfer"
+    id="org.apache.cordova.blackberry10.pimlib"
     version="1.0.0">
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.io.filetransfer" />
-    </js-module>
 
     <platform name="blackberry10">
-        <source-file src="src/blackberry10/index.js" />
-        <lib-file src="src/blackberry10/native/device/libfiletransfer.so" arch="device"/>
-        <lib-file src="src/blackberry10/native/simulator/libfiletransfer.so" arch="simulator"/>
+        <lib-file src="src/blackberry10/native/device/libpimcontacts.so" arch="device"></lib-file>
+        <lib-file src="src/blackberry10/native/simulator/libpimcontacts.so" arch="simulator"></lib-file>
         <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.io.filetransfer" value="com.blackberry.io.filetransfer" />
+            <feature name="org.apache.cordova.blackberry10.pimlib"></feature>
         </config-file>
-        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
     </platform>
 </plugin>

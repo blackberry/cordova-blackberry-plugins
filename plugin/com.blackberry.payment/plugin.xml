@@ -30,5 +30,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.payment" value="com.blackberry.payment" />
         </config-file>
+        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
     </platform>
 </plugin>

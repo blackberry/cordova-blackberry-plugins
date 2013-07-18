@@ -32,5 +32,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.sensors" value="com.blackberry.sensors" />
         </config-file>
+        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
     </platform>
 </plugin>
