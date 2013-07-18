@@ -32,5 +32,13 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.bbm.platform" value="com.blackberry.bbm.platform" />
         </config-file>
+        <config-file target="www/config.xml" parent="/widget">
+            <rim:permissions>
+            </rim:permissions>
+        </config-file>
+        <config-file target="www/config.xml" parent="/widget/rim:permissions">
+            <rim:permit>bbm_connect</rim:permit>
+        </config-file>
+        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
     </platform>
 </plugin>
