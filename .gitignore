@@ -36,7 +36,7 @@ plugin/*/src/blackberry10/native/simulator/*.so
 test/test-app/app/*
 test/test-suite/app/*
 test/autorun-mobile-spec/app/*
-test/mobile-spec/
+test/mobile-spec/app/*
 test/test-app/project.json
 test/test-suite/project.json
 
