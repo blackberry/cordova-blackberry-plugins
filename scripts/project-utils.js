@@ -24,6 +24,7 @@ var path = require('path'),
     wrench = require('wrench'),
     util = require('util'),
     ncp = require('ncp').ncp,
+    shell = require("shelljs"),
     utils = require('./utils'),
     conf = require(path.join(__dirname, "conf")),
     baseDir = path.join(__dirname, '/../'),
@@ -123,17 +124,14 @@ module.exports = {
     copyMobileSpec: function (projectPath, src, done) {
         jWorkflow.order()
         .andThen(function (prev, baton) {
-            var version = fs.readFileSync(path.join(projectPath, "www", "VERSION"));
             baton.take();
-            ncp(src, path.join(projectPath, "www"), function (err) {
-                if (err) {
-                    console.log(err);
-                }
-                //Change back the version
-                fs.writeFileSync(path.join(projectPath, "www", "VERSION"), version);
-                console.log("Copy Mobile Spec Finished");
-                baton.pass();
-            });
+            shell.mkdir('-p', path.join(projectPath, 'www'));
+            shell.exec("cd " + src + "&& git archive HEAD | tar -x -C " + path.join(projectPath, "www"));
+            shell.cp("-rf", path.join(projectPath, "..", "src", "plugin.xml"), path.join(projectPath, "www", "dependencies-plugin"));
+            shell.cp("-rf", path.join(projectPath, "..", "src", "config.xml"), path.join(projectPath, "www"));
+            shell.exec("cd " + projectPath + " && " + "cordova/plugin add " + path.join("www", "dependencies-plugin"));
+            console.log("Copy Mobile Spec Finished");
+            baton.pass();
         })
         .start(function () {
             if (done) {
