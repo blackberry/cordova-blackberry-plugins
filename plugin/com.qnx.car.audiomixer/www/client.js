@@ -32,10 +32,8 @@
 
 var _self = {},
 	_ID = 'com.qnx.car.audiomixer',
-    _utils = cordova.require('cordova/utils'),
-    _watches = {};
-	// _callback = require('./../../lib/callback'),
-	// Event = require('./enum/Event');
+	_utils = cordova.require('cordova/utils'),
+	_watches = {};
 
 
 /** 
@@ -44,8 +42,14 @@ var _self = {},
  * //to refer to the volume setting
  * car.audiomixer.AudioMixerSetting.VOLUME  //returns 'volume'
  */
-//_self.AudioMixerSetting = require('./enum/AudioMixerSetting');
+_self.AudioMixerSetting = require('./AudioMixerSetting');
 
+
+/**
+ * Handles update events for this extension
+ * @param data {Array} The updated data provided by the event 
+ * @private
+ */
 function onUpdate(data) {
 	var keys = Object.keys(_watches);
 	for (var i=0; i<keys.length; i++) {

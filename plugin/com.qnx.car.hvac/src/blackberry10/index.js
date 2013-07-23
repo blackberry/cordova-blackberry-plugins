@@ -17,14 +17,14 @@
  * for other information.
  */
 
- /**
- * Allows control of volume and other audio parameters
+/**
+ * Allows control of HVAC systems 
  *
  * @author mlapierre
  * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
  */
 
-var _audiomixer = require('./audiomixer'),
+var _hvac = require("./hvac"),
 	_wwfix = require("../../lib/wwfix"),
 	_eventResult;
 
@@ -33,15 +33,15 @@ var _audiomixer = require('./audiomixer'),
  */
 function init() {
 	try {
-		_audiomixer.init();
+		_hvac.init();
 	} catch (ex) {
-		console.error('Error in webworks ext: audiomixer/index.js:init():', ex);
+		console.error('Error in webworks ext: hvac/index.js:init():', ex);
 	}
 }
 init();
 
 
-/*
+/**
  * Exports are the publicly accessible functions
  */
 module.exports = {
@@ -55,7 +55,7 @@ module.exports = {
 	startEvents: function(success, fail, args, env) {
 		_eventResult = new PluginResult(args, env)
 		try {
-			_audiomixer.setTriggerUpdate(function (data) {
+			_hvac.setTriggerUpdate(function (data) {
 				_eventResult.callbackOk(data, true);
 			});
 			_eventResult.noResult(true);
@@ -75,7 +75,7 @@ module.exports = {
 		var result = new PluginResult(args, env);
 		try {
 			//disable the event trigger
-			_audiomixer.setTriggerUpdate(null);
+			_hvac.setTriggerUpdate(null);
 			result.ok(undefined, false);
 
 			//cleanup
@@ -87,7 +87,7 @@ module.exports = {
 	},
 
 	/**
-	 * Returns the current audio parameters
+	 * Returns HVAC settings
 	 * @param success {Function} Function to call if the operation is a success
 	 * @param fail {Function} Function to call if the operation fails
 	 * @param args {Object} The arguments supplied
@@ -96,8 +96,12 @@ module.exports = {
 	get: function(success, fail, args, env) {
 		var result = new PluginResult(args, env)
 		try {
-			args = _wwfix.parseArgs(args);
-			var data = _audiomixer.get(args.zone);
+			var fixedArgs = _wwfix.parseArgs(args);
+
+			var settings = (fixedArgs.settings) ? fixedArgs.settings.split(',') : null;
+			var zones = (fixedArgs.zones) ? fixedArgs.zones.split(',') : null;
+			var data = _hvac.get(settings, zones);
+
 			result.ok(data, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false)
@@ -105,7 +109,7 @@ module.exports = {
 	},
 	
 	/**
-	 * Sets one or more audio parameters
+	 * Sets one or more HVAC settings
 	 * @param success {Function} Function to call if the operation is a success
 	 * @param fail {Function} Function to call if the operation fails
 	 * @param args {Object} The arguments supplied
@@ -114,8 +118,8 @@ module.exports = {
 	set: function(success, fail, args, env) {
 		var result = new PluginResult(args, env)
 		try {
-			args = _wwfix.parseArgs(args);
-			_audiomixer.set(args.setting, args.zone, args.value);
+			var fixedArgs = _wwfix.parseArgs(args);
+			_hvac.set(fixedArgs.setting, fixedArgs.zone, fixedArgs.value);
 			result.ok(undefined, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false)

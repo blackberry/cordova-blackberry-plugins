@@ -17,18 +17,19 @@ http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
 for other information.
 -->
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-	id="com.qnx.car.audiomixer"
+	id="com.qnx.car.hvac"
 	version="1.0.0">
 	<js-module src="www/client.js">
-		<clobbers target="car.audiomixer" />
+		<clobbers target="car.hvac" />
 	</js-module>
-    <js-module src="www/AudioMixerSetting.js" />
+    <js-module src="www/HvacFanDirection.js" />
+    <js-module src="www/HvacSetting.js" />
 
 	<platform name="blackberry10">
 		<source-file src="src/blackberry10/index.js" />
-		<source-file src="src/blackberry10/audiomixer.js" />
+		<source-file src="src/blackberry10/hvac.js" />
 		<config-file target="www/config.xml" parent="/widget">
-			<feature name="com.qnx.car.audiomixer" value="com.qnx.car.audiomixer" />
+			<feature name="com.qnx.car.hvac" value="com.qnx.car.hvac" />
 		</config-file>
 	</platform>
 </plugin>
