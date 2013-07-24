@@ -17,18 +17,11 @@
  * for other information.
  */
  
-
- /**
+/**
  * @module car.hvac
  * @static
  *
  * @description Controls the HVAC system 
- * 
- */
- 
-/* 
- * @author mlapierre
- * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
  */
 
 var _self = {},

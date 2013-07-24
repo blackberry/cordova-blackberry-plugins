@@ -23,10 +23,6 @@
  *
  * @description Provides access to custom automotive sensors.
  */
- 
-/* @author mlapierre
- * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
- */
 
 var _self = {},
 	_ID = "com.qnx.car.sensors",

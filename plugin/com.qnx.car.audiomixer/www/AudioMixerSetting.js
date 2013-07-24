@@ -17,25 +17,23 @@
  * for other information.
  */
 
- /**
- * @name car.audiomixer.AudioMixerSetting
- * @static
- *
- * Audio mixer settings enumeration.
- *
- * @author mlapierre
- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
- */
-
 module.exports = {},
 
-/**  @property VOLUME Represents the volume setting */
-/**  @property BASS Represents the bass setting */
-/**  @property MID Represents the mid setting */
-/**  @property TREBLE Represents the treble setting */
-/**  @property BALANCE Represents the balance setting */
-/**  @property FADE Represents the fade setting */
-
+/**
+ * @static
+ * @memberOf module:car.audiomixer
+ * @name AudioMixerSetting
+ *
+ * @description <p>Audio mixer settings enumeration
+ * <p>All values indicate a level within a range from 0 to 100%.
+ *
+ * @property {Number} VOLUME The volume setting. 
+ * @property {String} BASS The bass setting.
+ * @property {String} MID The midrange setting. 
+ * @property {String} TREBLE The treble setting. 
+ * @property {Number} BALANCE The balance setting. 
+ * @property {String} FADE The fade setting. 
+ */
 Object.defineProperties(module.exports,
 {
 	'VOLUME':		{ value: 'volume',		enumerable: true, writable: false },

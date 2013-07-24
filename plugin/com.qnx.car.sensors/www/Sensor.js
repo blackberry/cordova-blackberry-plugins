@@ -17,15 +17,10 @@
  * for other information.
  */
 
- /**
- * @static
- * @author mlapierre
- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
- */
-
 module.exports = {};
 /**
- * @memberOf module:car_xyz_sensors
+ * @static
+ * @memberOf module:car.sensors
  * @name Sensor
  *
  * @description <p>Sensor type enumeration.

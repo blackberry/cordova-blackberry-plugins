@@ -17,11 +17,8 @@
  * for other information.
  */
 
- /**
+/**
  * Implementation for car.sensors API
- *
- * @author mlapierre
- * $Id: sensors.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
  */
 
 var	_pps = qnx.webplatform.pps,

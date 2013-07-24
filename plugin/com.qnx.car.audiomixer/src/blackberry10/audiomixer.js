@@ -19,9 +19,6 @@
 
 /**
  * The abstraction layer for mixer functionality
- *
- * @author mlapierre
- * $Id: audiomixer.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
  */
 
 var	_pps = qnx.webplatform.pps,
