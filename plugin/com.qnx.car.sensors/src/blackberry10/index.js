@@ -17,31 +17,31 @@
  * for other information.
  */
 
- /**
- * Allows control of volume and other audio parameters
+/**
+ * Implementation for car.sensors API
  *
  * @author mlapierre
  * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
  */
 
-var _audiomixer = require('./audiomixer'),
-	_wwfix = require("../../lib/wwfix"),
+var _wwfix = require("../../lib/wwfix"),
+	_sensors = require("./sensors"),
 	_eventResult;
+
 
 /**
  * Initializes the extension 
  */
 function init() {
 	try {
-		_audiomixer.init();
+		_sensors.init();
 	} catch (ex) {
-		console.error('Error in webworks ext: audiomixer/index.js:init():', ex);
+		console.error('Error in webworks ext: sensors/index.js:init():', ex);
 	}
 }
 init();
 
-
-/*
+/**
  * Exports are the publicly accessible functions
  */
 module.exports = {
@@ -55,7 +55,7 @@ module.exports = {
 	startEvents: function(success, fail, args, env) {
 		_eventResult = new PluginResult(args, env)
 		try {
-			_audiomixer.setTriggerUpdate(function (data) {
+			_sensors.setTriggerUpdate(function (data) {
 				_eventResult.callbackOk(data, true);
 			});
 			_eventResult.noResult(true);
@@ -75,7 +75,7 @@ module.exports = {
 		var result = new PluginResult(args, env);
 		try {
 			//disable the event trigger
-			_audiomixer.setTriggerUpdate(null);
+			_sensors.setTriggerUpdate(null);
 			result.ok(undefined, false);
 
 			//cleanup
@@ -87,7 +87,7 @@ module.exports = {
 	},
 
 	/**
-	 * Returns the current audio parameters
+	 * Returns the current vehicle sensors
 	 * @param {Function} success Function to call if the operation is a success
 	 * @param {Function} fail Function to call if the operation fails
 	 * @param {Object} args The arguments supplied
@@ -96,30 +96,14 @@ module.exports = {
 	get: function(success, fail, args, env) {
 		var result = new PluginResult(args, env)
 		try {
-			args = _wwfix.parseArgs(args);
-			var data = _audiomixer.get(args.zone);
+			var fixedArgs = _wwfix.parseArgs(args);
+			var data = _sensors.get((fixedArgs.sensors) ? fixedArgs.sensors.split(',') : null);
+
 			result.ok(data, false);
 		} catch (e) {
-			result.error(JSON.stringify(e), false)
+			result.error(JSON.stringify(e), false);
 		}
 	},
-	
-	/**
-	 * Sets one or more audio parameters
-	 * @param {Function} success Function to call if the operation is a success
-	 * @param {Function} fail Function to call if the operation fails
-	 * @param {Object} args The arguments supplied
-	 * @param {Object} env Environment variables
-	 */
-	set: function(success, fail, args, env) {
-		var result = new PluginResult(args, env)
-		try {
-			args = _wwfix.parseArgs(args);
-			_audiomixer.set(args.setting, args.zone, args.value);
-			result.ok(undefined, false);
-		} catch (e) {
-			result.error(JSON.stringify(e), false)
-		}
-	}
 };
 
+ 

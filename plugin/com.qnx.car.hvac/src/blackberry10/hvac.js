@@ -54,7 +54,7 @@ module.exports = {
 	
 	/**
 	 * Sets the trigger function to call when an event is fired
-	 * @param trigger {Function} The trigger function to call when an event is fired
+	 * @param {Function} trigger The trigger function to call when an event is fired
 	 */
 	setTriggerUpdate: function(trigger) {
 		_triggerUpdate = trigger;
@@ -62,8 +62,8 @@ module.exports = {
 	
 	/**
 	 * Returns HVAC settings
-	 * @param settings {Array} A list of car.hvac.HvacSetting values to filter by [optional]
-	 * @param zones {Array} A list of car.zones.Zone values to filter by [optional]
+	 * @param settings {Array} [settings] A list of car.hvac.HvacSetting values to filter by
+	 * @param zones {Array} [zones] A list of car.zones.Zone values to filter by
 	 * @returns {Object} The requested setting values
 	 */
 	get: function(settings, zones) {
@@ -107,9 +107,9 @@ module.exports = {
 	
 	/**
 	 * Sets an HVAC setting
-	 * @param setting {String} The car.hvac.HvacSetting value
-	 * @param zone {String} The car.zones.Zone value
-	 * @param value {Mixed} The value for the specified setting in the specified zone
+	 * @param {String} setting The car.hvac.HvacSetting value
+	 * @param {String} zone The car.Zone value
+	 * @param {Mixed} value The value for the specified setting in the specified zone
 	 */
 	set: function(setting, zone, value) {
 		if (typeof setting 	== 'string' &&

@@ -19,7 +19,7 @@
  
 
  /**
- * @module car_xyz_hvac
+ * @module car.hvac
  * @static
  *
  * @description Controls the HVAC system 
@@ -58,8 +58,8 @@ function onUpdate(data) {
 /**
  * Watch for HVAC changes
  * @param {Function} callback The function to call when a change is detected.
- * @return {Number} An ID for the added watch.
- * @memberOf module:car_xyz_hvac
+ * @return {String} An ID for the added watch.
+ * @memberOf module:car.hvac
  * @method watchHvac
  * @example
  * 
@@ -88,8 +88,8 @@ _self.watchHvac = function (callback) {
 
 /**
  * Stop watching HVAC items
- * @param {Number} watchId The watch ID returned by <i>car.hvac.watchHvac()</i>.
- * @memberOf module:car_xyz_hvac
+ * @param {String} watchId The watch ID returned by <i>car.hvac.watchHvac()</i>.
+ * @memberOf module:car.hvac
  * @method cancelWatch
  * @example
  * 
@@ -107,13 +107,13 @@ _self.cancelWatch = function (watchId) {
 
 /**
  * @desc <p>Return HVAC settings for the specified filter
- * <p>If successful, <i>car.hvac.get()</i> calls the <i>successCallback</i> function with an array of setting objects.
- * containing the setting (<b>car.hvac.HvacSetting</b>), the zone (<b>car.Zone</b>) and the value (number/string/boolean).
+ * <p>If successful, <i>car.hvac.get()</i> calls the <i>successCallback</i> function with an array of setting objects
+ * containing the setting (<b>car.hvac.HvacSetting</b>), the zone (<b>car.Zone</b>), and the value (number/string/boolean).
  * @param {Function} successCallback The function to call with the result.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @param {Array} [settings] An array of <b>car.hvac.HvacSetting</b> values to whitelist.
  * @param {Array} [zones] An array of <b>car.Zone</b> values to whitelist. 
- * @memberOf module:car_xyz_hvac
+ * @memberOf module:car.hvac
  * @method get
  * @see car.hvac.HvacSetting  
  * @see car.Zone
@@ -205,7 +205,7 @@ _self.get = function(successCallback, errorCallback, settings, zones) {
  * @param {Mixed} value The value to save.
  * @param {Function} [successCallback] The function to call with the result.
  * @param {Function} [errorCallback] The function to call if there is an error.
- * @memberOf module:car_xyz_hvac 
+ * @memberOf module:car.hvac 
  * @method set
  * @see car.hvac.HvacSetting
  * @see car.Zone  

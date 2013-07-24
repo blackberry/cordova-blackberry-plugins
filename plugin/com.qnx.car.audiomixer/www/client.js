@@ -36,12 +36,7 @@ var _self = {},
 	_watches = {};
 
 
-/** 
- * @property AudioMixerSetting An enumeration of audio mixer settings 
- * @example
- * //to refer to the volume setting
- * car.audiomixer.AudioMixerSetting.VOLUME  //returns 'volume'
- */
+// to refer to the audio mixer setting
 _self.AudioMixerSetting = require('./AudioMixerSetting');
 
 
@@ -59,18 +54,20 @@ function onUpdate(data) {
 
 /**
  * Watch for audio mixer changes
- * @param {Function} callback The function to be called when a change is detected
- * @return {Number} An id for the added watch
+ * @param {Function} callback The function to call when a change is detected.
+ * @return {String} An ID for the added watch.
+ * @memberOf module:car.audiomixer 
+ * @method watchAudioMixer
  * @example
  * 
  * //define a callback function
  * function myCallback(audioMixerItems) {
- *	  //iterate through the changed items
- *	  for (var i=0; i<audioMixerItems.length; i++) {
- *		  console.log("audio mixer item setting = " + audioMixerItems[i].setting + '\n' + //a car.audiomixer.AudioMixerSetting value
- *					  "audio mixer item zone = " + audioMixerItems[i].zone + '\n' +	   //a car.Zone value
- *					  "audio mixer item value = " + audioMixerItems[i].value + '\n\n');   //a numeric value
- *	  }
+ *		//iterate through the changed items
+ *		for (var i=0; i&lt;audioMixerItems.length; i++) {
+ *			console.log("audio mixer item setting = " + audioMixerItems[i].setting + '\n' +	//a car.audiomixer.AudioMixerSetting value
+ *						"audio mixer item zone = " + audioMixerItems[i].zone + '\n' +		//a car.Zone value
+ *						"audio mixer item value = " + audioMixerItems[i].value + '\n\n');	//a numeric value
+ *		}
  * }
  * 
  * var watchId = car.audiomixer.watchAudioMixer(myCallback);
@@ -89,7 +86,9 @@ _self.watchAudioMixer = function (callback) {
 
 /**	
  * Stop watching audio mixer changes
- * @param {Number} watchId The watch id returned by car.audiomixer.watchAudioMixer
+ * @param {Number} watchId The watch ID returned by <i>car.audiomixer.watchAudioMixer()</i>.
+ * @memberOf module:car.audiomixer
+ * @method cancelWatch
  * @example
  * 
  * car.audiomixer.cancelWatch(watchId);
@@ -105,36 +104,36 @@ _self.cancelWatch = function (watchId) {
 
 
 /**
- * Return the audio mixer settings for a specific zone
- * If successful, it calls the successCallback with a Zone object for the specific zone.
- * @param {Function} successCallback The callback that is called with the result on success
- * @param {Function} errorCallback (Optional) The callback that is called if there is an error
- * @param {String} zone (Optional) The Zone to filter the results by
- * @see car.Zone
+ * @desc <p>Return the audio mixer settings for a specific zone
+ * <p>If successful, <i>car.audiomixer.get()</i> calls the <i>successCallback</i> function with the <b>car.Zone</b> object for the specific zone.
+ * @param {Function} successCallback The function to call with the result on success.
+ * @param {Function} [errorCallback] The function to call if there is an error.
+ * @param {String} [zone] The zone to filter the results by.
+ * @memberOf module:car.audiomixer
+ * @method get
+ * @see car.Zone 
  * @example 
  *
  * //define your callback function(s)
  * function successCallback(audioMixerItems) {
- *	  //iterate through all the audio mixer items
- *	  for (var i=0; i<audioMixerItems.length; i++) {
- *		  console.log("audio mixer item setting = " + audioMixerItems[i].setting + '\n' + //a car.audiomixer.AudioMixerSetting value
- *					  "audio mixer item zone = " + audioMixerItems[i].zone + '\n' +	   //a car.Zone value
- *					  "audio mixer item value = " + audioMixerItems[i].value);			//a numeric value
- *	  }
+ *		//iterate through all the audio mixer items
+ *		for (var i=0; &lt;i<audioMixerItems.length; i++) {
+ *			console.log("audio mixer item setting = " + audioMixerItems[i].setting + '\n' +	//a car.audiomixer.AudioMixerSetting value
+ *						"audio mixer item zone = " + audioMixerItems[i].zone + '\n' +		//a car.Zone value
+ *						"audio mixer item value = " + audioMixerItems[i].value);			//a numeric value
+ *		}
  * }
  *
  * function errorCallback(error) {
- *	  console.log(error.code, error.msg);
+ *		console.log(error.code, error.msg);
  * }
  *
- * //optional: provide a car.Zone filter to retrieve only values for that zone.
- * //if omitted, settings for all zones will be returned
+ * //Optional: provide a car.Zone filter to retrieve values for only that zone.
+ * //If omitted, settings for all zones will be returned.
  * var zone = car.Zone.FRONT;
  *
  * //call the method
  * car.audiomixer.get(successCallback, errorCallback, zone);
- *
- * NOTE: considerations and being made for allowing an array of zones to be accepted
  *
  *
  * @example REST - single zone
@@ -144,10 +143,10 @@ _self.cancelWatch = function (watchId) {
  *
  * Response:
  * {
- *	  code: 1,
- *	  data: [
- *		  { setting: 'volume', zone: 'all', value: 50 }
- *	  ]
+ *		code: 1,
+ *		data: [
+ * 			{ setting: 'volume', zone: 'all', value: 50 }
+ *		]
  * }
  *
  *
@@ -158,17 +157,17 @@ _self.cancelWatch = function (watchId) {
  *
  * Success Response:
  * {
- *	  code: 1,
- *	  data: [
- *		  { setting: 'volume', zone: 'all', value: 50 },
- *		  { setting: 'bass', zone: 'all', value: 6 },
- *	  ]
+ *		code: 1,
+ *		data: [
+ *			{ setting: 'volume', zone: 'all', value: 50 },
+ *			{ setting: 'bass', zone: 'all', value: 6 },
+ *		]
  * }
  *
  * Error Response:
  * {
- *	  code: -1,
- *	  msg: "An error has occurred"
+ *		code: -1,
+ *		msg: "An error has occurred"
  * }
  */
 _self.get = function(successCallback, errorCallback, zone) {
@@ -181,19 +180,22 @@ _self.get = function(successCallback, errorCallback, zone) {
 
 
 /**
- * Saves an audio mixer setting
- * @param {String} setting A car.audiomixer.AudioMixerSetting value   
- * @param {String} zone A car.Zone value   
- * @param {Number} value The value to save
- * @param {Function} successCallback (Optional) The callback that is called on success
- * @param {Function} errorCallback (Optional) The callback that is called if there is an error
+ * Save an audio mixer setting
+ * @param {String} setting A <b>car.audiomixer.AudioMixerSetting</b> value.  
+ * @param {String} zone A <b>car.Zone</b> value.   
+ * @param {Number} value The value to save.
+ * @param {Function} [successCallback] The function to call on success.
+ * @param {Function} [errorCallback] The function to call if there is an error.
+ * @memberOf module:car.audiomixer
+ * @method set
  * @see car.audiomixer.AudioMixerSetting
  * @see car.Zone  
  *
- * //option 1: set the volume in the entire car to 50 using constants
+ * @example
+ * //option 1: Set the volume in the entire car to 50 using constants.
  * car.audiomixer.set(car.audiomixer.AudioMixerSetting.VOLUME, car.Zone.ALL, 50);
  *
- * //option 2: set the volume in the entire car to 50 without using constants
+ * //option 2: Set the volume in the entire car to 50 without using constants.
  * car.audiomixer.set('volume', 'all', 50);
  *
  *
@@ -204,13 +206,13 @@ _self.get = function(successCallback, errorCallback, zone) {
  *
  * Success Response:
  * {
- *	  code: 1
+ *		code: 1
  * }
  *
  * Error Response:
  * {
- *	  code: -1,
- *	  msg: "An error has occurred"
+ *		code: -1,
+ *		msg: "An error has occurred"
  * }
  */
 _self.set = function(setting, zone, value, successCallback, errorCallback) {

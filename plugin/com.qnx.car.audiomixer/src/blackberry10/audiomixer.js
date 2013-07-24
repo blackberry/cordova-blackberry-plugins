@@ -88,7 +88,7 @@ module.exports = {
 	
 	/**
 	 * Sets the trigger function to call when a mixer event is fired
-	 * @param trigger {Function} The trigger function to call when the event is fired
+	 * @param {Function} trigger The trigger function to call when the event is fired
 	 */
 	setTriggerUpdate: function(trigger) {
 		_triggerUpdate = trigger;
@@ -96,7 +96,7 @@ module.exports = {
 	
 	/**
 	 * Return the audio mixer settings for a specific zone
-	 * @param {String} zone (Optional) The Zone to filter the results by
+	 * @param {String} [zone] The Zone to filter the results by
 	 * @returns {Object} The requested settings
 	 */
 	get: function(zone) {

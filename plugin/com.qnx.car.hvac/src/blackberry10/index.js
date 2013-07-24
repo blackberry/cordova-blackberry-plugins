@@ -47,10 +47,10 @@ init();
 module.exports = {
 	/**
 	 * Returns the current audio parameters
-	 * @param success {Function} Function to call if the operation is a success
-	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied
-	 * @param env {Object} Environment variables
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
 	 */
 	startEvents: function(success, fail, args, env) {
 		_eventResult = new PluginResult(args, env)
@@ -66,10 +66,10 @@ module.exports = {
 
 	/**
 	 * Returns the current audio parameters
-	 * @param success {Function} Function to call if the operation is a success
-	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied
-	 * @param env {Object} Environment variables
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
 	 */
 	stopEvents: function(success, fail, args, env) {
 		var result = new PluginResult(args, env);
@@ -88,10 +88,10 @@ module.exports = {
 
 	/**
 	 * Returns HVAC settings
-	 * @param success {Function} Function to call if the operation is a success
-	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied
-	 * @param env {Object} Environment variables
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
 	 */
 	get: function(success, fail, args, env) {
 		var result = new PluginResult(args, env)
@@ -104,16 +104,16 @@ module.exports = {
 
 			result.ok(data, false);
 		} catch (e) {
-			result.error(JSON.stringify(e), false)
+			result.error(JSON.stringify(e), false);
 		}
 	},
 	
 	/**
 	 * Sets one or more HVAC settings
-	 * @param success {Function} Function to call if the operation is a success
-	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied
-	 * @param env {Object} Environment variables
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
 	 */
 	set: function(success, fail, args, env) {
 		var result = new PluginResult(args, env)
@@ -122,7 +122,7 @@ module.exports = {
 			_hvac.set(fixedArgs.setting, fixedArgs.zone, fixedArgs.value);
 			result.ok(undefined, false);
 		} catch (e) {
-			result.error(JSON.stringify(e), false)
+			result.error(JSON.stringify(e), false);
 		}
 	}
 };
