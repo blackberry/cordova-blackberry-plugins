@@ -139,24 +139,20 @@ JNEXT.Push = function () {
         // Trigger the event handler of specific Push events
         if (strEventId === "push.create.callback") {
             _results[strEventId].callbackOk(JSON.parse(args), false);
-
         } else if (strEventId === "push.create.simChangeCallback") {
             _results[strEventId].callbackOk(null, false);
-
         } else if (strEventId === "push.create.pushTransportReadyCallback") {
-            _results[strEventId].callbackOk(JSON.parse(args), true);
-        
+            _results[strEventId].callbackOk(JSON.parse(args), true);        
+        } else if (strEventId === "push.create.pushServiceConnectionReadyCallback") {
+            _results[strEventId].callbackOk(JSON.parse(args), true);        
         } else if (strEventId === "push.createChannel.callback") {
             info.result = JSON.parse(arData[1]);
             info.token = arData[2];
             _results[strEventId].callbackOk(info, false);
-
         } else if (strEventId === "push.destroyChannel.callback") {
             _results[strEventId].callbackOk(JSON.parse(args), false);
-
         } else if (strEventId === "push.launchApplicationOnPush.callback") {
             _results[strEventId].callbackOk(JSON.parse(args), false);
-
         }
     };
 

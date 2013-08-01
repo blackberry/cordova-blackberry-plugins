@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-#ifndef PUSH_JS_H_
-#define PUSH_JS_H_
+#ifndef PIPEDATA_H_
+#define PIPEDATA_H_
 
-#include <string>
-#include "../common/plugin.h"
-#include "push_ndk.hpp"
+namespace webworks {
 
-class Push: public JSExt {
-public:
-    explicit Push(const std::string& id);
-    virtual ~Push();
-
-    virtual std::string InvokeMethod(const std::string& command);
-    virtual bool CanDelete();
-    void NotifyEvent(const std::string& eventId, const std::string& eventArgs);
-
-private:
-    std::string m_id; // JNext id
-    webworks::PushNDK* m_pushNDK;
+enum PipeData {
+    STOP_THREAD = 0,
+    CONNECTION_ESTABLISHED,
+    PING_SELECT
 };
 
-#endif /* PUSH_JS_H_ */
+} // namespace webworks
+
+#endif /* PIPEDATA_H_ */

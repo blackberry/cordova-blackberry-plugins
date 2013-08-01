@@ -17,6 +17,8 @@
 describe("blackberry.push", function () {
     var constants = { "SUCCESS" : 0,
                       "INTERNAL_ERROR" : 500,
+                      "PUSH_SERVICE_CONNECTION_CLOSED" : 501,
+                      "PUSH_SERVICE_CONNECTION_PERMISSION_ERROR" : 502,                       
                       "INVALID_DEVICE_PIN" : 10001,
                       "INVALID_PROVIDER_APPLICATION_ID" : 10002,
                       "CHANNEL_ALREADY_DESTROYED" : 10004,
@@ -39,8 +41,10 @@ describe("blackberry.push", function () {
                       "MISSING_INVOKE_TARGET_ID" : 10111,
                       "SESSION_ALREADY_EXISTS" : 10112,
                       "INVALID_PPG_URL" : 10114,
+                      "CREATE_OPERATION" : 0,
                       "CREATE_CHANNEL_OPERATION" : 1,
-                      "DESTROY_CHANNEL_OPERATION" : 2},
+                      "DESTROY_CHANNEL_OPERATION" : 2,
+                      "LAUNCH_APP_ON_PUSH_OPERATION" : 3},
         pushService;
 
 
@@ -74,7 +78,8 @@ describe("blackberry.push", function () {
         var onSuccess,
             onFail,
             onSimChange,
-            onPushTransportReady;
+            onPushTransportReady,
+            onPushServiceConnectionReady;
 
         runs(function () {
             var options = { invokeTargetId : "", 
@@ -85,8 +90,9 @@ describe("blackberry.push", function () {
             onFail = jasmine.createSpy();
             onSimChange = jasmine.createSpy();
             onPushTransportReady = jasmine.createSpy();
+            onPushServiceConnectionReady = jasmine.createSpy();
 
-            blackberry.push.PushService.create(options, onSuccess, onFail, onSimChange, onPushTransportReady);
+            blackberry.push.PushService.create(options, onSuccess, onFail, onSimChange, onPushTransportReady, onPushServiceConnectionReady);
         });
 
         waitsFor(function () {
@@ -103,7 +109,8 @@ describe("blackberry.push", function () {
         var onSuccess,
             onFail,
             onSimChange,
-            onPushTransportReady;
+            onPushTransportReady,
+            onPushServiceConnectionReady;
 
         runs(function () {
             var options = { invokeTargetId : "com.webworks.test.functional.push.target",
@@ -114,8 +121,9 @@ describe("blackberry.push", function () {
             onFail = jasmine.createSpy();
             onSimChange = jasmine.createSpy();
             onPushTransportReady = jasmine.createSpy();
+            onPushServiceConnectionReady = jasmine.createSpy();
 
-            blackberry.push.PushService.create(options, onSuccess, onFail, onSimChange, onPushTransportReady);
+            blackberry.push.PushService.create(options, onSuccess, onFail, onSimChange, onPushTransportReady, onPushServiceConnectionReady);
         });
 
         waitsFor(function () {

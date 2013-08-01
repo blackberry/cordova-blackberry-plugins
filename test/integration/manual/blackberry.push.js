@@ -22,7 +22,8 @@ describe("blackberry.push.PushService", function () {
         var onSuccess,
             onFail,
             onSimChange,
-            onPushTransportReady;
+            onPushTransportReady,
+            onPushServiceConnectionReady;
 
         runs(function () {
             var options = { invokeTargetId : "com.webworks.test.functional.push.target",
@@ -33,8 +34,9 @@ describe("blackberry.push.PushService", function () {
             onFail = jasmine.createSpy();
             onSimChange = jasmine.createSpy();
             onPushTransportReady = jasmine.createSpy();
+            onPushServiceConnectionReady = jasmine.createSpy();
 
-            blackberry.push.PushService.create(options, onSuccess, onFail, onSimChange, onPushTransportReady);
+            blackberry.push.PushService.create(options, onSuccess, onFail, onSimChange, onPushTransportReady, onPushServiceConnectionReady);
         });
 
         waitsFor(function () {
