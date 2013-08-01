@@ -45,7 +45,11 @@
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>access_pimdomain_contacts</rim:permit>
         </config-file>
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts" />
+        </config-file>
         <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
+        <dependency id="org.apache.cordova.blackberry10.pimlib" url="." subdir="/plugin/org.apache.cordova.blackberry10.pimlib/"/>
         <source-file src="src/blackberry10/ContactActivity.js" />
         <source-file src="src/blackberry10/ContactAddress.js" />
         <source-file src="src/blackberry10/ContactError.js" />
@@ -59,8 +63,5 @@
         <source-file src="src/blackberry10/contactUtils.js" />
         <source-file src="src/blackberry10/contactConsts.js" />
         <source-file src="src/blackberry10/index.js" />
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts" />
-        </config-file>
     </platform>
 </plugin>
