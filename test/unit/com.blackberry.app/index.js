@@ -23,7 +23,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.app/",
     mockedLockRotation,
     mockedUnlockRotation,
     mockedWindowState,
-    mockedQnx,
+    mockedWp,
     mockedPluginResult,
     config;
 
@@ -54,24 +54,22 @@ describe("app index", function () {
         mockedLockRotation = jasmine.createSpy();
         mockedUnlockRotation = jasmine.createSpy();
         mockedWindowState = jasmine.createSpy("windowState");
-        mockedQnx = {
-            webplatform: {
-                getApplication: function () {
-                    return {
-                        minimizeWindow: mockedMinimize,
-                        exit: mockedExit,
-                        rotate: mockedRotate,
-                        lockRotation: mockedLockRotation,
-                        unlockRotation: mockedUnlockRotation,
-                        windowState: mockedWindowState
-                    };
-                }
+        mockedWp = {
+            getApplication: function () {
+                return {
+                    minimizeWindow: mockedMinimize,
+                    exit: mockedExit,
+                    rotate: mockedRotate,
+                    lockRotation: mockedLockRotation,
+                    unlockRotation: mockedUnlockRotation,
+                    windowState: mockedWindowState
+                };
             }
         };
         GLOBAL.window = {
-            qnx: mockedQnx
+            wp: mockedWp
         };
-        GLOBAL.qnx = mockedQnx;
+        GLOBAL.wp = mockedWp;
         mockedPluginResult = {
             ok: jasmine.createSpy("PluginResult.ok"),
             error: jasmine.createSpy("PluginResult.error"),
@@ -90,7 +88,7 @@ describe("app index", function () {
         mockedLockRotation = null;
         mockedUnlockRotation = null;
         mockedWindowState = null;
-        mockedQnx = null;
+        mockedWp = null;
         delete GLOBAL.window;
         delete GLOBAL.qnx;
         config = null;

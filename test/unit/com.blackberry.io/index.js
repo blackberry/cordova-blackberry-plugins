@@ -33,15 +33,13 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.io/",
 
 describe("blackberry.io index", function () {
     beforeEach(function () {
-        GLOBAL.qnx = {
-            webplatform: {
-                getApplication: function () {
-                    return mockedApplication;
-                }
+        GLOBAL.wp = {
+            getApplication: function () {
+                return mockedApplication;
             }
         };
         GLOBAL.window = {
-            qnx: qnx
+            wp: wp
         };
         GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
     });

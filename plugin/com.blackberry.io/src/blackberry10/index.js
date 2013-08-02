@@ -17,7 +17,7 @@ var _util = require("./../../lib/utils"),
     _webview;
 
 function getHomeDir() {
-    var homeDir = window.qnx.webplatform.getApplication().getEnv("HOME");
+    var homeDir = window.wp.getApplication().getEnv("HOME");
 
     // HOME environment variable starts with two slashes for some reason, get rid of the extra slash
     if (homeDir.match("^//")) {

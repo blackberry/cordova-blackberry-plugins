@@ -15,7 +15,7 @@
  */
 var overlayWebView;
 
-qnx.webplatform.getController().addEventListener('overlayWebView.initialized', function (webviewObj) {
+window.wp.getController().on('overlayWebView.initialized', function (webviewObj) {
     overlayWebView = webviewObj;
 });
 
@@ -42,7 +42,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.mediaplayerPreviewer.open(options, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.mediaplayerPreviewer.open(options, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -59,7 +59,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.camera.open(mode, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.camera.open(mode, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -76,7 +76,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.filePicker.open(options, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.filePicker.open(options, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -93,7 +93,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.icsViewer.open(options, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.icsViewer.open(options, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -111,7 +111,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.calendar.picker.open(options, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.calendar.picker.open(options, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -128,7 +128,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.calendar.composer.open(options, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.calendar.composer.open(options, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -145,7 +145,7 @@ module.exports = {
                 trigger(result, "invoke", error);
             };
 
-        window.qnx.webplatform.getApplication().cards.email.composer.open(options, done, cancel, invokeCallback);
+        window.wp.getApplication().cards.email.composer.open(options, done, cancel, invokeCallback);
         result.noResult(true);
     },
 
@@ -153,7 +153,7 @@ module.exports = {
         var title = JSON.parse(decodeURIComponent(args.title)),
             pluginResult = new PluginResult(args, env),
             request = JSON.parse(decodeURIComponent(args.request)),
-            invocation = window.qnx.webplatform.getApplication().invocation,
+            invocation = window.wp.core.invocation,
             onError,
             onSuccess;
 

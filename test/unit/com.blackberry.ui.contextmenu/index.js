@@ -30,34 +30,27 @@ var _extDir = __dirname + "/../../../plugin/",
         defineCustomContext: jasmine.createSpy(),
         enabled : true
     },
-    mockedQnx = {
-        webplatform: {
-            getController: function () {
-                return {
-                    addEventListener: function (eventType, callback) {
-                        callback();
-                    }
-                };
-            },
-            createUIWebView: function () {
-                return {
-                    contextMenu : mockedContextMenu
-                };
-            }
+    mockedWp = {
+        getController: function () {
+            return {
+                on: function (eventType, callback) {
+                    callback();
+                }
+            };
+        },
+        ui: {
+            contextmenu : mockedContextMenu
         }
     };
 
 describe("com.blackberry.ui.contextmenu index", function () {
 
     beforeEach(function () {
-        GLOBAL.qnx = mockedQnx;
+        GLOBAL.wp = mockedWp;
         GLOBAL.window = {
-            qnx: mockedQnx
+            wp: mockedWp
         };
         contextmenu = require(_extDir + "com.blackberry.ui.contextmenu");
-        overlayWebView = require(_libDir + "overlayWebView");
-        overlayWebView.create();
-        overlayWebView.contextMenu = mockedContextMenu;
         mockedPluginResult = {
             ok: jasmine.createSpy("PluginResult.ok"),
             error: jasmine.createSpy("PluginResult.error"),
@@ -68,7 +61,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
     });
 
     afterEach(function () {
-        delete GLOBAL.qnx;
+        delete GLOBAL.wp;
         delete GLOBAL.window;
         delete GLOBAL.PluginResult;
     });
@@ -79,7 +72,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
             },
             env = {};
         contextmenu.enabled(null, null, args, env);
-        expect(overlayWebView.contextMenu.enabled).toEqual(false);
+        expect(mockedWp.ui.contextmenu.enabled).toEqual(false);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
     });
 
@@ -90,7 +83,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
             env = {};
 
         contextmenu.enabled(null, null, args, env);
-        expect(overlayWebView.contextMenu.enabled).toEqual(true);
+        expect(mockedWp.ui.contextmenu.enabled).toEqual(true);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
     });
 
@@ -113,7 +106,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
     it("can add a custom menu item", function () {
         var args = {
                 contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'})),
+                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'}))
             },
             env = {},
             expectedArgs = {
@@ -129,7 +122,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
     it("properly passes the sourceId from the handler back to the callback", function () {
         var args = {
                 contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'})),
+                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'}))
             },
             env = {};
 
@@ -141,7 +134,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
         var id = 42,
             args = {
                 contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                actionId: encodeURIComponent(JSON.stringify(id)),
+                actionId: encodeURIComponent(JSON.stringify(id))
             },
             env = {},
             expectedArgs = {
@@ -160,7 +153,7 @@ describe("com.blackberry.ui.contextmenu index", function () {
                     includeContextItems: ['IMAGE'],
                     includePlatformItems: false,
                     includeMenuServiceItems: false
-                })),
+                }))
             },
             env = {};
 

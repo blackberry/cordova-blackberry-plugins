@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -79,11 +79,9 @@ describe("pim.calendar/index", function () {
             registerEvents: jasmine.createSpy("JNEXT.registerEvent")
         };
         GLOBAL.window = {
-            qnx: {
-                webplatform: {
-                    device: {
-                        timezone: "America/New_York"
-                    }
+            wp: {
+                device: {
+                    timezone: "America/New_York"
                 }
             }
         };
@@ -122,7 +120,7 @@ describe("pim.calendar/index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        args["options"]["sourceTimezone"] = window.qnx.webplatform.device.timezone;
+        args["options"]["sourceTimezone"] = window.wp.device.timezone;
 
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "find " + JSON.stringify(args));
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -131,11 +129,11 @@ describe("pim.calendar/index", function () {
     it("find - without correct permission specified", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
-            findOptions = {   
+            findOptions = {
                 filter: [{
                     fieldName: CalendarFindOptions.SEARCH_FIELD_GIVEN_NAME,
                     fieldValue: "John"
-                }], 
+                }],
                 limit: 5
             };
 
@@ -171,7 +169,7 @@ describe("pim.calendar/index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        args["sourceTimezone"] = window.qnx.webplatform.device.timezone;
+        args["sourceTimezone"] = window.wp.device.timezone;
         args["targetTimezone"] = "";
 
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "save " + JSON.stringify(args));
@@ -185,7 +183,7 @@ describe("pim.calendar/index", function () {
                 "summary": "a test",
                 "location": "test",
                 "start": new Date("Jan 01, 2015, 12:00"),
-                "end": new Date("Jan 01, 2015, 12:30"),
+                "end": new Date("Jan 01, 2015, 12:30")
             }),
             args = {},
             key;
@@ -221,7 +219,7 @@ describe("pim.calendar/index", function () {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
         });
 
-        args["sourceTimezone"] = window.qnx.webplatform.device.timezone;
+        args["sourceTimezone"] = window.wp.device.timezone;
 
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "remove " + JSON.stringify(args));
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -247,7 +245,7 @@ describe("pim.calendar/index", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
             args = {};
- 
+
         spyOn(utils, "hasPermission").andReturn(false);
 
         index.getDefaultCalendarAccount(successCb, failCb, args);
@@ -288,7 +286,7 @@ describe("pim.calendar/index", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
             args = {};
- 
+
         spyOn(utils, "hasPermission").andReturn(true);
 
         index.getCalendarAccounts(successCb, failCb, args);
@@ -306,7 +304,7 @@ describe("pim.calendar/index", function () {
                 eventId: encodeURIComponent(JSON.stringify("123")),
                 accountId: encodeURIComponent(JSON.stringify("1"))
             };
- 
+
         spyOn(utils, "hasPermission").andReturn(false);
 
         index.getEvent(successCb, failCb, args);
@@ -342,7 +340,7 @@ describe("pim.calendar/index", function () {
             failCb = jasmine.createSpy();
 
         spyOn(utils, "hasPermission").andReturn(true);
- 
+
         index.getDefaultCalendarFolder(successCb, failCb, {});
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDefaultCalendarFolder");
         expect(mockedPluginResult.ok).toHaveBeenCalled();

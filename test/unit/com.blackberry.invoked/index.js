@@ -35,15 +35,14 @@ describe("invoked index", function () {
         };
         GLOBAL.window = {};
         GLOBAL.window.qnx = {
-            callExtensionMethod : function () {},
-            webplatform: {
-                getApplication: function () {
-                    return {
-                        invocation: mockedInvocation
-                    };
-                }
+            callExtensionMethod : function () {}
+        };
+        GLOBAL.window.wp = {
+            core: {
+                invocation: mockedInvocation
             }
         };
+
         mockedPluginResult = {
             callbackOk: jasmine.createSpy(),
             callbackError: jasmine.createSpy(),
@@ -64,6 +63,7 @@ describe("invoked index", function () {
     afterEach(function () {
         mockedInvocation = null;
         GLOBAL.window.qnx = null;
+        GLOBAL.window.wp = null;
         index = null;
         successCB = null;
         failCB = null;

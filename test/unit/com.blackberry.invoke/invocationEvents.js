@@ -23,16 +23,14 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoke/",
 describe("invoke invocationEvents", function () {
     beforeEach(function () {
         mockedInvocation = {
-            addEventListener: jasmine.createSpy("invocation addEventListener"),
-            removeEventListener: jasmine.createSpy("invocation removeEventListener"),
+            on: jasmine.createSpy("invocation addEventListener"),
+            un: jasmine.createSpy("invocation removeEventListener"),
             interrupter: undefined
         };
-        GLOBAL.window.qnx = {
-            webplatform: {
-                getApplication: function () {
-                    return {
-                        invocation: mockedInvocation
-                    };
+        GLOBAL.window = {
+            wp: {
+                core: {
+                    invocation: mockedInvocation
                 }
             }
         };
@@ -53,36 +51,36 @@ describe("invoke invocationEvents", function () {
     describe("onchildcardstartpeek", function () {
         it("add proper event to invocation for 'onchildcardstartpeek'", function () {
             invocationEvents.addEventListener("onchildcardstartpeek", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardPeekStarted", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("cardPeekStarted", trigger);
         });
 
         it("remove proper event from invocation for 'onchildcardstartpeek", function () {
             invocationEvents.removeEventListener("onchildcardstartpeek", trigger);
-            expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardPeekStarted", trigger);
+            expect(mockedInvocation.un).toHaveBeenCalledWith("cardPeekStarted", trigger);
         });
     });
 
     describe("onchildcardendpeek", function () {
         it("add proper event to invocation for 'onchildcardendpeek'", function () {
             invocationEvents.addEventListener("onchildcardendpeek", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardPeekEnded", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("cardPeekEnded", trigger);
         });
 
         it("remove proper event from invocation for 'onchildcardendpeek", function () {
             invocationEvents.removeEventListener("onchildcardendpeek", trigger);
-            expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardPeekEnded", trigger);
+            expect(mockedInvocation.un).toHaveBeenCalledWith("cardPeekEnded", trigger);
         });
     });
 
     describe("onchildcardclosed", function () {
         it("add proper event to invocation for 'onchildcardclosed'", function () {
             invocationEvents.addEventListener("onchildcardclosed", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("childCardClosed", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("childCardClosed", trigger);
         });
 
         it("remove proper event from invocation for 'onchildcardclosed", function () {
             invocationEvents.removeEventListener("onchildcardclosed", trigger);
-            expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("childCardClosed", trigger);
+            expect(mockedInvocation.un).toHaveBeenCalledWith("childCardClosed", trigger);
         });
     });
 

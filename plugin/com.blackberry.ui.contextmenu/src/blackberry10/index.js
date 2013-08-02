@@ -16,7 +16,6 @@
 
 var LIB_FOLDER = "../../lib/",
     contextmenu,
-    _overlayWebView,
     _utils = require(LIB_FOLDER + 'utils');
 
 function enabled(success, fail, args, env) {
@@ -25,11 +24,11 @@ function enabled(success, fail, args, env) {
     if (typeof args.enabled !== 'undefined') {
         _enabled = JSON.parse(decodeURIComponent(args.enabled));
         if (typeof(_enabled) === 'boolean') {
-            _overlayWebView.contextMenu.enabled = _enabled;
+            wp.ui.contextmenu.enabled = _enabled;
         }
         result.ok(true, false);
     } else {
-        result.ok(_overlayWebView.contextMenu.enabled, false);
+        result.ok(wp.ui.contextmenu.enabled, false);
     }
 }
 
@@ -39,7 +38,7 @@ function overrideItem(success, fail, args, env) {
     args.handler = function (actionId) {
         result.callbackOk(null, true);
     };
-    if (_overlayWebView.contextMenu.overrideItem(args.action, args.handler)) {
+    if (wp.ui.contextmenu.overrideItem(args.action, args.handler)) {
         result.noResult(true);
     } else {
         result.error("Item could not be overriden", false);
@@ -49,7 +48,7 @@ function overrideItem(success, fail, args, env) {
 function clearOverride(success, fail, args, env) {
     var result = new PluginResult(args, env),
         actionId = JSON.parse(decodeURIComponent(args.actionId));
-    result.ok(_overlayWebView.contextMenu.clearOverride(actionId), false);
+    result.ok(wp.ui.contextmenu.clearOverride(actionId), false);
 }
 
 function addItem(success, fail, args, env) {
@@ -59,7 +58,7 @@ function addItem(success, fail, args, env) {
     args.handler = function (actionId, elementId) {
         result.callbackOk(elementId, true);
     };
-    _overlayWebView.contextMenu.addItem(function (data) {
+    wp.ui.contextmenu.addItem(function (data) {
         result.noResult(true);
     }, function (e) {
         result.error(e, false);
@@ -70,7 +69,7 @@ function removeItem(success, fail, args, env) {
     var result = new PluginResult(args, env);
     args.contexts = JSON.parse(decodeURIComponent(args.contexts));
     args.actionId = JSON.parse(decodeURIComponent(args.actionId));
-    _overlayWebView.contextMenu.removeItem(function (data) {
+    wp.ui.contextmenu.removeItem(function (data) {
         result.ok(data, false);
     }, function (e) {
         result.error(e, false);
@@ -81,7 +80,7 @@ function defineCustomContext(success, fail, args, env) {
     var result = new PluginResult(args, env);
     args.context = JSON.parse(decodeURIComponent(args.context));
     args.options = JSON.parse(decodeURIComponent(args.options));
-    _overlayWebView.contextMenu.defineCustomContext(args.context, args.options);
+    wp.ui.contextmenu.defineCustomContext(args.context, args.options);
     result.ok(null, false);
 }
 
@@ -93,9 +92,5 @@ contextmenu = {
     clearOverride: clearOverride,
     defineCustomContext: defineCustomContext
 };
-
-qnx.webplatform.getController().addEventListener('ui.init', function () {
-    _overlayWebView = require(LIB_FOLDER + 'overlayWebView');
-});
 
 module.exports = contextmenu;

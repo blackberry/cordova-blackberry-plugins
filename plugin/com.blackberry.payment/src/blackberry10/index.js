@@ -26,7 +26,7 @@ module.exports = {
                 "purchaseAppName" : JSON.parse(decodeURIComponent(args.purchaseAppName)),
                 "purchaseAppIcon" : JSON.parse(decodeURIComponent(args.purchaseAppIcon)),
                 "extraParameters" : JSON.parse(decodeURIComponent(args.extraParameters)),
-                "windowGroup" : window.qnx.webplatform.getController().windowGroup
+                "windowGroup" : window.wp.getController().windowGroup
             };
 
         try {
@@ -38,7 +38,7 @@ module.exports = {
     cancelSubscription: function (success, fail, args) {
         var cancelSubscription_arguments_t = {
                 "transactionID" : JSON.parse(decodeURIComponent(args.transactionID)),
-                "windowGroup" : window.qnx.webplatform.getController().windowGroup
+                "windowGroup" : window.wp.getController().windowGroup
             };
 
         try {
@@ -52,7 +52,7 @@ module.exports = {
         var getPrice_arguments_t = {
                 "id" : JSON.parse(decodeURIComponent(args.id)),
                 "sku" : JSON.parse(decodeURIComponent(args.sku)),
-                "windowGroup" : window.qnx.webplatform.getController().windowGroup
+                "windowGroup" : window.wp.getController().windowGroup
             };
 
         try {
@@ -65,7 +65,7 @@ module.exports = {
     getExistingPurchases: function (success, fail, args) {
         var getExistingPurchases_arguments_t = {
                 "refresh" : JSON.parse(decodeURIComponent(args.refresh)),
-                "windowGroup" : window.qnx.webplatform.getController().windowGroup
+                "windowGroup" : window.wp.getController().windowGroup
             };
 
         try {
@@ -78,7 +78,7 @@ module.exports = {
         var check_existing_args = {
                 "id" : JSON.parse(decodeURIComponent(args.id)),
                 "sku" : JSON.parse(decodeURIComponent(args.sku)),
-                "windowGroup" : window.qnx.webplatform.getController().windowGroup
+                "windowGroup" : window.wp.getController().windowGroup
             };
 
         try {
@@ -121,7 +121,7 @@ JNEXT.Payment = function ()
         result.successState = successState;
         result.errorObject = {};
         result.errorObject = errorObject;
-        
+
         return result;
     };
 
@@ -172,11 +172,11 @@ JNEXT.Payment = function ()
 
         return result;
     };
-    
+
     self.getPrice = function (args) {
         var val = JNEXT.invoke(self.m_id, "getPrice " + JSON.stringify(args)),
             result;
-   
+
         if (val === "-1") {
             result = self.getErrorObject("BPS_FAILURE", "-1", "getPrice Failed. Payment Service Error.");
         } else {
@@ -185,7 +185,7 @@ JNEXT.Payment = function ()
 
         return result;
     };
-    
+
     self.checkExisting = function (args) {
         var val = JNEXT.invoke(self.m_id, "checkExisting " + JSON.stringify(args)),
             result;
@@ -197,7 +197,7 @@ JNEXT.Payment = function ()
         }
 
         return result;
-    };    
+    };
 
     self.getId = function () {
         return self.m_id;

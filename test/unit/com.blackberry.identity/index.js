@@ -29,10 +29,8 @@ describe("identity index", function () {
     describe("getFields", function () {
         beforeEach(function () {
             GLOBAL.window = {
-                qnx: {
-                    webplatform: {
-                        device: {
-                        }
+                wp: {
+                    device: {
                     }
                 }
             };
@@ -57,7 +55,7 @@ describe("identity index", function () {
                 IMEI: "AA-BBBBBB-CCCCCC-D"
             };
 
-            window.qnx.webplatform.device = mockedDevice;
+            window.wp.device = mockedDevice;
 
             index.getFields();
 
@@ -81,7 +79,7 @@ describe("identity index", function () {
         it("will call fail when an error occurs", function () {
             var errMsg = "Something bad happened";
 
-            Object.defineProperty(window.qnx.webplatform.device, "devicePin", {
+            Object.defineProperty(window.wp.device, "devicePin", {
                 get: function () {
                     throw new Error(errMsg);
                 }

@@ -23,14 +23,14 @@ module.exports = {
         //IMSI is likely to fail since few devs will have access
         //TO compensate we will eat the error
         try {
-            fields.IMSI = window.qnx.webplatform.device.IMSI;
+            fields.IMSI = window.wp.device.IMSI;
         } catch (e) {
             //DO NOTHING
         }
 
         try {
-            fields.uuid = window.qnx.webplatform.device.devicePin;
-            fields.IMEI = window.qnx.webplatform.device.IMEI;
+            fields.uuid = window.wp.device.devicePin;
+            fields.IMEI = window.wp.device.IMEI;
 
             if (fields.uuid || fields.IMSI || fields.IMEI) {
                 result.ok(fields, false);

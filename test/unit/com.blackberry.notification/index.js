@@ -37,8 +37,8 @@ describe("notification index", function () {
         MockPluginResult.prototype.noResult = jasmine.createSpy("PluginResult.noResult");
 
 
-        GLOBAL.qnx = {
-            webplatform: {
+        GLOBAL.window = {
+            wp: {
                 notification: mockNotification
             }
         };
@@ -51,7 +51,7 @@ describe("notification index", function () {
     });
 
     afterEach(function () {
-        delete GLOBAL.qnx;
+        delete GLOBAL.window;
         delete GLOBAL.PluginResult;
         mockNotification = null;
         index = null;

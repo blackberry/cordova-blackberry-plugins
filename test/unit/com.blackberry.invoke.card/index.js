@@ -39,7 +39,7 @@ describe("invoke.card index", function () {
             }
         };
         mockedController = {
-            addEventListener: jasmine.createSpy().andCallFake(function (evt, callback) {
+            on: jasmine.createSpy().andCallFake(function (evt, callback) {
                 callback(mockedWebview);
             })
         };
@@ -67,33 +67,35 @@ describe("invoke.card index", function () {
 
         GLOBAL.window = {
             qnx: {
-                callExtensionMethod : function () {},
-                webplatform: {
-                    getApplication: function () {
-                        return {
-                            invocation : {
-                                TARGET_TYPE_MASK_APPLICATION : 1,
-                                TARGET_TYPE_MASK_CARD : 2,
-                                TARGET_TYPE_MASK_VIEWER : 4
+                callExtensionMethod : function () {}
+            },
+            wp: {
+                core: {
+                    invocation : {
+                        TARGET_TYPE_MASK_APPLICATION : 1,
+                        TARGET_TYPE_MASK_CARD : 2,
+                        TARGET_TYPE_MASK_VIEWER : 4
+                    }
+                },
+                getApplication: function () {
+                    return {
+                        cards: {
+                            mediaplayerPreviewer: mockedMediaPlayer,
+                            camera: mockedCamera,
+                            filePicker: mockedFile,
+                            icsViewer: mockedIcs,
+                            email: {
+                                composer: mockedEmailComposer
                             },
-                            cards: {
-                                mediaplayerPreviewer: mockedMediaPlayer,
-                                camera: mockedCamera,
-                                filePicker: mockedFile,
-                                icsViewer: mockedIcs,
-                                email: {
-                                    composer: mockedEmailComposer
-                                },
-                                calendar: {
-                                    picker: mockedCalPicker,
-                                    composer: mockedCalComposer
-                                }
+                            calendar: {
+                                picker: mockedCalPicker,
+                                composer: mockedCalComposer
                             }
-                        };
-                    },
-                    getController: function () {
-                        return mockedController;
-                    },
+                        }
+                    };
+                },
+                getController: function () {
+                    return mockedController;
                 }
             }
         };
@@ -236,14 +238,14 @@ describe("invoke.card index", function () {
                 body = "Body",
                 mockedArgs = {
                     "subject": subject,
-                    "body": body,
+                    "body": body
                 };
 
             index.invokeEmailComposer(successCB, null, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
 
             expect(mockedEmailComposer.open).toHaveBeenCalledWith({
                     subject: decodeURIComponent(subject),
-                    body: decodeURIComponent(body),
+                    body: decodeURIComponent(body)
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });

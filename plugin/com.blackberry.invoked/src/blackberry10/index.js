@@ -47,7 +47,7 @@ module.exports = {
     cardResizeDone: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
         try {
-            window.qnx.webplatform.getApplication().invocation.cardResized();
+            window.wp.core.invocation.cardResized();
             result.noResult(true);
         } catch (e) {
             result.error(e, false);
@@ -60,7 +60,7 @@ module.exports = {
 
         try {
             cardPeek = decodeURIComponent(args["peekType"]);
-            window.qnx.webplatform.getApplication().invocation.cardPeek(cardPeek);
+            window.wp.core.invocation.cardPeek(cardPeek);
             result.noResult(true);
         } catch (e) {
             result.error(e, false);
@@ -73,7 +73,7 @@ module.exports = {
 
         try {
             request = JSON.parse(decodeURIComponent(args["request"]));
-            window.qnx.webplatform.getApplication().invocation.sendCardDone(request);
+            window.wp.core.invocation.sendCardDone(request);
             result.noResult(true);
         } catch (e) {
             result.error(e, false);

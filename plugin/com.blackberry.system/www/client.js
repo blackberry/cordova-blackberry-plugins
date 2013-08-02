@@ -41,7 +41,7 @@ var _self = {},
         return thisChannel;
     });
 
-function getFieldValue(field, args) {
+function getFieldValue(field, args, keepSilent) {
     var value = null,
         success = function (data, response) {
             value = data;
@@ -53,7 +53,9 @@ function getFieldValue(field, args) {
     try {
         execFunc(success, fail, ID, field, args);
     } catch (e) {
-        console.error(e);
+        if (!keepSilent) {
+            console.error(e);
+        }
     }
 
     return value;
@@ -106,6 +108,8 @@ _self.getCurrentTimezone = function () {
 _self.getTimezones = function () {
     return getFieldValue("getTimezones");
 };
+//Front-load this call to avoid 10.2 error
+getFieldValue("getTimezones", undefined, true);
 
 _self.setWallpaper = function (path) {
     execFunc(noop, noop, ID, "setWallpaper", {"wallpaper": path});

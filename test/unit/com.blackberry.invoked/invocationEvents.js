@@ -24,8 +24,8 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoked/",
 describe("invoked invocationEvents", function () {
     beforeEach(function () {
         mockedInvocation = {
-            addEventListener: jasmine.createSpy("invocation addEventListener"),
-            removeEventListener: jasmine.createSpy("invocation removeEventListener"),
+            on: jasmine.createSpy("invocation addEventListener"),
+            un: jasmine.createSpy("invocation removeEventListener"),
             getStartupMode: jasmine.createSpy("getStartupMode").andCallFake(function () {
                 return startupMode;
             }),
@@ -33,16 +33,13 @@ describe("invoked invocationEvents", function () {
             LAUNCH: 0
         };
         GLOBAL.window = {
-            qnx: {
-                webplatform: {
-                    getApplication: function () {
-                        return {
-                            invocation: mockedInvocation
-                        };
-                    }
+            wp: {
+                core: {
+                    invocation: mockedInvocation
                 }
             }
         };
+        GLOBAL.wp = window.wp;
         startupMode = 1;
         //since multiple tests are requiring invocation events we must unrequire
         var name = require.resolve(_apiDir + "invocationEvents");
@@ -53,7 +50,8 @@ describe("invoked invocationEvents", function () {
 
     afterEach(function () {
         mockedInvocation = null;
-        delete GLOBAL.window.qnx;
+        delete GLOBAL.wp;
+        delete GLOBAL.window.wp;
         delete GLOBAL.window;
     });
 
@@ -62,12 +60,12 @@ describe("invoked invocationEvents", function () {
 
         it("calls framework setOnInvoked for 'invoked' event", function () {
             invocationEvents.addEventListener("invoked", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("Invoked", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("Invoked", trigger);
         });
 
         it("calls framework setOnInvoked right away when startupMode is Invoke", function () {
             invocationEvents.addEventListener("invoked", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("Invoked", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("Invoked", trigger);
             expect(trigger).toHaveBeenCalled();
         });
     });
@@ -75,31 +73,31 @@ describe("invoked invocationEvents", function () {
     describe("removeEventListener", function () {
         it("calls framework setOnInvoked for 'invoked' event", function () {
             invocationEvents.removeEventListener("invoked", trigger);
-            expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("Invoked", trigger);
+            expect(mockedInvocation.un).toHaveBeenCalledWith("Invoked", trigger);
         });
     });
 
     describe("onCardResize", function () {
         it("add proper event to invocation for 'oncardresize'", function () {
             invocationEvents.addEventListener("oncardresize", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardResize", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("cardResize", trigger);
         });
 
         it("remove proper event from invocation for 'oncardresize", function () {
             invocationEvents.removeEventListener("oncardresize", trigger);
-            expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardResize", trigger);
+            expect(mockedInvocation.un).toHaveBeenCalledWith("cardResize", trigger);
         });
     });
 
     describe("onCardClosed", function () {
         it("add proper event to invocation for 'oncardclosed'", function () {
             invocationEvents.addEventListener("oncardclosed", trigger);
-            expect(mockedInvocation.addEventListener).toHaveBeenCalledWith("cardClosed", trigger);
+            expect(mockedInvocation.on).toHaveBeenCalledWith("cardClosed", trigger);
         });
 
         it("remove proper event from invocation for 'oncardclosed", function () {
             invocationEvents.removeEventListener("oncardclosed", trigger);
-            expect(mockedInvocation.removeEventListener).toHaveBeenCalledWith("cardClosed", trigger);
+            expect(mockedInvocation.un).toHaveBeenCalledWith("cardClosed", trigger);
         });
     });
 });

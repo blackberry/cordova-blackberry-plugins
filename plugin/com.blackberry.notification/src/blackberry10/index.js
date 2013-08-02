@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 var _config = require("./../../lib/config"),
-    _notification = qnx.webplatform.notification;
+    _notification = window.wp.notification;
 
 module.exports = {
     notify: function (success, fail, sourceArgs, env) {

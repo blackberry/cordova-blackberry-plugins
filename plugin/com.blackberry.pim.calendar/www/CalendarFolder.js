@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -26,7 +26,7 @@ var CalendarFolder = function (properties) {
     this.readonly = properties && typeof properties.readonly !== "undefined" ? properties.readonly : false;
     this.type = properties && typeof properties.type !== "undefined" ? properties.type : -1; // TODO
     this.visible = properties && typeof properties.visible !== "undefined" ? properties.visible : true;
-    this.default = properties && typeof properties.default !== "undefined" ? properties.default : false;
+    this["default"] = properties && typeof properties["default"] !== "undefined" ? properties["default"] : false;
     this.enterprise = properties && typeof properties.enterprise !== "undefined" ? properties.enterprise : false;
 };
 
