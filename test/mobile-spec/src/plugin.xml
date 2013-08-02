@@ -18,9 +18,6 @@
  under the License.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0" id="org.cordova.mobile-spec-dependencies" version="1.0.0">
-  <engines>
-    <engine name="cordova" version="&gt;=2.7"/>
-  </engines>
   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
   <dependency id="org.apache.cordova.core.battery-status" url="https://github.com/apache/cordova-plugin-battery-status.git"/>
   <dependency id="org.apache.cordova.core.camera" url="https://github.com/apache/cordova-plugin-camera"/>

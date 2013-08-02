@@ -30,43 +30,29 @@ var jWorkflow = require("jWorkflow"),
 
 module.exports = function (branch, targetName, targetIP, targetType, targetPassword) {
     var deployTest = jWorkflow.order(),
-        preservingProject = false,
-        projectFileBackuped = path.join(testAppPrj, '..', 'project.json'),
-        projectFile = path.join(testAppPrj, 'project.json');
+        shouldAddTarget = targetName && targetIP && targetPassword;
 
-    if (!targetIP && !targetType && !targetPassword && 
-        fs.existsSync(path.join(testAppPrj, 'project.json'))) {
-        preservingProject = true;
-    }
-
-    deployTest = jWorkflow.order();
     deployTest.andThen(function (prev, baton) {
         baton.take();
-        prjUtils.setupRepo(branch ? branch : 'master', function () {
+        prjUtils.setupRepo(branch, function () {
             baton.pass();
         });
     })
     .andThen(function (prev, baton) {
         baton.take();
-        if (preservingProject) {
-            utils.copyFile(projectFile, path.join(testAppPrj, '..'));
-        }
         prjUtils.createProject(testAppPrj, testAppPrjName, function () {
-            if (preservingProject && fs.existsSync(projectFileBackuped)) {
-                utils.copyFile(projectFileBackuped, testAppPrj);
-            }
             baton.pass();
         });
     })
     .andThen(function (prev, baton) {
         baton.take();
-        if (!preservingProject) {
+        if (shouldAddTarget) {
             prjUtils.configProject(testAppPrj, targetName, targetIP, targetType, targetPassword, function () {
                 baton.pass();
-            });    
+            });
         } else {
             baton.pass();
-        }  
+        }
     })
     .andThen(function (prev, baton) {
         baton.take();
@@ -82,26 +68,7 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
     })
     .andThen(function (prev, baton) {
         var plugins = [
-            "com.blackberry.app",
-            "com.blackberry.bbm.platform",
-            "com.blackberry.connection",
-            "com.blackberry.identity",
-            "com.blackberry.invoke",
-            "com.blackberry.invoke.card",
-            "com.blackberry.invoked",
-            "com.blackberry.io",
-            "com.blackberry.io.filetransfer",
-            "com.blackberry.notification",
-            "com.blackberry.payment",
-            "com.blackberry.pim.calendar",
-            "com.blackberry.pim.contacts",
-            "com.blackberry.push",
-            "com.blackberry.sensors",
-            "com.blackberry.system",
-            "com.blackberry.ui.contextmenu",
-            "com.blackberry.ui.cover",
-            "com.blackberry.ui.dialog",
-            "com.blackberry.ui.toast"
+            path.join("www", "dependencies-plugin")
         ];
         baton.take();
         prjUtils.addPlugins(testAppPrj, plugins, function () {
@@ -110,12 +77,12 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
     })
     .andThen(function (prev, baton) {
         baton.take();
-        prjUtils.buildProject(testAppPrj, function () {
+        prjUtils.runProject(testAppPrj, targetName, function () {
             baton.pass();
         });
     })
     .start(function () {
         console.log("DONE");
     });
-    
+
 };

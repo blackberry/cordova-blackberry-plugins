@@ -28,52 +28,41 @@ var jWorkflow = require("jWorkflow"),
 
 module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
     var tasks = jWorkflow.order(),
-        preservingProject = false,
+        shouldAddTarget = targetName && targetIP && targetPassword,
         projectFileBackuped = path.join(projectPath, '..', 'project.json'),
         projectFile = path.join(projectPath, 'project.json');
 
-    if (fs.existsSync(projectPath)) {
+    if (!fs.existsSync(projectPath)) {
         wrench.mkdirSyncRecursive(projectPath, "0755");
-    }
-
-    if (!targetIP && !targetType && !targetPassword && 
-        fs.existsSync(projectFile)) {
-        preservingProject = true;
     }
 
     tasks.andThen(function (prev, baton) {
             baton.take();
-            prjUtils.setupRepo(branch ? branch : 'master', function () {
+            prjUtils.setupRepo(branch ? branch : 'origin/master', function () {
                 baton.pass();
             });
         })
     .andThen(function (prev, baton) {
         baton.take();
-        prjUtils.setupMobileSpecRepo(mobileSpecBranch ? mobileSpecBranch : 'master', function () {
+        prjUtils.setupMobileSpecRepo(mobileSpecBranch ? mobileSpecBranch : 'origin/master', function () {
             baton.pass();
         });
     })
     .andThen(function (prev, baton) {
         baton.take();
-        if (preservingProject) {
-            utils.copyFile(projectFile, path.join(projectPath, '..'));
-        }
         prjUtils.createProject(projectPath, projectName, function () {
-            if (preservingProject && fs.existsSync(projectFileBackuped)) {
-                utils.copyFile(projectFileBackuped, projectPath);
-            }
             baton.pass();
         });
     })
     .andThen(function (prev, baton) {
         baton.take();
-        if (!preservingProject) {
+        if (shouldAddTarget) {
             prjUtils.configProject(projectPath, targetName, targetIP, targetType, targetPassword, function () {
                 baton.pass();
-            });    
+            });
         } else {
             baton.pass();
-        }  
+        }
     })
     .andThen(function (prev, baton) {
         baton.take();
@@ -83,11 +72,15 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
     })
     .andThen(function (prev, baton) {
         baton.take();
-        prjUtils.buildProject(projectPath, function () {
+        prjUtils.runProject(projectPath, targetName, function () {
             baton.pass();
         });
     })
-    .start(function () {
-        console.log("DONE");
+    .start(function (err) {
+        if (!err) {
+            console.log("Mobile Spec Deployed Successfully!!!");
+        } else {
+            console.log("Everything is bad and you should feel bad");
+        }
     });
 };
