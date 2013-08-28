@@ -22,7 +22,7 @@ var fs = require('fs'),
 
 module.exports = function (done, custom) {
     var jasmine = require('jasmine-node'),
-        plugins = (custom !==  null && fs.existsSync(custom)) ? [custom] : fs.readdirSync(path.join(_c.ROOT, "plugin")),
+        plugins = (custom !==  null && (fs.existsSync(custom)) || fs.existsSync(path.join(_c.ROOT,'plugin',custom))) ? [path.basename(custom)] : fs.readdirSync(path.join(_c.ROOT, "plugin")),
         specs = [],
         onComplete = function (runner) {
             // remove temp folder after test finished
