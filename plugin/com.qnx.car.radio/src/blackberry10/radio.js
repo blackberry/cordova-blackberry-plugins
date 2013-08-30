@@ -144,16 +144,16 @@ module.exports = {
 		_statusPPS.open(_pps.FileMode.RDONLY);
 		
 		//writing pps commands
-		_commandPPS = _pps.createObject("/pps/radio/status", _pps.PPSMode.DELTA);
 		if (SIMULATION_MODE) {
-			_commandPPS.open(_pps.FileMode.WRONLY);
+			_commandPPS = _pps.createObject("/pps/radio/status", _pps.PPSMode.DELTA);
 		} else {
-			_commandPPS.open(_pps.FileMode.WRONLY);
+			_commandPPS = _pps.createObject("/pps/radio/command", _pps.PPSMode.DELTA);
 		}
+		_commandPPS.open(_pps.FileMode.WRONLY);
 
 		//status writer, used to save presets
-		_statusWriterPPS = _pps.createObject();
-		_statusWriterPPS.open("/pps/radio/status", JNEXT.PPS_WRONLY);
+		_statusWriterPPS = _pps.createObject("/pps/radio/status", _pps.PPSMode.DELTA);
+		_statusWriterPPS.open(_pps.FileMode.WRONLY);
 	},
 		
 	/**

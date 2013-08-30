@@ -17,18 +17,27 @@ http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
 for other information.
 -->
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-	id="com.qnx.radio"
+	id="com.qnx.car.mediaplayer"
 	version="1.0.0">
 	<js-module src="www/client.js">
-		<clobbers target="qnx.radio" />
+		<clobbers target="car.mediaplayer" />
 	</js-module>
+    <js-module src="www/Event.js" />
+    <js-module src="www/MediaNodeType.js" />
+    <js-module src="www/PlayerStatus.js" />
+    <js-module src="www/MediaSourceEvent.js" />
+    <js-module src="www/MediaSourceType.js" />
+    <js-module src="www/TrackSessionEvent.js" />
+    <js-module src="www/RepeatMode.js" />
+    <js-module src="www/ShuffleMode.js" />
 
 	<platform name="blackberry10">
 		<source-file src="src/blackberry10/index.js" />
 		<source-file src="src/blackberry10/context.js" />
-		<source-file src="src/blackberry10/radio.js" />
+		<source-file src="src/blackberry10/mediaplayer.js" />
+   		<source-file src="www/Event.js" />
 		<config-file target="www/config.xml" parent="/widget">
-			<feature name="com.qnx.radio" value="com.qnx.radio" />
+			<feature name="com.qnx.car.mediaplayer" value="com.qnx.car.mediaplayer" />
 		</config-file>
 	</platform>
 </plugin>

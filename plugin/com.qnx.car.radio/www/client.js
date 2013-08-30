@@ -24,7 +24,7 @@
  * @description Manages the radio interface
  */
 
-var _ID = "com.qnx.radio",
+var _ID = "com.qnx.car.radio",
 	_self = {},
 	_utils = cordova.require('cordova/utils'),
 	_watchesRadio = {};
@@ -81,7 +81,7 @@ _self.watchRadio = function (callback) {
 	
 	_watchesRadio[watchId] = callback;
 	if (Object.keys(_watchesRadio).length === 1) {
-		window.cordova.exec(onUpdateRadio, null, _ID, 'startEvent', { eventName: 'radioupdate' }, false);
+		window.cordova.exec(onUpdateRadio, null, _ID, 'startEvent', { eventName: 'radioUpdate' }, false);
 	}
 
 	return watchId;

@@ -32,18 +32,6 @@ var _wwfix = require("../../lib/wwfix"),
 	},
 	_listeners = {};
 
-/*
- * Initializes the extension 
- */
-function init() {
-	try {
-		_settings.init();
-	} catch (ex) {
-		console.error('Error in webworks ext: settings/index.js:init():', ex);
-	}
-}
-init();
-
 
 /**
  * Exports are the publicly accessible functions
