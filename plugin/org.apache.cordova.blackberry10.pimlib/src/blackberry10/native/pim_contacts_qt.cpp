@@ -783,7 +783,13 @@ void PimContactsQt::populateField(const bbpim::Contact& contact, bbpim::Attribut
         Json::Value val;
         SubKindToStringMap::const_iterator typeIter = _subKindAttributeMap.find(currentAttr.subKind());
 
-        if (typeIter != _subKindAttributeMap.end()) {
+        // Check note type first
+        if (kind == bbpim::AttributeKind::Note) {
+            std::string note = currentAttr.value().toStdString();
+            note = replaceString(note);
+            contactItem["note"] = Json::Value(note);
+            break;
+        } else if (typeIter != _subKindAttributeMap.end()) {
             if (isContactField) {
                 val["type"] = Json::Value(typeIter->second);
 
@@ -810,11 +816,6 @@ void PimContactsQt::populateField(const bbpim::Contact& contact, bbpim::Attribut
                     }
                 }
             }
-        } else if (kind == bbpim::AttributeKind::Note) {
-            std::string note = currentAttr.value().toStdString();
-            note = replaceString(note);
-            contactItem["note"] = Json::Value(note);
-            break;
         }
     }
 }
@@ -1544,7 +1545,7 @@ void PimContactsQt::createAttributeSubKindMap()
     _attributeSubKindMap["YahooMessegerJapan"] = bbpim::AttributeSubKind::InstantMessagingYahooMessengerJapan;
     _attributeSubKindMap["BbPlaybook"] = bbpim::AttributeSubKind::VideoChatBbPlaybook;
     _attributeSubKindMap["ringtone"] = bbpim::AttributeSubKind::SoundRingtone;
-    _attributeSubKindMap["note"] = bbpim::AttributeSubKind::Invalid;
+    _attributeSubKindMap["note"] = bbpim::AttributeSubKind::Other;
 }
 
 void PimContactsQt::createKindAttributeMap() {
