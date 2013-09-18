@@ -24,12 +24,8 @@
     </js-module>
 
     <platform name="blackberry10">
-        <config-file target="www/config.xml" parent="/widget">
-            <rim:permissions>
-            </rim:permissions>
-        </config-file>
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
-            <rim:permit>read_device_indentifying_information</rim:permit>
+            <rim:permit>read_device_identifying_information</rim:permit>
         </config-file>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.identity" value="com.blackberry.identity" />
