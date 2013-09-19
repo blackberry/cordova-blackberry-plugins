@@ -109,9 +109,7 @@ Json::Value PimContactsQt::Find(const Json::Value& args)
             listFilters.setIsFavourite(favorite);
         }
 
-        if (limit != -1) {
-            listFilters.setLimit(limit);
-        }
+        listFilters.setLimit(limit);
 
         getAccountFilters(NULL, &listFilters, includeAccounts, excludeAccounts);
 
@@ -578,6 +576,7 @@ QSet<bbpim::ContactId> PimContactsQt::singleFieldSearch(const Json::Value& searc
 
         contactFilter.setSearchFields(searchFields);
         contactFilter.setSearchValue(QString(searchFieldsJson["fieldValue"].asString().c_str()));
+        contactFilter.setLimit(0); // Always get all results
 
         if (favorite) {
             contactFilter.setIsFavourite(favorite);
