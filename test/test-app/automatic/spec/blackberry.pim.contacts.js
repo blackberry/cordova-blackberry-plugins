@@ -25,7 +25,8 @@ var contacts,
     ContactActivity,
     ContactPickerOptions,
     clonedContact,
-    foundContact;
+    foundContact,
+    createCompleted;
 
 function deleteContactWithMatchingLastName(lastName) {
     var findOptions = {
@@ -65,6 +66,27 @@ function deleteContactWithMatchingLastName(lastName) {
     runs(function () {
         expect(numContactsRemoved).toBe(numContactsFound);
     });
+}
+
+function createMultipleContacts(quantity) {
+    var newContact = contacts.create(),
+        successCb = function () {
+            createMultipleContacts(quantity-1);
+        },
+        errorCb = function () {
+            console.log('could not create contacts');
+        },
+        params = {
+            "givenName" : "Chris",
+            "familyName": "Flowers"
+        };
+
+    if (quantity>0) {
+        newContact.name = params;
+        newContact.save(successCb, errorCb);
+    } else {
+        createCompleted = true;
+    }
 }
 
 function testReadOnly(object, property) {
@@ -1597,6 +1619,27 @@ describe("blackberry.pim.contacts", function () {
                 expect(error).toBe(false);
                 expect(findSuccessCb).toHaveBeenCalled();
                 expect(findErrorCb).not.toHaveBeenCalled();
+            });
+        });
+
+        it("Empty findOptions has no return limit of 20 contacts", function () {
+            var findOptions = {},
+                onFindSuccessSpy = jasmine.createSpy().andCallFake(function (foundContacts) {
+                    expect(foundContacts.length).toBeGreaterThan(20);
+                    deleteContactWithMatchingLastName("Flowers");
+                }),
+                onFindErrorSpy = jasmine.createSpy(),
+                amount = 21;
+
+            createCompleted = false;
+            createMultipleContacts(amount);
+
+            waitsFor(function () {
+                return createCompleted;
+            }, 'should create 24 contacts', 40000);
+
+            runs(function () {
+                contacts.find(["name"], findOptions, onFindSuccessSpy, onFindErrorSpy);
             });
         });
 
