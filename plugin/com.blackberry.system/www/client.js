@@ -87,10 +87,6 @@ function defineReadOnlyField(obj, field, value) {
     });
 }
 
-_self.hasPermission = function (module) {
-    return getFieldValue("hasPermission", {"module": module});
-};
-
 _self.hasCapability = function (capability) {
     return getFieldValue("hasCapability", {"capability": capability});
 };
