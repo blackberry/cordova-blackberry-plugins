@@ -30,10 +30,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.push" value="com.blackberry.push" />
         </config-file>
-        <config-file target="www/config.xml" parent="/widget">
-            <rim:permissions>
-            </rim:permissions>
-        </config-file>
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit system="true">_sys_use_consumer_push</rim:permit>
             <rim:permit>run_when_backgrounded</rim:permit>

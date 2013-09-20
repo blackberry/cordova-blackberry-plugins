@@ -38,10 +38,6 @@
     <js-module src="src/blackberry10/ContactActivity.js" />
 
     <platform name="blackberry10">
-        <config-file target="www/config.xml" parent="/widget">
-            <rim:permissions>
-            </rim:permissions>
-        </config-file>
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>access_pimdomain_contacts</rim:permit>
         </config-file>
