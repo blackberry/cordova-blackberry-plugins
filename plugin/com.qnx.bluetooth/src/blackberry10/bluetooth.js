@@ -25,13 +25,52 @@ var _pps = qnx.webplatform.pps,
 	_pairedDevicesPPS,
 	_controlPPS,
 	_statusPPS,
+	_servicesPPS,
 
-	_pairedDevices = {};
+	_pairedDevices = {},
+
+	_serviceConnectedTrigger,
+	_serviceDisconnectedTrigger;
 
 /* TODO Please make sure that constants below are identical to ones in client.js*/
+/* TODO Please make sure that constants below are identical to ones in client.js*/
+/** To exchange Legacy pin (usually hardcoded) */
+var LEGACY_PIN = "LEGACY_PIN",
+	/** To allow remote device connect */
+	AUTHORIZE = "AUTHORIZE",
+	/** Request to display dialog to enter authorization passkey */
+	PASS_KEY = "PASS_KEY",
+	/** Request to display dialog to confirm displayed  passkey*/
+	ACCEPT_PASS_KEY = "ACCEPT_PASS_KEY",
+	/** Request to display dialog display passkey*/
+	DISPLAY_PASS_KEY = "DISPLAY_PASS_KEY",
+	/** Defines Handsfree Profile ID */
+	SERVICE_HFP = "0x111E",
+	/** Defines Message Access Profile ID */
+	SERVICE_MAP = "0x1134",
+	/** Defines Serial Port Profile ID */
+	SERVICE_SPP = "0x1101",
+	/** Defines Phonebook Access Profile ID */
+	SERVICE_PBAP = "0x1130",
+	/** Defines Personal Area Network ID */
+	SERVICE_PAN = "0x1115",
+	/** Defines Phonebook Access Profile ID */
+	SERVICE_AVRCP = "0x110B",
+	/** Defines All allowed Profiles ID for current device*/
+	SERVICE_ALL = "ALL";
 
-/** Defines All allowed Profiles ID for current device*/
-var SERVICE_ALL = "ALL";
+	/** Non-discoverable or connectable. */
+	DEVICE_NOT_ACCESSIBLE = 0;
+	/** General discoverable and connectable. */
+	DEVICE_GENERAL_ACCESSIBLE = 1;
+	/** Limited discoverable and connectable. */
+	DEVICE_LIMITED_ACCESSIBLE = 2;
+	/** Connectable but not discoverable. */
+	DEVICE_CONNECTABLE_ONLY = 3;
+	/** Discoverable but not connectable. */
+	DEVICE_DISCOVERABLE_ONLY = 4;
+
+
 
 
 /* TODO Please make sure that constants above are identical to ones in client.js*/
@@ -70,15 +109,75 @@ function onStatusPPSChange(event) {
 				// deleting device from local list of devices when it was deleted by pps-bluetooth from the list of paired devices
 				delete _pairedDevices[mac];
 				break;
+			/* Event indicated that one of the services is connected */
+			case "BTMGR_EVENT_SERVICE_CONNECTED":
+				if (_serviceConnectedTrigger && event.data.data2) {
+					var triggerEvent = {mac:mac, serviceid:event.data.data2};
+					_serviceConnectedTrigger(triggerEvent);
+				}
+				break;
+			/* Event indicated that all allowed services connected */
+			case "BTMGR_EVENT_CONNECT_ALL_SUCCESS":
+				if (_serviceConnectedTrigger && mac) {
+					var triggerEvent = {mac:mac, serviceid:SERVICE_ALL};
+					_serviceConnectedTrigger(triggerEvent);
+				}
+				break;
+			/* Event indicated that one of the services is disconnected */
+			case "BTMGR_EVENT_SERVICE_DISCONNECTED":
+				if (_serviceDisconnectedTrigger && event.data.data2) {
+					var triggerEvent = {mac:mac, serviceid:event.data.data2};
+					_serviceDisconnectedTrigger(triggerEvent);
+				}
+				break;
+			/* Event indicated that all allowed services disconnected */
+			case "BTMGR_EVENT_DISCONNECT_ALL_SUCCESS":
+				if (_serviceDisconnectedTrigger) {
+					var triggerEvent = {mac:mac, serviceid:SERVICE_ALL};
+					_serviceDisconnectedTrigger(triggerEvent);
+				}
+				break;
 		}
 	}
 }
 
+/**
+ * Event handler to process services object change event.
+ * I return snapshot of the whole status object when change detected
+ * */
+function onServicesPPSChange() {
+
+	var devices = {};
+	if(_servicesPPS && _servicesPPS.ppsObj) {
+		devices[SERVICE_HFP] = _servicesPPS.ppsObj['hfp'];
+		devices[SERVICE_SPP] = _servicesPPS.ppsObj['spp'];
+		devices[SERVICE_PBAP] = _servicesPPS.ppsObj['pbap'];
+		devices[SERVICE_MAP] = _servicesPPS.ppsObj['map'];
+		devices[SERVICE_PAN] = _servicesPPS.ppsObj['pan'];
+		devices[SERVICE_AVRCP] = _servicesPPS.ppsObj['avrcp'];
+	}
+	_serviceStateChanged(devices);
+}
 
 /**
  * Exports are the publicly accessible functions
  */
 module.exports = {
+	/**
+	 * Sets the trigger function to call when a service connected fired
+	 * @param trigger {Function} The trigger function to call when the event is fired
+	 */
+	setServiceConnectedTrigger:function (trigger) {
+		_serviceConnectedTrigger = trigger;
+	},
+
+	/**
+	 * Sets the trigger function to call when service disconnected fired
+	 * @param trigger {Function} The trigger function to call when the event is fired
+	 */
+	setServiceDisconnectedTrigger:function (trigger) {
+		_serviceDisconnectedTrigger = trigger;
+	},
 
 	/**
 	 * Initializes the extension,
@@ -103,6 +202,12 @@ module.exports = {
 		_statusPPS = _pps.createObject("/pps/services/bluetooth/status", _pps.PPSMode.DELTA);
 		_statusPPS.onNewData = onStatusPPSChange;
 		_statusPPS.open(_pps.FileMode.RDONLY);
+
+		/* Initialise PPS object which indicates what services currently connected and what is MAC of devices */
+		_servicesPPS = _pps.createObject("/pps/services/bluetooth/services", _pps.PPSMode.DELTA);
+		_servicesPPS.onNewData = onServicesPPSChange;
+		_servicesPPS.open(_pps.FileMode.RDONLY);
+
 	},
 
 	/**
@@ -138,4 +243,34 @@ module.exports = {
 	getPaired:function () {
 		return _pairedDevices;
 	},
+
+	/**
+	 * Gets a list of connected devices for bluetooth services.
+	 * @param service {String} (optional) The bluetooth service.
+	 */
+	getConnectedDevices: function(service) {
+		var devices = {};
+		if(_servicesPPS && _servicesPPS.ppsObj) {
+			if(!service || service == SERVICE_HFP || service == SERVICE_ALL) {
+				devices[SERVICE_HFP] = _servicesPPS.ppsObj['hfp'];
+			}
+			if(!service || service == SERVICE_SPP || service == SERVICE_ALL) {
+				devices[SERVICE_SPP] = _servicesPPS.ppsObj['spp'];
+			}
+			if(!service || service == SERVICE_PBAP || service == SERVICE_ALL) {
+				devices[SERVICE_PBAP] = _servicesPPS.ppsObj['pbap'];
+			}
+			if(!service || service == SERVICE_MAP || service == SERVICE_ALL) {
+				devices[SERVICE_MAP] = _servicesPPS.ppsObj['map'];
+			}
+			if(!service || service == SERVICE_PAN || service == SERVICE_ALL) {
+				devices[SERVICE_PAN] = _servicesPPS.ppsObj['pan'];
+			}
+			if(!service || service == SERVICE_AVRCP || service == SERVICE_ALL) {
+				devices[SERVICE_AVRCP] = _servicesPPS.ppsObj['avrcp'];
+			}
+		}
+		return devices;
+	},
+
 };

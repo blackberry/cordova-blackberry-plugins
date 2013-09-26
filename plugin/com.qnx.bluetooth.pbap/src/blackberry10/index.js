@@ -18,20 +18,18 @@
  */
 
 /**
- * Defines Bluetooth operations
+ * Allows access to device contact PIM storage.
  */
-
 var _wwfix = require("../../lib/wwfix"),
-	_bluetooth = require("./bluetooth"),
 	_actionMap = {
 		/**
 		 * @event
 		 * Triggered when the contact service state has changed.
 		 */
-		bluetoothserviceconnected: {
+		bluetoothpbapstatechange: {
 			context: require("./context"),
-			event: "bluetoothserviceconnected",
-			triggerEvent: "bluetoothserviceconnected",
+			event: "bluetoothpbapstatechange",
+			triggerEvent: "bluetoothpbapstatechange",
 			trigger: function (pluginResult, data) {
 				pluginResult.callbackOk(data, true);
 			} 
@@ -40,25 +38,26 @@ var _wwfix = require("../../lib/wwfix"),
 		 * @event
 		 * Triggered when the contact service status has changed.
 		 */
-		bluetoothservicedisconnected: {
+		bluetoothpbapstatuschange: {
 			context: require("./context"),
-			event: "bluetoothservicedisconnected",
-			triggerEvent: "bluetoothservicedisconnected",
+			event: "bluetoothpbapstatuschange",
+			triggerEvent: "bluetoothpbapstatuschange",
 			trigger: function (pluginResult, data) {
 				pluginResult.callbackOk(data, true);
 			} 
 		}
 	},
+	_pbap = require("./pbap"),
 	_listeners = {};
 
 /**
- * Initializes the extension
+ * Initializes the extension 
  */
 function init() {
 	try {
-		_bluetooth.init();
+		_pbap.init();
 	} catch (ex) {
-		console.error('Error in webworks ext: bluetooth/index.js:init():', ex);
+		console.error('Error in webworks ext: blueooth.pbap/index.js:init():', ex);
 	}
 }
 init();
@@ -67,6 +66,7 @@ init();
  * Exports are the publicly accessible functions
  */
 module.exports = {
+
 	/**
 	 * Turn on event dispatching for a specific event name
 	 * @param {Function} success Function to call if the operation is a success
@@ -131,21 +131,21 @@ module.exports = {
 	},
 
 	/**
-	 * Connects to specified service on device
+	 * 
 	 * @param success {Function} Function to call if the operation is a success
 	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied. Available arguments for this call are:
-	 *	{
-	 *		*: {Mixed},	//the arguments for this function are dynamic and could be anything
-	 *		[...]
-	 *	}
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
 	 * @param env {Object} Environment variables
 	 */
-	connectService:function (success, fail, args, env) {
+	find: function(success, fail, args, env) {
 		var result = new PluginResult(args, env);
 		try {
 			var fixedArgs = _wwfix.parseArgs(args);
-			var data = _bluetooth.connectService(fixedArgs.service, fixedArgs.mac);
+			var data = _pbap.find(typeof(fixedArgs['filter']) === 'object' ? fixedArgs['filter'] : null,
+									typeof(fixedArgs['orderBy']) === 'string' ? fixedArgs['orderBy'] : null,
+									typeof(fixedArgs['isAscending']) === 'boolean' ? fixedArgs['isAscending'] : null,
+									typeof(fixedArgs['limit']) === 'number' ? fixedArgs['limit'] : null,
+									typeof(fixedArgs['offset']) === 'number' ? fixedArgs['offset'] : null);
 			result.ok(data, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false);
@@ -153,20 +153,53 @@ module.exports = {
 	},
 
 	/**
-	 * Return list of paired devices
+	 * Creates or updates a contact.
 	 * @param success {Function} Function to call if the operation is a success
 	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied. Available arguments for this call are:
-	 *	{
-	 *		*: {Mixed},	//the arguments for this function are dynamic and could be anything
-	 *		[...]
-	 *	}
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
 	 * @param env {Object} Environment variables
 	 */
-	getPaired:function (success, fail, args, env) {
-		var result = new PluginResult(args, env)
+	save: function(success, fail, args, env) {
+		var result = new PluginResult(args, env);
 		try {
-			var data = _bluetooth.getPaired();
+			var fixedArgs = _wwfix.parseArgs(args);
+			_pbap.save(fixedArgs.contact);
+			result.ok(undefined, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
+	},
+
+	/**
+	 * Removes a contact.
+	 * @param success {Function} Function to call if the operation is a success
+	 * @param fail {Function} Function to call if the operation fails
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
+	 * @param env {Object} Environment variables
+	 */
+	remove: function(success, fail, args, env) {
+		var result = new PluginResult(args, env);
+		try {
+			var fixedArgs = _wwfix.parseArgs(args);
+			_pbap.remove(fixedArgs.contact);
+			result.ok(undefined, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
+	},
+	
+	/**
+	 * Gets the current state of the contact service.
+	 * @param success {Function} Function to call if the operation is a success
+	 * @param fail {Function} Function to call if the operation fails
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
+	 * @param env {Object} Environment variables
+	 */
+	getState: function(success, fail, args, env) {
+		var result = new PluginResult(args, env);
+		try {
+			var fixedArgs = _wwfix.parseArgs(args);
+			var data = _pbap.getState();
 			result.ok(data, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false);
@@ -174,25 +207,39 @@ module.exports = {
 	},
 
 	/**
-	 * Gets a list of connected devices for bluetooth services.
+	 * Gets the current status of the contact service.
 	 * @param success {Function} Function to call if the operation is a success
 	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied. Available arguments for this call are:
-	 *	{
-	 *		*: {Mixed},	//the arguments for this function are dynamic and could be anything
-	 *		[...]
-	 *	}
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
 	 * @param env {Object} Environment variables
 	 */
-	getConnectedDevices:function (success, fail, args, env) {
-		var result = new PluginResult(args, env)
+	getStatus: function(success, fail, args, env) {
+		var result = new PluginResult(args, env);
 		try {
-			args = _wwfix.parseArgs(args);
-			var data = _bluetooth.getConnectedDevices(args.service);
+			var fixedArgs = _wwfix.parseArgs(args);
+			var data = _pbap.getStatus();
 			result.ok(data, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false);
 		}
 	},
+	
+	/**
+	 * Forces a phone book resynchronization with the connected device.
+	 * @param success {Function} Function to call if the operation is a success
+	 * @param fail {Function} Function to call if the operation fails
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
+	 * @param env {Object} Environment variables
+	 */
+	refresh: function(success, fail, args, env) {
+		var result = new PluginResult(args, env)
+		try {
+			var fixedArgs = _wwfix.parseArgs(args);
+			_pbap.refresh();
+			result.ok(undefined, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
+	}
 };
 
