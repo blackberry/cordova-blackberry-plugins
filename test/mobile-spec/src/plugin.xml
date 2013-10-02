@@ -37,4 +37,6 @@
   <dependency id="org.apache.cordova.core.network-information" url="https://github.com/apache/cordova-plugin-network-information"/>
   <dependency id="org.apache.cordova.core.splashscreen" url="https://github.com/apache/cordova-plugin-splashscreen"/>
   <dependency id="org.apache.cordova.core.vibration" url="https://github.com/apache/cordova-plugin-vibration"/>
+  <access origin="http://apache.org" subdomains="true"/>
+  <access origin="https://apache.org" subdomains="true"/>
 </plugin>
