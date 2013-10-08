@@ -26,7 +26,7 @@ var jWorkflow = require("jWorkflow"),
     projectPath = path.join(baseDir, "test", "mobile-spec/app"),
     projectName = "CordovaMobileSpec";
 
-module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
+module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch, storepass) {
     var tasks = jWorkflow.order(),
         shouldAddTarget = targetName && targetIP && targetPassword,
         projectFileBackuped = path.join(projectPath, '..', 'project.json'),
@@ -74,7 +74,7 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
         baton.take();
         prjUtils.runProject(projectPath, targetName, function () {
             baton.pass();
-        });
+        }, storepass);
     })
     .start(function (err) {
         if (!err) {

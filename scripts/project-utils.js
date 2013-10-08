@@ -102,23 +102,27 @@ module.exports = {
 
     configProject: function (projectPath, targetName, targetIP, targetType, targetPassword, done) {
         var cmd = path.join('platforms', 'blackberry10', 'cordova', 'target') + " add %s %s %s";
-        // No validation for targetName, type, ip, password here, target command will
-        // take care the validation
-        if (targetName && targetType && targetIP) {
-            cmd = util.format(cmd, targetName, targetIP, targetType);
-            if (targetPassword) {
-                cmd = cmd.concat(" --password ").concat(targetPassword);
-            }
-            jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
-                .start(function () {
-                    if (done) {
-                        done();
+
+        this.getDeviceInfo(targetIP, targetPassword, function (err, deviceInfo) {
+            if (!err) {
+                if (targetName && targetType && targetIP) {
+                    cmd = util.format(cmd, targetName, targetIP, targetType);
+                    if (targetPassword) {
+                        cmd = cmd.concat(" --password ").concat(targetPassword).concat(" --pin " + deviceInfo.pin);
                     }
-                });
-        } else {
-            console.log("Invalid parameters for adding a target so it will be skipped. Please run jake -T to get the usage.");
-            process.exit(-1);
-        }
+                    jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
+                        .start(function () {
+                            if (done) {
+                                done();
+                            }
+                        });
+                } else {
+                    console.log("Invalid parameters for adding a target so it will be skipped. Please run jake -T to get the usage.");
+                    process.exit(-1);
+                }
+            }
+
+        });
     },
 
     replaceWWW: function (projectPath, src, done) {
@@ -156,9 +160,16 @@ module.exports = {
         });
     },
 
-    runProject: function (projectPath, target, done) {
-        var cmd = "cordova run %s";
-        cmd = util.format(cmd, target ? target : "--device");
+    runProject: function (projectPath, target, done, storepass) {
+        var cmd = "cordova run",
+            args = [];
+
+        args.push(storepass ? "-k " + storepass : "");
+        args.push(target ? target : "--device");
+        console.log(args[0], args[1]);
+        args.forEach(function (arg) {
+            cmd = cmd.concat(" ").concat(arg);
+        });
 
         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
         .start(function () {
@@ -189,5 +200,31 @@ module.exports = {
         if (done) {
             done();
         }
+    },
+
+    getDeviceInfo: function (ip, password, callback) {
+        var cmd = "blackberry-deploy -listDeviceInfo %s -password %s";
+
+        cmd = util.format(cmd, ip, password);
+        shell.exec(cmd, {silent: true}, function (code, out) {
+            var err,
+                result = {},
+                name,
+                pin;
+
+            if (code != 0) {
+                err = "Error: failed to get device information";
+            } else {
+                name = /modelname::(.*?)(\r?)\n/.exec(out);
+                pin = /devicepin::0x(.*?)(\r?)\n/.exec(out);
+                if (name && name.length > 0) {
+                    result.name = name[1];
+                }
+                if (pin && pin.length > 0) {
+                    result.pin = pin[1];
+                }
+            }
+            callback(err, result);
+        });
     }
 };
