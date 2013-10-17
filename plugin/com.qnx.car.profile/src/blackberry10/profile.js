@@ -155,6 +155,11 @@ module.exports = {
 		if (params.length > 0) {
 			_db.query(query.format(params.join(','), profileId));
 		}
+
+		//if active profile, update pps
+		if (profileId == this.getActive().id) {
+			this.setActive(profileId);
+		}
 	},
 
 	/**
