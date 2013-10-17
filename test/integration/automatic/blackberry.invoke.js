@@ -33,7 +33,7 @@ describe("blackberry.invoke", function () {
 
         runs(function () {
             expect(onErrorSpy).not.toHaveBeenCalled();
-            blackberry.event.addEventListener("onChildCardClosed", onChildCardClosedHandlerSpy);
+            document.addEventListener("onChildCardClosed", onChildCardClosedHandlerSpy);
             blackberry.invoke.closeChildCard();
         });
 
@@ -47,7 +47,7 @@ describe("blackberry.invoke", function () {
     }
 
     afterEach(function() {
-        blackberry.event.removeEventListener("onChildCardClosed", onChildCardClosedHandlerSpy);
+        document.removeEventListener("onChildCardClosed", onChildCardClosedHandlerSpy);
     });
 
     it('blackberry.invoke should exist', function () {
