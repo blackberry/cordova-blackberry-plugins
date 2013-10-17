@@ -47,7 +47,43 @@ var _wwfix = require("../../lib/wwfix"),
 			trigger: function (pluginResult, data) {
 				pluginResult.callbackOk(data, true);
 			} 
-		}
+		},
+		/**
+		 * @event
+		 * Triggered when one new paired device created
+		 */
+		bluetoothnewpaireddevice:{
+			context: require("./context"),
+			event: "bluetoothnewpaireddevice",
+			triggerEvent: "bluetoothnewpaireddevice",
+			trigger: function (pluginResult, data) {
+				pluginResult.callbackOk(data, true);
+			}
+		},
+		/**
+		 * @event
+		 * Triggered when one pairing is complete
+		 */
+		bluetoothpairingcomplete:{
+			context: require("./context"),
+			event: "bluetoothpairingcomplete",
+			triggerEvent: "bluetoothpairingcomplete",
+			trigger: function (pluginResult, data) {
+				pluginResult.callbackOk(data, true);
+			}
+		},
+		/**
+		 * @event
+		 * Triggered when paired device deleted successfully
+		 */
+		bluetoothpaireddevicedeleted:{
+			context: require("./context"),
+			event: "bluetoothpaireddevicedeleted",
+			triggerEvent: "bluetoothpaireddevicedeleted",
+			trigger: function (pluginResult, data) {
+				pluginResult.callbackOk(data, true);
+			}
+		},
 	},
 	_listeners = {};
 

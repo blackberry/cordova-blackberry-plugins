@@ -30,7 +30,10 @@ var _pps = qnx.webplatform.pps,
 	_pairedDevices = {},
 
 	_serviceConnectedTrigger,
-	_serviceDisconnectedTrigger;
+	_serviceDisconnectedTrigger,
+	_newPairedDeviceTrigger,
+	_pairingCompleteTrigger,
+	_deviceDeletedTrigger;
 
 /* TODO Please make sure that constants below are identical to ones in client.js*/
 /* TODO Please make sure that constants below are identical to ones in client.js*/
@@ -91,6 +94,10 @@ function onPairedDevice(event) {
 
 		// saving paired device in the list to maintain local copy
 		_pairedDevices[device.mac] = device;
+
+		if (_newPairedDeviceTrigger) {
+			_newPairedDeviceTrigger(device);
+		}
 	}
 }
 
@@ -108,6 +115,9 @@ function onStatusPPSChange(event) {
 			case "BTMGR_EVENT_DEVICE_DELETED":
 				// deleting device from local list of devices when it was deleted by pps-bluetooth from the list of paired devices
 				delete _pairedDevices[mac];
+				if (_deviceDeletedTrigger) {
+					_deviceDeletedTrigger(mac);
+				}
 				break;
 			/* Event indicated that one of the services is connected */
 			case "BTMGR_EVENT_SERVICE_CONNECTED":
@@ -137,6 +147,12 @@ function onStatusPPSChange(event) {
 					_serviceDisconnectedTrigger(triggerEvent);
 				}
 				break;
+			/* Indicates that Pairing completed successfully, also contains MAC of the paired device */
+			case "BTMGR_EVENT_PAIRING_COMPLETE":
+				if (_pairingCompleteTrigger) {
+					_pairingCompleteTrigger(mac);
+				}
+				break;
 		}
 	}
 }
@@ -156,7 +172,7 @@ function onServicesPPSChange() {
 		devices[SERVICE_PAN] = _servicesPPS.ppsObj['pan'];
 		devices[SERVICE_AVRCP] = _servicesPPS.ppsObj['avrcp'];
 	}
-	_serviceStateChanged(devices);
+	//_serviceStateChanged(devices);
 }
 
 /**
@@ -177,6 +193,30 @@ module.exports = {
 	 */
 	setServiceDisconnectedTrigger:function (trigger) {
 		_serviceDisconnectedTrigger = trigger;
+	},
+
+	/**
+	 * Sets the trigger function to call when a Bluetooth new paired device event is fired
+	 * @param trigger {Function} The trigger function to call when the event is fired
+	 */
+	setNewPairedDeviceTrigger:function (trigger) {
+		_newPairedDeviceTrigger = trigger;
+	},
+
+	/**
+	 * Sets the trigger function to call when paired device deleted event fired
+	 * @param trigger {Function} The trigger function to call when the event is fired
+	 */
+	setDeviceDeletedTrigger:function (trigger) {
+		_deviceDeletedTrigger = trigger;
+	},
+
+	/**
+	 * Sets the trigger function to call when a Bluetooth pairing complete event is fired
+	 * @param trigger {Function} The trigger function to call when the event is fired
+	 */
+	setPairingCompleteTrigger:function (trigger) {
+		_pairingCompleteTrigger = trigger;
 	},
 
 	/**

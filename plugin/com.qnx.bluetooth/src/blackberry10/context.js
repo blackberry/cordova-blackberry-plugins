@@ -41,6 +41,15 @@ module.exports = {
 				case "bluetoothservicedisconnected":
 					_bluetooth.setServiceDisconnectedTrigger(trigger);
 					break;
+				case "bluetoothnewpaireddevice":
+					_bluetooth.setNewPairedDeviceTrigger(trigger);
+					break;
+				case "bluetoothpairingcomplete":
+					_bluetooth.setPairingCompleteTrigger(trigger);
+					break;
+				case "bluetoothpaireddevicedeleted":
+					_bluetooth.setDeviceDeletedTrigger(trigger);
+					break;
 			}
 		}
 	},
@@ -57,6 +66,15 @@ module.exports = {
 					break;
 				case "bluetoothservicedisconnected":
 					_bluetooth.setServiceDisconnectedTrigger(null);
+					break;
+				case "bluetoothnewpaireddevice":
+					_bluetooth.setNewPairedDeviceTrigger(null);
+					break;
+				case "bluetoothpairingcomplete":
+					_bluetooth.setPairingCompleteTrigger(null);
+					break;
+				case "bluetoothpaireddevicedeleted":
+					_bluetooth.setDeviceDeletedTrigger(null);
 					break;
 			}
 		}

@@ -26,7 +26,7 @@
 
 
 var _ID = "com.qnx.bluetooth",
-	_events = ["bluetoothserviceconnected", "bluetoothservicedisconnected"];
+	_events = ["bluetoothserviceconnected", "bluetoothservicedisconnected", "bluetoothnewpaireddevice", "bluetoothpairingcomplete", "bluetoothpaireddevicedeleted"];
 
 
 _events.map(function (eventName) {
