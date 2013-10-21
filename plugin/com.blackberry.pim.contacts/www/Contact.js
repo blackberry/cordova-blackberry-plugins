@@ -272,7 +272,7 @@ Contact.prototype.remove = function (onRemoveSuccess, onRemoveError) {
 };
 
 Contact.prototype.clone = function () {
-    var contact = new Contact({"id" : -1 * this.id}),
+    var contact = new Contact({"id" : null}),
         key;
 
     for (key in this) {
