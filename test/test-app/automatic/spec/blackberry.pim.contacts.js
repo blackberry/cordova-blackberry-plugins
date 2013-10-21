@@ -430,6 +430,16 @@ describe("blackberry.pim.contacts", function () {
                     expect(contact.id).toBeDefined();
                     expect(contact.name).toBeDefined();
                     expect(contact.name.givenName).toBe("Alessandro");
+                    expect(contact.name.alias).toBe("Alias");
+                    expect(contact.name.formatted).toBe("FormattedName");
+                    expect(contact.name.honorificPrefix).toBe("HonorPrefix");
+                    expect(contact.ims).toContain(new_contact.ims[0]);
+                    expect(contact.ims).toContain(new_contact.ims[1]);
+                    expect(contact.ims).toContain(new_contact.ims[2]);
+                    expect(contact.ims).toContain(new_contact.ims[3]);
+                    expect(contact.ims).toContain(new_contact.ims[4]);
+                    expect(contact.ims).toContain(new_contact.ims[5]);
+                    expect(contact.categories).toContain(new_contact.categories[0]);
                     called = true;
                 }),
                 errorCb = jasmine.createSpy("onSaveError").andCallFake(function (errorObj) {
@@ -451,6 +461,9 @@ describe("blackberry.pim.contacts", function () {
                 new_contact.name.givenName = first_name;
                 new_contact.name.familyName = last_name;
                 new_contact.name.middleName = "Middle";
+                new_contact.name.alias = "Alias";
+                new_contact.name.honorificPrefix = "HonorPrefix";
+                new_contact.name.formatted = "FormattedName";
 
                 new_contact.phoneNumbers = [ { type: "home", value: "1234567890" },
                                              { type: "work", value: "0987654321" } ];
@@ -461,8 +474,12 @@ describe("blackberry.pim.contacts", function () {
                 new_contact.emails = [ { type: "home", value: "abc@person.com" },
                                        { type: "work", value: "fgh@rim.com" } ];
 
-                new_contact.ims = [ { type: "GoogleTalk", value: "gggggggg" },
-                                    { type: "Aim", value: "aaaaa" } ];
+                new_contact.ims = [ { type: "Aim", value: "aaaaa" },
+                                    { type: "GoogleTalk", value: "gggggggg" },
+                                    { type: "Irc", value: "iiiiiiiii" },
+                                    { type: "Msn", value: "mmmmmmmm" },
+                                    { type: "Qq", value: "qqqqqqqqq" },
+                                    { type: "YahooMessengerJapan", value: "yyyyyyyy" }, ];
 
                 new_contact.urls = [ { type: "personal", value: "www.mywebsite.com" } ];
 
@@ -472,6 +489,8 @@ describe("blackberry.pim.contacts", function () {
                 new_contact.organizations = [ {"name": "RIM", "department": "BlackBerry WebWorks", "title": "Developer"},
                                               {"name": "IBM", "title": "Manager"},
                                               {"name": "The Cool Co.", "department": "Cooler", "title": "Mr. Cool"} ];
+
+                 new_contact.categories = [ { type: "categories", value: "aaaaaaaa" } ];
 
                 new_contact.note = "This is a test contact for the PIM WebWorks API";
                 new_contact.videoChat = ["abc", "def"];
@@ -655,6 +674,7 @@ describe("blackberry.pim.contacts", function () {
 
             if (foundContact) {
                 clonedContact = foundContact.clone();
+                expect(clonedContact.id).toBe(null);
                 clonedContact.save(successCb, errorCb);
 
                 waitsFor(function () {
@@ -990,6 +1010,8 @@ describe("blackberry.pim.contacts", function () {
                 workEmail = { type: ContactField.WORK, value: "abc@blah.com" },
                 contact = contacts.create({
                     "name": name,
+                    "displayName": "jWebworks",
+                    "nickname": "jon",
                     "phoneNumbers": [workPhone],
                     "emails": [workEmail]
                 }),
@@ -1009,6 +1031,8 @@ describe("blackberry.pim.contacts", function () {
                 contactFound = contacts.getContact(contactToFind.id.toString());
                 expect(contactFound.id).toBe(contactToFind.id);
                 expect(contactFound.name).toEqual(contactToFind.name);
+                expect(contactFound.displayName).toEqual(contactToFind.displayName);
+                expect(contactFound.nickname).toEqual(contactToFind.nickname);
                 expect(contactFound.phoneNumbers).toEqual([workPhone]);
                 expect(contactFound.emails).toEqual([workEmail]);
             });
@@ -1072,6 +1096,7 @@ describe("blackberry.pim.contacts", function () {
                 deleteContactWithMatchingLastName("Smitherman");
                 deleteContactWithMatchingLastName("Simpson");
                 deleteContactWithMatchingLastName("WebWorksTest");
+                deleteContactWithMatchingLastName("WebworksTestSource");
             }
         });
 
@@ -1762,6 +1787,57 @@ describe("blackberry.pim.contacts", function () {
             try {
                 contactObj.save(function () {
                     contacts.find(["name", "news"], findOptions, successCb, errorCb);
+                });
+            } catch (e) {
+                console.log("Error:  " + e);
+                error = true;
+            }
+
+            waitsFor(function () {
+                return called;
+            }, "success/error callback never called", 15000);
+
+            runs(function () {
+                expect(error).toBe(false);
+                expect(successCb).toHaveBeenCalled();
+                expect(errorCb).not.toHaveBeenCalled();
+            });
+        });
+
+        it("Find populates the sourceAccounts object with correct values", function () {
+            var contactObj,
+                called = false,
+                error = false,
+                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                    console.log(contacts);
+                    expect(contacts.length).toBe(1);
+
+                    if (contacts.length === 1) {
+                        expect(contacts[0].name.givenName).toBe("Dan");
+                        expect(contacts[0].name.familyName).toBe("WebworksTestSource");
+                        expect(contacts[0].sourceAccounts.length).toBeGreaterThan(0);
+                        expect(contacts[0].sourceAccounts[0].id).toBe(2);
+                    }
+
+                    called = true;
+                }),
+                errorCb = jasmine.createSpy("onFindError").andCallFake(function (error) {
+                    called = true;
+                }),
+                findOptions = {
+                    filter: [{
+                        "fieldName": ContactFindOptions.SEARCH_FIELD_FAMILY_NAME,
+                        "fieldValue": "WebworksTestSource"
+                    }]
+                };
+
+            contactObj = contacts.create({
+                "name": { familyName: "WebworksTestSource", givenName: "Dan" }
+            });
+
+            try {
+                contactObj.save(function () {
+                    contacts.find(["name"], findOptions, successCb, errorCb);
                 });
             } catch (e) {
                 console.log("Error:  " + e);
