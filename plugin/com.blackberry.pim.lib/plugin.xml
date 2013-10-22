@@ -17,15 +17,18 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-    id="org.apache.cordova.blackberry10.pimlib"
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+    id="com.blackberry.pim.lib"
     version="1.0.0">
+
+    <description>BlackBerry 10 PIM Library</description>
+    <license>Apache 2.0</license>
 
     <platform name="blackberry10">
         <lib-file src="src/blackberry10/native/device/libpimcontacts.so" arch="device"></lib-file>
         <lib-file src="src/blackberry10/native/simulator/libpimcontacts.so" arch="simulator"></lib-file>
         <config-file target="www/config.xml" parent="/widget">
-            <feature name="org.apache.cordova.blackberry10.pimlib"></feature>
+            <feature name="com.blackberry.pim.lib"></feature>
         </config-file>
     </platform>
 </plugin>

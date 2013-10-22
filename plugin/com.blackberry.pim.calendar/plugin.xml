@@ -16,9 +16,13 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
     id="com.blackberry.pim.calendar"
     version="1.0.0">
+
+    <description>BlackBerry 10 Calendar APIs</description>
+    <license>Apache 2.0</license>
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.pim.calendar" />
     </js-module>
@@ -45,6 +49,6 @@
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>access_pimdomain_calendars</rim:permit>
         </config-file>
-        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
+        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>
