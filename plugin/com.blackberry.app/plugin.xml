@@ -16,9 +16,13 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
     id="com.blackberry.app"
     version="1.0.0">
+
+    <description>BlackBerry 10 Application APIs</description>
+    <license>Apache 2.0</license>
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.app" />
     </js-module>
@@ -29,4 +33,5 @@
             <feature name="com.blackberry.app" value="com.blackberry.app" />
         </config-file>
     </platform>
+
 </plugin>

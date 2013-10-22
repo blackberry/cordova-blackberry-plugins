@@ -16,9 +16,12 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
     id="com.blackberry.jpps"
     version="1.0.0">
+
+    <description>BlackBerry 10 JPPS Library</description>
+    <license>Apache 2.0</license>
 
     <platform name="blackberry10">
         <lib-file src="src/blackberry10/native/device/libjpps.so" arch="device"/>
