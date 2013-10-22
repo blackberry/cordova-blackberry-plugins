@@ -16,9 +16,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
     id="com.blackberry.ui.dialog"
     version="1.0.0">
+
+    <description>BlackBerry 10 Dialog APIs</description>
+    <license>Apache 2.0</license>
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.ui.dialog" />
     </js-module>

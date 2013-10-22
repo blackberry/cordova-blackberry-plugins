@@ -16,9 +16,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
     id="com.blackberry.connection"
     version="1.0.0">
+
+    <description>BlackBerry 10 Connection APIs</description>
+    <license>Apache 2.0</license>
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.connection" />
     </js-module>
@@ -28,6 +33,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.connection" value="com.blackberry.connection" />
         </config-file>
-        <dependency id="com.blackberry.jpps" url="." subdir="/plugin/com.blackberry.jpps/"/>
+        <dependency id="com.blackberry.jpps"/>
     </platform>
 </plugin>
