@@ -364,21 +364,21 @@ module.exports = {
 	 * @param {Function} success Function to call if the operation is a success.
 	 * @param {Function} fail Function to call if the operation fails.
 	 * @param {Number} mediaSourceId The ID of the media source.
-	 * @param {String} [mediaNodeId=null] The ID of the media node from which to search.
 	 * @param {String} searchTerm The term to search for.
+	 * @param {String} [filter=""] The filter to use to search. null, the search starts from the root node.
 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
 	 * all records will be retrieved.
 	 * @param {Number} [offset=0] The offset at which to start retrieving records. If omitted or negative,
 	 * offset will be 0.
 	 * @returns {Boolean} True if the operation was successful, False if not.
 	 */
-	search: function(success, fail, mediaSourceId, mediaNodeId, searchTerm, limit, offset) {
+	search: function(success, fail, mediaSourceId, searchTerm, filter, limit, offset) {
 		console.log('car.mediaplayer/mediaplayer.js::search', arguments);
 		return _jPlayerObj ? _jPlayerObj.search(
 				registerCallbackFunctions(success, fail),
 				mediaSourceId,
-				typeof mediaNodeId === 'string' && mediaNodeId.trim() !== '' ? mediaNodeId : ROOT_MEDIA_NODE_ID,
 				searchTerm,
+				typeof filter === 'string' && filter.trim() !== '' ? filter : '',
 				typeof limit === 'number' ? limit : -1,
 				typeof offset === 'number' ? offset: 0
 			) : false;
@@ -392,18 +392,16 @@ module.exports = {
 	 * @param {?String} mediaNodeId The media node ID on which to base the track session.
 	 * @param {Number} index The index of the item within the track session to set as current after creation.
 	 * @param {Number} limit The maximum number of media nodes to add to the track session. A limit of -1 indicates no limit.
-	 * @param {Number} offset The offset within the specified media node at which to start building the track session.
 	 * @returns {Boolean} True if the operation was successful, False if not.
 	 */
-	createTrackSession: function(success, fail, mediaSourceId, mediaNodeId, index, limit, offset) {
+	createTrackSession: function(success, fail, mediaSourceId, mediaNodeId, index, limit) {
 		console.log('car.mediaplayer/mediaplayer.js::createTrackSession', arguments);
 		return _jPlayerObj ? _jPlayerObj.createTrackSession(
 				registerCallbackFunctions(success, fail),
 				mediaSourceId,
 				mediaNodeId === null ? ROOT_MEDIA_NODE_ID : mediaNodeId,
 				index,
-				limit,
-				offset
+				limit
 			) : false;
 	},
 

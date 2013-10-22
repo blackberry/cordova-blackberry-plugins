@@ -407,7 +407,7 @@ var MediaPlayer = function(playerName) {
 	 * @param {String} searchTerm The term to search for.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
-	 * @param {String} [mediaNodeId=null] The ID of the media node from which to search. If omitted or
+	 * @param {String} [filter=""] The filter to use to search.
 	 * null, the search starts from the root node.
 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
 	 * all records are retrieved.
@@ -473,12 +473,12 @@ var MediaPlayer = function(playerName) {
 	 *		msg: "An error has occurred"
 	 * }
 	 */
-	self.search = function(mediaSourceId, searchTerm, success, error, mediaNodeId, limit, offset) {
+	self.search = function(mediaSourceId, searchTerm, success, error, filter, limit, offset) {
 		console.log('car.mediaplayer/client.js::search', arguments);
 		var args = {
 				mediaSourceId: mediaSourceId,
 				searchTerm: searchTerm,
-				mediaNodeId: typeof mediaNodeId === 'string' && mediaNodeId.trim() !== '' ? mediaNodeId : null,
+				filter: typeof filter === 'string' && filter.trim() !== '' ? filter : "",
 				limit: typeof limit === 'number' ? limit : -1,
 				offset: typeof offset === 'number' ? offset : 0
 		};
@@ -495,8 +495,6 @@ var MediaPlayer = function(playerName) {
 	 * the tracksession.
 	 * @param {Number} [limit=-1] The maximum number of media nodes to add to the tracksession. A limit of -1
 	 * indicates no limit.
-	 * @param {Number} [offset=0] The offset within the specified media node at which to start building the track
-	 * session.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method createTrackSession	 
 	 * @example
@@ -540,14 +538,13 @@ var MediaPlayer = function(playerName) {
 	 *		msg: "An error has occurred"
 	 * }
 	 */
-	self.createTrackSession = function(mediaSourceId, success, error, mediaNodeId, index, limit, offset) {
+	self.createTrackSession = function(mediaSourceId, success, error, mediaNodeId, index, limit) {
 		console.log('car.mediaplayer/client.js::createTrackSession', arguments);
 		var args = {
 				mediaSourceId: mediaSourceId,
 				mediaNodeId: mediaNodeId,
 				index: index,
-				limit: limit,
-				offset: offset
+				limit: limit
 		};
 		window.cordova.exec(success, error, _ID, 'createTrackSession', args, false);
 	};

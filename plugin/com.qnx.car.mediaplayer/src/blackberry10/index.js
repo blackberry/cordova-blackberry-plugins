@@ -247,8 +247,8 @@ module.exports = {
 	 * @param args {Object} The arguments supplied. Available arguments for this call are:
 	 *	{
 	 *		mediaSourceId: {Number},
-	 *		mediaNodeId: {String},
 	 *		searchTerm: {String},
+	 *		filter: {String},
 	 *		limit: {Number},
 	 *		offset: {Number}
 	 *	}
@@ -264,8 +264,8 @@ module.exports = {
 				result.callbackError(data, false);
 			},
 			fixedArgs.mediaSourceId,
-			fixedArgs.mediaNodeId,
 			fixedArgs.searchTerm,
+			fixedArgs.filter,
 			fixedArgs.limit,
 			fixedArgs.offset);
 
@@ -290,8 +290,7 @@ module.exports = {
 				mediaSourceId: { type: 'number' },
 				mediaNodeId: { type: 'string', nullable: true, optional: true, defaultValue: null },
 				index: { type: 'number', optional: true, defaultValue: 0 },
-				limit: { type: 'number', optional: true, defaultValue: -1 },
-				offset: { type: 'number', optional: true, defaultValue: 0 }
+				limit: { type: 'number', optional: true, defaultValue: -1 }
 			})) {
 				fail(-1, 'Invalid arguments.');
 			} else {
@@ -303,8 +302,7 @@ module.exports = {
 				fixedArgs.mediaSourceId,
 				fixedArgs.mediaNodeId,
 				fixedArgs.index,
-				fixedArgs.limit,
-				fixedArgs.offset);
+				fixedArgs.limit);
 			}
 			result.noResult(true);
 		} catch (e) {
