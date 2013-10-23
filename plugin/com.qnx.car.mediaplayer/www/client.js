@@ -407,7 +407,7 @@ var MediaPlayer = function(playerName) {
 	 * @param {String} searchTerm The term to search for.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
-	 * @param {String} [filter=""] The filter to use to search.
+	 * @param {String} [filter=null] The filter to use to search.
 	 * null, the search starts from the root node.
 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
 	 * all records are retrieved.
@@ -478,7 +478,7 @@ var MediaPlayer = function(playerName) {
 		var args = {
 				mediaSourceId: mediaSourceId,
 				searchTerm: searchTerm,
-				filter: typeof filter === 'string' && filter.trim() !== '' ? filter : "",
+				filter: typeof filter === 'string' && filter.trim() !== '' ? filter : null,
 				limit: typeof limit === 'number' ? limit : -1,
 				offset: typeof offset === 'number' ? offset : 0
 		};

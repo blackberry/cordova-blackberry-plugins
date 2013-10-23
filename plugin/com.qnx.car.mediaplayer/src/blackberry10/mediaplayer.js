@@ -365,7 +365,7 @@ module.exports = {
 	 * @param {Function} fail Function to call if the operation fails.
 	 * @param {Number} mediaSourceId The ID of the media source.
 	 * @param {String} searchTerm The term to search for.
-	 * @param {String} [filter=""] The filter to use to search. null, the search starts from the root node.
+	 * @param {String} [filter=null] The filter to use to search. null, the search is not filtered.
 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
 	 * all records will be retrieved.
 	 * @param {Number} [offset=0] The offset at which to start retrieving records. If omitted or negative,
@@ -378,7 +378,7 @@ module.exports = {
 				registerCallbackFunctions(success, fail),
 				mediaSourceId,
 				searchTerm,
-				typeof filter === 'string' && filter.trim() !== '' ? filter : '',
+				typeof filter === 'string' && filter.trim() !== '' ? filter : null,
 				typeof limit === 'number' ? limit : -1,
 				typeof offset === 'number' ? offset: 0
 			) : false;
