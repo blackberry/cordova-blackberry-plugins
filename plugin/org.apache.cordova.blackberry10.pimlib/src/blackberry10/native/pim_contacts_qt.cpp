@@ -96,6 +96,7 @@ Json::Value PimContactsQt::Find(const Json::Value& args)
         bbpim::ContactService service;
         bbpim::ContactListFilters listFilters;
         QList<bbpim::Contact> results;
+        bbpim::Contact contact;
         Json::Value contacts;
 
         getSortSpecs(args["options"]["sort"]);
@@ -117,7 +118,9 @@ Json::Value PimContactsQt::Find(const Json::Value& args)
 
         results = service.contacts(listFilters);
         for (QList<bbpim::Contact>::const_iterator i = results.constBegin(); i != results.constEnd(); i++) {
-            Json::Value contactItem = populateContact(*i, args["fields"]);
+            contact = *i;
+            contact = service.contactDetails(contact.id());
+            Json::Value contactItem = populateContact(contact, args["fields"]);
             contacts.append(contactItem);
         }
 
@@ -634,6 +637,8 @@ bool PimContactsQt::lessThan(const bbpim::Contact& c1, const bbpim::Contact& c2)
 Json::Value PimContactsQt::assembleSearchResults(const QSet<bbpim::ContactId>& resultIds, const Json::Value& contactFields, int limit)
 {
     QMap<bbpim::ContactId, bbpim::Contact> completeResults;
+    bbpim::Contact contact;
+    bbpim::ContactService service;
 
     // put complete contacts in map
     for (QSet<bbpim::ContactId>::const_iterator i = resultIds.constBegin(); i != resultIds.constEnd(); i++) {
@@ -656,7 +661,8 @@ Json::Value PimContactsQt::assembleSearchResults(const QSet<bbpim::ContactId>& r
     }
 
     for (int i = 0; i < limit; i++) {
-        Json::Value contactItem = populateContact(sortedResults[i], contactFields);
+        contact = service.contactDetails(sortedResults[i].id());
+        Json::Value contactItem = populateContact(contact, contactFields);
         contactArray.append(contactItem);
     }
 
