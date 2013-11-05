@@ -30,6 +30,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.jpps"/>
         </config-file>
-        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
+        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>
