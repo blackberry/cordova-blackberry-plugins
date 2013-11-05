@@ -25,7 +25,7 @@
     <license>Apache 2.0</license>
 
     <js-module src="www/client.js">
-        <clobbers target="blackberry.io" />
+        <merges target="blackberry.io" />
     </js-module>
 
     <platform name="blackberry10">
