@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="org.apache.mobilespec" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>mobilespec</name>
+    <description>
+        Cordova test suite.
+    </description>
+    <author rim:copyright="Copyright 1998-2013 BlackBerry" email="test@blackberry.com" href="http://www.BlackBerry.com">BlackBerry Limited</author>
+    <content src="index.html"/>
+    <access origin="http://audio.ibeat.org" />
+    <access origin="http://cordova-filetransfer.jitsu.com" />
+    <access origin="http://whatheaders.com" />
+    <access origin="http://apache.org" subdomains="true"/>
+    <access origin="https://apache.org" subdomains="true"/>
+    <access origin="http://www.google.com" />
+    <access origin="httpssss://example.com" />
+</widget>

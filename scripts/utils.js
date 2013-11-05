@@ -87,28 +87,37 @@ module.exports = {
         }
     },
 
-    execCommandWithJWorkflow: function (command, options, neverDrop) {
+    execCommandWithJWorkflow: function (command, options, customOptions) {
         var displayOutput = this.displayOutput;
+
+        customOptions = customOptions || {};
+
+        if (typeof customOptions === "boolean") {
+            customOptions = { neverDrop: customOptions};
+        }
+
         return function (prev, baton) {
             baton.take();
-            console.log("[EXECUTING] " + command);
+            if (!customOptions.logSilent) console.log("[EXECUTING] " + command);
             options = options || {};
             options.maxBuffer = 1024 * 1024;
             var c = childProcess.exec(command, options, function (error, stdout, stderr) {
-                if (error && !neverDrop) {
+                if (error && !customOptions.neverDrop) {
                     baton.drop(error.code);
                 } else {
                     baton.pass(error);
                 }
             });
 
-            c.stdout.on('data', function (data) {
-                displayOutput(data);
-            });
+            if (!customOptions.silent) {
+                c.stdout.on('data', function (data) {
+                    displayOutput(data);
+                });
 
-            c.stderr.on('data', function (data) {
-                displayOutput(data);
-            });
+                c.stderr.on('data', function (data) {
+                    displayOutput(data);
+                });
+            }
         };
     },
 

@@ -24,6 +24,7 @@ var path = require('path'),
     wrench = require('wrench'),
     util = require('util'),
     ncp = require('ncp').ncp,
+    shell = require("shelljs"),
     utils = require('./utils'),
     conf = require(path.join(__dirname, "conf")),
     baseDir = path.join(__dirname, '/../'),
@@ -33,20 +34,23 @@ var path = require('path'),
 
 module.exports = {
     setupRepo: function (branch, done) {
+        branch = branch || "origin/master";
+
         var workflow = jWorkflow.order(),
             clone = util.format("git clone %s %s", conf.CORDOVA_BB10_REPOS.url, cordovaDir),
-            checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
+            checkout = util.format("git checkout %s", branch),
             fetchAll = "git fetch --all --prune",
             npmInstall = "npm install";
         // fetch all if cordova repos folder exists
         if (fs.existsSync(cordovaDir)) {
-            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
+            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}, {silent: true}));
         } else {
-            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
+            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}, {silent: true}));
         }
         workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: cordovaDir}))
-        .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}))
+        .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}, {silent: true, logSilent: true}))
         .start(function () {
+            console.log("[STATUS] cordova-blackberry repo setup complete");
             done();
         });
     },
@@ -57,36 +61,47 @@ module.exports = {
             checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
             fetchAll = "git fetch --all --prune";
 
-        // fetch all if the repos exists 
+        // fetch all if the repos exists
         if (fs.existsSync(mobileSpecDir)) {
-            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
+            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}, {silent: true}));
         } else {
-            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
+            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}, {silent: true}));
         }
         workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
         .start(function () {
+            console.log("[STATUS] cordova-mobile-spec repo setup complete");
             done();
         });
     },
 
     createProject: function (projectPath, name, done) {
-        var create = util.format(path.join("bin", "create") + " %s %s %s", projectPath, name, name);
+        var platformDir = path.join(projectPath, "platforms", "blackberry10"),
+            cordovaCreateCmd = util.format(path.join("bin", "create") + " %s %s %s", platformDir, name, name),
+            cliCreateCmd = util.format("cordova create %s %s %s", projectPath, name, name),
+            platformAddCmd = "cordova platform add blackberry10";
 
         // Delete existing project folder
         if (fs.existsSync(projectPath)) {
             wrench.rmdirSyncRecursive(projectPath);
         }
 
-        jWorkflow.order(utils.execCommandWithJWorkflow(create, {cwd: path.join(cordovaDir, "blackberry10")}))
-        .start(function () {
-            if (done) {
-                done();
-            }
-        });
+        jWorkflow
+            .order(utils.execCommandWithJWorkflow(cliCreateCmd))
+            .andThen(utils.execCommandWithJWorkflow(platformAddCmd, {cwd: projectPath}))
+            .andThen(function (prev, baton) {
+                wrench.rmdirSyncRecursive(platformDir);
+                baton.pass();
+            })
+            .andThen(utils.execCommandWithJWorkflow(cordovaCreateCmd, {cwd: path.join(cordovaDir, "blackberry10")}, {silent: true}))
+            .start(function () {
+                if (done) {
+                    done();
+                }
+            });
     },
 
     configProject: function (projectPath, targetName, targetIP, targetType, targetPassword, done) {
-        var cmd = path.join('cordova', 'target') + " add %s %s %s";
+        var cmd = path.join('platforms', 'blackberry10', 'cordova', 'target') + " add %s %s %s";
         // No validation for targetName, type, ip, password here, target command will
         // take care the validation
         if (targetName && targetType && targetIP) {
@@ -101,7 +116,7 @@ module.exports = {
                     }
                 });
         } else {
-            console.log("Invalid parameters, run jake -T to get the usage");
+            console.log("Invalid parameters for adding a target so it will be skipped. Please run jake -T to get the usage.");
             process.exit(-1);
         }
     },
@@ -112,6 +127,7 @@ module.exports = {
         })
         .andThen(function () {
             wrench.copyDirSyncRecursive(src, path.join(projectPath, "www/"));
+            shell.cp("-f", path.join(src, "config.xml"), path.join(projectPath, "platforms", "blackberry10", "www", "config.xml"));
         })
         .start(function () {
             if (done) {
@@ -123,17 +139,15 @@ module.exports = {
     copyMobileSpec: function (projectPath, src, done) {
         jWorkflow.order()
         .andThen(function (prev, baton) {
-            var version = fs.readFileSync(path.join(projectPath, "www", "VERSION"));
             baton.take();
-            ncp(src, path.join(projectPath, "www"), function (err) {
-                if (err) {
-                    console.log(err);
-                }
-                //Change back the version
-                fs.writeFileSync(path.join(projectPath, "www", "VERSION"), version);
-                console.log("Copy Mobile Spec Finished");
-                baton.pass();
-            });
+            shell.mkdir('-p', path.join(projectPath, 'www'));
+            shell.exec("cd " + src + "&& git archive HEAD | tar -x -C " + path.join(projectPath, "www"));
+            shell.cp("-rf", path.join(projectPath, "..", "src", "plugin.xml"), path.join(projectPath, "www", "dependencies-plugin"));
+            shell.cp("-rf", path.join(projectPath, "..", "src", "config.xml"), path.join(projectPath, "www"));
+            console.log("[STATUS] Mobile Spec Assets Copied Successfully");
+            shell.exec("cd " + projectPath + " && " + "cordova plugin add " + path.join("www", "dependencies-plugin"));
+            console.log("[STATUS] Mobile Spec depenencies added");
+            baton.pass();
         })
         .start(function () {
             if (done) {
@@ -142,8 +156,9 @@ module.exports = {
         });
     },
 
-    buildProject: function (projectPath, done) {
-        var cmd = path.join('cordova', 'run');
+    runProject: function (projectPath, target, done) {
+        var cmd = "cordova run %s";
+        cmd = util.format(cmd, target ? target : "--device");
 
         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
         .start(function () {
@@ -154,12 +169,11 @@ module.exports = {
     },
 
     addPlugins: function (projectPath, plugins, done) {
-        var pluginsPath = path.join(baseDir, 'plugin'),
-            addPlugin = path.join("cordova", "plugin") + " add %s",
+        var addPlugin = "cordova plugin add %s",
             task = jWorkflow.order();
 
         plugins.forEach(function (plugin) {
-            var cmd = util.format(addPlugin, path.join(pluginsPath, plugin));
+            var cmd = util.format(addPlugin, plugin);
             task.andThen(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}));
         });
         task.start(function () {

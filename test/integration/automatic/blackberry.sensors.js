@@ -25,7 +25,7 @@ describe("blackberry.sensors", function () {
 
         it('should be able to get a list of supported sensors', function () {
             runs(function () {
-                expect(blackberry.sensors.supportedSensors).toContain("devicecompass");
+                expect(blackberry.sensors.supportedSensors).toEqual(jasmine.any(String));
             });
         });
 
