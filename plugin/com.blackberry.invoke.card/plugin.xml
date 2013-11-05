@@ -25,7 +25,7 @@
     <license>Apache 2.0</license>
 
     <js-module src="www/client.js">
-        <clobbers target="blackberry.invoke.card" />
+        <merges target="blackberry.invoke.card" />
     </js-module>
 
     <platform name="blackberry10">
