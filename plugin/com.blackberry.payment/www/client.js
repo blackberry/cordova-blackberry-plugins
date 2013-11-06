@@ -18,6 +18,7 @@
  */
 
 var _self = {},
+    exec = cordova.require("cordova/exec"),
     _ID = "com.blackberry.payment";
 
 function getFieldValue(field) {
@@ -29,7 +30,7 @@ function getFieldValue(field) {
             throw data;
         };
     try {
-        window.webworks.exec(success, fail, _ID, field);
+        exec(success, fail, _ID, field);
     } catch (e) {
         console.error(e);
     }
@@ -98,7 +99,7 @@ _self.purchase = function (purchase_arguments_t, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    window.webworks.exec(onSuccess, onFail, _ID, "purchase", args, true);
+    exec(onSuccess, onFail, _ID, "purchase", args, true);
 };
 
 _self.getExistingPurchases = function (refresh, success, fail) {
@@ -121,7 +122,7 @@ _self.getExistingPurchases = function (refresh, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    window.webworks.exec(onSuccess, onFail, _ID, "getExistingPurchases", args, true);
+    exec(onSuccess, onFail, _ID, "getExistingPurchases", args, true);
 };
 
 _self.cancelSubscription = function (transactionID, success, fail) {
@@ -144,7 +145,7 @@ _self.cancelSubscription = function (transactionID, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    window.webworks.exec(onSuccess, onFail, _ID, "cancelSubscription", args, true);
+    exec(onSuccess, onFail, _ID, "cancelSubscription", args, true);
 };
 
 _self.getPrice = function (args, success, fail) {
@@ -167,7 +168,7 @@ _self.getPrice = function (args, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    window.webworks.exec(onSuccess, onFail, _ID, "getPrice", args, true);
+    exec(onSuccess, onFail, _ID, "getPrice", args, true);
 };
 
 _self.checkExisting = function (args, success, fail) {
@@ -190,7 +191,7 @@ _self.checkExisting = function (args, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    window.webworks.exec(onSuccess, onFail, _ID, "checkExisting", args, true);
+    exec(onSuccess, onFail, _ID, "checkExisting", args, true);
 };
 
 _self.checkAppSubscription = function (success, fail) {
@@ -204,7 +205,7 @@ _self.checkAppSubscription = function (success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    window.webworks.exec(onSuccess, onFail, _ID, "checkExisting", args, true);
+    exec(onSuccess, onFail, _ID, "checkExisting", args, true);
 };
 
 Object.defineProperty(_self, "developmentMode", {
@@ -213,7 +214,7 @@ Object.defineProperty(_self, "developmentMode", {
     },
     set: function (value) {
         try {
-            window.webworks.exec(function () {}, function () {}, _ID, "developmentMode", {"developmentMode": value});
+            exec(function () {}, function () {}, _ID, "developmentMode", {"developmentMode": value});
         } catch (e) {
             console.error(e);
         }
