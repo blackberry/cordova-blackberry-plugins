@@ -18,6 +18,7 @@
 */
 
 var _self = {},
+    exec = cordova.require("cordova/exec"),
     _ID = "com.blackberry.push",
     PushService,
     PushPayload,
@@ -51,6 +52,13 @@ var _self = {},
     CREATE_CHANNEL_OPERATION = 1,
     DESTROY_CHANNEL_OPERATION = 2;
 
+function defineReadOnlyField (obj, field, value) {
+    Object.defineProperty(obj, field, {
+        "value": value,
+        "writable": false
+    });
+}
+
 /*
  * Define methods of push.PushService
  */
@@ -65,11 +73,11 @@ PushService.create = function (options, successCallback, failCallback, simChange
         createCallback = function (result) {
             if (result === SUCCESS) {
                 if (simChangeCallback) {
-                    window.webworks.exec(simChangeCallback, noop, _ID, "registerCallback", {id: "push.create.simChangeCallback"});
+                    exec(simChangeCallback, noop, _ID, "registerCallback", {id: "push.create.simChangeCallback"});
                 }
 
                 if (pushTransportReadyCallback) {
-                    window.webworks.exec(pushTransportReadyCallback, noop, _ID, "registerCallback", {id: "push.create.pushTransportReadyCallback"});
+                    exec(pushTransportReadyCallback, noop, _ID, "registerCallback", {id: "push.create.pushTransportReadyCallback"});
                 }
 
                 if (successCallback) {
@@ -102,12 +110,12 @@ PushService.create = function (options, successCallback, failCallback, simChange
     createAppId = args.appId;
 
     // Send command to framework to start Push service
-    window.webworks.exec(createCallback, noop, _ID, "startService", args);
+    exec(createCallback, noop, _ID, "startService", args);
 };
 
 PushService.prototype.createChannel = function (createChannelCallback) {
     // Send command to framework to create Push channel
-    window.webworks.exec(function (info) {
+    exec(function (info) {
         if (createChannelCallback) {
             createChannelCallback(info.result, info.token);
         }
@@ -116,7 +124,7 @@ PushService.prototype.createChannel = function (createChannelCallback) {
 
 PushService.prototype.destroyChannel = function (destroyChannelCallback) {
     // Send command to framework to destroy Push channel
-    window.webworks.exec(destroyChannelCallback, noop, _ID, "destroyChannel", null);
+    exec(destroyChannelCallback, noop, _ID, "destroyChannel", null);
 };
 
 PushService.prototype.extractPushPayload = function (invokeObject) {
@@ -140,7 +148,7 @@ PushService.prototype.extractPushPayload = function (invokeObject) {
 
     // Send command to framework to get the Push payload object
     args = { "data" : invokeObject.data };
-    window.webworks.exec(success, fail, _ID, "extractPushPayload", args);
+    exec(success, fail, _ID, "extractPushPayload", args);
 
     if (!payload.valid) {
         throw error_string;
@@ -168,54 +176,54 @@ PushService.prototype.launchApplicationOnPush = function (shouldLaunch, launchAp
     var args = { "shouldLaunch" : shouldLaunch };
 
     // Send command to framework to set the launch flag
-    window.webworks.exec(launchApplicationCallback, noop, _ID, "launchApplicationOnPush", args);
+    exec(launchApplicationCallback, noop, _ID, "launchApplicationOnPush", args);
 };
 
 /*
  * Define constants of push.PushService
  */
-window.webworks.defineReadOnlyField(PushService, "SUCCESS", SUCCESS);
-window.webworks.defineReadOnlyField(PushService, "INTERNAL_ERROR", INTERNAL_ERROR);
-window.webworks.defineReadOnlyField(PushService, "INVALID_DEVICE_PIN", INVALID_DEVICE_PIN);
-window.webworks.defineReadOnlyField(PushService, "INVALID_PROVIDER_APPLICATION_ID", INVALID_PROVIDER_APPLICATION_ID);
-window.webworks.defineReadOnlyField(PushService, "CHANNEL_ALREADY_DESTROYED", CHANNEL_ALREADY_DESTROYED);
-window.webworks.defineReadOnlyField(PushService, "CHANNEL_ALREADY_DESTROYED_BY_PROVIDER", CHANNEL_ALREADY_DESTROYED_BY_PROVIDER);
-window.webworks.defineReadOnlyField(PushService, "INVALID_PPG_SUBSCRIBER_STATE", INVALID_PPG_SUBSCRIBER_STATE);
-window.webworks.defineReadOnlyField(PushService, "PPG_SUBSCRIBER_NOT_FOUND", PPG_SUBSCRIBER_NOT_FOUND);
-window.webworks.defineReadOnlyField(PushService, "EXPIRED_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG", EXPIRED_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG);
-window.webworks.defineReadOnlyField(PushService, "INVALID_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG", INVALID_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG);
-window.webworks.defineReadOnlyField(PushService, "PPG_SUBSCRIBER_LIMIT_REACHED", PPG_SUBSCRIBER_LIMIT_REACHED);
-window.webworks.defineReadOnlyField(PushService, "INVALID_OS_VERSION_OR_DEVICE_MODEL_NUMBER", INVALID_OS_VERSION_OR_DEVICE_MODEL_NUMBER);
-window.webworks.defineReadOnlyField(PushService, "CHANNEL_SUSPENDED_BY_PROVIDER", CHANNEL_SUSPENDED_BY_PROVIDER);
-window.webworks.defineReadOnlyField(PushService, "CREATE_SESSION_NOT_DONE", CREATE_SESSION_NOT_DONE);
-window.webworks.defineReadOnlyField(PushService, "MISSING_PPG_URL", MISSING_PPG_URL);
-window.webworks.defineReadOnlyField(PushService, "PUSH_TRANSPORT_UNAVAILABLE", PUSH_TRANSPORT_UNAVAILABLE);
-window.webworks.defineReadOnlyField(PushService, "OPERATION_NOT_SUPPORTED", OPERATION_NOT_SUPPORTED);
-window.webworks.defineReadOnlyField(PushService, "CREATE_CHANNEL_NOT_DONE", CREATE_CHANNEL_NOT_DONE);
-window.webworks.defineReadOnlyField(PushService, "MISSING_PORT_FROM_PPG", MISSING_PORT_FROM_PPG);
-window.webworks.defineReadOnlyField(PushService, "MISSING_SUBSCRIPTION_RETURN_CODE_FROM_PPG", MISSING_SUBSCRIPTION_RETURN_CODE_FROM_PPG);
-window.webworks.defineReadOnlyField(PushService, "PPG_SERVER_ERROR", PPG_SERVER_ERROR);
-window.webworks.defineReadOnlyField(PushService, "MISSING_INVOKE_TARGET_ID", MISSING_INVOKE_TARGET_ID);
-window.webworks.defineReadOnlyField(PushService, "SESSION_ALREADY_EXISTS", SESSION_ALREADY_EXISTS);
-window.webworks.defineReadOnlyField(PushService, "INVALID_PPG_URL", INVALID_PPG_URL);
-window.webworks.defineReadOnlyField(PushService, "CREATE_CHANNEL_OPERATION", CREATE_CHANNEL_OPERATION);
-window.webworks.defineReadOnlyField(PushService, "DESTROY_CHANNEL_OPERATION", DESTROY_CHANNEL_OPERATION);
+defineReadOnlyField(PushService, "SUCCESS", SUCCESS);
+defineReadOnlyField(PushService, "INTERNAL_ERROR", INTERNAL_ERROR);
+defineReadOnlyField(PushService, "INVALID_DEVICE_PIN", INVALID_DEVICE_PIN);
+defineReadOnlyField(PushService, "INVALID_PROVIDER_APPLICATION_ID", INVALID_PROVIDER_APPLICATION_ID);
+defineReadOnlyField(PushService, "CHANNEL_ALREADY_DESTROYED", CHANNEL_ALREADY_DESTROYED);
+defineReadOnlyField(PushService, "CHANNEL_ALREADY_DESTROYED_BY_PROVIDER", CHANNEL_ALREADY_DESTROYED_BY_PROVIDER);
+defineReadOnlyField(PushService, "INVALID_PPG_SUBSCRIBER_STATE", INVALID_PPG_SUBSCRIBER_STATE);
+defineReadOnlyField(PushService, "PPG_SUBSCRIBER_NOT_FOUND", PPG_SUBSCRIBER_NOT_FOUND);
+defineReadOnlyField(PushService, "EXPIRED_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG", EXPIRED_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG);
+defineReadOnlyField(PushService, "INVALID_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG", INVALID_AUTHENTICATION_TOKEN_PROVIDED_TO_PPG);
+defineReadOnlyField(PushService, "PPG_SUBSCRIBER_LIMIT_REACHED", PPG_SUBSCRIBER_LIMIT_REACHED);
+defineReadOnlyField(PushService, "INVALID_OS_VERSION_OR_DEVICE_MODEL_NUMBER", INVALID_OS_VERSION_OR_DEVICE_MODEL_NUMBER);
+defineReadOnlyField(PushService, "CHANNEL_SUSPENDED_BY_PROVIDER", CHANNEL_SUSPENDED_BY_PROVIDER);
+defineReadOnlyField(PushService, "CREATE_SESSION_NOT_DONE", CREATE_SESSION_NOT_DONE);
+defineReadOnlyField(PushService, "MISSING_PPG_URL", MISSING_PPG_URL);
+defineReadOnlyField(PushService, "PUSH_TRANSPORT_UNAVAILABLE", PUSH_TRANSPORT_UNAVAILABLE);
+defineReadOnlyField(PushService, "OPERATION_NOT_SUPPORTED", OPERATION_NOT_SUPPORTED);
+defineReadOnlyField(PushService, "CREATE_CHANNEL_NOT_DONE", CREATE_CHANNEL_NOT_DONE);
+defineReadOnlyField(PushService, "MISSING_PORT_FROM_PPG", MISSING_PORT_FROM_PPG);
+defineReadOnlyField(PushService, "MISSING_SUBSCRIPTION_RETURN_CODE_FROM_PPG", MISSING_SUBSCRIPTION_RETURN_CODE_FROM_PPG);
+defineReadOnlyField(PushService, "PPG_SERVER_ERROR", PPG_SERVER_ERROR);
+defineReadOnlyField(PushService, "MISSING_INVOKE_TARGET_ID", MISSING_INVOKE_TARGET_ID);
+defineReadOnlyField(PushService, "SESSION_ALREADY_EXISTS", SESSION_ALREADY_EXISTS);
+defineReadOnlyField(PushService, "INVALID_PPG_URL", INVALID_PPG_URL);
+defineReadOnlyField(PushService, "CREATE_CHANNEL_OPERATION", CREATE_CHANNEL_OPERATION);
+defineReadOnlyField(PushService, "DESTROY_CHANNEL_OPERATION", DESTROY_CHANNEL_OPERATION);
 
 /*
  * Define push.PushPayload
  */
 PushPayload = function (payload) {
-    window.webworks.defineReadOnlyField(this, "data", payload.data);
-    window.webworks.defineReadOnlyField(this, "headers", payload.headers);
-    window.webworks.defineReadOnlyField(this, "id", payload.id);
-    window.webworks.defineReadOnlyField(this, "isAcknowledgeRequired", payload.isAcknowledgeRequired);
+    defineReadOnlyField(this, "data", payload.data);
+    defineReadOnlyField(this, "headers", payload.headers);
+    defineReadOnlyField(this, "id", payload.id);
+    defineReadOnlyField(this, "isAcknowledgeRequired", payload.isAcknowledgeRequired);
 };
 
 PushPayload.prototype.acknowledge = function (shouldAcceptPush) {
     var args = {"id" : this.id, "shouldAcceptPush" : shouldAcceptPush};
 
     // Send command to framework to acknowledge the Push payload
-    window.webworks.exec(noop, noop, _ID, "acknowledge", args);
+    exec(noop, noop, _ID, "acknowledge", args);
 };
 
 _self.PushService = PushService;

@@ -89,12 +89,6 @@ _self.setOption = function (option, value) {
 };
 
 
-function createEventHandler(_eventId, callback) {
-    if (!window.webworks.event.isOn(_eventId)) {
-		window.webworks.event.once(_ID, _eventId, callback);
-	}
-}
-
 _self.getToken = function (idsProvider, tokenType, appliesTo, successCallback, failureCallback) {
 	var args = {
 		"provider": idsProvider,
