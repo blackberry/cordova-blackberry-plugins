@@ -155,47 +155,49 @@ module.exports = {
     },
 
     setOptions: function (success, fail, args) {
+        var result = new PluginResult(args, env);
         if (args.options) {
             args.options = JSON.parse(decodeURIComponent(args.options));
 
             if (!args.options.sensor) {
-                fail(-1, "Must specify a sensor");
+                result.error(-1, "Must specify a sensor");
                 return;
             }
 
             if (args.options.delay && typeof(args.options.delay) !== "number") {
-                fail(-1, "Delay must be a number");
+                result.error(-1, "Delay must be a number");
                 return;
             }
 
             if (args.options.queue && typeof(args.options.queue) !== "boolean") {
-                fail(-1, "Queue must be a boolean value");
+                result.error(-1, "Queue must be a boolean value");
                 return;
             }
 
             if (args.options.batching && typeof(args.options.batching) !== "boolean") {
-                fail(-1, "Batching must be a boolean value");
+                result.error(-1, "Batching must be a boolean value");
                 return;
             }
 
             if (args.options.background && typeof(args.options.background) !== "boolean") {
-                fail(-1, "Background must be a booleani value");
+                result.error(-1, "Background must be a booleani value");
                 return;
             }
 
             if (args.options.reducedReporting && typeof(args.options.reducedReporting) !== "boolean") {
-                fail(-1, "Reduced reporting must be a boolean value");
+                result.error(-1, "Reduced reporting must be a boolean value");
                 return;
             }
 
             sensors.getInstance().setOptions(args.options);
-            success();
+            result.ok(null, false);
         } else {
-            fail(-1, "Need to specify arguments");
+            result.error(-1, "Need to specify arguments");
         }
     },
 
     supportedSensors: function (success, fail, args) {
-        success(sensors.getInstance().supportedSensors());
+        var result = new PluginResult(args, env);
+        result.ok(sensors.getInstance().supportedSensors(), false);
     }
 };

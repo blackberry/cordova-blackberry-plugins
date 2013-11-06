@@ -99,35 +99,43 @@ module.exports = {
 
     self : {
         appVersion : function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("appVersion"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("appVersion"), false);
         },
 
         bbmsdkVersion: function (success, fail, args, env) {
-            success(parseInt(bbm.getInstance().self.getProfile("bbmsdkVersion"), 10));
+            var result = new PluginResult(args, env);
+            result.ok(parseInt(bbm.getInstance().self.getProfile("bbmsdkVersion"), 10), false);
         },
 
         displayName: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("displayName"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("displayName"), false);
         },
 
         handle: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("handle"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("handle"), false);
         },
 
         personalMessage: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("personalMessage"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("personalMessage"), false);
         },
 
         ppid: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("ppid"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("ppid"), false);
         },
 
         status: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("status"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("status"), false);
         },
 
         statusMessage: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("statusMessage"));
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().self.getProfile("statusMessage"), false);
         },
 
         getDisplayPicture: function (success, fail, args, env) {
@@ -139,32 +147,34 @@ module.exports = {
         },
 
         setStatus: function (success, fail, args, env) {
+            var result = new PluginResult(args, env);
             if (args) {
                 args.status = JSON.parse(decodeURIComponent(args.status));
                 args.statusMessage = JSON.parse(decodeURIComponent(args.statusMessage));
 
                 if (args.status !== "available" && args.status !== "busy") {
-                    fail(-1, "Status is not valid");
+                    result.error(-1, "Status is not valid");
                     return;
                 }
             }
 
             bbm.getInstance().self.setStatus(args);
-            success();
+            result.ok(null, false);
         },
 
         setPersonalMessage: function (success, fail, args, env) {
+            var result = new PluginResult(args, env);
             if (args) {
                 args.personalMessage = JSON.parse(decodeURIComponent(args.personalMessage));
 
                 if (args.personalMessage.length === 0) {
-                    fail(-1, "Personal message must not be empty");
+                    result.error(-1, "Personal message must not be empty");
                     return;
                 }
             }
 
             bbm.getInstance().self.setPersonalMessage(args.personalMessage);
-            success();
+            result.ok(null, false);
         },
 
         setDisplayPicture: function (success, fail, args, env) {
@@ -215,8 +225,9 @@ module.exports = {
             },
 
             clearItems: function (success, fail, args, env) {
+                var result = new PluginResult(args, env);
                 bbm.getInstance().self.profilebox.clearItems();
-                success();
+                result.ok(null, false);
             },
 
             registerIcon: function (success, fail, args, env) {
@@ -238,19 +249,22 @@ module.exports = {
             },
 
             getItems: function (success, fail, args, env) {
-                success(bbm.getInstance().self.profilebox.getItems());
+                var result = new PluginResult(args, env);
+                result.ok(bbm.getInstance().self.profilebox.getItems(), false);
             },
 
             getAccessible : function (success, fail, args, env) {
-                success(bbm.getInstance().self.profilebox.getAccessible());
+                var result = new PluginResult(args, env);
+                result.ok(bbm.getInstance().self.profilebox.getAccessible(), false);
             }
         }
     },
 
     users : {
         inviteToDownload: function (success, fail, args, env) {
+            var result = new PluginResult(args, env);
             bbm.getInstance().users.inviteToDownload();
-            success();
+            result.ok(null, false);
         }
     }
 };
