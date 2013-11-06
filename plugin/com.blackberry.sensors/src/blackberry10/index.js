@@ -118,9 +118,8 @@ var sensors = require("./sensorsJNEXT").sensors,
     _listeners = {};
 
 module.exports = {
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -138,9 +137,8 @@ module.exports = {
         }
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event;
@@ -154,48 +152,32 @@ module.exports = {
         }
     },
 
-    setOptions: function (success, fail, args) {
+    setOptions: function (result, args) {
         if (args.options) {
-            args.options = JSON.parse(decodeURIComponent(args.options));
+            args.options = args.options;
 
             if (!args.options.sensor) {
-                fail(-1, "Must specify a sensor");
-                return;
+                result.error("Must specify a sensor");
+            } else if (args.options.delay && typeof(args.options.delay) !== "number") {
+                result.error("Delay must be a number");
+            } else if (args.options.queue && typeof(args.options.queue) !== "boolean") {
+                result.error("Queue must be a boolean value");
+            } else if (args.options.batching && typeof(args.options.batching) !== "boolean") {
+                result.error("Batching must be a boolean value");
+            } else if (args.options.background && typeof(args.options.background) !== "boolean") {
+                result.error("Background must be a booleani value");
+            } else if (args.options.reducedReporting && typeof(args.options.reducedReporting) !== "boolean") {
+                result.error("Reduced reporting must be a boolean value");
+            } else {
+                sensors.getInstance().setOptions(args.options);
+                result.ok();
             }
-
-            if (args.options.delay && typeof(args.options.delay) !== "number") {
-                fail(-1, "Delay must be a number");
-                return;
-            }
-
-            if (args.options.queue && typeof(args.options.queue) !== "boolean") {
-                fail(-1, "Queue must be a boolean value");
-                return;
-            }
-
-            if (args.options.batching && typeof(args.options.batching) !== "boolean") {
-                fail(-1, "Batching must be a boolean value");
-                return;
-            }
-
-            if (args.options.background && typeof(args.options.background) !== "boolean") {
-                fail(-1, "Background must be a booleani value");
-                return;
-            }
-
-            if (args.options.reducedReporting && typeof(args.options.reducedReporting) !== "boolean") {
-                fail(-1, "Reduced reporting must be a boolean value");
-                return;
-            }
-
-            sensors.getInstance().setOptions(args.options);
-            success();
         } else {
-            fail(-1, "Need to specify arguments");
+            result.error("Need to specify arguments");
         }
     },
 
-    supportedSensors: function (success, fail, args) {
-        success(sensors.getInstance().supportedSensors());
+    supportedSensors: function (result, args) {
+        result.ok(sensors.getInstance().supportedSensors());
     }
 };

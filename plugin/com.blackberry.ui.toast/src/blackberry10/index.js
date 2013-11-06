@@ -17,10 +17,9 @@
 var toast,
     _overlayWebView;
 
-function show(success, fail, args, env) {
-    var result = new PluginResult(args, env),
-        message = args.message !== 'undefined' ? JSON.parse(decodeURIComponent(args.message)) : undefined,
-        options = args.options !== 'undefined' ? JSON.parse(decodeURIComponent(args.options)) : {};
+function show(result, args, env) {
+    var message = args.message !== 'undefined' ? args.message : undefined,
+        options = args.options !== 'undefined' ? args.options : {};
 
     options.dismissHandler = function (toastId) {
         result.callbackOk({reason: "dismissed", toastId: toastId}, false);

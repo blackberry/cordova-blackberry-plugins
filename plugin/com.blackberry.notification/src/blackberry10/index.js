@@ -17,14 +17,13 @@ var _config = require("./../../lib/config"),
     _notification = qnx.webplatform.notification;
 
 module.exports = {
-    notify: function (success, fail, sourceArgs, env) {
-        var result = new PluginResult(sourceArgs, env),
-            args = {},
+    notify: function (result, sourceArgs, env) {
+        var args = {},
             key;
 
         for (key in sourceArgs) {
             if (sourceArgs.hasOwnProperty(key)) {
-                args[key] = JSON.parse(decodeURIComponent(sourceArgs[key]));
+                args[key] = sourceArgs[key];
             }
         }
 
@@ -60,14 +59,13 @@ module.exports = {
         result.noResult(true);
     },
 
-    remove: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            tag;
+    remove: function (result, args, env) {
+        var tag;
 
         if (!args || !args.tag) {
             result.error("No tag provided for notification removal");
         } else {
-            tag = JSON.parse(decodeURIComponent(args.tag));
+            tag = args.tag;
             _notification.remove(tag);
             result.ok();
         }

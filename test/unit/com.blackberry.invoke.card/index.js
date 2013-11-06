@@ -26,9 +26,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoke.card/",
     mockedCalComposer,
     mockedEmailComposer,
     mockedPluginResult,
-    index,
-    successCB,
-    failCB;
+    index;
 
 describe("invoke.card index", function () {
 
@@ -93,7 +91,7 @@ describe("invoke.card index", function () {
                     },
                     getController: function () {
                         return mockedController;
-                    },
+                    }
                 }
             }
         };
@@ -104,28 +102,16 @@ describe("invoke.card index", function () {
             ok: jasmine.createSpy(),
             error: jasmine.createSpy()
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         GLOBAL.qnx = GLOBAL.window.qnx;
         index = require(_apiDir + "index");
-        successCB = jasmine.createSpy("success callback");
-        failCB = jasmine.createSpy("fail callback");
     });
 
     afterEach(function () {
-        mockedMediaPlayer = null;
-        mockedCamera = null;
+        delete GLOBAL.window.qnx;
         delete GLOBAL.window;
         delete GLOBAL.qnx;
-        mockedFile = null;
-        mockedCalPicker = null;
-        mockedCalComposer = null;
-        mockedEmailComposer = null;
-        mockedIcs = null;
-        index = null;
         delete require.cache[require.resolve(_apiDir + "index")];
-        successCB = null;
-        failCB = null;
     });
 
     describe("invoke camera", function () {
@@ -134,7 +120,7 @@ describe("invoke.card index", function () {
                     "mode": encodeURIComponent(JSON.stringify({mode: "photo"}))
                 };
 
-            index.invokeCamera(successCB, null, mockedArgs);
+            index.invokeCamera(mockedPluginResult, mockedArgs);
             expect(mockedCamera.open).toHaveBeenCalledWith({
                 mode: "photo"
             }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
@@ -148,7 +134,7 @@ describe("invoke.card index", function () {
                     "options": encodeURIComponent(JSON.stringify({mode: "Picker"}))
                 };
 
-            index.invokeFilePicker(successCB, null, mockedArgs);
+            index.invokeFilePicker(mockedPluginResult, mockedArgs);
             expect(mockedFile.open).toHaveBeenCalledWith({
                     mode: "Picker"
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
@@ -167,7 +153,7 @@ describe("invoke.card index", function () {
                     imageUri: imageUri
                 };
 
-            index.invokeMediaPlayer(successCB, null, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
+            index.invokeMediaPlayer(mockedPluginResult, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
 
             expect(mockedMediaPlayer.open).toHaveBeenCalledWith({
                     contentTitle: decodeURIComponent(contentTitle),
@@ -180,11 +166,10 @@ describe("invoke.card index", function () {
 
     describe("invoke ICS viewer", function () {
         it("can invoke ICS viewer with options", function () {
-            var successCB = jasmine.createSpy(),
-                mockedArgs = {
+            var mockedArgs = {
                     options: encodeURIComponent(JSON.stringify({options: {uri: "file://path/to/file.ics"}}))
                 };
-            index.invokeIcsViewer(successCB, null, mockedArgs);
+            index.invokeIcsViewer(mockedPluginResult, mockedArgs);
             expect(mockedIcs.open).toHaveBeenCalledWith({
                 options: { uri : "file://path/to/file.ics" }
             }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
@@ -193,11 +178,10 @@ describe("invoke.card index", function () {
 
     describe("invoke calendar picker", function () {
         it("can invoke calendar picker with options", function () {
-            var successCB = jasmine.createSpy(),
-                mockedArgs = {
+            var mockedArgs = {
                     options: encodeURIComponent(JSON.stringify({options: {filepath: "/path/to/file.vcs"}}))
                 };
-            index.invokeCalendarPicker(successCB, null, mockedArgs);
+            index.invokeCalendarPicker(mockedPluginResult, mockedArgs);
             expect(mockedCalPicker.open).toHaveBeenCalledWith({
                 options: { filepath : "/path/to/file.vcs" }
             }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
@@ -218,7 +202,7 @@ describe("invoke.card index", function () {
                     "duration": duration
                 };
 
-            index.invokeCalendarComposer(successCB, null, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
+            index.invokeCalendarComposer(mockedPluginResult, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
 
             expect(mockedCalComposer.open).toHaveBeenCalledWith({
                     subject: decodeURIComponent(subject),
@@ -239,7 +223,7 @@ describe("invoke.card index", function () {
                     "body": body,
                 };
 
-            index.invokeEmailComposer(successCB, null, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
+            index.invokeEmailComposer(mockedPluginResult, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
 
             expect(mockedEmailComposer.open).toHaveBeenCalledWith({
                     subject: decodeURIComponent(subject),
@@ -256,19 +240,20 @@ describe("invoke.card index", function () {
         });
 
         it("can invoke the target picker ", function () {
-            var mockedArgs = {
+            var uri = 'file:///a test uri.jpg',
+                mockedArgs = {
                     title : encodeURIComponent(JSON.stringify('A test title')),
                     request : encodeURIComponent(JSON.stringify({
-                        uri : 'file:///a test uri.jpg',
+                        uri : uri,
                         target_type : ['CARD', 'APPLICATION', 'VIEWER']
                     }))
                 },
-            request;
+                request = {
+                    uri: uri,
+                    target_type_mask: 7
+                };
 
-            index.invokeTargetPicker(successCB, null, mockedArgs);
-            request = JSON.parse(decodeURIComponent(mockedArgs.request));
-            request.target_type_mask = 7;
-            delete request.target_type;
+            index.invokeTargetPicker(mockedPluginResult, mockedArgs);
 
             expect(mockedWebview.invocationlist.show).toHaveBeenCalledWith(
                 request,
@@ -290,7 +275,7 @@ describe("invoke.card index", function () {
                 },
             request;
 
-            index.invokeTargetPicker(successCB, null, mockedArgs);
+            index.invokeTargetPicker(mockedPluginResult, mockedArgs);
             request = JSON.parse(decodeURIComponent(mockedArgs.request));
             request.target_type_mask = 7;
             delete request.target_type;
@@ -317,7 +302,7 @@ describe("invoke.card index", function () {
                 },
             request;
 
-            index.invokeTargetPicker(successCB, null, mockedArgs);
+            index.invokeTargetPicker(mockedPluginResult, mockedArgs);
             request = JSON.parse(decodeURIComponent(mockedArgs.request));
             request.metadata = JSON.stringify(request.metadata);
 

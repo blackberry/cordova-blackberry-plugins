@@ -28,35 +28,29 @@ function getHomeDir() {
 }
 
 module.exports = {
-    sandbox: function (success, fail, args, env) {
-        var value,
-            result = new PluginResult(args, env);
-
+    sandbox: function (result, args, env) {
         _webview = _util.requireWebview();
 
-        if (args && args["sandbox"]) {
-            value = JSON.parse(decodeURIComponent(args["sandbox"]));
-            _webview.setSandbox(JSON.parse(value));
+        //If sandbox arg is sent down this is the setter
+        if (args && args.sandbox) {
+            _webview.setSandbox(!!args.sandbox);
             result.ok(null, false);
         } else {
-            value = _webview.getSandbox();
-            result.ok(value === "1", false); // always return "0" or "1" even after explicitly setting value to true or false
+            // Since this is getter, it will always return "0" or "1" even after explicitly setting value to true or false
+            result.ok(_webview.getSandbox() === "1", false);
         }
     },
 
-    home: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    home: function (result, args, env) {
         result.ok(getHomeDir(), false);
     },
 
-    sharedFolder: function (success, fail, args, env) {
-        var home = getHomeDir(),
-            result = new PluginResult(args, env);
+    sharedFolder: function (result, args, env) {
+        var home = getHomeDir();
         result.ok(home + "/../shared", false);
     },
 
-    SDCard: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    SDCard: function (result, args, env) {
         result.ok("/accounts/1000/removable/sdcard", false);
     }
 };

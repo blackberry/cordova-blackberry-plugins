@@ -68,7 +68,6 @@ describe("pim.contacts index", function () {
             ok: jasmine.createSpy(),
             error: jasmine.createSpy()
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         Contact = require(_apiDir + "www/Contact");
         index = require(_apiDir + "index");
@@ -78,8 +77,8 @@ describe("pim.contacts index", function () {
         delete GLOBAL.JNEXT;
         delete GLOBAL.window;
         delete GLOBAL.cordova;
-        delete GLOBAL.PluginResult;
-        index = null;
+        delete require.cache[require.resolve(_apiDir + "www/Contact")];
+        delete require.cache[require.resolve(_apiDir + "index")];
     });
 
     it("JNEXT require/createObject/registerEvents are not called upon requiring index", function () {
@@ -89,9 +88,7 @@ describe("pim.contacts index", function () {
     });
 
     it("find - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            findOptions = {
+        var findOptions = {
                 filter: [{
                     fieldName: ContactFindOptions.SEARCH_FIELD_GIVEN_NAME,
                     fieldValue: "John"
@@ -105,7 +102,7 @@ describe("pim.contacts index", function () {
         args.fields = encodeURIComponent(JSON.stringify(["name"]));
         args.options = encodeURIComponent(JSON.stringify(findOptions));
 
-        index.find(successCb, failCb, args);
+        index.find(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -116,9 +113,7 @@ describe("pim.contacts index", function () {
     });
 
     it("find - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            findOptions = {
+        var findOptions = {
                 filter: [{
                     fieldName: ContactFindOptions.SEARCH_FIELD_GIVEN_NAME,
                     fieldValue: "John"
@@ -128,7 +123,7 @@ describe("pim.contacts index", function () {
 
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.find(successCb, failCb, {
+        index.find(mockedPluginResult, {
             fields: encodeURIComponent(JSON.stringify(["name"])),
             options: encodeURIComponent(JSON.stringify(findOptions))
         });
@@ -138,9 +133,7 @@ describe("pim.contacts index", function () {
     });
 
     it("save - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            contact = new Contact({
+        var contact = new Contact({
                 name: {"familyName": "Smith", "givenName": "John"},
                 note: "this is a test"
             }),
@@ -157,7 +150,7 @@ describe("pim.contacts index", function () {
             }
         }
 
-        index.save(successCb, failCb, args);
+        index.save(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -171,9 +164,7 @@ describe("pim.contacts index", function () {
     });
 
     it("save - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            contact = new Contact({
+        var contact = new Contact({
                 name: {"familyName": "Smith", "givenName": "John"},
                 note: "this is a test"
             }),
@@ -188,21 +179,19 @@ describe("pim.contacts index", function () {
             }
         }
 
-        index.save(successCb, failCb, args);
+        index.save(mockedPluginResult, args);
         expect(JNEXT.invoke).not.toHaveBeenCalled();
         expect(mockedPluginResult.callbackError).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("remove - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {};
+        var args = {};
 
         spyOn(utils, "hasPermission").andReturn(true);
 
         args.contactId = encodeURIComponent(JSON.stringify(1));
 
-        index.remove(successCb, failCb, args);
+        index.remove(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -213,12 +202,9 @@ describe("pim.contacts index", function () {
     });
 
     it("remove - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy();
-
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.remove(successCb, failCb, {
+        index.remove(mockedPluginResult, {
             contactId: encodeURIComponent(JSON.stringify(1)),
             _eventId: encodeURIComponent(JSON.stringify("abc"))
         });
@@ -228,30 +214,26 @@ describe("pim.contacts index", function () {
     });
 
     it("getContact - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {
+        var args = {
                 contactId: encodeURIComponent(JSON.stringify("123"))
             };
 
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.getContact(successCb, failCb, args);
+        index.getContact(mockedPluginResult, args);
 
         expect(JNEXT.invoke).not.toHaveBeenCalled();
         expect(mockedPluginResult.error).toHaveBeenCalledWith(ContactError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getContact - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {
+        var args = {
                 contactId: encodeURIComponent(JSON.stringify("123"))
             };
 
         spyOn(utils, "hasPermission").andReturn(true);
 
-        index.getContact(successCb, failCb, args);
+        index.getContact(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -264,15 +246,13 @@ describe("pim.contacts index", function () {
     });
 
     it("invokeContactPicker - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {};
+        var args = {};
 
         spyOn(utils, "hasPermission").andReturn(true);
 
         args.options = encodeURIComponent(JSON.stringify({ mode: ContactPickerOptions.MODE_SINGLE }));
 
-        index.invokeContactPicker(successCb, failCb, args);
+        index.invokeContactPicker(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -284,12 +264,9 @@ describe("pim.contacts index", function () {
     });
 
     it("invokeContactPicker - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy();
-
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.invokeContactPicker(successCb, failCb, {
+        index.invokeContactPicker(mockedPluginResult, {
             options: encodeURIComponent(JSON.stringify({ mode: ContactPickerOptions.MODE_SINGLE }))
         });
 

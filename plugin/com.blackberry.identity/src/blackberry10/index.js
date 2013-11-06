@@ -16,9 +16,8 @@
 var ERRON_MSG_PPS = "Cannot retrieve data from system";
 
 module.exports = {
-    getFields: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            fields = { };
+    getFields: function (result, args, env) {
+        var fields = { };
 
         //IMSI is likely to fail since few devs will have access
         //TO compensate we will eat the error

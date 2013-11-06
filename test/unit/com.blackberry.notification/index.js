@@ -18,9 +18,7 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.notification/",
     _libDir = __dirname + "/../../../lib/",
     index,
     mockNotification,
-    MockPluginResult,
-    successCB,
-    failCB;
+    MockPluginResult;
 
 describe("notification index", function () {
     beforeEach(function () {
@@ -43,20 +41,11 @@ describe("notification index", function () {
             }
         };
 
-        GLOBAL.PluginResult = MockPluginResult;
-
         index = require(_apiDir + "index");
-        successCB = jasmine.createSpy("success callback");
-        failCB = jasmine.createSpy("fail callback");
     });
 
     afterEach(function () {
         delete GLOBAL.qnx;
-        delete GLOBAL.PluginResult;
-        mockNotification = null;
-        index = null;
-        successCB = null;
-        failCB = null;
         delete require.cache[require.resolve(_apiDir + "index")];
     });
 
@@ -98,7 +87,7 @@ describe("notification index", function () {
 
         describe("notify method", function () {
             it("Should invoke notification notify method when making a call with required parameters", function () {
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
@@ -123,7 +112,7 @@ describe("notification index", function () {
                 notifyArgs.options.payloadType = "PayloadType";
                 notifyArgs.options.payloadURI = "http://www.payload.uri";
 
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
@@ -137,7 +126,7 @@ describe("notification index", function () {
                 notifyArgs.options.target = "The.Target";
                 notifyArgs.options.targetAction = defaultTargetAction;
 
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
@@ -148,7 +137,7 @@ describe("notification index", function () {
                 args.options = JSON.stringify({tag: encodeURIComponent("TheTag"), 'target': ""});
                 notifyArgs.options.target = "";
 
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(mockNotification.notify.mostRecentCall.args[0].targetAction).not.toBeDefined();
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalled();
@@ -157,7 +146,7 @@ describe("notification index", function () {
             });
 
             it("Should invoke notification notify with no default targetAction if target is not provided", function () {
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(args.options.target).not.toBeDefined();
                 expect(args.options.targetAction).not.toBeDefined();
@@ -194,7 +183,7 @@ describe("notification index", function () {
                 notifyArgs.options.target = appTargetFirst;
                 notifyArgs.options.targetAction = defaultTargetAction;
 
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(MockPluginResult.prototype.noResult).toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
@@ -202,7 +191,7 @@ describe("notification index", function () {
             });
 
             it("Should not set target and targetAction if not provided and no in config", function () {
-                index.notify(successCB, failCB, args);
+                index.notify(new MockPluginResult(), args);
                 expect(mockNotification.notify).toHaveBeenCalledWith(notifyArgs, jasmine.any(Function));
                 expect(args.options.target).not.toBeDefined();
                 expect(args.options.targetAction).not.toBeDefined();
@@ -213,7 +202,7 @@ describe("notification index", function () {
         });
         describe("remove method", function () {
             it("Should call notification remove method when remove is called.", function () {
-                index.remove(successCB, failCB, {tag: encodeURIComponent(JSON.stringify("TheTag"))});
+                index.remove(new MockPluginResult(), {tag: encodeURIComponent(JSON.stringify("TheTag"))});
                 expect(mockNotification.remove).toHaveBeenCalledWith(notifyArgs.options.tag);
                 expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
@@ -221,7 +210,7 @@ describe("notification index", function () {
             });
 
             it("Should throw an error when no tag is provided.", function () {
-                index.remove(successCB, failCB);
+                index.remove(new MockPluginResult());
                 expect(mockNotification.remove).not.toHaveBeenCalledWith(notifyArgs.options.tag);
                 expect(MockPluginResult.prototype.ok).not.toHaveBeenCalled();
                 expect(MockPluginResult.prototype.error).toHaveBeenCalledWith(jasmine.any(String));

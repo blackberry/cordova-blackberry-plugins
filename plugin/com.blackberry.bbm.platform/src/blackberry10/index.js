@@ -39,9 +39,8 @@ var bbm = require("./BBMJNEXT").bbm,
     };
 
 module.exports = {
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -61,9 +60,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener;
@@ -78,12 +76,8 @@ module.exports = {
         }
     },
 
-    register: function (success, fail, args, env) {
+    register: function (result, args, env) {
         if (args) {
-            var result = new PluginResult(args, env);
-
-            args.options = JSON.parse(decodeURIComponent(args.options));
-
             if (!args.options.uuid || args.options.uuid.length === 0) {
                 result.error("Must specifiy UUID");
             }
@@ -98,81 +92,65 @@ module.exports = {
     },
 
     self : {
-        appVersion : function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("appVersion"));
+        appVersion : function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("appVersion"));
         },
 
-        bbmsdkVersion: function (success, fail, args, env) {
-            success(parseInt(bbm.getInstance().self.getProfile("bbmsdkVersion"), 10));
+        bbmsdkVersion: function (result, args, env) {
+            result.ok(parseInt(bbm.getInstance().self.getProfile("bbmsdkVersion"), 10));
         },
 
-        displayName: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("displayName"));
+        displayName: function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("displayName"));
         },
 
-        handle: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("handle"));
+        handle: function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("handle"));
         },
 
-        personalMessage: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("personalMessage"));
+        personalMessage: function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("personalMessage"));
         },
 
-        ppid: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("ppid"));
+        ppid: function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("ppid"));
         },
 
-        status: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("status"));
+        status: function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("status"));
         },
 
-        statusMessage: function (success, fail, args, env) {
-            success(bbm.getInstance().self.getProfile("statusMessage"));
+        statusMessage: function (result, args, env) {
+            result.ok(bbm.getInstance().self.getProfile("statusMessage"));
         },
 
-        getDisplayPicture: function (success, fail, args, env) {
-            var result = new PluginResult(args, env);
-
+        getDisplayPicture: function (result, args, env) {
             bbm.getInstance().self.getDisplayPicture(result);
-
             result.noResult(true);
         },
 
-        setStatus: function (success, fail, args, env) {
-            if (args) {
-                args.status = JSON.parse(decodeURIComponent(args.status));
-                args.statusMessage = JSON.parse(decodeURIComponent(args.statusMessage));
-
-                if (args.status !== "available" && args.status !== "busy") {
-                    fail(-1, "Status is not valid");
-                    return;
-                }
+        setStatus: function (result, args, env) {
+            if (!args || (args.status !== "available" && args.status !== "busy") ) {
+                result.error("Status is not valid");
+            } else {
+                bbm.getInstance().self.setStatus(args);
+                result.ok();
             }
-
-            bbm.getInstance().self.setStatus(args);
-            success();
         },
 
-        setPersonalMessage: function (success, fail, args, env) {
-            if (args) {
-                args.personalMessage = JSON.parse(decodeURIComponent(args.personalMessage));
-
-                if (args.personalMessage.length === 0) {
-                    fail(-1, "Personal message must not be empty");
-                    return;
-                }
+        setPersonalMessage: function (result, args, env) {
+            if (!args || !args.personalMessage ||  args.personalMessage.length === 0) {
+                result.error("Personal message must not be empty");
+            } else {
+                bbm.getInstance().self.setPersonalMessage(args.personalMessage);
+                result.ok();
             }
-
-            bbm.getInstance().self.setPersonalMessage(args.personalMessage);
-            success();
         },
 
-        setDisplayPicture: function (success, fail, args, env) {
-            var result = new PluginResult(args, env);
-
-            args.displayPicture = JSON.parse(decodeURIComponent(args.displayPicture));
-
-            if (args.displayPicture.length === 0) {
+        setDisplayPicture: function (result, args, env) {
+            if (!args) {
+                result.error("Invalid Arguments");
+            } else if (args.displayPicture.length === 0) {
                 result.error("Display picture must not be empty");
             } else if (!_whitelist.isAccessAllowed(args.displayPicture)) {
                 result.error("URL denied by whitelist: " + args.displayPicture);
@@ -184,12 +162,10 @@ module.exports = {
         },
 
         profilebox: {
-            addItem: function (success, fail, args, env) {
-                var result = new PluginResult(args, env);
-
-                args.options = JSON.parse(decodeURIComponent(args.options));
-
-                if (!args.options.text || args.options.text.length === 0) {
+            addItem: function (result, args, env) {
+                if (!args || ! args.options) {
+                    result.error("Invalid Arguments: options must exist.");
+                } else if (!args.options.text || args.options.text.length === 0) {
                     result.error("must specify text");
                 } else if (!args.options.cookie || args.options.cookie.length === 0) {
                     result.error("Must specify cookie");
@@ -201,12 +177,10 @@ module.exports = {
                 }
             },
 
-            removeItem: function (success, fail, args, env) {
-                var result = new PluginResult(args, env);
-
-                args.options = JSON.parse(decodeURIComponent(args.options));
-
-                if (!args.options.id || args.options.id.length === 0 || typeof args.options.id !== "string") {
+            removeItem: function (result, args, env) {
+                if (!args || ! args.options) {
+                    result.error("Invalid Arguments: options must exist.");
+                } else if (!args.options.id || args.options.id.length === 0 || typeof args.options.id !== "string") {
                     result.error("Must specify valid item id");
                 } else {
                     bbm.getInstance().self.profilebox.removeItem(args.options, result);
@@ -214,17 +188,15 @@ module.exports = {
                 }
             },
 
-            clearItems: function (success, fail, args, env) {
+            clearItems: function (result, args, env) {
                 bbm.getInstance().self.profilebox.clearItems();
-                success();
+                result.ok();
             },
 
-            registerIcon: function (success, fail, args, env) {
-                var result = new PluginResult(args, env);
-
-                args.options = JSON.parse(decodeURIComponent(args.options));
-
-                if (!args.options.iconId || args.options.iconId <= 0) {
+            registerIcon: function (result, args, env) {
+                if (!args || ! args.options) {
+                    result.error("Invalid Arguments: options must exist.");
+                } else if (!args.options.iconId || args.options.iconId <= 0) {
                     result.error("Must specify valid ID for icon");
                 } else if (!args.options.icon || args.options.icon.length === 0) {
                     result.error("Must specify icon to register");
@@ -237,20 +209,20 @@ module.exports = {
                 }
             },
 
-            getItems: function (success, fail, args, env) {
-                success(bbm.getInstance().self.profilebox.getItems());
+            getItems: function (result, args, env) {
+                result.ok(bbm.getInstance().self.profilebox.getItems());
             },
 
-            getAccessible : function (success, fail, args, env) {
-                success(bbm.getInstance().self.profilebox.getAccessible());
+            getAccessible : function (result, args, env) {
+                result.ok(bbm.getInstance().self.profilebox.getAccessible());
             }
         }
     },
 
     users : {
-        inviteToDownload: function (success, fail, args, env) {
+        inviteToDownload: function (result, args, env) {
             bbm.getInstance().users.inviteToDownload();
-            success();
+            result.ok();
         }
     }
 };

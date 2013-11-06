@@ -17,56 +17,50 @@ var _push,
     _results = {};
 
 module.exports = {
-    startService: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            pushOptions = { "invokeTargetId" : JSON.parse(decodeURIComponent(args.invokeTargetId)),
-                            "appId" : JSON.parse(decodeURIComponent(args.appId)),
-                            "ppgUrl" : JSON.parse(decodeURIComponent(args.ppgUrl)) };
+    startService: function (result, args, env) {
+        var pushOptions = { "invokeTargetId" : args.invokeTargetId,
+                            "appId" : args.appId,
+                            "ppgUrl" : args.ppgUrl };
 
         _results["push.create.callback"] = result;
         _push.getInstance().startService(pushOptions);
         result.noResult(true);
     },
 
-    createChannel: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    createChannel: function (result, args, env) {
         _results["push.createChannel.callback"] = result;
         _push.getInstance().createChannel(args);
         result.noResult(true);
     },
 
-    destroyChannel: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    destroyChannel: function (result, args, env) {
         _results["push.destroyChannel.callback"] = result;
         _push.getInstance().destroyChannel(args);
         result.noResult(true);
     },
 
-    extractPushPayload: function (success, fail, args, env) {
-        var invokeData = { "data" : JSON.parse(decodeURIComponent(args.data)) },
-            result = new PluginResult(args, env);
+    extractPushPayload: function (result, args, env) {
+        var invokeData = { "data" : args.data };
+
         result.ok(_push.getInstance().extractPushPayload(invokeData));
     },
 
-    launchApplicationOnPush: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    launchApplicationOnPush: function (result, args, env) {
         _results["push.launchApplicationOnPush.callback"] = result;
-        _push.getInstance().launchApplicationOnPush(JSON.parse(decodeURIComponent(args.shouldLaunch)));
+        _push.getInstance().launchApplicationOnPush(args.shouldLaunch);
         result.noResult(true);
     },
 
-    acknowledge: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            acknowledgeData = { "id" : JSON.parse(decodeURIComponent(args.id)),
-                                "shouldAcceptPush" : JSON.parse(decodeURIComponent(args.shouldAcceptPush)) };
+    acknowledge: function (result, args, env) {
+        var acknowledgeData = { "id" : args.id,
+                                "shouldAcceptPush" : args.shouldAcceptPush };
 
         _push.getInstance().acknowledge(acknowledgeData);
         result.ok();
     },
 
-    registerCallback: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            id = JSON.parse(decodeURIComponent(args.id));
+    registerCallback: function (result, args, env) {
+        var id = args.id;
 
         _results[id] = result;
         result.noResult(true);
@@ -145,7 +139,7 @@ JNEXT.Push = function () {
 
         } else if (strEventId === "push.create.pushTransportReadyCallback") {
             _results[strEventId].callbackOk(JSON.parse(args), true);
-        
+
         } else if (strEventId === "push.createChannel.callback") {
             info.result = JSON.parse(arData[1]);
             info.token = arData[2];

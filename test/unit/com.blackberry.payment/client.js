@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,40 +20,36 @@
 var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.payment",
     _apiDir = _extDir + "/" + _ID,
-    client,
-    mockedWebworks;
+    client;
 
 describe("payment client", function () {
     beforeEach(function () {
-        mockedWebworks = {
+        GLOBAL.cordova = {
+            require: function () {
+                return cordova.exec;
+            },
             exec: jasmine.createSpy("exec")
         };
-        GLOBAL.window = {
-            webworks: mockedWebworks
-        };
-        delete require.cache[require.resolve(_apiDir + "/www/client")];
         client = require(_apiDir + "/www/client");
     });
 
     afterEach(function () {
-        mockedWebworks = null;
-        delete GLOBAL.window;
-        client = null;
+        delete GLOBAL.cordova;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
     });
 
     describe("developmentMode", function () {
         it("getting developmentMode should return value from exec", function () {
-            mockedWebworks.exec = jasmine.createSpy("exec").andCallFake(function (success, fail, service, action, args) {
+            cordova.exec.andCallFake(function (success, fail, service, action, args) {
                 success(false);
             });
             expect(client.developmentMode).toEqual(false);
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "developmentMode");
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "developmentMode");
         });
 
         it("setting developmentMode should call exec with user-specified value", function () {
-            mockedWebworks.exec = jasmine.createSpy("exec");
             client.developmentMode = true;
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "developmentMode", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "developmentMode", {
                 "developmentMode": true
             });
         });
@@ -71,7 +67,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Purchase argument is not provided or is not a object."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling purchase() with right params should call exec", function () {
@@ -89,7 +85,7 @@ describe("payment client", function () {
 
             client.purchase(args, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "purchase", args, true);
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "purchase", args, true);
         });
     });
 
@@ -105,7 +101,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Refresh argument is not provided or is not a boolean value."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling getExistingPurchases() with right params should call exec", function () {
@@ -114,7 +110,7 @@ describe("payment client", function () {
 
             client.getExistingPurchases(true, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getExistingPurchases", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getExistingPurchases", {
                 "refresh": true
             }, true);
         });
@@ -132,7 +128,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Transaction ID is not provided or not a string value."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling cancelSubscription with right params should call exec", function () {
@@ -141,7 +137,7 @@ describe("payment client", function () {
 
             client.cancelSubscription("abc", successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cancelSubscription", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "cancelSubscription", {
                 "transactionID": "abc"
             }, true);
         });
@@ -159,7 +155,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Either ID or SKU needs to be provided as string."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling getPrice with missing sku or id will invoke error callback", function () {
@@ -175,7 +171,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Either ID or SKU needs to be provided as string."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling getPrice with sku should call exec", function () {
@@ -186,7 +182,7 @@ describe("payment client", function () {
                 "sku": "abc"
             }, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getPrice", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getPrice", {
                 "id": "",
                 "sku": "abc"
             }, true);
@@ -200,7 +196,7 @@ describe("payment client", function () {
                 "id": "123"
             }, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getPrice", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getPrice", {
                 "sku": "",
                 "id": "123"
             }, true);
@@ -215,7 +211,7 @@ describe("payment client", function () {
                 "id": "123"
             }, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getPrice", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "getPrice", {
                 "sku": "abc",
                 "id": "123"
             }, true);
@@ -234,7 +230,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Either ID or SKU needs to be provided as string."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling checkExisting with missing sku or id will invoke error callback", function () {
@@ -250,7 +246,7 @@ describe("payment client", function () {
                 errorID: "-1",
                 errorText: "Either ID or SKU needs to be provided as string."
             });
-            expect(mockedWebworks.exec).not.toHaveBeenCalled();
+            expect(cordova.exec).not.toHaveBeenCalled();
         });
 
         it("calling checkExisting with sku should call exec", function () {
@@ -261,7 +257,7 @@ describe("payment client", function () {
                 "sku": "abc"
             }, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
                 "sku": "abc",
                 "id": ""
             }, true);
@@ -275,7 +271,7 @@ describe("payment client", function () {
                 "id": "123"
             }, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
                 "sku": "",
                 "id": "123"
             }, true);
@@ -290,7 +286,7 @@ describe("payment client", function () {
                 "id": "123"
             }, successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
                 "sku": "abc",
                 "id": "123"
             }, true);
@@ -304,7 +300,7 @@ describe("payment client", function () {
 
             client.checkAppSubscription(successCb, errorCb);
 
-            expect(mockedWebworks.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "checkExisting", {
                 "sku": "",
                 "id": "-1"
             }, true);

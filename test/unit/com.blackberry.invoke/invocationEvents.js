@@ -27,27 +27,27 @@ describe("invoke invocationEvents", function () {
             removeEventListener: jasmine.createSpy("invocation removeEventListener"),
             interrupter: undefined
         };
-        GLOBAL.window.qnx = {
-            webplatform: {
-                getApplication: function () {
-                    return {
-                        invocation: mockedInvocation
-                    };
+        GLOBAL.window = {
+            qnx: {
+                webplatform: {
+                    getApplication: function () {
+                        return {
+                            invocation: mockedInvocation
+                        };
+                    }
                 }
             }
         };
 
         //since multiple tests are requiring invocation events we must unrequire
-        var name = require.resolve(_apiDir + "invocationEvents");
-        delete require.cache[name];
+        delete require.cache[require.resolve(_apiDir + "invocationEvents")];
         invocationEvents = require(_apiDir + "invocationEvents");
         trigger = function () {};
     });
 
     afterEach(function () {
-        mockedInvocation = null;
-        GLOBAL.window.qnx = null;
-        trigger = null;
+        delete GLOBAL.window;
+        delete require.cache[require.resolve(_apiDir + "invocationEvents")];
     });
 
     describe("onchildcardstartpeek", function () {

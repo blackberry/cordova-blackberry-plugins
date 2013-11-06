@@ -63,10 +63,7 @@ describe("ui.toast index", function () {
         GLOBAL.window = {
             qnx: mockQnx
         };
-
         GLOBAL.qnx = mockQnx;
-
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         index = require(root + "plugin/com.blackberry.ui.toast/index");
     });
@@ -74,17 +71,16 @@ describe("ui.toast index", function () {
     afterEach(function () {
         delete GLOBAL.window;
         delete GLOBAL.qnx;
-        delete GLOBAL.PluginResult;
+        delete require.cache[require.resolve(root + "plugin/com.blackberry.ui.toast/index")];
     });
 
     it("shows toast", function () {
-        var noop = function () {},
-            mockArgs = {
+        var mockArgs = {
                 message: encodeURIComponent(JSON.stringify("This is a toast")),
                 options: encodeURIComponent(JSON.stringify({ buttonText : 'Test'}))
             };
 
-        index.show(noop, noop, mockArgs, null);
+        index.show(mockedPluginResult, mockArgs, null);
         expect(mockedOverlayWebview.toast.show).toHaveBeenCalledWith("This is a toast", { buttonText : 'Test', callbackHandler: jasmine.any(Function), dismissHandler: jasmine.any(Function)});
         expect(mockedPluginResult.ok).toHaveBeenCalledWith({reason: "created", toastId: jasmine.any(Number)}, true);
 

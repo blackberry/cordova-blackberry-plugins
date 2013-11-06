@@ -41,9 +41,8 @@ function processCover(cover) {
 
 module.exports = {
 
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
 
@@ -62,9 +61,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             systemEvent = _actionMap[eventName].event;
 
@@ -77,8 +75,7 @@ module.exports = {
         }
     },
 
-    resetCover: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    resetCover: function (result, args, env) {
         try {
             window.qnx.webplatform.getApplication().updateCover({"cover": "reset"});
             result.ok(null, false);
@@ -88,9 +85,8 @@ module.exports = {
         }
     },
 
-    coverSize: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            coverSize,
+    coverSize: function (result, args, env) {
+        var coverSize,
             response;
         try {
             coverSize = window.qnx.webplatform.getApplication().coverSize;
@@ -102,11 +98,10 @@ module.exports = {
         }
     },
 
-    updateCover: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            processedCover;
+    updateCover: function (result, args, env) {
+        var processedCover;
         try {
-            processedCover = processCover(JSON.parse(decodeURIComponent(args.cover)));
+            processedCover = processCover(args.cover);
             window.qnx.webplatform.getApplication().updateCover(processedCover);
             result.ok(null, false);
         } catch (e) {

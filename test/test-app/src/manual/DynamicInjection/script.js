@@ -28,7 +28,7 @@ function testBB() {
         return;
     }
 
-    document.addEventListener("webworksready", function () {
+    document.addEventListener("deviceready", function () {
         alert("Test passed WebWorks ready was triggered after being injected");
     });
 }

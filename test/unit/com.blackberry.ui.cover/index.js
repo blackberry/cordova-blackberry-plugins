@@ -16,7 +16,6 @@
 
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.ui.cover/",
     _libDir = __dirname + "/../../../lib/",
-    events = require(_libDir + "event"),
     index,
     mockedPluginResult,
     mockedCoverSize,
@@ -24,7 +23,6 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.ui.cover/",
 
 describe("index ui.cover", function () {
     beforeEach(function () {
-        index = require(_apiDir + "index");
         mockedCoverSize = '{"width":334,"height":396}';
         mockedUpdateCover = jasmine.createSpy("update cover");
         GLOBAL.window = {
@@ -48,65 +46,59 @@ describe("index ui.cover", function () {
             error: jasmine.createSpy("PluginResult.error"),
             noResult: jasmine.createSpy("PluginResult.noResult")
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
+        index = require(_apiDir + "index");
     });
 
     afterEach(function () {
         delete GLOBAL.window;
-        delete GLOBAL.PluginResult;
-        index = null;
-        mockedCoverSize = null;
-        mockedUpdateCover = null;
-        mockedPluginResult = null;
+        delete require.cache[require.resolve(_apiDir + "index")];
     });
 
     it("gets coverSize", function () {
-        var success = jasmine.createSpy(),
-            fail = jasmine.createSpy();
-        index.coverSize(success, fail);
+        index.coverSize(mockedPluginResult);
         expect(mockedPluginResult.ok).toHaveBeenCalledWith({width: 334, height: 396}, false);
         expect(mockedPluginResult.error).not.toHaveBeenCalled();
     });
 
     it("resetCover", function () {
-        var success = jasmine.createSpy(),
-            fail = jasmine.createSpy(),
-            resetCover = {cover: "reset"};
+        var resetCover = {cover: "reset"};
 
-        index.resetCover(success, fail, {cover: encodeURIComponent(JSON.stringify(resetCover))});
+        index.resetCover(mockedPluginResult, {cover: encodeURIComponent(JSON.stringify(resetCover))});
         expect(mockedPluginResult.ok).toHaveBeenCalled();
         expect(mockedPluginResult.error).not.toHaveBeenCalled();
         expect(mockedUpdateCover).toHaveBeenCalledWith(resetCover);
     });
 
     it("updateCover", function () {
-        var success = jasmine.createSpy(),
-            fail = jasmine.createSpy(),
-            fakeCover = {
+        var fakeCover = {
                 cover: {
                     type: "file",
                     path: "/path/to/application/cover.jpg"
                 },
-                text: [{"label": "cover label", "size": 5, "wrap": true}],
+                text: [
+                    {
+                        "label": "cover label",
+                        "size": 5,
+                        "wrap": true
+                    }
+                ]
             };
-        index.updateCover(success, fail, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
+        index.updateCover(mockedPluginResult, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
         expect(mockedPluginResult.error).not.toHaveBeenCalled();
         expect(mockedUpdateCover).toHaveBeenCalledWith(fakeCover);
     });
 
     it("updateCover strips file:// prefix before sending to webplatform", function () {
-        var success = jasmine.createSpy(),
-            fail = jasmine.createSpy(),
-            fakeCover = {
+        var fakeCover = {
                 "cover": {
                     type: "file",
                     path: "file:///path/to/application/cover.jpg"
                 },
-                text: [{"label": "cover label", "size": 5, "wrap": true}],
+                text: [{"label": "cover label", "size": 5, "wrap": true}]
             };
-        index.updateCover(success, fail, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
+        index.updateCover(mockedPluginResult, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
         expect(mockedPluginResult.error).not.toHaveBeenCalled();
         expect(mockedUpdateCover).toHaveBeenCalledWith({
@@ -114,7 +106,7 @@ describe("index ui.cover", function () {
                 type: "file",
                 path: "/path/to/application/cover.jpg"
             },
-            text: [{"label": "cover label", "size": 5, "wrap": true}],
+            text: [{"label": "cover label", "size": 5, "wrap": true}]
         });
     });
 

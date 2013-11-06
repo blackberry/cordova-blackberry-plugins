@@ -19,8 +19,6 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.invoked/",
     mockedInvocation,
     mockedPluginResult,
     index,
-    successCB,
-    failCB,
     errorCode = -1;
 
 describe("invoked index", function () {
@@ -33,14 +31,15 @@ describe("invoked index", function () {
             }),
             LAUNCH: 0
         };
-        GLOBAL.window = {};
-        GLOBAL.window.qnx = {
-            callExtensionMethod : function () {},
-            webplatform: {
-                getApplication: function () {
-                    return {
-                        invocation: mockedInvocation
-                    };
+        GLOBAL.window = {
+            qnx:  {
+                callExtensionMethod : function () {},
+                webplatform: {
+                    getApplication: function () {
+                        return {
+                            invocation: mockedInvocation
+                        };
+                    }
                 }
             }
         };
@@ -51,22 +50,14 @@ describe("invoked index", function () {
             ok: jasmine.createSpy(),
             error: jasmine.createSpy()
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         //since multiple tests are requiring invocation events we must unrequire
-        var name = require.resolve(_apiDir + "invocationEvents");
-        delete require.cache[name];
         index = require(_apiDir + "index");
-        successCB = jasmine.createSpy("success callback");
-        failCB = jasmine.createSpy("fail callback");
     });
 
     afterEach(function () {
-        mockedInvocation = null;
-        GLOBAL.window.qnx = null;
-        index = null;
-        successCB = null;
-        failCB = null;
+        delete GLOBAL.window;
+        delete require.cache[require.resolve(_apiDir + "invocationEvents")];
     });
 
     describe("methods", function () {
@@ -83,24 +74,24 @@ describe("invoked index", function () {
         });
 
         // Positive
-        it("can call cardResizeDone with success callback at the end", function () {
-            index.cardResizeDone(successCB, failCB);
+        it("can call cardResizeDone with noResult callback at the end", function () {
+            index.cardResizeDone(mockedPluginResult);
             expect(mockedInvocation.cardResized).toHaveBeenCalled();
             expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
 
-        it("can call cardStartPeek with success callback at the end", function () {
+        it("can call cardStartPeek with noResult callback at the end", function () {
             var cartType = "root",
                 args = {
                     'peekType': encodeURIComponent(cartType)
                 };
 
-            index.cardStartPeek(successCB, failCB, args);
+            index.cardStartPeek(mockedPluginResult, args);
             expect(mockedInvocation.cardPeek).toHaveBeenCalledWith(cartType);
             expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
 
-        it("can call cardRequestClosure with success callback at the end", function () {
+        it("can call cardRequestClosure with noResult callback at the end", function () {
             var request = {
                     reason: "Close Reason",
                     type: "mime/type",
@@ -110,20 +101,20 @@ describe("invoked index", function () {
                     "request": encodeURIComponent(JSON.stringify(request))
                 };
 
-            index.cardRequestClosure(successCB, failCB, args);
+            index.cardRequestClosure(mockedPluginResult, args);
             expect(mockedInvocation.sendCardDone).toHaveBeenCalledWith(request);
             expect(mockedPluginResult.noResult).toHaveBeenCalled();
         });
 
         // Negative
-        it("can call cardStartPeek with fail callback when missing required parameter", function () {
-            index.cardStartPeek(successCB, failCB);
+        it("can call cardStartPeek with error callback when missing required parameter", function () {
+            index.cardStartPeek(mockedPluginResult);
             expect(mockedInvocation.cardResized).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalled();
         });
 
-        it("can call cardRequestClosure with fail callback when missing required parameter", function () {
-            index.cardRequestClosure(successCB, failCB);
+        it("can call cardRequestClosure with error callback when missing required parameter", function () {
+            index.cardRequestClosure(mockedPluginResult);
             expect(mockedInvocation.sendCardDone).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalled();
         });

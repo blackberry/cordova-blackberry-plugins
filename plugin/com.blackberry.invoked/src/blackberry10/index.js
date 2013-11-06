@@ -44,8 +44,7 @@ var _actionMap = {
     _listeners = {};
 
 module.exports = {
-    cardResizeDone: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    cardResizeDone: function (result, args, env) {
         try {
             window.qnx.webplatform.getApplication().invocation.cardResized();
             result.noResult(true);
@@ -54,12 +53,11 @@ module.exports = {
         }
     },
 
-    cardStartPeek: function (success, fail, args, env) {
-        var cardPeek,
-            result = new PluginResult(args, env);
+    cardStartPeek: function (result, args, env) {
+        var cardPeek;
 
         try {
-            cardPeek = decodeURIComponent(args["peekType"]);
+            cardPeek = decodeURIComponent(args.peekType);
             window.qnx.webplatform.getApplication().invocation.cardPeek(cardPeek);
             result.noResult(true);
         } catch (e) {
@@ -67,12 +65,11 @@ module.exports = {
         }
     },
 
-    cardRequestClosure: function (success, fail, args, env) {
-        var request,
-            result = new PluginResult(args, env);
+    cardRequestClosure: function (result, args, env) {
+        var request;
 
         try {
-            request = JSON.parse(decodeURIComponent(args["request"]));
+            request = args.request;
             window.qnx.webplatform.getApplication().invocation.sendCardDone(request);
             result.noResult(true);
         } catch (e) {
@@ -80,9 +77,8 @@ module.exports = {
         }
     },
 
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             invokedEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -100,9 +96,8 @@ module.exports = {
         }
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             invokedEvent = _actionMap[eventName].event;

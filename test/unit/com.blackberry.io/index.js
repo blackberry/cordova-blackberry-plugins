@@ -15,7 +15,7 @@
  */
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.io/",
     _libDir = __dirname + "/../../../lib/",
-    index = require(_apiDir + "/index"),
+    index,
     utils = require(_libDir + "/utils"),
     mockedWebview = {
         setSandbox: jasmine.createSpy("setSandbox"),
@@ -29,11 +29,12 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.io/",
         error: jasmine.createSpy("PluginResult.error"),
         noResult: jasmine.createSpy("PluginResult.noResult"),
         callbackOk: jasmine.createSpy("PluginResult.callbackOk")
-    };
+    },
+    mockedQnx;
 
 describe("blackberry.io index", function () {
     beforeEach(function () {
-        GLOBAL.qnx = {
+        mockedQnx = {
             webplatform: {
                 getApplication: function () {
                     return mockedApplication;
@@ -41,14 +42,16 @@ describe("blackberry.io index", function () {
             }
         };
         GLOBAL.window = {
-            qnx: qnx
+            qnx: mockedQnx
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+        GLOBAL.qnx = mockedQnx;
+        index = require(_apiDir + "/index");
     });
 
     afterEach(function () {
         delete GLOBAL.window;
-        delete GLOBAL.PluginResult;
+        delete GLOBAL.qnx;
+        delete require.cache[require.resolve(_apiDir + "/index")];
     });
 
     describe("sandbox", function () {
@@ -57,35 +60,35 @@ describe("blackberry.io index", function () {
         });
 
         it("sandbox called with args will set webview sandbox", function () {
-            index.sandbox(null, null, {
+            index.sandbox(mockedPluginResult, {
                 "sandbox": encodeURIComponent(JSON.stringify(false))
-            }, null);
+            });
             expect(mockedWebview.setSandbox).toHaveBeenCalledWith(false);
             expect(mockedPluginResult.ok).toHaveBeenCalled();
         });
 
         it("sandbox called without args will get webview sandbox", function () {
             var success = jasmine.createSpy("success");
-            index.sandbox(success, null, null, null);
+            index.sandbox(mockedPluginResult);
             expect(mockedWebview.getSandbox).toHaveBeenCalled();
             expect(mockedPluginResult.ok).toHaveBeenCalledWith(false, false);
         });
     });
 
     it("home calls getEnv('HOME')", function () {
-        index.home();
+        index.home(mockedPluginResult);
         expect(mockedApplication.getEnv).toHaveBeenCalledWith("HOME");
         expect(mockedPluginResult.ok).toHaveBeenCalledWith("/home", false);
     });
 
     it("sharedFolder calls getEnv('HOME')", function () {
-        index.sharedFolder();
+        index.sharedFolder(mockedPluginResult);
         expect(mockedApplication.getEnv).toHaveBeenCalledWith("HOME");
         expect(mockedPluginResult.ok).toHaveBeenCalledWith("/home/../shared", false);
     });
 
     it("SDCard calls getEnv('HOME')", function () {
-        index.SDCard();
+        index.SDCard(mockedPluginResult);
         expect(mockedPluginResult.ok).toHaveBeenCalledWith("/accounts/1000/removable/sdcard", false);
     });
 });

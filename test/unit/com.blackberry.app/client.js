@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -85,7 +85,7 @@ describe("app client", function () {
         delete GLOBAL.window;
         delete GLOBAL.cordova;
         delete GLOBAL.navigator;
-        client = null;
+        delete require.cache[require.resolve(_apiDir + "/www/client")];
     });
 
     it("exec should have been called once for all app fields", function () {
@@ -130,7 +130,7 @@ describe("app client", function () {
 
         it("should be populated with localized language value, when region value not available", function () {
             navigator.language = "en-FR";
-            expect(client.description === mockData.description["en"]);
+            expect(client.description === mockData.description.en);
         });
     });
 
@@ -165,7 +165,7 @@ describe("app client", function () {
 
         it("should be populated with localized language value, when region value not availble", function () {
             GLOBAL.window.navigator = {language: "en-FR"};
-            expect(client.name === mockData.name["en"]);
+            expect(client.name === mockData.name.en);
         });
     });
 
@@ -200,7 +200,7 @@ describe("app client", function () {
             expect(client.windowState === mockData.windowState);
         });
     });
-    
+
     describe("lockOrientation", function () {
         it("should call exec", function () {
             client.lockOrientation('portrait-primary', false);

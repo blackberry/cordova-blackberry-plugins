@@ -16,7 +16,7 @@
 
 var root = __dirname + "/../../../",
     webview = require(root + "lib/webview"),
-    overlayWebView = require(root + "lib/overlayWebView"),
+    overlayWebView,
     mockedPluginResult,
     index;
 
@@ -31,14 +31,15 @@ describe("ui.dialog index", function () {
             error: jasmine.createSpy("PluginResult.error"),
             noResult: jasmine.createSpy("PluginResult.noResult")
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
+        overlayWebView = require(root + "lib/overlayWebView");
         index = require(root + "plugin/com.blackberry.ui.dialog/index");
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
-        delete GLOBAL.PluginResult;
         delete require.cache[require.resolve(root + "plugin/com.blackberry.ui.dialog/index")];
+        delete require.cache[require.resolve(root + "lib/overlayWebView")];
     });
 
     it("makes sure that the dialog is called properly", function () {
@@ -53,13 +54,13 @@ describe("ui.dialog index", function () {
         args.settings = encodeURIComponent(JSON.stringify(args.settings));
 
         spyOn(overlayWebView, "showDialog");
-        index.customAskAsync(null, null, args);
+        index.customAskAsync(mockedPluginResult, args);
 
         expect(overlayWebView.showDialog).toHaveBeenCalled();
     });
 
     it("makes sure that a message is specified", function () {
-        index.customAskAsync(null, null, {});
+        index.customAskAsync(mockedPluginResult, {});
         expect(mockedPluginResult.error).toHaveBeenCalled();
     });
 
@@ -67,7 +68,7 @@ describe("ui.dialog index", function () {
         var args = {};
         args.message = "Hello World";
         args.message = encodeURIComponent(args.message);
-        index.customAskAsync(null, null, args);
+        index.customAskAsync(mockedPluginResult, args);
         expect(mockedPluginResult.error).toHaveBeenCalled();
     });
     it("makes sure that buttons is an array", function () {
@@ -76,7 +77,7 @@ describe("ui.dialog index", function () {
             args = {buttons : 3};
         args.message = "Hello World";
         args.message = encodeURIComponent(args.message);
-        index.customAskAsync(null, null, args);
+        index.customAskAsync(mockedPluginResult, args);
         expect(mockedPluginResult.error).toHaveBeenCalledWith("buttons is not an array", false);
     });
 
@@ -96,7 +97,7 @@ describe("ui.dialog index", function () {
                 "ok": true
             });
         });
-        index.standardAskAsync(null, null, args);
+        index.standardAskAsync(mockedPluginResult, args);
 
         expect(overlayWebView.showDialog).toHaveBeenCalled();
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -107,7 +108,7 @@ describe("ui.dialog index", function () {
 
     it("makes sure that a message is specified for standard dialogs", function () {
         var args = { type: encodeURIComponent(1) };
-        index.standardAskAsync(null, null, args);
+        index.standardAskAsync(mockedPluginResult, args);
         expect(mockedPluginResult.error).toHaveBeenCalledWith("message is undefined", false);
     });
 
@@ -115,7 +116,7 @@ describe("ui.dialog index", function () {
         var args = {};
         args.message = "Hello World";
         args.message = encodeURIComponent(args.message);
-        index.standardAskAsync(null, null, args);
+        index.standardAskAsync(mockedPluginResult, args);
         expect(mockedPluginResult.error).toHaveBeenCalledWith("type is undefined", false);
     });
 
@@ -126,7 +127,7 @@ describe("ui.dialog index", function () {
         args.message = encodeURIComponent(args.message);
         args.type = encodeURIComponent(args.type);
 
-        index.standardAskAsync(null, null, args);
+        index.standardAskAsync(mockedPluginResult, args);
 
         expect(mockedPluginResult.error).toHaveBeenCalledWith("invalid dialog type: 6", false);
     });

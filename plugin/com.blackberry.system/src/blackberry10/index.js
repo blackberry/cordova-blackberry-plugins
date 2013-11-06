@@ -88,9 +88,8 @@ var Whitelist = require("../../lib/policy/whitelist").Whitelist,
 
 module.exports = {
 
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
@@ -110,9 +109,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             context = _actionMap[eventName].context,
             systemEvent = _actionMap[eventName].event;
@@ -126,9 +124,8 @@ module.exports = {
         }
     },
 
-    hasCapability: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            SUPPORTED_CAPABILITIES = [
+    hasCapability: function (result, args, env) {
+        var SUPPORTED_CAPABILITIES = [
                 "input.touch",
                 "location.gps",
                 "media.audio.capture",
@@ -144,9 +141,8 @@ module.exports = {
         result.ok(SUPPORTED_CAPABILITIES.indexOf(capability) >= 0, false);
     },
 
-    getFontInfo: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            fontFamily,
+    getFontInfo: function (result, args, env) {
+        var fontFamily,
             fontSize;
 
         try {
@@ -159,9 +155,8 @@ module.exports = {
         }
     },
 
-    getDeviceProperties: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            returnObj;
+    getDeviceProperties: function (result, args, env) {
+        var returnObj;
         try {
             returnObj = {
                 "hardwareId" : window.qnx.webplatform.device.hardwareId,
@@ -174,9 +169,8 @@ module.exports = {
         }
     },
 
-    region: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            region;
+    region: function (result, args, env) {
+        var region;
         try {
             region = window.qnx.webplatform.getApplication().systemRegion;
             result.ok(region, false);
@@ -185,8 +179,7 @@ module.exports = {
         }
     },
 
-    getCurrentTimezone: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    getCurrentTimezone: function (result, args, env) {
         try {
             result.ok(window.qnx.webplatform.device.timezone, false);
         } catch (err) {
@@ -194,8 +187,7 @@ module.exports = {
         }
     },
 
-    getTimezones: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    getTimezones: function (result, args, env) {
         try {
             window.qnx.webplatform.device.getTimezones(function (zones) {
                 result.ok(zones, false);
@@ -205,11 +197,10 @@ module.exports = {
         }
     },
 
-    setWallpaper: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            path;
+    setWallpaper: function (result, args, env) {
+        var path;
         try {
-            path = _utils.translatePath(JSON.parse(decodeURIComponent(args.wallpaper)));
+            path = _utils.translatePath(args.wallpaper);
             // Removing file:// form the path because newWallpaper can't handle it.
             path = path.replace(/file:\/\//, '');
             window.qnx.webplatform.getApplication().newWallpaper(path);
@@ -219,10 +210,8 @@ module.exports = {
         }
     },
 
-    deviceLockedStatus: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            callback;
-
+    deviceLockedStatus: function (result, args, env) {
+        var callback;
         try {
             callback = function (state) {
                 result.ok(state, false);

@@ -19,11 +19,11 @@ var LIB_FOLDER = "../../lib/",
     _overlayWebView,
     _utils = require(LIB_FOLDER + 'utils');
 
-function enabled(success, fail, args, env) {
-    var result = new PluginResult(args, env),
-        _enabled;
+function enabled(result, args) {
+    var _enabled;
+
     if (typeof args.enabled !== 'undefined') {
-        _enabled = JSON.parse(decodeURIComponent(args.enabled));
+        _enabled = args.enabled;
         if (typeof(_enabled) === 'boolean') {
             _overlayWebView.contextMenu.enabled = _enabled;
         }
@@ -33,9 +33,7 @@ function enabled(success, fail, args, env) {
     }
 }
 
-function overrideItem(success, fail, args, env) {
-    var result = new PluginResult(args, env);
-    args.action = JSON.parse(decodeURIComponent(args.action));
+function overrideItem(result, args) {
     args.handler = function (actionId) {
         result.callbackOk(null, true);
     };
@@ -46,16 +44,11 @@ function overrideItem(success, fail, args, env) {
     }
 }
 
-function clearOverride(success, fail, args, env) {
-    var result = new PluginResult(args, env),
-        actionId = JSON.parse(decodeURIComponent(args.actionId));
-    result.ok(_overlayWebView.contextMenu.clearOverride(actionId), false);
+function clearOverride(result, args) {
+    result.ok(_overlayWebView.contextMenu.clearOverride(args.actionId), false);
 }
 
-function addItem(success, fail, args, env) {
-    var result = new PluginResult(args, env);
-    args.contexts = JSON.parse(decodeURIComponent(args.contexts));
-    args.action = JSON.parse(decodeURIComponent(args.action));
+function addItem(result, args, env) {
     args.handler = function (actionId, elementId) {
         result.callbackOk(elementId, true);
     };
@@ -66,10 +59,7 @@ function addItem(success, fail, args, env) {
     }, args, env);
 }
 
-function removeItem(success, fail, args, env) {
-    var result = new PluginResult(args, env);
-    args.contexts = JSON.parse(decodeURIComponent(args.contexts));
-    args.actionId = JSON.parse(decodeURIComponent(args.actionId));
+function removeItem(result, args, env) {
     _overlayWebView.contextMenu.removeItem(function (data) {
         result.ok(data, false);
     }, function (e) {
@@ -77,10 +67,7 @@ function removeItem(success, fail, args, env) {
     }, args, env);
 }
 
-function defineCustomContext(success, fail, args, env) {
-    var result = new PluginResult(args, env);
-    args.context = JSON.parse(decodeURIComponent(args.context));
-    args.options = JSON.parse(decodeURIComponent(args.options));
+function defineCustomContext(result, args) {
     _overlayWebView.contextMenu.defineCustomContext(args.context, args.options);
     result.ok(null, false);
 }

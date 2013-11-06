@@ -19,140 +19,132 @@ qnx.webplatform.getController().addEventListener('overlayWebView.initialized', f
     overlayWebView = webviewObj;
 });
 
-function trigger(result, type, arg) {
+function trigger(pluginResult, type, arg) {
     var keepCallback = type === "invoke";
 
-    result.callbackOk({
+    pluginResult.callbackOk({
         "type": type,
-        "result": arg
+        "pluginResult": arg
     }, keepCallback);
 }
 
 module.exports = {
-    invokeMediaPlayer: function (success, fail, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
-            result = new PluginResult(args, env),
+    invokeMediaPlayer: function (pluginResult, args, env) {
+        var options = args.options,
             done = function (data) {
-                trigger(result, "done", data);
+                trigger(pluginResult, "done", data);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.mediaplayerPreviewer.open(options, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
-    invokeCamera: function (success, fail, args, env) {
-        var mode = JSON.parse(decodeURIComponent(args["mode"])),
-            result = new PluginResult(args, env),
+    invokeCamera: function (pluginResult, args, env) {
+        var mode = args.mode,
             done = function (path) {
-                trigger(result, "done", path);
+                trigger(pluginResult, "done", path);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.camera.open(mode, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
-    invokeFilePicker: function (success, fail, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
-            result = new PluginResult(args, env),
+    invokeFilePicker: function (pluginResult, args, env) {
+        var options = args.options,
             done = function (path) {
-                trigger(result, "done", path);
+                trigger(pluginResult, "done", path);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.filePicker.open(options, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
-    invokeIcsViewer: function (success, fail, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
-            result = new PluginResult(args, env),
+    invokeIcsViewer: function (pluginResult, args, env) {
+        var options = args.options,
             done = function (path) {
-                trigger(result, "done", path);
+                trigger(pluginResult, "done", path);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.icsViewer.open(options, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
 
-    invokeCalendarPicker: function (success, fail, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
-            result = new PluginResult(args, env),
+    invokeCalendarPicker: function (pluginResult, args, env) {
+        var options = args.options,
             done = function (file) {
-                trigger(result, "done", file);
+                trigger(pluginResult, "done", file);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.calendar.picker.open(options, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
-    invokeCalendarComposer: function (success, fail, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
-            result = new PluginResult(args, env),
+    invokeCalendarComposer: function (pluginResult, args, env) {
+        var options = args.options,
             done = function (data) {
-                trigger(result, "done", data);
+                trigger(pluginResult, "done", data);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.calendar.composer.open(options, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
-    invokeEmailComposer: function (success, fail, args, env) {
-        var options = JSON.parse(decodeURIComponent(args["options"])),
-            result = new PluginResult(args, env),
+    invokeEmailComposer: function (pluginResult, args, env) {
+        var options = args.options,
             done = function (data) {
-                trigger(result, "done", data);
+                trigger(pluginResult, "done", data);
             },
             cancel = function (reason) {
-                trigger(result, "cancel", reason);
+                trigger(pluginResult, "cancel", reason);
             },
             invokeCallback = function (error) {
-                trigger(result, "invoke", error);
+                trigger(pluginResult, "invoke", error);
             };
 
         window.qnx.webplatform.getApplication().cards.email.composer.open(options, done, cancel, invokeCallback);
-        result.noResult(true);
+        pluginResult.noResult(true);
     },
 
-    invokeTargetPicker: function (success, fail, args, env) {
-        var title = JSON.parse(decodeURIComponent(args.title)),
-            pluginResult = new PluginResult(args, env),
-            request = JSON.parse(decodeURIComponent(args.request)),
+    invokeTargetPicker: function (pluginResult, args, env) {
+        var title = args.title,
+            request = args.request,
             invocation = window.qnx.webplatform.getApplication().invocation,
             onError,
             onSuccess;
@@ -160,14 +152,14 @@ module.exports = {
         onError = function (error) {
             pluginResult.callbackOk({
                 "status": "error",
-                "result": error
+                "pluginResult": error
             }, false);
         };
 
-        onSuccess = function (result) {
+        onSuccess = function (pluginResult) {
             pluginResult.callbackOk({
                 "status": "success",
-                "result": result
+                "pluginResult": pluginResult
             }, false);
         };
 
@@ -176,7 +168,7 @@ module.exports = {
         if (request["target_type"] && Array.isArray(request["target_type"])) {
 
             request["target_type"] = request["target_type"].filter(function (element) {
-                var result = false;
+                var pluginResult = false;
                 switch (element)
                 {
                 case "APPLICATION":
@@ -193,10 +185,10 @@ module.exports = {
                     break;
 
                 default:
-                    result = true;
+                    pluginResult = true;
                     break;
                 }
-                return result;
+                return pluginResult;
             });
 
             delete request["target_type"];

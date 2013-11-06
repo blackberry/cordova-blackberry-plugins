@@ -19,6 +19,9 @@ var _apiDir = __dirname + "/../../../plugin/com.blackberry.sensors/",
     index;
 
 describe("sensors index", function () {
+
+    var mockedPluginResult;
+
     beforeEach(function () {
         GLOBAL.JNEXT = {
             require: jasmine.createSpy().andReturn(true),
@@ -26,65 +29,68 @@ describe("sensors index", function () {
             invoke: jasmine.createSpy().andReturn(2),
             registerEvents: jasmine.createSpy().andReturn(true)
         };
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult")
+        };
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
-        index = null;
+        delete require.cache[require.resolve(_apiDir + "index")];
     });
 
     describe("Events", function () {
-        var mockedPluginResult,
-            noop = function () {};
+        var context;
 
         beforeEach(function () {
-            mockedPluginResult = {
-                error: jasmine.createSpy("PluginResult.error"),
-                noResult: jasmine.createSpy("PluginResult.noResult")
-            };
-
-            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+            context = require(_apiDir + "sensorsEvents");
         });
-
         afterEach(function () {
-            delete GLOBAL.PluginResult;
+            delete require.cache[require.resolve(_apiDir + "sensorsEvents")];
         });
 
         it("startEvent", function () {
-            var context = require(_apiDir + "sensorsEvents"),
-                eventName = "deviceaccelerometer",
+            var eventName = "deviceaccelerometer",
                 systemEventName = "deviceaccelerometer",
                 env = {webview: {id: 22 }};
 
             spyOn(context, "addEventListener");
 
-            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            index.startEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             expect(context.addEventListener).toHaveBeenCalledWith(systemEventName, jasmine.any(Function));
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
 
             //Will not start it twice
             context.addEventListener.reset();
-            index.startEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            index.startEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             expect(context.addEventListener).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
         });
 
         it("stopEvent", function () {
-            var context = require(_apiDir + "sensorsEvents"),
-                eventName = "deviceaccelerometer",
+            var eventName = "deviceaccelerometer",
                 systemEventName = "deviceaccelerometer",
-                env = {webview: {id: 22 }};
+                env = {
+                    webview: {
+                        id: 22
+                    }
+                };
 
+            spyOn(context, "addEventListener");
             spyOn(context, "removeEventListener");
 
-            index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            index.startEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+
+            index.stopEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             expect(context.removeEventListener).toHaveBeenCalledWith(systemEventName, jasmine.any(Function));
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(false);
 
             //Will not stop an unstarted event
             context.removeEventListener.reset();
-            index.stopEvent(noop, noop, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
+            index.stopEvent(mockedPluginResult, {eventName: encodeURIComponent(JSON.stringify(eventName))}, env);
             expect(context.removeEventListener).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalledWith("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
         });
@@ -95,33 +101,29 @@ describe("sensors index", function () {
         describe("setOptions", function () {
 
             it("can call success", function () {
-                var success = jasmine.createSpy(),
-                    options = { "sensor" : "devicecompass", "delay" : 10000 },
+                var options = { "sensor" : "devicecompass", "delay" : 10000 },
                     args = { "options" : JSON.stringify(options) };
 
-                index.setOptions(success, null, args, null);
+                index.setOptions(mockedPluginResult, args);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "setOptions " + JSON.stringify(options));
-                expect(success).toHaveBeenCalled();
+                expect(mockedPluginResult.ok).toHaveBeenCalled();
             });
 
             it("can call with invalid parameters", function () {
-                var fail = jasmine.createSpy(),
-                    options = { "sensor" : "devicecompass", "delay" : "10000", background : 0 },
+                var options = { "sensor" : "devicecompass", "delay" : "10000", background : 0 },
                     args = { options : JSON.stringify(options) };
 
-                index.setOptions(null, fail, args, null);
-                expect(fail).toHaveBeenCalled();
+                index.setOptions(mockedPluginResult, args);
+                expect(mockedPluginResult.error).toHaveBeenCalled();
             });
         });
 
         describe("supportedSensors", function () {
 
             it("can get a list of supported sensors", function () {
-                var success = jasmine.createSpy();
-
-                index.supportedSensors(success, null, null, null);
+                index.supportedSensors(mockedPluginResult);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "supportedSensors");
-                expect(success).toHaveBeenCalled();
+                expect(mockedPluginResult.ok).toHaveBeenCalled();
             });
         });
 

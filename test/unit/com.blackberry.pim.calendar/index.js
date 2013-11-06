@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,7 +38,6 @@ describe("pim.calendar/index", function () {
         GLOBAL.cordova = {
             require: jasmine.createSpy().andReturn(mockedExec)
         };
-        CalendarEvent = require(_apiDir + "www/CalendarEvent");
         GLOBAL.JNEXT = {
             require: jasmine.createSpy("JNEXT.require").andCallFake(function () {
                 return true;
@@ -87,14 +86,16 @@ describe("pim.calendar/index", function () {
                 }
             }
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+        CalendarEvent = require(_apiDir + "www/CalendarEvent");
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
-        GLOBAL.JNEXT = null;
-        GLOBAL.cordova = null;
-        index = null;
+        delete GLOBAL.JNEXT;
+        delete GLOBAL.cordova;
+        delete GLOBAL.window;
+        delete require.cache[require.resolve(_apiDir + "www/CalendarEvent")];
+        delete require.cache[require.resolve(_apiDir + "index")];
     });
 
     it("JNEXT require/createObject/registerEvents are not called upon requiring index", function () {
@@ -104,9 +105,7 @@ describe("pim.calendar/index", function () {
     });
 
     it("find - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            findOptions = {
+        var findOptions = {
                 limit: 5,
                 detail: CalendarFindOptions.DETAIL_AGENDA
             },
@@ -116,7 +115,7 @@ describe("pim.calendar/index", function () {
 
         spyOn(utils, "hasPermission").andReturn(true);
 
-        index.find(successCb, failCb, args);
+        index.find(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -129,19 +128,17 @@ describe("pim.calendar/index", function () {
     });
 
     it("find - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            findOptions = {   
+        var findOptions = {
                 filter: [{
                     fieldName: CalendarFindOptions.SEARCH_FIELD_GIVEN_NAME,
                     fieldValue: "John"
-                }], 
+                }],
                 limit: 5
             };
 
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.find(successCb, failCb, {
+        index.find(mockedPluginResult, {
             fields: encodeURIComponent(JSON.stringify(["name"])),
             options: encodeURIComponent(JSON.stringify(findOptions))
         });
@@ -151,9 +148,7 @@ describe("pim.calendar/index", function () {
     });
 
     it("save - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            evt = {},
+        var evt = {},
             args = {},
             key;
 
@@ -165,7 +160,7 @@ describe("pim.calendar/index", function () {
             }
         }
 
-        index.save(successCb, failCb, args);
+        index.save(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -179,9 +174,7 @@ describe("pim.calendar/index", function () {
     });
 
     it("save - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            evt = new CalendarEvent({
+        var evt = new CalendarEvent({
                 "summary": "a test",
                 "location": "test",
                 "start": new Date("Jan 01, 2015, 12:00"),
@@ -198,16 +191,14 @@ describe("pim.calendar/index", function () {
             }
         }
 
-        index.save(successCb, failCb, args);
+        index.save(mockedPluginResult, args);
 
         expect(JNEXT.invoke).not.toHaveBeenCalled();
         expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("remove - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {
+        var args = {
                 accountId : encodeURIComponent(JSON.stringify(1)),
                 calEventId : encodeURIComponent(JSON.stringify(2)),
                 removeAll : encodeURIComponent(JSON.stringify(true))
@@ -215,7 +206,7 @@ describe("pim.calendar/index", function () {
 
         spyOn(utils, "hasPermission").andReturn(true);
 
-        index.remove(successCb, failCb, args);
+        index.remove(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -228,12 +219,9 @@ describe("pim.calendar/index", function () {
     });
 
     it("remove - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy();
-
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.remove(successCb, failCb, {
+        index.remove(mockedPluginResult, {
             accountId : encodeURIComponent(JSON.stringify(1)),
             calEventId : encodeURIComponent(JSON.stringify(2)),
             removeAll : encodeURIComponent(JSON.stringify(true))
@@ -244,26 +232,22 @@ describe("pim.calendar/index", function () {
     });
 
     it("getDefaultCalendarAccount - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {};
- 
+        var args = {};
+
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.getDefaultCalendarAccount(successCb, failCb, args);
+        index.getDefaultCalendarAccount(mockedPluginResult, args);
 
         expect(JNEXT.invoke).not.toHaveBeenCalled();
         expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getDefaultCalendarAccount - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {};
+        var args = {};
 
         spyOn(utils, "hasPermission").andReturn(true);
 
-        index.getDefaultCalendarAccount(successCb, failCb, args);
+        index.getDefaultCalendarAccount(mockedPluginResult, args);
 
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDefaultCalendarAccount");
         expect(mockedPluginResult.ok).toHaveBeenCalledWith({
@@ -272,26 +256,22 @@ describe("pim.calendar/index", function () {
     });
 
     it("getCalendarAccounts - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {};
+        var args = {};
 
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.getCalendarAccounts(successCb, failCb, args);
+        index.getCalendarAccounts(mockedPluginResult, args);
 
         expect(JNEXT.invoke).not.toHaveBeenCalled();
         expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getCalendarAccounts - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {};
- 
+        var args = {};
+
         spyOn(utils, "hasPermission").andReturn(true);
 
-        index.getCalendarAccounts(successCb, failCb, args);
+        index.getCalendarAccounts(mockedPluginResult, args);
 
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getCalendarAccounts");
         expect(mockedPluginResult.ok).toHaveBeenCalledWith([{
@@ -300,32 +280,28 @@ describe("pim.calendar/index", function () {
     });
 
     it("getEvent - without correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {
+        var args = {
                 eventId: encodeURIComponent(JSON.stringify("123")),
                 accountId: encodeURIComponent(JSON.stringify("1"))
             };
- 
+
         spyOn(utils, "hasPermission").andReturn(false);
 
-        index.getEvent(successCb, failCb, args);
+        index.getEvent(mockedPluginResult, args);
 
         expect(JNEXT.invoke).not.toHaveBeenCalled();
         expect(mockedPluginResult.error).toHaveBeenCalledWith(CalendarError.PERMISSION_DENIED_ERROR, false);
     });
 
     it("getEvent - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy(),
-            args = {
+        var args = {
                 eventId: encodeURIComponent(JSON.stringify("123")),
                 accountId: encodeURIComponent(JSON.stringify("1"))
             };
 
         spyOn(utils, "hasPermission").andReturn(true);
 
-        index.getEvent(successCb, failCb, args);
+        index.getEvent(mockedPluginResult, args);
 
         Object.getOwnPropertyNames(args).forEach(function (key) {
             args[key] = JSON.parse(decodeURIComponent(args[key]));
@@ -338,12 +314,9 @@ describe("pim.calendar/index", function () {
     });
 
     it("getDefaultCalendarFolder  - with correct permission specified", function () {
-        var successCb = jasmine.createSpy(),
-            failCb = jasmine.createSpy();
-
         spyOn(utils, "hasPermission").andReturn(true);
- 
-        index.getDefaultCalendarFolder(successCb, failCb, {});
+
+        index.getDefaultCalendarFolder(mockedPluginResult, {});
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDefaultCalendarFolder");
         expect(mockedPluginResult.ok).toHaveBeenCalled();
     });

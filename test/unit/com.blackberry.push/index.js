@@ -37,18 +37,13 @@ describe("push index", function () {
             ok: jasmine.createSpy(),
             noResult: jasmine.createSpy()
         };
-        GLOBAL.PluginResult = jasmine.createSpy().andReturn(mockedPluginResult);
 
-        successCB = jasmine.createSpy();
-        failCB = jasmine.createSpy();
         index = require(_apiDir + "index");
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
-        delete GLOBAL.PluginResult;
-        index = null;
-        args = {};
+        delete require.cache[require.resolve(_apiDir + "index")];
     });
 
     it("makes sure that JNEXT not is initalized", function () {
@@ -62,21 +57,21 @@ describe("push index", function () {
         args.appId = encodeURIComponent(JSON.stringify("appId"));
         args.ppgUrl = encodeURIComponent(JSON.stringify("ppgUrl"));
 
-        index.startService(successCB, failCB, args);
+        index.startService(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "startService " + JSON.stringify(expected_args));
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("makes sure that JNEXT.invoke createChannel is called", function () {
-        index.createChannel(successCB, failCB, args);
+        index.createChannel(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "createChannel");
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
     });
 
     it("makes sure that JNEXT.invoke destroyChannel is called", function () {
-        index.destroyChannel(successCB, failCB, args);
+        index.destroyChannel(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "destroyChannel");
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -88,7 +83,7 @@ describe("push index", function () {
         args.data = encodeURIComponent(JSON.stringify("hello world"));
         JNEXT.invoke = jasmine.createSpy().andReturn(" 123 " + JSON.stringify(expected_args));
 
-        index.extractPushPayload(successCB, failCB, args);
+        index.extractPushPayload(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "extractPushPayload " + JSON.stringify(expected_args));
         expect(mockedPluginResult.ok).toHaveBeenCalledWith(expected_args);
@@ -97,7 +92,7 @@ describe("push index", function () {
     it("makes sure that JNEXT.invoke registerToLaunch is called", function () {
         args = {"shouldLaunch" : true};
 
-        index.launchApplicationOnPush(successCB, failCB, args);
+        index.launchApplicationOnPush(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "registerToLaunch");
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -106,7 +101,7 @@ describe("push index", function () {
     it("makes sure that JNEXT.invoke unregisterFromLaunch is called", function () {
         args = {"shouldLaunch" : false};
 
-        index.launchApplicationOnPush(successCB, failCB, args);
+        index.launchApplicationOnPush(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "unregisterFromLaunch");
         expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
@@ -118,7 +113,7 @@ describe("push index", function () {
         args.id = encodeURIComponent(JSON.stringify("payloadId"));
         args.shouldAcceptPush = encodeURIComponent(JSON.stringify(true));
 
-        index.acknowledge(successCB, failCB, args);
+        index.acknowledge(mockedPluginResult, args);
 
         expect(mockJNEXT.invoke).toHaveBeenCalledWith("0", "acknowledge " + JSON.stringify(expected_args));
         expect(mockedPluginResult.ok).toHaveBeenCalled();

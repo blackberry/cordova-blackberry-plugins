@@ -48,7 +48,6 @@ describe("io.filetransfer index", function () {
             noResult: jasmine.createSpy("PluginResult.noResult"),
             callbackOk: jasmine.createSpy("PluginResult.callbackOk")
         };
-        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
 
         spyOn(webview, "windowGroup").andReturn(42);
         index = require(root + "plugin/com.blackberry.io.filetransfer/index");
@@ -57,9 +56,7 @@ describe("io.filetransfer index", function () {
     afterEach(function () {
         delete GLOBAL.JNEXT;
         delete require.cache[require.resolve(root + "plugin/com.blackberry.io.filetransfer/index")];
-        index = null;
         delete GLOBAL.window;
-        delete GLOBAL.PluginResult;
     });
 
     it("makes sure JNEXT was not initialized on require", function () {
@@ -97,7 +94,7 @@ describe("io.filetransfer index", function () {
                     "callbackId": "123"
                 };
 
-            index.upload(null, null, mocked_args, null);
+            index.upload(mockedPluginResult, mocked_args);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith("0", "upload " + JSON.stringify(expected_args));
             expect(mockedPluginResult.noResult).toHaveBeenCalled();
@@ -125,7 +122,7 @@ describe("io.filetransfer index", function () {
                     "callbackId": "1"
                 };
 
-            index.upload(null, null, mocked_args);
+            index.upload(mockedPluginResult, mocked_args);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith("0", "upload " + JSON.stringify(expected_default_args));
             expect(mockedPluginResult.noResult).toHaveBeenCalled();
@@ -139,7 +136,7 @@ describe("io.filetransfer index", function () {
                     "callbackId": encodeURIComponent(JSON.stringify("123"))
                 };
 
-            index.upload(null, null, mocked_args, null);
+            index.upload(mockedPluginResult, mocked_args);
 
             expect(mockedPluginResult.noResult).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalled();
@@ -155,7 +152,7 @@ describe("io.filetransfer index", function () {
                     }))
                 };
 
-            index.upload(null, null, mocked_args, null);
+            index.upload(mockedPluginResult, mocked_args);
 
             expect(mockedPluginResult.noResult).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalled();
@@ -173,7 +170,7 @@ describe("io.filetransfer index", function () {
                 params = JSON.parse(arguments[1].substring(7, arguments[1].length));
             });
 
-            index.upload(null, null, mocked_args, null);       
+            index.upload(mockedPluginResult, mocked_args);
 
             expect(JNEXT.invoke).toHaveBeenCalled();
             expect(params.filePath).toEqual("/ROOT/../app/native/persistent/test.txt");
@@ -195,7 +192,7 @@ describe("io.filetransfer index", function () {
                     "windowGroup": 42
                 };
 
-            index.download(null, null, mocked_args, null);
+            index.download(mockedPluginResult, mocked_args);
 
             expect(JNEXT.invoke).toHaveBeenCalledWith("0", "download " + JSON.stringify(expected_args));
             expect(mockedPluginResult.noResult).toHaveBeenCalled();
@@ -209,7 +206,7 @@ describe("io.filetransfer index", function () {
                     "callbackId": encodeURIComponent(JSON.stringify("123"))
                 };
 
-            index.download(null, null,  mocked_args, null);
+            index.download(mockedPluginResult,  mocked_args);
 
             expect(mockedPluginResult.noResult).not.toHaveBeenCalled();
             expect(mockedPluginResult.error).toHaveBeenCalled();
@@ -227,7 +224,7 @@ describe("io.filetransfer index", function () {
                 params = JSON.parse(arguments[1].substring(9, arguments[1].length));
             });
 
-            index.download(null, null, mocked_args, null);       
+            index.download(mockedPluginResult, mocked_args);
 
             expect(JNEXT.invoke).toHaveBeenCalled();
             expect(params.target).toEqual("/ROOT/../app/native/persistent/test.txt");

@@ -17,88 +17,90 @@ var paymentJNext,
     _util = require("../../lib/utils");
 
 module.exports = {
-    purchase: function (success, fail, args) {
+    purchase: function (result, args) {
         var purchase_arguments_t = {
-                "digitalGoodID" : JSON.parse(decodeURIComponent(args.digitalGoodID)),
-                "digitalGoodSKU" : JSON.parse(decodeURIComponent(args.digitalGoodSKU)),
-                "digitalGoodName" : JSON.parse(decodeURIComponent(args.digitalGoodName)),
-                "metaData" : JSON.parse(decodeURIComponent(args.metaData)),
-                "purchaseAppName" : JSON.parse(decodeURIComponent(args.purchaseAppName)),
-                "purchaseAppIcon" : JSON.parse(decodeURIComponent(args.purchaseAppIcon)),
-                "extraParameters" : JSON.parse(decodeURIComponent(args.extraParameters)),
+                "digitalGoodID" : args.digitalGoodID,
+                "digitalGoodSKU" : args.digitalGoodSKU,
+                "digitalGoodName" : args.digitalGoodName,
+                "metaData" : args.metaData,
+                "purchaseAppName" : args.purchaseAppName,
+                "purchaseAppIcon" : args.purchaseAppIcon,
+                "extraParameters" : args.extraParameters,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().purchase(purchase_arguments_t));
+            result.ok(paymentJNext.getInstance().purchase(purchase_arguments_t));
         } catch (err) {
-            fail(-1, err.message);
+            result.error({code: -1, message: err.message});
         }
     },
-    cancelSubscription: function (success, fail, args) {
+    cancelSubscription: function (result, args) {
         var cancelSubscription_arguments_t = {
-                "transactionID" : JSON.parse(decodeURIComponent(args.transactionID)),
+                "transactionID" : args.transactionID,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().cancelSubscription(cancelSubscription_arguments_t));
+            result.ok(paymentJNext.getInstance().cancelSubscription(cancelSubscription_arguments_t));
         } catch (err) {
-            fail(-1, err.message);
+            result.error({code: -1, message: err.message});
         }
 
     },
-    getPrice: function (success, fail, args) {
+    getPrice: function (result, args) {
         var getPrice_arguments_t = {
-                "id" : JSON.parse(decodeURIComponent(args.id)),
-                "sku" : JSON.parse(decodeURIComponent(args.sku)),
+                "id" : args.id,
+                "sku" : args.sku,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().getPrice(getPrice_arguments_t));
+            result.ok(paymentJNext.getInstance().getPrice(getPrice_arguments_t));
         } catch (err) {
-            fail(-1, err.message);
+            result.error({code: -1, message: err.message});
         }
 
     },
-    getExistingPurchases: function (success, fail, args) {
+    getExistingPurchases: function (result, args) {
         var getExistingPurchases_arguments_t = {
-                "refresh" : JSON.parse(decodeURIComponent(args.refresh)),
+                "refresh" : args.refresh,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().getExistingPurchases(getExistingPurchases_arguments_t));
+            result.ok(paymentJNext.getInstance().getExistingPurchases(getExistingPurchases_arguments_t));
         } catch (err) {
-            fail(-1, err.message);
+            result.error({code: -1, message: err.message});
         }
     },
-    checkExisting: function (success, fail, args) {
+    checkExisting: function (result, args) {
         var check_existing_args = {
-                "id" : JSON.parse(decodeURIComponent(args.id)),
-                "sku" : JSON.parse(decodeURIComponent(args.sku)),
+                "id" : args.id,
+                "sku" : args.sku,
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().checkExisting(check_existing_args));
+            result.ok(paymentJNext.getInstance().checkExisting(check_existing_args));
         } catch (err) {
-            fail(-1, err.message);
+            result.error({code: -1, message: err.message});
         }
     },
-    developmentMode: function (success, fail, args) {
-        var value, developmentMode_args;
-        if (args && args["developmentMode"]) {
-            value = JSON.parse(decodeURIComponent(args["developmentMode"]));
+    developmentMode: function (result, args) {
+        var value,
+            developmentMode_args;
+
+        if (args && args.developmentMode) {
+            value = args.developmentMode;
             developmentMode_args = {
                 "developmentMode" : value
             };
             paymentJNext.getInstance().setDevelopmentMode(developmentMode_args);
-            success();
+            result.ok();
         } else {
             value = paymentJNext.getInstance().getDevelopmentMode();
-            success(value === "true");
+            result.ok(value === "true");
         }
     }
 };
@@ -113,7 +115,10 @@ JNEXT.Payment = function ()
         hasInstance = false;
 
     self.getErrorObject = function (state, errorID, errorText) {
-        var result = {}, successState = {}, errorObject = {};
+        var result = {},
+            successState = {},
+            errorObject = {};
+
         successState["state"] = state;
         errorObject["errorID"] = errorID;
         errorObject["errorText"] = errorText;
@@ -121,7 +126,7 @@ JNEXT.Payment = function ()
         result.successState = successState;
         result.errorObject = {};
         result.errorObject = errorObject;
-        
+
         return result;
     };
 
@@ -172,11 +177,11 @@ JNEXT.Payment = function ()
 
         return result;
     };
-    
+
     self.getPrice = function (args) {
         var val = JNEXT.invoke(self.m_id, "getPrice " + JSON.stringify(args)),
             result;
-   
+
         if (val === "-1") {
             result = self.getErrorObject("BPS_FAILURE", "-1", "getPrice Failed. Payment Service Error.");
         } else {
@@ -185,7 +190,7 @@ JNEXT.Payment = function ()
 
         return result;
     };
-    
+
     self.checkExisting = function (args) {
         var val = JNEXT.invoke(self.m_id, "checkExisting " + JSON.stringify(args)),
             result;
@@ -197,7 +202,7 @@ JNEXT.Payment = function ()
         }
 
         return result;
-    };    
+    };
 
     self.getId = function () {
         return self.m_id;

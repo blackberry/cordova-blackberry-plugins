@@ -9,7 +9,7 @@
             e.source.postMessage(blackberry.app.id, event.origin);
         }
 
-        document.addEventListener('webworksready', function () {
+        document.addEventListener('deviceready', function () {
             // Post to parent to indicate we are ready
             window.addEventListener('message', postBlackberryId, false);
             parent.postMessage('wwready', "*");

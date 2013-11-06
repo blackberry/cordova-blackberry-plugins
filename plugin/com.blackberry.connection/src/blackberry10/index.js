@@ -79,9 +79,8 @@ _actionMap = {
 
 module.exports = {
 
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
 
@@ -100,9 +99,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             listener = _listeners[eventName][env.webview.id],
             systemEvent = _actionMap[eventName].event;
 
@@ -115,8 +113,7 @@ module.exports = {
         }
     },
 
-    type: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    type: function (result, args, env) {
         try {
             result.ok(currentConnectionType(), false);
         } catch (e) {

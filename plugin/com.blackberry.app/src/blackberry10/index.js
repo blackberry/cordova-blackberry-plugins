@@ -18,24 +18,25 @@ var _config = require("./../../lib/config"),
     _appEvents = require("./../../lib/events/applicationEvents"),
     _orientation,
     _listeners = {},
+    UNKNOWN_ORIENTATION = "unknown",
     _actionMap = {
         swipedown: {
             event: "swipedown",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         pause: {
             event: "inactive",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         resume: {
             event: "active",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         orientationchange : {
             //special case, handled in add
@@ -46,37 +47,37 @@ var _config = require("./../../lib/config"),
             event: "keyboardOpening",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardopened: {
             event: "keyboardOpened",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardclosing: {
             event: "keyboardClosing",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardclosed: {
             event: "keyboardClosed",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardposition: {
             event: "keyboardPosition",
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(JSON.parse(obj), true);
-            } 
+            }
         },
         windowstatechanged: {
             event: "stateChange",
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(obj, true);
-            } 
+            }
         }
     };
 
@@ -98,8 +99,7 @@ function angleToOrientation(angle) {
         orientation = 'landscape-primary';
         break;
     default:
-        orientation = "unknown";
-        break;
+        orientation = UNKNOWN_ORIENTATION;
     }
 
     return orientation;
@@ -116,7 +116,7 @@ function edgeToOrientation(edge) {
     case "right_up":
         return "landscape-secondary";
     default:
-        return "unknown";
+        return UNKNOWN_ORIENTATION;
     }
 }
 
@@ -138,7 +138,7 @@ function translateToDeviceOrientation(orientation) {
         return 'right_up';
 
     default:
-        return 'unknown';    
+        return UNKNOWN_ORIENTATION;
     }
 }
 
@@ -154,9 +154,8 @@ function rotateWhenLockedTrigger(pluginResult, edge) {
 
 module.exports = {
 
-    startEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    startEvent: function (result, args, env) {
+        var eventName = args.eventName,
             systemEvent = _actionMap[eventName].event,
             listener = _actionMap[eventName].trigger.bind(null, result);
 
@@ -185,9 +184,8 @@ module.exports = {
         result.noResult(true);
     },
 
-    stopEvent: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            eventName = JSON.parse(decodeURIComponent(args.eventName)),
+    stopEvent: function (result, args, env) {
+        var eventName = args.eventName,
             listener = _listeners[eventName] ? _listeners[eventName][env.webview.id] : undefined,
             systemEvent = _actionMap[eventName].event;
         if (!listener) {
@@ -203,10 +201,9 @@ module.exports = {
             result.noResult(false);
         }
     },
-   
-    getReadOnlyFields : function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            ro = {
+
+    getReadOnlyFields : function (result, args, env) {
+        var ro = {
                 author: _config.author,
                 authorEmail: _config.authorEmail,
                 authorURL: _config.authorURL,
@@ -221,9 +218,8 @@ module.exports = {
         result.ok(ro, false);
     },
 
-    lockOrientation : function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            orientation = JSON.parse(decodeURIComponent(args.orientation)),
+    lockOrientation : function (result, args, env) {
+        var orientation = args.orientation,
             rotateTo = translateToDeviceOrientation(orientation),
             recieveRotateEvents = args.recieveRotateEvents === undefined  ? true : args.recieveRotateEvents;
 
@@ -233,39 +229,39 @@ module.exports = {
         result.ok(true, false);
     },
 
-    unlockOrientation : function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    unlockOrientation : function (result, args, env) {
         qnx.webplatform.getApplication().unlockRotation();
         result.ok(null, false);
     },
 
-    rotate : function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            orientation = translateToDeviceOrientation(JSON.parse(decodeURIComponent(args.orientation)), fail);
-        qnx.webplatform.getApplication().rotate(orientation);
-        result.ok(null, false);
+    rotate : function (result, args, env) {
+        var orientation = args.orientation,
+            rotateTo = translateToDeviceOrientation(orientation);
+
+        if (rotateTo === UNKNOWN_ORIENTATION) {
+            result.error("Invalid orientation type.");
+        } else {
+            qnx.webplatform.getApplication().rotate(rotateTo);
+            result.ok(null);
+        }
     },
 
-    currentOrientation : function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            orientation = _orientation || angleToOrientation(window.orientation);
+    currentOrientation : function (result, args, env) {
+        var orientation = _orientation || angleToOrientation(window.orientation);
         result.ok(orientation, false);
     },
 
-    minimize: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    minimize: function (result, args, env) {
         qnx.webplatform.getApplication().minimizeWindow();
         result.ok(null, false);
     },
 
-    exit: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    exit: function (result, args, env) {
         window.qnx.webplatform.getApplication().exit();
         result.ok(null, false);
     },
 
-    windowState : function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+    windowState : function (result, args, env) {
         result.ok(qnx.webplatform.getApplication().windowState, false);
     }
 };
