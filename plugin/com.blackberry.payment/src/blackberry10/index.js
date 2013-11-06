@@ -18,7 +18,8 @@ var paymentJNext,
 
 module.exports = {
     purchase: function (success, fail, args) {
-        var purchase_arguments_t = {
+        var result = new PluginResult(args, env),
+        purchase_arguments_t = {
                 "digitalGoodID" : JSON.parse(decodeURIComponent(args.digitalGoodID)),
                 "digitalGoodSKU" : JSON.parse(decodeURIComponent(args.digitalGoodSKU)),
                 "digitalGoodName" : JSON.parse(decodeURIComponent(args.digitalGoodName)),
@@ -30,75 +31,81 @@ module.exports = {
             };
 
         try {
-            success(paymentJNext.getInstance().purchase(purchase_arguments_t));
+            result.ok(paymentJNext.getInstance().purchase(purchase_arguments_t), false);
         } catch (err) {
-            fail(-1, err.message);
+            result.error(-1, err.message);
         }
     },
     cancelSubscription: function (success, fail, args) {
-        var cancelSubscription_arguments_t = {
+        var result = new PluginResult(args, env),
+        cancelSubscription_arguments_t = {
                 "transactionID" : JSON.parse(decodeURIComponent(args.transactionID)),
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().cancelSubscription(cancelSubscription_arguments_t));
+            result.ok(paymentJNext.getInstance().cancelSubscription(cancelSubscription_arguments_t), false);
         } catch (err) {
-            fail(-1, err.message);
+            result.error(-1, err.message);
         }
 
     },
     getPrice: function (success, fail, args) {
-        var getPrice_arguments_t = {
+        var result = new PluginResult(args, env),
+        getPrice_arguments_t = {
                 "id" : JSON.parse(decodeURIComponent(args.id)),
                 "sku" : JSON.parse(decodeURIComponent(args.sku)),
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().getPrice(getPrice_arguments_t));
+            result.ok(paymentJNext.getInstance().getPrice(getPrice_arguments_t), false);
         } catch (err) {
-            fail(-1, err.message);
+            result.error(-1, err.message);
         }
 
     },
     getExistingPurchases: function (success, fail, args) {
-        var getExistingPurchases_arguments_t = {
+        var result = new PluginResult(args, env),
+        getExistingPurchases_arguments_t = {
                 "refresh" : JSON.parse(decodeURIComponent(args.refresh)),
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().getExistingPurchases(getExistingPurchases_arguments_t));
+            result.ok(paymentJNext.getInstance().getExistingPurchases(getExistingPurchases_arguments_t), false);
         } catch (err) {
-            fail(-1, err.message);
+            result.error(-1, err.message);
         }
     },
     checkExisting: function (success, fail, args) {
-        var check_existing_args = {
+        var result = new PluginResult(args, env),
+        check_existing_args = {
                 "id" : JSON.parse(decodeURIComponent(args.id)),
                 "sku" : JSON.parse(decodeURIComponent(args.sku)),
                 "windowGroup" : window.qnx.webplatform.getController().windowGroup
             };
 
         try {
-            success(paymentJNext.getInstance().checkExisting(check_existing_args));
+            result.ok(paymentJNext.getInstance().checkExisting(check_existing_args), false);
         } catch (err) {
-            fail(-1, err.message);
+            result.error(-1, err.message);
         }
     },
     developmentMode: function (success, fail, args) {
-        var value, developmentMode_args;
+        var result = new PluginResult(args, env),
+            value, 
+            developmentMode_args;
         if (args && args["developmentMode"]) {
             value = JSON.parse(decodeURIComponent(args["developmentMode"]));
             developmentMode_args = {
                 "developmentMode" : value
             };
             paymentJNext.getInstance().setDevelopmentMode(developmentMode_args);
-            success();
+            result.ok(null, false);
         } else {
             value = paymentJNext.getInstance().getDevelopmentMode();
-            success(value === "true");
+            result.ok(value === "true", false);
         }
     }
 };
