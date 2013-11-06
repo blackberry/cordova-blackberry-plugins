@@ -154,7 +154,7 @@ module.exports = {
         }
     },
 
-    setOptions: function (success, fail, args) {
+    setOptions: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
         if (args.options) {
             args.options = JSON.parse(decodeURIComponent(args.options));
@@ -196,7 +196,7 @@ module.exports = {
         }
     },
 
-    supportedSensors: function (success, fail, args) {
+    supportedSensors: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
         result.ok(sensors.getInstance().supportedSensors(), false);
     }
