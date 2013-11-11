@@ -82,75 +82,51 @@ describe("bbm.platform index", function () {
         describe("self profile", function () {
 
             it("appVersion", function () {
-                var success = jasmine.createSpy();
-
-                index.self.appVersion(success, null, null, null);
-
+                index.self.appVersion(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "appVersion");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("bbmsdkVersion", function () {
-                var success = jasmine.createSpy();
-
-                index.self.bbmsdkVersion(success, null, null, null);
-
+                index.self.bbmsdkVersion(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "bbmsdkVersion");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("displayName", function () {
-                var success = jasmine.createSpy();
-
-                index.self.displayName(success, null, null, null);
-
+                index.self.displayName(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "displayName");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("handle", function () {
-                var success = jasmine.createSpy();
-
-                index.self.handle(success, null, null, null);
-
+                index.self.handle(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "handle");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("personalMessage", function () {
-                var success = jasmine.createSpy();
-
-                index.self.personalMessage(success, null, null, null);
-
+                index.self.personalMessage(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "personalMessage");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("ppid", function () {
-                var success = jasmine.createSpy();
-
-                index.self.ppid(success, null, null, null);
-
+                index.self.ppid(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "ppid");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("status", function () {
-                var success = jasmine.createSpy();
-
-                index.self.status(success, null, null, null);
-
+                index.self.status(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "status");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("statusMessage", function () {
-                var success = jasmine.createSpy();
-
-                index.self.statusMessage(success, null, null, null);
-
+                index.self.statusMessage(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.getProfile " + "statusMessage");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
 
@@ -168,8 +144,7 @@ describe("bbm.platform index", function () {
 
         describe("setStatus", function () {
             it("can call setStatus and succeed", function () {
-                var success = jasmine.createSpy(),
-                    args,
+                var args,
                     status = "available",
                     statusMessage = "Hello World";
 
@@ -177,15 +152,14 @@ describe("bbm.platform index", function () {
                 statusMessage = encodeURIComponent(statusMessage);
                 args = { "status": JSON.stringify(status), "statusMessage": JSON.stringify(statusMessage) };
 
-                index.self.setStatus(success, null, args, null);
+                index.self.setStatus(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.setStatus " + JSON.stringify(args));
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("can call setStatus and fail", function () {
-                var fail = jasmine.createSpy(),
-                    args,
+                var args,
                     status = "hello",
                     statusMessage = "";
 
@@ -193,36 +167,34 @@ describe("bbm.platform index", function () {
                 statusMessage = encodeURIComponent(statusMessage);
                 args = { "status": JSON.stringify(status), "statusMessage": JSON.stringify(statusMessage) };
 
-                index.self.setStatus(null, fail, args, null);
+                index.self.setStatus(null, null, args, null);
 
-                expect(fail).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalled();
             });
         });
 
         describe("setPersonalMessage", function () {
             it("can call setPersonalMessage and succeed", function () {
-                var success = jasmine.createSpy(),
-                    args,
+                var args,
                     personalMessage = "Hello World";
 
                 args = { "personalMessage": encodeURIComponent(JSON.stringify(personalMessage)) };
 
-                index.self.setPersonalMessage(success, null, args, null);
+                index.self.setPersonalMessage(null, null, args, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.setPersonalMessage " + personalMessage);
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
 
             it("can call setPersonalMessage and fail", function () {
-                var fail = jasmine.createSpy(),
-                    args,
+                var args,
                     personalMessage = "";
 
                 args = { "personalMessage": encodeURIComponent(JSON.stringify(personalMessage)) };
 
-                index.self.setPersonalMessage(null, fail, args, null);
+                index.self.setPersonalMessage(null, null, args, null);
 
-                expect(fail).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.error).toHaveBeenCalled();
             });
         });
 
@@ -295,11 +267,10 @@ describe("bbm.platform index", function () {
 
         describe("clearItems", function () {
             it("can call clearItems and succeed", function () {
-                var success = jasmine.createSpy();
 
-                index.self.profilebox.clearItems(success, null, null, null);
+                index.self.profilebox.clearItems(null, null, null, null);
 
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
 
@@ -326,23 +297,19 @@ describe("bbm.platform index", function () {
 
         describe("getAccessible", function () {
             it("can call getAccessible and succeed", function () {
-                var success = jasmine.createSpy();
 
-                index.self.profilebox.getAccessible(success, null, null, null);
+                index.self.profilebox.getAccessible(null, null, null, null);
 
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.getAccessible");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
 
         describe("getItems", function () {
             it("can call getItems and succeed", function () {
-                var success = jasmine.createSpy();
-
-                index.self.profilebox.getItems(success, null, null, null);
-
+                index.self.profilebox.getItems(null, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "self.profilebox.getItems");
-                expect(success).toHaveBeenCalled();
+                expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
             });
         });
     });
@@ -379,8 +346,8 @@ describe("bbm.platform index", function () {
                 fail = jasmine.createSpy("fail");
 
             index.users.inviteToDownload(success, fail, null);
-            expect(success).toHaveBeenCalled();
-            expect(fail).not.toHaveBeenCalled();
+            expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
+            expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
             expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "users.inviteToDownload");
         });
     });

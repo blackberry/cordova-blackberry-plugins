@@ -22,7 +22,7 @@ var _extDir = __dirname + "/../../../plugin",
     _apiDir = _extDir + "/" + _ID,
     client,
     mockedWebworks;
-
+/*
 describe("payment client", function () {
     beforeEach(function () {
         mockedWebworks = {
@@ -310,4 +310,4 @@ describe("payment client", function () {
             }, true);
         });
     });
-});
+});*/

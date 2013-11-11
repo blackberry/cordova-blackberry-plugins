@@ -16,40 +16,39 @@
 var _apiDir = __dirname + "/../../../plugin/com.blackberry.sensors/",
     _libDir = __dirname + "/../../../lib/",
     events = require(_libDir + "event"),
+    mockedPluginResult,
     index;
 
 describe("sensors index", function () {
     beforeEach(function () {
+
         GLOBAL.JNEXT = {
             require: jasmine.createSpy().andReturn(true),
             createObject: jasmine.createSpy().andReturn("1"),
             invoke: jasmine.createSpy().andReturn(2),
             registerEvents: jasmine.createSpy().andReturn(true)
         };
+
         index = require(_apiDir + "index");
+
+        mockedPluginResult = {
+            ok: jasmine.createSpy("PluginResult.ok"),
+            error: jasmine.createSpy("PluginResult.error"),
+            noResult: jasmine.createSpy("PluginResult.noResult")
+        };
+
+        GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
+
     });
 
     afterEach(function () {
         delete GLOBAL.JNEXT;
+        delete GLOBAL.PluginResult;
         index = null;
     });
 
     describe("Events", function () {
-        var mockedPluginResult,
-            noop = function () {};
-
-        beforeEach(function () {
-            mockedPluginResult = {
-                error: jasmine.createSpy("PluginResult.error"),
-                noResult: jasmine.createSpy("PluginResult.noResult")
-            };
-
-            GLOBAL.PluginResult = jasmine.createSpy("PluginResult").andReturn(mockedPluginResult);
-        });
-
-        afterEach(function () {
-            delete GLOBAL.PluginResult;
-        });
+        var noop = function () {};
 
         it("startEvent", function () {
             var context = require(_apiDir + "sensorsEvents"),
@@ -101,7 +100,7 @@ describe("sensors index", function () {
 
                 index.setOptions(success, null, args, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "setOptions " + JSON.stringify(options));
-                expect(success).toHaveBeenCalled();
+                expect(mockedPluginResult.ok).toHaveBeenCalled();
             });
 
             it("can call with invalid parameters", function () {
@@ -110,7 +109,7 @@ describe("sensors index", function () {
                     args = { options : JSON.stringify(options) };
 
                 index.setOptions(null, fail, args, null);
-                expect(fail).toHaveBeenCalled();
+                expect(mockedPluginResult.error).toHaveBeenCalled();
             });
         });
 
@@ -121,7 +120,7 @@ describe("sensors index", function () {
 
                 index.supportedSensors(success, null, null, null);
                 expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "supportedSensors");
-                expect(success).toHaveBeenCalled();
+                expect(mockedPluginResult.ok).toHaveBeenCalled();
             });
         });
 

@@ -41,8 +41,9 @@ module.exports = function (done, custom) {
         utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
         // filter out non-plugin files/dirs
         plugins.forEach(function (plugin, index) {
-            if (/blackberry\./.test(plugin) && fs.existsSync(path.join(_c.ROOT, "plugin", plugin, "www"))) {
-                specs.push(path.join(_c.TEMP, "test/unit/" + plugin));
+            if (/blackberry\./.test(plugin) && fs.existsSync(path.join(_c.ROOT, "plugin", plugin, "www")) &&
+                fs.existsSync(path.join(_c.TEMP, "test/unit/", plugin))) {
+                specs.push(path.join(_c.TEMP, "test/unit/", plugin));
                 // plugin index.js
                 utils.copyFolder(path.join(_c.ROOT, "plugin", plugin, "src/blackberry10"), path.join(_c.TEMP, "plugin", plugin));
                 // plugin client.js
@@ -57,8 +58,9 @@ module.exports = function (done, custom) {
         jasmine.executeSpecsInFolder({
             'specFolders': specs,
             'onComplete': onComplete,
-            'isVerbose': false,
+            'isVerbose': true,
             'showColors': true
         });
+
     });
 };

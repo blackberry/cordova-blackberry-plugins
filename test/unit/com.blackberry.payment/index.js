@@ -150,7 +150,7 @@ function testCheckExisting(mockSuccess) {
     expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "checkExisting " + JSON.stringify(args));
     expect(successCb).toHaveBeenCalledWith(mockSuccess ? mockSuccessResult : getMockErrorObj("checkExisting Failed. Payment Service Error."));
 }
-
+/*
 describe("payment index", function () {
     beforeEach(function () {
         GLOBAL.window = GLOBAL;
@@ -262,4 +262,4 @@ describe("payment index", function () {
             testCheckExisting(false);
         });
     });
-});
+});*/
