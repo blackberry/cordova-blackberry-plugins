@@ -52,7 +52,7 @@ var _self = {},
     CREATE_CHANNEL_OPERATION = 1,
     DESTROY_CHANNEL_OPERATION = 2;
 
-function defineReadOnlyField (obj, field, value) {
+function defineReadOnlyField(obj, field, value) {
     Object.defineProperty(obj, field, {
         "value": value,
         "writable": false
