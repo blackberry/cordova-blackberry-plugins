@@ -17,7 +17,7 @@ var paymentJNext,
     _util = require("../../lib/utils");
 
 module.exports = {
-    purchase: function (success, fail, args) {
+    purchase: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
         purchase_arguments_t = {
                 "digitalGoodID" : JSON.parse(decodeURIComponent(args.digitalGoodID)),
@@ -36,7 +36,7 @@ module.exports = {
             result.error(-1, err.message);
         }
     },
-    cancelSubscription: function (success, fail, args) {
+    cancelSubscription: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
         cancelSubscription_arguments_t = {
                 "transactionID" : JSON.parse(decodeURIComponent(args.transactionID)),
@@ -50,7 +50,7 @@ module.exports = {
         }
 
     },
-    getPrice: function (success, fail, args) {
+    getPrice: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
         getPrice_arguments_t = {
                 "id" : JSON.parse(decodeURIComponent(args.id)),
@@ -65,7 +65,7 @@ module.exports = {
         }
 
     },
-    getExistingPurchases: function (success, fail, args) {
+    getExistingPurchases: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
         getExistingPurchases_arguments_t = {
                 "refresh" : JSON.parse(decodeURIComponent(args.refresh)),
@@ -78,7 +78,7 @@ module.exports = {
             result.error(-1, err.message);
         }
     },
-    checkExisting: function (success, fail, args) {
+    checkExisting: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
         check_existing_args = {
                 "id" : JSON.parse(decodeURIComponent(args.id)),
@@ -92,7 +92,7 @@ module.exports = {
             result.error(-1, err.message);
         }
     },
-    developmentMode: function (success, fail, args) {
+    developmentMode: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
             value, 
             developmentMode_args;
