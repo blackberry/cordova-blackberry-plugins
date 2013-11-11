@@ -19,24 +19,24 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0" id="org.cordova.mobile-spec-dependencies" version="1.0.0">
   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
-  <dependency id="org.apache.cordova.core.battery-status" url="https://github.com/apache/cordova-plugin-battery-status.git"/>
-  <dependency id="org.apache.cordova.core.camera" url="https://github.com/apache/cordova-plugin-camera"/>
-  <dependency id="org.apache.cordova.core.console" url="https://github.com/apache/cordova-plugin-console"/>
-  <dependency id="org.apache.cordova.core.contacts" url="https://github.com/apache/cordova-plugin-contacts"/>
-  <dependency id="org.apache.cordova.core.device" url="https://github.com/apache/cordova-plugin-device"/>
-  <dependency id="org.apache.cordova.core.device-motion" url="https://github.com/apache/cordova-plugin-device-motion"/>
-  <dependency id="org.apache.cordova.core.device-orientation" url="https://github.com/apache/cordova-plugin-device-orientation"/>
-  <dependency id="org.apache.cordova.core.dialogs" url="https://github.com/apache/cordova-plugin-dialogs"/>
-  <dependency id="org.apache.cordova.core.file" url="https://github.com/apache/cordova-plugin-file"/>
-  <dependency id="org.apache.cordova.core.file-transfer" url="https://github.com/apache/cordova-plugin-file-transfer.git"/>
-  <dependency id="org.apache.cordova.core.geolocation" url="https://github.com/apache/cordova-plugin-geolocation"/>
-  <dependency id="org.apache.cordova.core.globalization" url="https://github.com/apache/cordova-plugin-globalization"/>
-  <dependency id="org.apache.cordova.core.inappbrowser" url="https://github.com/apache/cordova-plugin-inappbrowser"/>
-  <dependency id="org.apache.cordova.core.AudioHandler" url="https://github.com/apache/cordova-plugin-media"/>
-  <dependency id="org.apache.cordova.core.media-capture" url="https://github.com/apache/cordova-plugin-media-capture"/>
-  <dependency id="org.apache.cordova.core.network-information" url="https://github.com/apache/cordova-plugin-network-information"/>
-  <dependency id="org.apache.cordova.core.splashscreen" url="https://github.com/apache/cordova-plugin-splashscreen"/>
-  <dependency id="org.apache.cordova.core.vibration" url="https://github.com/apache/cordova-plugin-vibration"/>
+  <dependency id="org.apache.cordova.battery-status"/>
+  <dependency id="org.apache.cordova.camera" />
+  <dependency id="org.apache.cordova.console" />
+  <dependency id="org.apache.cordova.contacts"/>
+  <dependency id="org.apache.cordova.device"/>
+  <dependency id="org.apache.cordova.device-motion" />
+  <dependency id="org.apache.cordova.device-orientation" />
+  <dependency id="org.apache.cordova.dialogs" />
+  <dependency id="org.apache.cordova.file"/>
+  <dependency id="org.apache.cordova.file-transfer"/>
+  <dependency id="org.apache.cordova.geolocation"/>
+  <dependency id="org.apache.cordova.globalization"/>
+  <dependency id="org.apache.cordova.inappbrowser"/>
+  <dependency id="org.apache.cordova.media" />
+  <dependency id="org.apache.cordova.media-capture" />
+  <dependency id="org.apache.cordova.network-information" />
+  <dependency id="org.apache.cordova.splashscreen" />
+  <dependency id="org.apache.cordova.vibration" />
   <platform name="blackberry10">
     <config-file target="www/config.xml" parent="/widget">
       <access origin="http://apache.org" subdomains="true"/>
