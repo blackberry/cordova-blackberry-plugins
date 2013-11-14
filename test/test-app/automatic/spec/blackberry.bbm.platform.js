@@ -30,7 +30,7 @@ describe("blackberry.bbm.platform", function () {
             runs(function () {
                 onChange = jasmine.createSpy().andCallFake(function (allowed, reason) {
                     if (reason === "unregistered") {
-                        blackberry.bbm.platform.register({ uuid : "68de53d0-e701-11e1-aff1-0800200c9a66" });
+                        blackberry.bbm.platform.register({ uuid : "68de53d0-e701-11e1-aff1-0800200c9a77" });
                     } else if (reason === "allowed") {
                         flag = true;
                     }
