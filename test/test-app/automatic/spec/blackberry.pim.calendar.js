@@ -1870,7 +1870,7 @@ describe("blackberry.pim.calendar", function () {
             expect(successCb).not.toHaveBeenCalled();
         });
 
-        xit('can still find events even if find options is null', function () {
+        it('can still find events even if find options is null', function () {
             var called = false,
                 successCb = jasmine.createSpy().andCallFake(function (events) {
                     expect(events.length).toBeGreaterThan(0);
@@ -1963,7 +1963,8 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        it('Can get all events (max=findOptions.limit) if filter is a blank object without any params', function () {
+        xit('Can get all events (max=findOptions.limit) if filter is a blank object without any params', function () {
+            //disabled: BRWSR-14829
             if (isDefaultFolderAccessible()) {
                 var called = false,
                     successCb = jasmine.createSpy().andCallFake(function (events) {
@@ -1997,7 +1998,8 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        it('Can get all events (max=findOptions.limit) if filter is not defined in CalendarFindOptions', function () {
+        xit('Can get all events (max=findOptions.limit) if filter is not defined in CalendarFindOptions', function () {
+            //disabled: BRWSR-14829
             if (isDefaultFolderAccessible()) {
                 var called = false,
                     successCb = jasmine.createSpy().andCallFake(function (events) {
@@ -2029,7 +2031,7 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        xit('Can get all events (max=infinity) if findOptions is a blank object without any params', function () {
+        it('Can get all events (max=infinity) if findOptions is a blank object without any params', function () {
             var called = false,
                 successCb = jasmine.createSpy().andCallFake(function (events) {
                     expect(events).toBeDefined();
@@ -2166,7 +2168,7 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        it('can sort search results by location (asc)', function () {
+        xit('can sort search results by location (asc)', function () {
             if (isDefaultFolderAccessible()) {
                 var called = false,
                     filter = {
