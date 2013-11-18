@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 var _self = {},
     _ID = "com.blackberry.user.identity",
     noop = function () {},
@@ -59,8 +59,10 @@ _self.self = {};
 
 _self.getVersion = function () {
 	var version = -1,
-		response = function (data) { version = data; };
-	
+		response = function (data) {
+            version = data;
+        };
+
 	exec(response, noop, _ID, "getVersion");
 	return version;
 };
@@ -70,8 +72,10 @@ _self.registerProvider = function (provider) {
             "provider": provider
         },
         obj,
-        response = function (data) { obj = JSON.parse(data); };
-        
+        response = function (data) {
+            obj = JSON.parse(data);
+        };
+
 	exec(response, noop, _ID, "registerProvider", args);
 	return obj;
 };
@@ -82,8 +86,10 @@ _self.setOption = function (option, value) {
 			"value": value
 		},
 		obj,
-		response = function (data) { obj = JSON.parse(data); };
-		
+		response = function (data) {
+            obj = JSON.parse(data);
+        };
+
 	exec(response, noop, _ID, "setOption", args);
 	return obj;
 };
