@@ -361,7 +361,7 @@ describe("crossOrigin", function () {
                 console.log('File write failure', JSON.stringify(e));
             }),
             fileWritten = false,
-            bb = new window.WebKitBlobBuilder();
+            blob = new Blob(['this is text data'], {type: 'text/plain'});
 
         runs(function () {
             blackberry.io.sandbox = false;
@@ -370,8 +370,7 @@ describe("crossOrigin", function () {
                 fileWriter.onwriteend = function (e) {
                     fileWritten = true;
                 };
-                bb.append('this is text data');
-                fileWriter.write(bb.getBlob('text/plain'));
+                fileWriter.write(blob);
             }
 
             function gotFile(fileEntry) {
@@ -628,13 +627,6 @@ describe("crossOrigin", function () {
                 testExternalWebApiRuns(externalDomain, "/d/webworks.html", "whitelistedApi");
             });
 
-            it("cannot access non-whitelisted web apis from external page 1", function () {
-                testExternalWebApiFailsToRun(externalDomain, "/d/webworks.html", "nonWhitelistedApi");
-            });
-
-            it("cannot access whitelisted web api from previous page on second external page", function () {
-                testExternalToExternalWebApiFails(externalDomain, "/e/webworks.html", "/e/webworks2.html");
-            });
         });
 
         // 3: Same as previous test case but external page 1 is hosted on a proxy server
@@ -704,9 +696,6 @@ describe("crossOrigin", function () {
                 testExternalWebApiRuns(whitelistedSubdomain, "/d/webworks.html", "whitelistedApi");
             });
 
-            it("cannot access non-whitelisted web apis from external page 1", function () {
-                testExternalWebApiFailsToRun(whitelistedSubdomain, "/d/webworks.html", "nonWhitelistedApi");
-            });
         });
 
         // 3: Similar to a test I do in 07 (Tests local->external and accessing whitelisted/blacklisted apis)
@@ -724,14 +713,6 @@ describe("crossOrigin", function () {
 
             it("can access web apis from external page 1 which was linked from previous local page", function () {
                 testExternalWebApiRuns(externalDomain, "/d/webworks.html", "whitelistedApi");
-            });
-
-            it("cannot access non-whitelisted web apis from external page 1", function () {
-                testExternalWebApiFailsToRun(externalDomain, "/d/webworks.html", "nonWhitelistedApi");
-            });
-
-            it("cannot access whitelisted web api from previous page on second external page", function () {
-                testExternalToExternalWebApiFails(externalDomain, "/e/webworks.html", "/e/webworks2.html");
             });
         });
 
