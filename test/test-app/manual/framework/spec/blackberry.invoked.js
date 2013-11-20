@@ -56,10 +56,10 @@ describe("blackberry.invoked", function () {
         });
 
         afterEach(function () {
-            onCardResize = null;
-            onCardClosed = null;
             document.removeEventListener("onCardResize", onCardResize);
             document.removeEventListener("onCardClosed", onCardClosed);
+            onCardResize = null;
+            onCardClosed = null;
             confirm = null;
         });
 

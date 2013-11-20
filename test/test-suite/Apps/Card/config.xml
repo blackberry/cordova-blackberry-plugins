@@ -27,8 +27,6 @@
 	</author>
     <description>This app tests invocation</description>
 	<access uri="*" />
-	<feature id="blackberry.invoke" />
-	<feature id="blackberry.invoked" />
 	<rim:invoke-target id="net.rim.webworks.invoke.invoke.card.type">
 		<type>card.previewer</type>
 	</rim:invoke-target>
