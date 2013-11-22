@@ -36,6 +36,7 @@ describe("blackberry.invoke", function () {
     afterEach(function () {
         onSuccess = null;
         onError = null;
+        request = null;
         onSuccessFlag = false;
         onErrorFlag = false;
     });
@@ -73,7 +74,7 @@ describe("blackberry.invoke", function () {
             confirm;
 
         try {
-            blackberry.invoke.invoke(request, onSuccess);
+            blackberry.invoke.invoke(request, onSuccess, onError);
         } catch (e) {
             console.log(e);
         }
@@ -88,6 +89,162 @@ describe("blackberry.invoke", function () {
             expect(confirm).toEqual(true);
             expect(onSuccess).toHaveBeenCalled();
             expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should be able to invoke with tel protocol', function () {
+        var request = {
+            action: "bb.action.OPEN",
+            uri: "tel:5555555555"
+        },
+        confirm;
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it invoke?");
+
+            expect(confirm).toEqual(true);
+            expect(onSuccess).toHaveBeenCalled();
+            expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should be able to invoke with sms protocol', function () {
+        var request = {
+            action: "bb.action.OPEN",
+            uri: "sms:5555555555"
+        },
+        confirm;
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it invoke?");
+
+            expect(confirm).toEqual(true);
+            expect(onSuccess).toHaveBeenCalled();
+            expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should be able to invoke with pin protocol', function () {
+        var request = {
+            action: "bb.action.OPEN",
+            uri: "pin:5555555555"
+        },
+        confirm;
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it invoke?");
+
+            expect(confirm).toEqual(true);
+            expect(onSuccess).toHaveBeenCalled();
+            expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should be able to invoke with mailto protocol', function () {
+        var request = {
+            action: "bb.action.OPEN",
+            uri: "mailto:fake@fake.com"
+        },
+        confirm;
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it invoke?");
+
+            expect(confirm).toEqual(true);
+            expect(onSuccess).toHaveBeenCalled();
+            expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should be able to invoke with camera protocol', function () {
+        var request = {
+            action: "bb.action.OPEN",
+            uri: "camera:"
+        },
+        confirm;
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it invoke?");
+
+            expect(confirm).toEqual(true);
+            expect(onSuccess).toHaveBeenCalled();
+            expect(onError).not.toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should fail with unknown protocol', function () {
+        var request = {
+            action: "bb.action.OPEN",
+            uri: "unknown://:"
+        },
+        confirm;
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it fail to invoke?");
+
+            expect(confirm).toEqual(true);
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(onError).toHaveBeenCalled();
         });
     });
 
@@ -192,6 +349,5 @@ describe("blackberry.invoke", function () {
                 }
             });
         });
-
     });
 });
