@@ -42,5 +42,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.user.identity" value="com.blackberry.user.identity" />
         </config-file>
+        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>
