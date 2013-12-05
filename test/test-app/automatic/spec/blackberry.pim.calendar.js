@@ -1969,7 +1969,7 @@ describe("blackberry.pim.calendar", function () {
                     successCb = jasmine.createSpy().andCallFake(function (events) {
                         expect(events).toBeDefined();
                         expect(Array.isArray(events)).toBeTruthy();
-                        expect(events.length).toEqual(jasmine.any(Number));
+                        expect(events.length).toEqual(5);
                         called = true;
                     }),
                     errorCb = jasmine.createSpy().andCallFake(function (error) {
@@ -1978,6 +1978,10 @@ describe("blackberry.pim.calendar", function () {
                     filter = {},
                     findOptions = {
                         "filter": filter,
+                        "sort": [{
+                            "fieldName": CalendarFindOptions.SORT_FIELD_SUMMARY,
+                            "desc": false
+                        }],
                         "detail": CalendarFindOptions.DETAIL_FULL,
                         "limit": 5
                     };
@@ -1998,19 +2002,22 @@ describe("blackberry.pim.calendar", function () {
         });
 
         it('Can get all events (max=findOptions.limit) if filter is not defined in CalendarFindOptions', function () {
-            //disabled: BRWSR-14829
             if (isDefaultFolderAccessible()) {
                 var called = false,
                     successCb = jasmine.createSpy().andCallFake(function (events) {
                         expect(events).toBeDefined();
                         expect(Array.isArray(events)).toBeTruthy();
-                        expect(events.length).toEqual(jasmine.any(Number));
+                        expect(events.length).toEqual(5);
                         called = true;
                     }),
                     errorCb = jasmine.createSpy().andCallFake(function (error) {
                         called = true;
                     }),
                     findOptions = {
+                        "sort": [{
+                        "fieldName": CalendarFindOptions.SORT_FIELD_SUMMARY,
+                        "desc": false
+                    }],
                         "detail": CalendarFindOptions.DETAIL_FULL,
                         "limit": 5
                     };
