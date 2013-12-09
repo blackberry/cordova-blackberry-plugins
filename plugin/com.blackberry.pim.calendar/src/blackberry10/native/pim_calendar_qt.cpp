@@ -729,7 +729,7 @@ QDateTime PimCalendarQt::getDate(const Json::Value& arg) {
 }
 
 std::string PimCalendarQt::getSafeString(const std::string& s) {
-    return replaceAll(replaceAll(replaceAll(replaceAll(s), "\n", "\\\\n"), "\r", ""), "\t", "\\\\t");
+    return replaceAll(replaceAll(replaceAll(replaceAll(replaceAll(replaceAll(s), "\\", "\\\\"), "\n", "\\\\n"), "\r", ""), "\t", "\\\\t"), "\\\"", "\"");
 }
 
 std::string PimCalendarQt::replaceAll(const std::string& s, const std::string& source, const std::string& target) {

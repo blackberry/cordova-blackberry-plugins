@@ -472,6 +472,97 @@ describe("blackberry.pim.contacts", function () {
             });
         });
 
+        it('Can create & save a contact that contains special characters', function () {
+            var first_name,
+                last_name,
+                new_contact,
+                error = false,
+                called = false,
+                successCb = jasmine.createSpy("onSaveSuccess").andCallFake(function (contact) {
+                    expect(contact).toBeDefined();
+                    expect(contact.id).toBeDefined();
+                    expect(contact.name).toBeDefined();
+                    expect(contact.name.givenName).toBe("\"John\" \\n \\t \\");
+                    called = true;
+                }),
+                errorCb = jasmine.createSpy("onSaveError").andCallFake(function (errorObj) {
+                    called = true;
+                });
+
+            try {
+                first_name = "\"John\" \n \t \\";
+                last_name = "Doe";
+                new_contact = contacts.create();
+                new_contact.name = {};
+                new_contact.name.givenName = first_name;
+                new_contact.name.familyName = last_name;
+                new_contact.name.middleName = "Middle";
+
+                new_contact.save(successCb, errorCb);
+            } catch (e) {
+                console.log("Error:  " + e);
+                error = true;
+            }
+
+            waitsFor(function () {
+                return called;
+            }, "success/error callback never called", 15000);
+
+            runs(function () {
+                expect(error).toBe(false);
+                expect(successCb).toHaveBeenCalled();
+                expect(errorCb).not.toHaveBeenCalled();
+            });
+        });
+
+        it('Can find the contact with special characters', function () {
+            var findOptions = {
+                    filter: [{
+                        fieldName: ContactFindOptions.SEARCH_FIELD_FAMILY_NAME,
+                        fieldValue: "Doe"
+                    }, {
+                        fieldName: ContactFindOptions.SEARCH_FIELD_GIVEN_NAME,
+                        fieldValue: "\"John\" \n \t \\"
+                    }]
+                },
+                error = false,
+                called = false,
+                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                    expect(contacts).toBeDefined();
+                    expect(contacts.length).toBe(1);
+
+                    if (contacts.length === 1) {
+                        foundContact = contacts[0];
+                        expect(contacts[0].name).toBeDefined();
+                        expect(contacts[0].name.givenName).toBe("\"John\" \\n \\t \\");
+                        expect(contacts[0].name.familyName).toBe("Doe");
+                        deleteContactWithMatchingLastName("Doe");
+                    }
+
+                    called = true;
+                }),
+                errorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
+                    called = true;
+                });
+
+            try {
+                contacts.find(["name", "emails"], findOptions, successCb, errorCb);
+            } catch (e) {
+                console.log("Error:  " + e);
+                error = true;
+            }
+
+            waitsFor(function () {
+                return called;
+            }, "success/error callback never called", 15000);
+
+            runs(function () {
+                expect(error).toBe(false);
+                expect(successCb).toHaveBeenCalled();
+                expect(errorCb).not.toHaveBeenCalled();
+            });
+        });
+
         it('Can find the contact that has just been created', function () {
             var findOptions = {
                     filter: [{
