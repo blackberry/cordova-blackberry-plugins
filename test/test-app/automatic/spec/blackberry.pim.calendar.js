@@ -480,13 +480,13 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        it('can save event with some fields that contain double quotes', function () {
+        it('can save event with some fields that contain double quotes and backslash', function () {
             if (isDefaultFolderAccessible()) {
                 var start = new Date("Jan 08, 2013, 11:00"),
                     end = new Date("Jan 08, 2013, 12:00"),
                     summary = "WebWorksTest quotes and multi-line (wwt002)",
                     location = "Location 1",
-                    description = "This is a multi-line description\n\nWith \"quotes\"! http://www.rim.com\n",
+                    description = "This is a multi-line description\n\nWith \"quotes\"! http://www.rim.com\n \\",
                     called = false,
                     evt,
                     successCb = jasmine.createSpy().andCallFake(function (saved) {
@@ -801,7 +801,7 @@ describe("blackberry.pim.calendar", function () {
                     'Mar 21, 2013, 10:00', // 0: EDT
                     'Mar 31, 2013, 03:00', // 1: EDT
                     'Mar 30, 2013, 20:00', // 2: EDT
-                    'Mar 30, 2013, 21:00', // 3: EDT 
+                    'Mar 30, 2013, 21:00', // 3: EDT
                     'Oct 27, 2013, 04:00', // 4: EDT
                     'Oct 26, 2013, 21:00', // 5: EDT
                     'Oct 26, 2013, 22:00', // 6: EDT

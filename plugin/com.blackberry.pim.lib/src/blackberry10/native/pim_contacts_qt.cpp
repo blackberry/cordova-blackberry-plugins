@@ -673,7 +673,7 @@ std::string PimContactsQt::replaceAll(const std::string& s, const std::string& s
     return temp;
 }
 std::string PimContactsQt::replaceString(const std::string& s) {
-    std::string temp = replaceAll(replaceAll(replaceAll(replaceAll(replaceAll(s), "\n", "\\\\n"), "\r", ""), "\t", "\\\\t"), "\"", "\"");
+    std::string temp = replaceAll(replaceAll(replaceAll(replaceAll(replaceAll(replaceAll(s), "\\", "\\\\"), "\n", "\\\\n"), "\r", ""), "\t", "\\\\t"), "\\\"", "\"");
     return temp;
 }
 
