@@ -294,6 +294,8 @@ Json::Value PimContactsQt::GetContact(const Json::Value& args)
             returnObj["_success"] = true;
             if (contact.isValid()) {
                 returnObj["contact"] = populateContact(contact, fields);
+                populateDisplayNameNickName(contact, returnObj["contact"], "displayName");
+                populateDisplayNameNickName(contact, returnObj["contact"], "nickname");
             }
         }
     } else {
@@ -721,6 +723,7 @@ Json::Value PimContactsQt::populateContact(const bbpim::Contact& contact, const 
                 case bbpim::AttributeKind::Pager:
                 case bbpim::AttributeKind::Phone:
                 case bbpim::AttributeKind::Profile:
+                case bbpim::AttributeKind::Group:
                 case bbpim::AttributeKind::Website:
                 case bbpim::AttributeKind::InstantMessaging: {
                     contactItem[field] = Json::Value();
@@ -1522,9 +1525,10 @@ void PimContactsQt::createAttributeSubKindMap()
     _attributeSubKindMap["categories"] = bbpim::AttributeSubKind::GroupDepartment;
     _attributeSubKindMap["givenName"] = bbpim::AttributeSubKind::NameGiven;
     _attributeSubKindMap["familyName"] = bbpim::AttributeSubKind::NameSurname;
-    _attributeSubKindMap["honorificPrefix"] = bbpim::AttributeSubKind::Title;
+    _attributeSubKindMap["honorificPrefix"] = bbpim::AttributeSubKind::NamePrefix;
     _attributeSubKindMap["honorificSuffix"] = bbpim::AttributeSubKind::NameSuffix;
     _attributeSubKindMap["middleName"] = bbpim::AttributeSubKind::NameMiddle;
+    _attributeSubKindMap["alias"] = bbpim::AttributeSubKind::NameAlias;
     _attributeSubKindMap["nickname"] = bbpim::AttributeSubKind::NameNickname;
     _attributeSubKindMap["displayName"] = bbpim::AttributeSubKind::NameDisplayName;
     _attributeSubKindMap["phoneticGivenName"] = bbpim::AttributeSubKind::NamePhoneticGiven;
@@ -1538,11 +1542,14 @@ void PimContactsQt::createAttributeSubKindMap()
     _attributeSubKindMap["GoogleTalk"] = bbpim::AttributeSubKind::InstantMessagingGoogleTalk;
     _attributeSubKindMap["Sametime"] = bbpim::AttributeSubKind::InstantMessagingSametime;
     _attributeSubKindMap["Icq"] = bbpim::AttributeSubKind::InstantMessagingIcq;
+    _attributeSubKindMap["Irc"] = bbpim::AttributeSubKind::InstantMessagingIrc;
     _attributeSubKindMap["Jabber"] = bbpim::AttributeSubKind::InstantMessagingJabber;
     _attributeSubKindMap["MsLcs"] = bbpim::AttributeSubKind::InstantMessagingMsLcs;
+    _attributeSubKindMap["Msn"] = bbpim::AttributeSubKind::InstantMessagingMsn;
+    _attributeSubKindMap["Qq"] = bbpim::AttributeSubKind::InstantMessagingQq;
     _attributeSubKindMap["Skype"] = bbpim::AttributeSubKind::InstantMessagingSkype;
     _attributeSubKindMap["YahooMessenger"] = bbpim::AttributeSubKind::InstantMessagingYahooMessenger;
-    _attributeSubKindMap["YahooMessegerJapan"] = bbpim::AttributeSubKind::InstantMessagingYahooMessengerJapan;
+    _attributeSubKindMap["YahooMessengerJapan"] = bbpim::AttributeSubKind::InstantMessagingYahooMessengerJapan;
     _attributeSubKindMap["BbPlaybook"] = bbpim::AttributeSubKind::VideoChatBbPlaybook;
     _attributeSubKindMap["ringtone"] = bbpim::AttributeSubKind::SoundRingtone;
     _attributeSubKindMap["note"] = bbpim::AttributeSubKind::Other;
@@ -1582,13 +1589,15 @@ void PimContactsQt::createSubKindAttributeMap() {
     _subKindAttributeMap[bbpim::AttributeSubKind::ProfileTungle] = "tungle";
     _subKindAttributeMap[bbpim::AttributeSubKind::DateBirthday] = "birthday";
     _subKindAttributeMap[bbpim::AttributeSubKind::DateAnniversary] = "anniversary";
+    _subKindAttributeMap[bbpim::AttributeSubKind::GroupDepartment] = "categories";
     _subKindAttributeMap[bbpim::AttributeSubKind::NameGiven] = "givenName";
     _subKindAttributeMap[bbpim::AttributeSubKind::NameSurname] = "familyName";
-    _subKindAttributeMap[bbpim::AttributeSubKind::Title] = "honorificPrefix";
+    _subKindAttributeMap[bbpim::AttributeSubKind::NamePrefix] = "honorificPrefix";
     _subKindAttributeMap[bbpim::AttributeSubKind::NameSuffix] = "honorificSuffix";
     _subKindAttributeMap[bbpim::AttributeSubKind::NameMiddle] = "middleName";
     _subKindAttributeMap[bbpim::AttributeSubKind::NamePhoneticGiven] = "phoneticGivenName";
     _subKindAttributeMap[bbpim::AttributeSubKind::NamePhoneticSurname] = "phoneticFamilyName";
+    _subKindAttributeMap[bbpim::AttributeSubKind::NameAlias] = "alias";
     _subKindAttributeMap[bbpim::AttributeSubKind::NameNickname] = "nickname";
     _subKindAttributeMap[bbpim::AttributeSubKind::NameDisplayName] = "displayName";
     _subKindAttributeMap[bbpim::AttributeSubKind::OrganizationAffiliationName] = "name";
@@ -1600,11 +1609,14 @@ void PimContactsQt::createSubKindAttributeMap() {
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingGoogleTalk] = "GoogleTalk";
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingSametime] = "Sametime";
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingIcq] = "Icq";
+    _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingIrc] = "Irc";
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingJabber] = "Jabber";
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingMsLcs] = "MsLcs";
+    _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingMsn] = "Msn";
+    _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingQq] = "Qq";
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingSkype] = "Skype";
     _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingYahooMessenger] = "YahooMessenger";
-    _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingYahooMessengerJapan] = "YahooMessegerJapan";
+    _subKindAttributeMap[bbpim::AttributeSubKind::InstantMessagingYahooMessengerJapan] = "YahooMessengerJapan";
     _subKindAttributeMap[bbpim::AttributeSubKind::VideoChatBbPlaybook] = "BbPlaybook";
     _subKindAttributeMap[bbpim::AttributeSubKind::SoundRingtone] = "ringtone";
     _subKindAttributeMap[bbpim::AttributeSubKind::Personal] = "personal";
