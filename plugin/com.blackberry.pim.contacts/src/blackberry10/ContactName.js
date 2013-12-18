@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 var ContactName = function (properties) {
+    this.alias = properties && properties.alias ? properties.alias : "";
     this.formatted = properties && properties.formatted ? properties.formatted : "";
     this.familyName = properties && properties.familyName ? properties.familyName : "";
     this.givenName = properties && properties.givenName ? properties.givenName : "";
