@@ -58,7 +58,9 @@ module.exports = {
             invokeCallback = function (error) {
                 trigger(result, "invoke", error);
             };
-
+        if (mode === "") {
+            mode = "photo";
+        }
         window.qnx.webplatform.getApplication().cards.camera.open(mode, done, cancel, invokeCallback);
         result.noResult(true);
     },
