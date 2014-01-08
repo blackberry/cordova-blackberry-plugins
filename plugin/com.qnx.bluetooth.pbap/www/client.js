@@ -134,6 +134,7 @@ function Contact(properties) {
 	this.email3 = null;
 	this.faxPhone = null;
 	this.firstName = null;
+	this.formattedName = null;
 	this.homeAddress1 = null;
 	this.homeAddress2 = null;
 	this.homeAddressCity = null;
