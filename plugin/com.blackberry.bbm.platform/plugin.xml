@@ -24,6 +24,8 @@
     <description>BlackBerry 10 BBM Platform APIs</description>
     <license>Apache 2.0</license>
 
+    <dependency id="com.blackberry.utils" />
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.bbm.platform" />
     </js-module>
@@ -40,6 +42,5 @@
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>bbm_connect</rim:permit>
         </config-file>
-        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>

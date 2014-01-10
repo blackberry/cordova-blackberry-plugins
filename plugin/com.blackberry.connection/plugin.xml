@@ -24,6 +24,8 @@
     <description>BlackBerry 10 Connection APIs</description>
     <license>Apache 2.0</license>
 
+    <dependency id="com.blackberry.jpps"/>
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.connection" />
     </js-module>
@@ -33,6 +35,5 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.connection" value="com.blackberry.connection" />
         </config-file>
-        <dependency id="com.blackberry.jpps"/>
     </platform>
 </plugin>

@@ -25,6 +25,8 @@
     <description>BlackBerry 10 Payment APIs</description>
     <license>Apache 2.0</license>
 
+    <dependency id="com.blackberry.utils" />
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.payment" />
     </js-module>
@@ -36,6 +38,5 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.payment" value="com.blackberry.payment" />
         </config-file>
-        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>

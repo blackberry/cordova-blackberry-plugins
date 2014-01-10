@@ -24,6 +24,9 @@
     <description>BlackBerry 10 Contacts APIs</description>
     <license>Apache 2.0</license>
 
+    <dependency id="com.blackberry.utils" />
+    <dependency id="com.blackberry.pim.lib" />
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.pim.contacts" />
     </js-module>
@@ -49,8 +52,6 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts" />
         </config-file>
-        <dependency id="com.blackberry.utils" />
-        <dependency id="com.blackberry.pim.lib" />
         <source-file src="src/blackberry10/ContactActivity.js" />
         <source-file src="src/blackberry10/ContactAddress.js" />
         <source-file src="src/blackberry10/ContactError.js" />

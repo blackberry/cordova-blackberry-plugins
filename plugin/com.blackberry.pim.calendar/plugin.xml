@@ -24,6 +24,8 @@
     <description>BlackBerry 10 Calendar APIs</description>
     <license>Apache 2.0</license>
 
+    <dependency id="com.blackberry.utils" />
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.pim.calendar" />
     </js-module>
@@ -50,6 +52,5 @@
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>access_pimdomain_calendars</rim:permit>
         </config-file>
-        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>

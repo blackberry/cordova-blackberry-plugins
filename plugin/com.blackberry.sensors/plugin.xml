@@ -24,6 +24,8 @@
     <description>BlackBerry 10 Sensors APIs</description>
     <license>Apache 2.0</license>
 
+    <dependency id="com.blackberry.utils" />
+
     <js-module src="www/client.js">
         <clobbers target="blackberry.sensors" />
     </js-module>
@@ -37,6 +39,5 @@
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.sensors" value="com.blackberry.sensors" />
         </config-file>
-        <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>
