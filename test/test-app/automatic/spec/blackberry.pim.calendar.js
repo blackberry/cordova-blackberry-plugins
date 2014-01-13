@@ -1963,8 +1963,7 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        xit('Can get all events (max=findOptions.limit) if filter is a blank object without any params', function () {
-            //disabled: BRWSR-14829
+        it('Can get all events (max=findOptions.limit) if filter is a blank object without any params', function () {
             if (isDefaultFolderAccessible()) {
                 var called = false,
                     successCb = jasmine.createSpy().andCallFake(function (events) {
@@ -1998,8 +1997,7 @@ describe("blackberry.pim.calendar", function () {
             }
         });
 
-        xit('Can get all events (max=findOptions.limit) if filter is not defined in CalendarFindOptions', function () {
-            //disabled: BRWSR-14829
+        it('Can get all events (max=findOptions.limit) if filter is not defined in CalendarFindOptions', function () {
             if (isDefaultFolderAccessible()) {
                 var called = false,
                     successCb = jasmine.createSpy().andCallFake(function (events) {
