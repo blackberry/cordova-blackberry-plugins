@@ -32,7 +32,7 @@ function validateFindArguments(findOptions) {
     var error = false;
 
     findOptions = findOptions || {};
-    findOptions.sort = findOptions.sort || [];
+    findOptions.sort = findOptions.sort || [{}];
 
     // if limit is invalid, set it to -1
     if (!error && (typeof findOptions.limit !== "number" || findOptions.limit <= 0)) {
@@ -66,7 +66,7 @@ function validateFindArguments(findOptions) {
                 break;
             default:
                 // if sort id not specified or invalid, defaults to SORT_FIELD_SUMMARY
-                findOptions.sort = CalendarFindOptions.SORT_FIELD_SUMMARY;
+                s.fieldName = CalendarFindOptions.SORT_FIELD_SUMMARY;
             }
 
             if (s.desc === undefined || typeof s.desc !== "boolean") {
