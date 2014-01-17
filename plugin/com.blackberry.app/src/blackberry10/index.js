@@ -25,18 +25,6 @@ var _config = require("./../../lib/config"),
                 pluginResult.callbackOk(undefined, true);
             } 
         },
-        pause: {
-            event: "inactive",
-            trigger: function (pluginResult) {
-                pluginResult.callbackOk(undefined, true);
-            } 
-        },
-        resume: {
-            event: "active",
-            trigger: function (pluginResult) {
-                pluginResult.callbackOk(undefined, true);
-            } 
-        },
         orientationchange : {
             //special case, handled in add
             event: "rotate",
