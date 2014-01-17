@@ -105,6 +105,11 @@ JNEXT.BBM = function ()
         JNEXT.invoke(_self.m_id, "self.profilebox.registerIcon " + JSON.stringify(options));
     };
 
+    _self.self.profilebox.getItemIcon = function (options, pluginResult) {
+        _self.profileBoxGetItemIconHandlers.push(pluginResult);
+        return JNEXT.invoke(_self.m_id, "self.profilebox.getItemIcon " JSON.stringify(options));
+    };
+
     _self.self.profilebox.getItems = function () {
         return JSON.parse(JNEXT.invoke(_self.m_id, "self.profilebox.getItems"));
     };
@@ -115,6 +120,10 @@ JNEXT.BBM = function ()
 
     _self.users.inviteToDownload = function () {
         JNEXT.invoke(_self.m_id, "users.inviteToDownload");
+    };
+
+    _self.users.getContactsWithApp = function () {
+        return JNEXT.invoke(_self.m_id, "users.getContactsWithApp");
     };
 
     _self.getId = function () {
@@ -179,6 +188,9 @@ JNEXT.BBM = function ()
             //TODO: Switch from a queue getting the callbackId from native
             result = _self.profileBoxRegisterIconHandlers.shift();
             result.callbackOk(JSON.parse(obj));
+        } else if (strEventDesc === "self.profilebox.getItemIcon") {
+            obj = arData.slice(1, arData.length).join(" ");
+            //double check this
         }
     };
 
@@ -188,6 +200,7 @@ JNEXT.BBM = function ()
     _self.profileBoxAddItemHandlers = [];
     _self.profileBoxRemoveItemHandlers = [];
     _self.profileBoxRegisterIconHandlers = [];
+    _self.profileBoxGetItemIconHandlers = [];
 
     _self.getInstance = function () {
         if (!hasInstance) {

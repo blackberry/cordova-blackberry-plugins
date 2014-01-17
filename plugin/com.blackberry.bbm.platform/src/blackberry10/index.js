@@ -248,6 +248,18 @@ module.exports = {
                 }
             },
 
+            getItemIcon: function (success, fail, args, env) {
+                var result = new PluginResult(args, env);
+
+                args.options = JSON.parse(decodeURIComponent(args.options));
+
+                if (!args.options.iconId || args.options.iconId <= 0 || typeof(args.options.iconId) !== "number") {
+                    result.error("Must specify valid ID for icon");
+                } else {
+                    result.ok(bbm.getInstance().self.profilebox.getItemIcon(args.options, result), false);
+                }
+            },
+
             getItems: function (success, fail, args, env) {
                 var result = new PluginResult(args, env);
                 result.ok(bbm.getInstance().self.profilebox.getItems(), false);
@@ -265,6 +277,11 @@ module.exports = {
             var result = new PluginResult(args, env);
             bbm.getInstance().users.inviteToDownload();
             result.ok(null, false);
+        },
+
+        getContactsWithApp: function (success, fail, args, env) {
+            var result = new PluginResult(args, env);
+            result.ok(bbm.getInstance().users.getContactsWithApp(), false);
         }
     }
 };

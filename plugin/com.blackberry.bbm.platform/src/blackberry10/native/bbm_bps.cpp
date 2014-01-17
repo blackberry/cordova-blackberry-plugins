@@ -44,6 +44,7 @@ pthread_mutex_t BBMBPS::m_lock = PTHREAD_MUTEX_INITIALIZER;
 int BBMBPS::m_eventChannel = -1;
 int BBMBPS::m_BBMInternalDomain = -1;
 ProfileFieldMap *BBMBPS::m_pProfileFieldMap = NULL;
+bbmsp_contact_list_t *BBMBPS::m_pContactList;
 
 BBMBPS::BBMBPS(BBM *parent) : m_pParent(parent)
 {
@@ -149,10 +150,13 @@ void BBMBPS::processProfileUpdate(bbmsp_event_t *event)
                 updateString += "status " + getFullProfile();
                 break;
             case BBMSP_INSTALL_APP:
+                updateString += "install " + getFullProfile();
                 return;
             case BBMSP_UNINSTALL_APP:
+                updateString += "uninstall " + getFullProfile();
                 return;
             case BBMSP_INVITATION_RECEIVED:
+                updateString += "invitation " + getFullProfile();
                 return;
         }
         m_pParent->NotifyEvent(updateString);
@@ -161,6 +165,8 @@ void BBMBPS::processProfileUpdate(bbmsp_event_t *event)
 
 void BBMBPS::processContactUpdate(bbmsp_event_t *event)
 {
+    Json::FastWriter writer;
+
     bbmsp_presence_update_types_t updateType;
     bbmsp_contact_t *contact;
     std::string updateString = "onupdate ";
@@ -171,26 +177,50 @@ void BBMBPS::processContactUpdate(bbmsp_event_t *event)
         switch (updateType)
         {
             case BBMSP_DISPLAY_NAME:
-                updateString += "displayname " + getFullContact(contact);
+                updateString += "displayname " + writer.write(getFullContact(contact));
                 break;
             case BBMSP_DISPLAY_PICTURE:
-                updateString += "displaypicture " + getFullContact(contact);
+                updateString += "displaypicture " + writer.write(getFullContact(contact));
                 break;
             case BBMSP_PERSONAL_MESSAGE:
-                updateString += "personalmessage " + getFullContact(contact);
+                updateString += "personalmessage " + writer.write(getFullContact(contact));
                 break;
             case BBMSP_STATUS:
-                updateString += "status " + getFullContact(contact);
+                updateString += "status " + writer.write(getFullContact(contact));
                 break;
             case BBMSP_INSTALL_APP:
+                updateString += "install " + writer.write(getFullContact(contact));
                 return;
             case BBMSP_UNINSTALL_APP:
+                updateString += "uninstall " + writer.write(getFullContact(contact));
                 return;
             case BBMSP_INVITATION_RECEIVED:
+                updateString += "invitation " + writer.write(getFullContact(contact));
                 return;
         }
         m_pParent->NotifyEvent(updateString);
     }
+}
+
+void BBMBPS::processContactList(bbmsp_event_t* event)
+{
+    Json::FastWriter writer;
+    Json::Value root;
+    bbmsp_contact_list_t *list;
+
+    if (bbmsp_event_contact_list_get_full_contact_list(event, &list) == BBMSP_SUCCESS) {
+        int size = bbmsp_contact_list_get_size(list);
+
+        bbmsp_contact_t **contactArray = new bbmsp_contact_t*[size];
+
+        if (bbmsp_contact_list_get_all_contacts(list, contactArray) == BBMSP_SUCCESS) {
+            for (int i = 0; i < size; i++) {
+                root.append(getFullContact(contactArray[i]));
+            }
+        }
+        delete[] contactArray;
+    }
+    m_pParent->NotifyEvent(std::string("users.getContactsWithApp ").append(writer.write(root)));
 }
 
 Json::Value BBMBPS::processProfileBoxItem(const bbmsp_user_profile_box_item_t *item)
@@ -249,6 +279,17 @@ void BBMBPS::processProfileBoxRegisterIcon(bbmsp_event_t *event)
     m_pParent->NotifyEvent(std::string("self.profilebox.registerIcon ").append(Json::FastWriter().write(root)));
 }
 
+void BBMBPS::processProfileBoxIconRetrieved(bbmsp_event_t *event)
+{
+    event = event;
+
+    Json::Value root;
+    Json::Value result;
+
+    result["icon"] = "";
+    m_pParent->NotifyEvent(std::string("self.profilebox.getIcon ").append(Json::FastWriter().write(root)));
+}
+
 std::string BBMBPS::getFullProfile()
 {
     Json::Value root;
@@ -269,30 +310,18 @@ std::string BBMBPS::getProfileDisplayPicture(bbmsp_profile_t *profile)
 {
     bbmsp_image_t *avatar;
     std::string result;
-    char *imgData = NULL;
-    char *output = NULL;
 
     bbmsp_image_create_empty(&avatar);
-    if (bbmsp_profile_get_display_picture(profile, avatar) == BBMSP_SUCCESS) {
-        imgData = bbmsp_image_get_data(avatar);
-
-        int size = bbmsp_image_get_data_size(avatar);
-
-        if (size > 0) {
-            output = new char[size*4];
-
-            int bufferSize = b64_ntop(reinterpret_cast<unsigned char *>(imgData), bbmsp_image_get_data_size(avatar), output, size*4);
-            output[bufferSize] = 0;
-            result = output;
-            delete output;
-        }
+    if (bbmsp_profile_get_display_picture(profile, avatar) === BBMSP_SUCCESS) {
+        result = imageToBase64(avatar);
     }
+
     bbmsp_image_destroy(&avatar);
 
     return result;
 }
 
-std::string BBMBPS::getFullContact(bbmsp_contact_t *contact)
+Json::Value BBMBPS::getFullContact(bbmsp_contact_t *contact)
 {
     Json::Value root;
 
@@ -305,7 +334,28 @@ std::string BBMBPS::getFullContact(bbmsp_contact_t *contact)
     root["appVersion"] = GetContact(contact, BBM_APP_VERSION);
     root["bbmsdkVersion"] = GetContact(contact, BBM_SDK_VERSION);
 
-    return Json::FastWriter().write(root);
+    return root;
+}
+
+std::string BBMBPS::imageToBase64(bbmsp_image_t *img)
+{
+    std::string result;
+    char *imgData = NULL;
+    char *output = NULL;
+
+    imgData = bbmsp_image_get_data(img);
+    int size = bbmsp_image_get_data_size(img);
+
+    if (size > 0) {
+        output = new char[size*4];
+
+        int bufferSize = b64_ntop(reinterpret_cast<unsigned char *>(imgData), size, output, size*4);
+        output[bufferSize] = 0;
+        result = output;
+        delete[] output;
+    }
+
+    return result;
 }
 
 size_t BBMBPS::loadImage(const std::string& imgPath, bbmsp_image_t **img)
@@ -341,7 +391,7 @@ size_t BBMBPS::loadImage(const std::string& imgPath, bbmsp_image_t **img)
         if (size) {
             bbmsp_image_create(img, type, imgData, size);
         }
-        delete imgData;
+        delete[] imgData;
         close(imgFile);
     }
 
@@ -372,19 +422,23 @@ int BBMBPS::WaitForEvents()
 
                 if (bbmsp_event_get_category(event, &eventCategory) == BBMSP_SUCCESS) {
                     if (bbmsp_event_get_type(event, &eventType) == BBMSP_SUCCESS) {
-                        switch (eventCategory) {
+                        switch (eventCategory)
+                        {
                             case BBMSP_REGISTRATION:
                             {
                                 switch (eventType) {
                                     case BBMSP_SP_EVENT_ACCESS_CHANGED:
+                                    {
                                         processAccessCode(bbmsp_event_access_changed_get_access_error_code(bbmEvent));
                                         break;
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                             case BBMSP_USER_PROFILE:
                             {
-                                switch (eventType) {
+                                switch (eventType)
+                                {
                                     case BBMSP_SP_EVENT_PROFILE_CHANGED:
                                     {
                                         bbmsp_presence_update_types_t profileUpdateType;
@@ -403,7 +457,8 @@ int BBMBPS::WaitForEvents()
                             }
                             case BBMSP_CONTACT_LIST:
                             {
-                                switch (eventType) {
+                                switch (eventType)
+                                {
                                     case BBMSP_SP_EVENT_CONTACT_CHANGED:
                                     {
                                         processContactUpdate(bbmEvent);
@@ -431,6 +486,11 @@ int BBMBPS::WaitForEvents()
                                         processProfileBoxRegisterIcon(bbmEvent);
                                         break;
                                     }
+                                    case BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED:
+                                    {
+                                        prcoessProfileBoxIconRetrieved(bbmEvent);
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -438,6 +498,7 @@ int BBMBPS::WaitForEvents()
                 }
             } else if (event_domain == m_BBMInternalDomain) {
                 int code = bps_event_get_code(event);
+
                 if (code == INTERNAL_EVENT_REGISTER) {
                     bps_event_payload_t *payload = bps_event_get_payload(event);
                     char *uuid = reinterpret_cast<char *>(payload->data1);
@@ -458,6 +519,8 @@ int BBMBPS::WaitForEvents()
                     }
 
                     bbmsp_profile_destroy(&profile);
+                } else if (code == INTERNAL_EVENT_GET_CONTACT_LIST) {
+                    bbmsp_contact_list_get();
                 } else if (code == INTERNAL_EVENT_STOP) {
                     break;
                 }
@@ -771,6 +834,19 @@ void BBMBPS::ProfileBoxRegisterIcon(const Json::Value& iconData)
     MUTEX_UNLOCK();
 }
 
+void BBMBPS::ProfileBoxGetItemIcon(const Json::Value& item)
+{
+    MUTEX_LOCK();
+    Json::Value root;
+
+    if (bbmsp_user_profile_box_retrieve_icon(item["iconId"].asInt() != BBMSP_ASYNC)) {
+        fprintf(stderr, "grabbing icon\n");
+        root["error"] = "Could not retrieve profile box item icon";
+        m_pParent->NotifyEvent(std::string("self.profilebox.getItemIcon ").append(Json::FastWriter().write(root)));
+    }
+    MUTEX_UNLOCK();
+}
+
 std::string BBMBPS::ProfileBoxGetItems()
 {
     MUTEX_LOCK();
@@ -806,6 +882,14 @@ void BBMBPS::InviteToDownload()
     MUTEX_LOCK();
     bbmsp_send_download_invitation();
     MUTEX_UNLOCK();
+}
+
+void BBMBPS::GetContactsWithApp()
+{
+    bps_event_t *event = NULL;
+
+    bps_event_create(&event, m_BBMInternalDomain, INTERNAL_EVENT_GET_CONTACT_LIST, NULL, NULL);
+    bps_channel_push_event(m_eventChannel, event);
 }
 
 void BBMBPS::createProfileFieldMap()

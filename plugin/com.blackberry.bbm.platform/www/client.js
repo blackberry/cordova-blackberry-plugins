@@ -164,8 +164,19 @@ _self.self.profilebox.registerIcon = function (options, success, error) {
     return exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/registerIcon", args);
 };
 
+_self.self.profilebox.getItemIcon = function (options, success, error) {
+    var args = {"options": options},
+        handler = createEventHandler(success, error);
+    return exec(handler.onSuccess, handler.onError, _ID, "self/profilebox/getItemIcon", args);
+};
+
 _self.users.inviteToDownload = function () {
     return getFieldValue("users/inviteToDownload");
+};
+
+_self.uesrs.getContactsWithApp = function (callback) {
+    var handler = createEventHandler(callback);
+    return exec(handler.onSuccess, handler.onError, _ID, "users/getContactsWithApp", args);
 };
 
 Object.defineProperty(_self.self.profilebox, "accessible", {
