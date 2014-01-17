@@ -57,8 +57,8 @@ http.createServer(function (request, response) {
                 wrench.mkdirSyncRecursive(path.join(testReportDir,  'details'), "0755");
             }
             // Copy jasmin js and css to testReport folder
-            wrench.copyDirSyncRecursive(path.join(testAppDir, 'src', 'js'), path.join(testReportDir, 'js'));
-            wrench.copyDirSyncRecursive(path.join(testAppDir, 'src', 'css'), path.join(testReportDir, 'css'));
+            wrench.copyDirSyncRecursive(path.join(testAppDir, 'js'), path.join(testReportDir, 'js'));
+            wrench.copyDirSyncRecursive(path.join(testAppDir, 'css'), path.join(testReportDir, 'css'));
             utils.copyFile(path.join(__dirname, 'template', 'js/report.js'), path.join(testReportDir, 'js'));
             utils.copyFile(path.join(__dirname, 'template', 'css/styles.css'), path.join(testReportDir, 'css'));
 
