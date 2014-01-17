@@ -312,7 +312,7 @@ std::string BBMBPS::getProfileDisplayPicture(bbmsp_profile_t *profile)
     std::string result;
 
     bbmsp_image_create_empty(&avatar);
-    if (bbmsp_profile_get_display_picture(profile, avatar) === BBMSP_SUCCESS) {
+    if (bbmsp_profile_get_display_picture(profile, avatar) == BBMSP_SUCCESS) {
         result = imageToBase64(avatar);
     }
 
@@ -488,7 +488,7 @@ int BBMBPS::WaitForEvents()
                                     }
                                     case BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED:
                                     {
-                                        prcoessProfileBoxIconRetrieved(bbmEvent);
+                                        processProfileBoxIconRetrieved(bbmEvent);
                                         break;
                                     }
                                 }

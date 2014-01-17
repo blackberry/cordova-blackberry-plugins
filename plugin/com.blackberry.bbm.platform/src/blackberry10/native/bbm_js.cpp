@@ -150,7 +150,7 @@ std::string BBM::InvokeMethod(const std::string& command)
         return m_pBBMController->ProfileBoxGetAccessible();
     } else if (strCommand == "users.inviteToDownload") {
         m_pBBMController->InviteToDownload();
-    } else if () {
+    } else if (strCommand == "users.getContactsWithApp") {
         m_pBBMController->GetContactsWithApp();
     }
     return "";

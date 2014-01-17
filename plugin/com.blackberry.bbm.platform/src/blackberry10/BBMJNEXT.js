@@ -190,7 +190,8 @@ JNEXT.BBM = function ()
             result.callbackOk(JSON.parse(obj));
         } else if (strEventDesc === "self.profilebox.getItemIcon") {
             obj = arData.slice(1, arData.length).join(" ");
-            //double check this
+            result = _self.profileBoxGetItemIconHandlers.shift();
+            result.callbackOk(JSON.parse(arData[1]));
         }
     };
 
