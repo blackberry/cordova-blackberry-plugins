@@ -58,6 +58,7 @@ describe("com.blackberry.ui.contextmenu client", function () {
         expect(client.CONTEXT_LINK).toEqual("LINK");
         expect(client.CONTEXT_INPUT).toEqual("INPUT");
         expect(client.CONTEXT_TEXT).toEqual("TEXT");
+        expect(client.ACTION_MENU_SERVICE).toEqual("MenuService");
     });
 
     it('expect context menu action Ids to be defined properly', function () {
@@ -118,5 +119,24 @@ describe("com.blackberry.ui.contextmenu client", function () {
         var actionId = 'OpenLink';
         client.clearOverride(actionId);
         expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'clearOverride', {actionId: actionId});
+    });
+
+    it("can disable a platform provided item", function () {
+        var context = client.CONTEXT_ALL,
+            actionId = client.ACTION_OPEN_LINK;
+        client.disablePlatformItem(context, actionId);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'disablePlatformItem', {context: context, actionId: actionId});
+    });
+
+    it("can enable a disabled platform provided item", function () {
+        var context = client.CONTEXT_ALL,
+            actionId = client.ACTION_OPEN_LINK;
+        client.enablePlatformItem(context, actionId);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'enablePlatformItem', {context: context, actionId: actionId});
+    });
+
+    it("can list the disabled platform provided item", function () {
+        client.listDisabledPlatformItems();
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, 'listDisabledPlatformItems');
     });
 });
