@@ -47,9 +47,9 @@ function overrideItem(success, fail, args, env) {
 }
 
 function clearOverride(success, fail, args, env) {
-    var result = new PluginResult(args, env),
-        actionId = JSON.parse(decodeURIComponent(args.actionId));
-    result.ok(_overlayWebView.contextMenu.clearOverride(actionId), false);
+    var result = new PluginResult(args, env);
+    args.actionId = JSON.parse(decodeURIComponent(args.actionId));
+    result.ok(_overlayWebView.contextMenu.clearOverride(args.actionId), false);
 }
 
 function addItem(success, fail, args, env) {
@@ -85,12 +85,34 @@ function defineCustomContext(success, fail, args, env) {
     result.ok(null, false);
 }
 
+function disablePlatformItem(success, fail, args, env) {
+    var result = new PluginResult(args, env);
+    args.context = JSON.parse(decodeURIComponent(args.context));
+    args.actionId = JSON.parse(decodeURIComponent(args.actionId));
+    result.ok(_overlayWebView.contextMenu.disablePlatformItem(args.context, args.actionId), false);
+}
+
+function enablePlatformItem(success, fail, args, env) {
+    var result = new PluginResult(args, env);
+    args.context = JSON.parse(decodeURIComponent(args.context));
+    args.actionId = JSON.parse(decodeURIComponent(args.actionId));
+    result.ok(_overlayWebView.contextMenu.enablePlatformItem(args.context, args.actionId), false);
+}
+
+function listDisabledPlatformItems(success, fail, args, env) {
+    var result = new PluginResult(args, env);
+    result.ok(_overlayWebView.contextMenu.listDisabledPlatformItems(), false);
+}
+
 contextmenu = {
     enabled: enabled,
     addItem: addItem,
     removeItem: removeItem,
     overrideItem: overrideItem,
     clearOverride: clearOverride,
+    disablePlatformItem: disablePlatformItem,
+    enablePlatformItem: enablePlatformItem,
+    listDisabledPlatformItems: listDisabledPlatformItems,
     defineCustomContext: defineCustomContext
 };
 

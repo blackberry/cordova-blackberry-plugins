@@ -15,6 +15,7 @@
  */
 var _extDir = __dirname + "/../../../plugin/",
     _libDir = __dirname + "/../../../lib/",
+    env = {},
     contextmenu,
     overlayWebView,
     mockedPluginResult,
@@ -28,6 +29,9 @@ var _extDir = __dirname + "/../../../plugin/",
         overrideItem: jasmine.createSpy(),
         clearOverride: jasmine.createSpy(),
         defineCustomContext: jasmine.createSpy(),
+        disablePlatformItem: jasmine.createSpy(),
+        enablePlatformItem: jasmine.createSpy(),
+        listDisabledPlatformItems: jasmine.createSpy(),
         enabled : true
     },
     mockedQnx = {
@@ -75,9 +79,9 @@ describe("com.blackberry.ui.contextmenu index", function () {
 
     it("can set the enabled property to false properly", function () {
         var args = {
-                enabled: false
-            },
-            env = {};
+            enabled: false
+        };
+
         contextmenu.enabled(null, null, args, env);
         expect(overlayWebView.contextMenu.enabled).toEqual(false);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
@@ -85,9 +89,8 @@ describe("com.blackberry.ui.contextmenu index", function () {
 
     it("can set and read the enabled property to true", function () {
         var args = {
-                enabled: true
-            },
-            env = {};
+            enabled: true
+        };
 
         contextmenu.enabled(null, null, args, env);
         expect(overlayWebView.contextMenu.enabled).toEqual(true);
@@ -96,16 +99,14 @@ describe("com.blackberry.ui.contextmenu index", function () {
 
     it("Will not set the property when incorrect parameters are passed", function () {
         var args = {
-                enabled: true
-            },
-            env = {};
+            enabled: true
+        };
 
         contextmenu.enabled(null, null, args, env);
         expect(mockedContextMenu.enabled).toEqual(true);
         args = {
             enabled: "false"
         };
-        env = {};
         expect(mockedContextMenu.enabled).toEqual(true);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
     });
@@ -113,9 +114,8 @@ describe("com.blackberry.ui.contextmenu index", function () {
     it("can add a custom menu item", function () {
         var args = {
                 contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'})),
+                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'}))
             },
-            env = {},
             expectedArgs = {
                 contexts: ['ALL'],
                 action: {actionId: 'explosion'},
@@ -128,10 +128,9 @@ describe("com.blackberry.ui.contextmenu index", function () {
 
     it("properly passes the sourceId from the handler back to the callback", function () {
         var args = {
-                contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                action: encodeURIComponent(JSON.stringify({actionId: 'explosion'})),
-            },
-            env = {};
+            contexts: encodeURIComponent(JSON.stringify(['ALL'])),
+            action: encodeURIComponent(JSON.stringify({actionId: 'explosion'}))
+        };
 
         contextmenu.addItem(null, null, args, env);
         expect(mockedPluginResult.callbackOk).toHaveBeenCalledWith("1", true);
@@ -141,9 +140,8 @@ describe("com.blackberry.ui.contextmenu index", function () {
         var id = 42,
             args = {
                 contexts: encodeURIComponent(JSON.stringify(['ALL'])),
-                actionId: encodeURIComponent(JSON.stringify(id)),
+                actionId: encodeURIComponent(JSON.stringify(id))
             },
-            env = {},
             expectedArgs = {
                 contexts: ['ALL'],
                 actionId: id
@@ -155,14 +153,13 @@ describe("com.blackberry.ui.contextmenu index", function () {
 
     it("can define a custom context", function () {
         var args = {
-                context: encodeURIComponent(JSON.stringify("myContext")),
-                options: encodeURIComponent(JSON.stringify({
-                    includeContextItems: ['IMAGE'],
-                    includePlatformItems: false,
-                    includeMenuServiceItems: false
-                })),
-            },
-            env = {};
+            context: encodeURIComponent(JSON.stringify("myContext")),
+            options: encodeURIComponent(JSON.stringify({
+                includeContextItems: ['IMAGE'],
+                includePlatformItems: false,
+                includeMenuServiceItems: false
+            }))
+        };
 
         contextmenu.defineCustomContext(null, null, args, env);
         expect(mockedContextMenu.defineCustomContext).toHaveBeenCalledWith("myContext", {
@@ -182,38 +179,56 @@ describe("com.blackberry.ui.contextmenu index", function () {
 
     it("can override a platform menu item", function () {
         var args = {
-                action: encodeURIComponent(JSON.stringify({actionId: 'Paste'}))
-            },
-            env = {};
+            action: encodeURIComponent(JSON.stringify({actionId: 'Paste'}))
+        };
         contextmenu.overrideItem(null, null, args, env);
         expect(mockedContextMenu.overrideItem).toHaveBeenCalledWith({ actionId: 'Paste'}, jasmine.any(Function));
     });
 
     it("can override a platform MenuService menu item", function () {
         var args = {
-                action: encodeURIComponent(JSON.stringify({actionId: 'MenuService-Share'}))
-            },
-            env = {};
+            action: encodeURIComponent(JSON.stringify({actionId: 'MenuService-Share'}))
+        };
         contextmenu.overrideItem(null, null, args, env);
         expect(mockedContextMenu.overrideItem).toHaveBeenCalledWith({ actionId: 'MenuService-Share'}, jasmine.any(Function));
     });
 
     it("can clear an overriden platform menu item", function () {
         var args = {
-                actionId: encodeURIComponent(JSON.stringify('Copy'))
-            },
-            env = {};
+            actionId: encodeURIComponent(JSON.stringify('Copy'))
+        };
         contextmenu.clearOverride(null, null, args, env);
         expect(mockedContextMenu.clearOverride).toHaveBeenCalledWith('Copy');
     });
 
     it("can clear an overriden menu item", function () {
         var args = {
-                actionId: encodeURIComponent(JSON.stringify('MenuService-Share'))
-            },
-            env = {};
+            actionId: encodeURIComponent(JSON.stringify('MenuService-Share'))
+        };
         contextmenu.clearOverride(null, null, args, env);
         expect(mockedContextMenu.clearOverride).toHaveBeenCalledWith('MenuService-Share');
     });
 
+    it("can disable a platform menu item", function () {
+        var args = {
+            actionId: encodeURIComponent(JSON.stringify('Paste')),
+            context: encodeURIComponent(JSON.stringify('INPUT'))
+        };
+        contextmenu.disablePlatformItem(null, null, args, env);
+        expect(mockedContextMenu.disablePlatformItem).toHaveBeenCalledWith(args.context, args.actionId);
+    });
+
+    it("can enable a disabled platform menu item", function () {
+        var args = {
+            actionId: encodeURIComponent(JSON.stringify('Paste')),
+            context: encodeURIComponent(JSON.stringify('INPUT'))
+        };
+        contextmenu.enablePlatformItem(null, null, args, env);
+        expect(mockedContextMenu.enablePlatformItem).toHaveBeenCalledWith(args.context, args.actionId);
+    });
+
+    it("can list all disabled platform menu items", function () {
+        contextmenu.listDisabledPlatformItems(null);
+        expect(mockedContextMenu.listDisabledPlatformItems).toHaveBeenCalled();
+    });
 });

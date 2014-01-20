@@ -109,6 +109,18 @@ contextmenu.defineCustomContext = function (customContext, options) {
     exec(function () {}, function () {}, _ID, 'defineCustomContext', {context: customContext, options: options});
 };
 
+contextmenu.disablePlatformItem = function (context, actionId) {
+    return exec(function () {}, function () {}, _ID, 'disablePlatformItem', {context: context, actionId: actionId});
+};
+
+contextmenu.enablePlatformItem = function (context, actionId) {
+    return exec(function () {}, function () {}, _ID, 'enablePlatformItem', {context: context, actionId: actionId});
+};
+
+contextmenu.listDisabledPlatformItems = function () {
+    return exec(function () {}, function () {}, _ID, 'listDisabledPlatformItems');
+};
+
 defineReadOnlyContext("ALL");
 defineReadOnlyContext("LINK");
 defineReadOnlyContext("IMAGE_LINK");
@@ -128,5 +140,6 @@ defineReadOnlyActions("SAVE_IMAGE", "SaveImage");
 defineReadOnlyActions("COPY_IMAGE_LINK", "CopyImageLink");
 defineReadOnlyActions("VIEW_IMAGE", "ViewImage");
 defineReadOnlyActions("INSPECT_ELEMENT", "InspectElement");
+defineReadOnlyActions("MENU_SERVICE", "MenuService");
 
 module.exports = contextmenu;
