@@ -25,7 +25,7 @@ var _ID = "com.blackberry.ui.cover",
         cover: {
             type: 'snapshot',
             capture: {}
-        },
+        }
     },
     events = ["entercover", "exitcover"],
     textLabels = [];

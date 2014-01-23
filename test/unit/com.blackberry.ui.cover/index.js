@@ -88,7 +88,7 @@ describe("index ui.cover", function () {
                     type: "file",
                     path: "/path/to/application/cover.jpg"
                 },
-                text: [{"label": "cover label", "size": 5, "wrap": true}],
+                text: [{"label": "cover label", "size": 5, "wrap": true}]
             };
         index.updateCover(success, fail, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
@@ -104,7 +104,7 @@ describe("index ui.cover", function () {
                     type: "file",
                     path: "file:///path/to/application/cover.jpg"
                 },
-                text: [{"label": "cover label", "size": 5, "wrap": true}],
+                text: [{"label": "cover label", "size": 5, "wrap": true}]
             };
         index.updateCover(success, fail, {cover: encodeURIComponent(JSON.stringify(fakeCover))}, null);
         expect(mockedPluginResult.ok).toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe("index ui.cover", function () {
                 type: "file",
                 path: "/path/to/application/cover.jpg"
             },
-            text: [{"label": "cover label", "size": 5, "wrap": true}],
+            text: [{"label": "cover label", "size": 5, "wrap": true}]
         });
     });
 

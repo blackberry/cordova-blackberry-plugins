@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 function validateIdMessageSettings(args) {
-    
+
     if (args.settings) {
         args.settings = JSON.parse(decodeURIComponent(args.settings));
     }
@@ -35,7 +35,7 @@ function validateIdMessageSettings(args) {
 var dialog,
     overlayWebView = require('../../lib/overlayWebView'),
     _webview = require("../../lib/webview");
-    
+
 module.exports = {
     customAskAsync: function (success, fail, args, env) {
         var pluginResult = new PluginResult(args, env),
@@ -80,7 +80,7 @@ module.exports = {
             pluginResult.error("message is undefined", false);
             return;
         }
-        
+
         if (args.type) {
             args.type = JSON.parse(decodeURIComponent(args.type));
         } else {
@@ -92,21 +92,21 @@ module.exports = {
             pluginResult.error("invalid dialog type: " + args.type, false);
             return;
         }
-        
+
         buttons = {
             0: "JavaScriptAlert",                       // D_OK
             1: ["Save", "Discard"],                     // D_SAVE
             2: ["Delete", "Cancel"],                    // D_DELETE
             3: ["Yes", "No"],                           // D_YES_NO
             4: "JavaScriptConfirm",                     // D_OK_CANCEL
-            5: "JavaScriptPrompt",                      // D_Prompt
+            5: "JavaScriptPrompt"                       // D_Prompt
         };
 
         if (!Array.isArray(buttons[args.type])) {
             messageObj = {
                 title : args.settings.title,
                 htmlmessage :  args.message,
-                dialogType : buttons[args.type],
+                dialogType : buttons[args.type]
             };
             overlayWebView.showDialog(messageObj, function (result) {
                 if (args.type === 0) {//Ok dialog
@@ -133,7 +133,7 @@ module.exports = {
                 htmlmessage :  args.message,
                 dialogType : "JavaScriptConfirm",
                 oklabel : buttons[args.type][0],
-                cancellabel : buttons[args.type][1],
+                cancellabel : buttons[args.type][1]
             };
             overlayWebView.showDialog(messageObj, function (result) {
                 if (result.ok) {
