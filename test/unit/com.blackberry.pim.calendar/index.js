@@ -189,7 +189,7 @@ describe("pim.calendar/index", function () {
                 "summary": "a test",
                 "location": "test",
                 "start": new Date("Jan 01, 2015, 12:00"),
-                "end": new Date("Jan 01, 2015, 12:30"),
+                "end": new Date("Jan 01, 2015, 12:30")
             }),
             args = {},
             key;

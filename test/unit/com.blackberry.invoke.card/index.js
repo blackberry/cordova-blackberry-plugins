@@ -93,7 +93,7 @@ describe("invoke.card index", function () {
                     },
                     getController: function () {
                         return mockedController;
-                    },
+                    }
                 }
             }
         };
@@ -236,14 +236,14 @@ describe("invoke.card index", function () {
                 body = "Body",
                 mockedArgs = {
                     "subject": subject,
-                    "body": body,
+                    "body": body
                 };
 
             index.invokeEmailComposer(successCB, null, {options: encodeURIComponent(JSON.stringify(mockedArgs))});
 
             expect(mockedEmailComposer.open).toHaveBeenCalledWith({
                     subject: decodeURIComponent(subject),
-                    body: decodeURIComponent(body),
+                    body: decodeURIComponent(body)
                 }, jasmine.any(Function), jasmine.any(Function), jasmine.any(Function));
             expect(mockedPluginResult.noResult).toHaveBeenCalledWith(true);
         });

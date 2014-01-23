@@ -32,7 +32,7 @@ describe("connection index", function () {
                 }
             }
         };
-        GLOBAL.window = { 
+        GLOBAL.window = {
             qnx: mockedQnx
         };
         mockedPluginResult = {
@@ -81,7 +81,7 @@ describe("connection index", function () {
                     'vpn': 'vpn',
                     'bb': 'rim-bb',
                     'unknown': 'unknown',
-                    'none': 'none',
+                    'none': 'none'
                 };
                 Object.getOwnPropertyNames(map).forEach(function (type) {
                     var success = jasmine.createSpy();

@@ -24,7 +24,7 @@ describe("sensor sensorEvents", function () {
             createObject: jasmine.createSpy().andReturn("1"),
             invoke: jasmine.createSpy().andReturn(2),
             registerEvents: jasmine.createSpy().andReturn(true),
-            Sensor: function () {},
+            Sensor: function () {}
         };
         sensorsEvents = require(_apiDir + "sensorsEvents");
     });
@@ -139,7 +139,7 @@ describe("sensor sensorEvents", function () {
             sensorsEvents.removeEventListener("devicelinearacceleration");
             expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "stopSensor " + "devicelinearacceleration");
         });
-        
+
         it("invokes JNEXT stopSensor for 'devicerotationmatrix' event", function () {
             sensorsEvents.removeEventListener("devicerotationmatrix");
             expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "stopSensor " + "devicerotationmatrix");
@@ -158,7 +158,7 @@ describe("sensor sensorEvents", function () {
         it("invokes JNEXT stopSensor for 'deviceholster' event", function () {
             sensorsEvents.removeEventListener("deviceholster");
             expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "stopSensor " + "deviceholster");
-        });        
+        });
     });
 });
 
