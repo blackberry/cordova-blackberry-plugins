@@ -39,6 +39,7 @@ describe('blackberry.ui.contextmenu', function () {
         expect(blackberry.ui.contextmenu.ACTION_SAVE_LINK_AS).toEqual("SaveLinkAs");
         expect(blackberry.ui.contextmenu.ACTION_VIEW_IMAGE).toEqual("ViewImage");
         expect(blackberry.ui.contextmenu.ACTION_SELECT).toEqual("Select");
+        expect(blackberry.ui.contextmenu.ACTION_MENU_SERVICE).toEqual("MenuService");
     });
 
 });
