@@ -67,7 +67,7 @@ _self.getVersion = function () {
 
 _self.registerProvider = function (provider) {
     var args = {
-            "provider": provider || {}
+            "provider": provider
         },
         obj,
         response = function (data) { obj = JSON.parse(data); };
@@ -79,7 +79,7 @@ _self.registerProvider = function (provider) {
 _self.setOption = function (option, value) {
 	var args = {
 			"option": option,
-			"value": value || {}
+			"value": value
 		},
 		obj,
 		response = function (data) { obj = JSON.parse(data); };
@@ -93,7 +93,7 @@ _self.getToken = function (idsProvider, tokenType, appliesTo, successCallback, f
 	var args = {
 		"provider": idsProvider,
 		"tokenType": tokenType,
-		"appliesTo": appliesTo || {}
+		"appliesTo": appliesTo
     };
 
 	exec(successCallback, failureCallback, _ID, "getToken", args);
@@ -104,7 +104,7 @@ _self.clearToken = function (idsProvider, tokenType, appliesTo, successCallback,
 	var args = {
 		"provider": idsProvider,
 		"tokenType": tokenType,
-		"appliesTo": appliesTo || {}
+		"appliesTo": appliesTo
     };
 
 	exec(successCallback, failureCallback, _ID, "clearToken", args);
@@ -114,7 +114,7 @@ _self.getProperties = function (idsProvider, propertyType, userProperties, succe
 	var args = {
 		"provider": idsProvider,
 		"propertyType": propertyType,
-		"userProperties": userProperties || {}
+		"userProperties": userProperties
     };
 
 	exec(successCallback, failureCallback, _ID, "getProperties", args);
@@ -125,7 +125,7 @@ _self.getData = function (idsProvider, dataType, dataFlags, dataName, successCal
 		"provider": idsProvider,
 		"dataType": dataType,
 		"dataFlags": dataFlags,
-		"dataName": dataName || {}
+		"dataName": dataName
     };
 
 	exec(successCallback, failureCallback, _ID, "getData", args);
@@ -137,7 +137,7 @@ _self.createData = function (idsProvider, dataType, dataFlags, dataName, dataVal
 		"dataType": dataType,
 		"dataFlags": dataFlags,
 		"dataName": dataName,
-		"dataValue": dataValue || {}
+		"dataValue": dataValue
     };
 
 	exec(successCallback, failureCallback, _ID, "createData", args);
@@ -148,7 +148,7 @@ _self.deleteData = function (idsProvider, dataType, dataFlags, dataName, success
 		"provider": idsProvider,
 		"dataType": dataType,
 		"dataFlags": dataFlags,
-		"dataName": dataName || {}
+		"dataName": dataName
     };
 	exec(successCallback, failureCallback, _ID, "deleteData", args);
 };
@@ -159,7 +159,7 @@ _self.setData = function (idsProvider, dataType, dataFlags, dataName, dataValue,
 		"dataType": dataType,
 		"dataFlags": dataFlags,
 		"dataName": dataName,
-		"dataValue": dataValue || {}
+		"dataValue": dataValue
     };
 
 	exec(successCallback, failureCallback, _ID, "setData", args);
@@ -169,7 +169,7 @@ _self.listData = function (idsProvider, dataType, dataFlags, successCallback, fa
 	var args = {
 		"provider": idsProvider,
 		"dataType": dataType,
-		"dataFlags": dataFlags || {}
+		"dataFlags": dataFlags
     };
 
 	exec(successCallback, failureCallback, _ID, "listData", args);
@@ -179,7 +179,7 @@ _self.challenge = function (idsProvider, challengeType, challengeFlags, successC
 	var args = {
 		"provider": idsProvider,
 		"challengeType": challengeType,
-		"challengeFlags": challengeFlags || {}
+		"challengeFlags": challengeFlags
     };
 
 	exec(successCallback, failureCallback, _ID, "challenge", args);
@@ -190,7 +190,7 @@ _self.registerNotifier = function (idsProvider, notifierType, notifierFlags, not
 		"provider": idsProvider,
 		"notifierType": notifierType,
 		"notifierFlags": notifierFlags,
-		"notifierName": notifierName || {}
+		"notifierName": notifierName
     };
 
 	exec(successCallback, failureCallback, _ID, "registerNotifier", args);
