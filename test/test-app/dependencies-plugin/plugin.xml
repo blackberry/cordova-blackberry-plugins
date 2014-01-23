@@ -19,25 +19,25 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0" id="com.blackberry.test-app-dependencies" version="1.0.0">
   <name>Test-App plugin to quickly pull in all cordova plugins</name>
-  <dependency id="com.blackberry.app" url="." subdir="/plugin/com.blackberry.app/"/>
-  <dependency id="com.blackberry.bbm.platform" url="." subdir="/plugin/com.blackberry.bbm.platform/"/>
-  <dependency id="com.blackberry.connection" url="." subdir="/plugin/com.blackberry.connection/"/>
-  <dependency id="com.blackberry.identity" url="." subdir="/plugin/com.blackberry.identity/"/>
-  <dependency id="com.blackberry.invoke" url="." subdir="/plugin/com.blackberry.invoke/"/>
-  <dependency id="com.blackberry.invoke.card" url="." subdir="/plugin/com.blackberry.invoke.card/"/>
-  <dependency id="com.blackberry.invoked" url="." subdir="/plugin/com.blackberry.invoked/"/>
-  <dependency id="com.blackberry.io" url="." subdir="/plugin/com.blackberry.io/"/>
-  <dependency id="com.blackberry.io.filetransfer" url="." subdir="/plugin/com.blackberry.io.filetransfer/"/>
-  <dependency id="com.blackberry.notification" url="." subdir="/plugin/com.blackberry.notification/"/>
-  <dependency id="com.blackberry.payment" url="." subdir="/plugin/com.blackberry.payment/"/>
-  <dependency id="com.blackberry.pim.calendar" url="." subdir="/plugin/com.blackberry.pim.calendar/"/>
-  <dependency id="com.blackberry.pim.contacts" url="." subdir="/plugin/com.blackberry.pim.contacts/"/>
-  <dependency id="com.blackberry.push" url="." subdir="/plugin/com.blackberry.push/"/>
-  <dependency id="com.blackberry.sensors" url="." subdir="/plugin/com.blackberry.sensors/"/>
-  <dependency id="com.blackberry.system" url="." subdir="/plugin/com.blackberry.system/"/>
-  <dependency id="com.blackberry.ui.contextmenu" url="." subdir="/plugin/com.blackberry.ui.contextmenu/"/>
-  <dependency id="com.blackberry.ui.cover" url="." subdir="/plugin/com.blackberry.ui.cover/"/>
-  <dependency id="com.blackberry.ui.dialog" url="." subdir="/plugin/com.blackberry.ui.dialog/"/>
-  <dependency id="com.blackberry.ui.toast" url="." subdir="/plugin/com.blackberry.ui.toast/"/>
-  <dependency id="com.blackberry.user.identity" url="." subdir="/plugin/com.blackberry.user.identity/"/>
+  <dependency id="com.blackberry.app" />
+  <dependency id="com.blackberry.bbm.platform" />
+  <dependency id="com.blackberry.connection" />
+  <dependency id="com.blackberry.identity" />
+  <dependency id="com.blackberry.invoke" />
+  <dependency id="com.blackberry.invoke.card" />
+  <dependency id="com.blackberry.invoked" />
+  <dependency id="com.blackberry.io" />
+  <dependency id="com.blackberry.io.filetransfer" />
+  <dependency id="com.blackberry.notification" />
+  <dependency id="com.blackberry.payment" />
+  <dependency id="com.blackberry.pim.calendar" />
+  <dependency id="com.blackberry.pim.contacts" />
+  <dependency id="com.blackberry.push" />
+  <dependency id="com.blackberry.sensors" />
+  <dependency id="com.blackberry.system" />
+  <dependency id="com.blackberry.ui.contextmenu" />
+  <dependency id="com.blackberry.ui.cover" />
+  <dependency id="com.blackberry.ui.dialog" />
+  <dependency id="com.blackberry.ui.toast" />
+  <dependency id="com.blackberry.user.identity" />
 </plugin>
