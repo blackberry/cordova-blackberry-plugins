@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -108,7 +108,11 @@ describe("pim.calendar/index", function () {
             failCb = jasmine.createSpy(),
             findOptions = {
                 limit: 5,
-                detail: CalendarFindOptions.DETAIL_AGENDA
+                detail: CalendarFindOptions.DETAIL_AGENDA,
+                sort: [{
+                    fieldName: 2,
+                    desc: false
+                }]
             },
             args = {
                 options: encodeURIComponent(JSON.stringify(findOptions))
@@ -131,11 +135,11 @@ describe("pim.calendar/index", function () {
     it("find - without correct permission specified", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
-            findOptions = {   
+            findOptions = {
                 filter: [{
                     fieldName: CalendarFindOptions.SEARCH_FIELD_GIVEN_NAME,
                     fieldValue: "John"
-                }], 
+                }],
                 limit: 5
             };
 
@@ -247,7 +251,7 @@ describe("pim.calendar/index", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
             args = {};
- 
+
         spyOn(utils, "hasPermission").andReturn(false);
 
         index.getDefaultCalendarAccount(successCb, failCb, args);
@@ -288,7 +292,7 @@ describe("pim.calendar/index", function () {
         var successCb = jasmine.createSpy(),
             failCb = jasmine.createSpy(),
             args = {};
- 
+
         spyOn(utils, "hasPermission").andReturn(true);
 
         index.getCalendarAccounts(successCb, failCb, args);
@@ -306,7 +310,7 @@ describe("pim.calendar/index", function () {
                 eventId: encodeURIComponent(JSON.stringify("123")),
                 accountId: encodeURIComponent(JSON.stringify("1"))
             };
- 
+
         spyOn(utils, "hasPermission").andReturn(false);
 
         index.getEvent(successCb, failCb, args);
@@ -342,7 +346,7 @@ describe("pim.calendar/index", function () {
             failCb = jasmine.createSpy();
 
         spyOn(utils, "hasPermission").andReturn(true);
- 
+
         index.getDefaultCalendarFolder(successCb, failCb, {});
         expect(JNEXT.invoke).toHaveBeenCalledWith(mockJnextObjId, "getDefaultCalendarFolder");
         expect(mockedPluginResult.ok).toHaveBeenCalled();
