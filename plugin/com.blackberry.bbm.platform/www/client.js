@@ -174,7 +174,7 @@ _self.users.inviteToDownload = function () {
     return getFieldValue("users/inviteToDownload");
 };
 
-_self.uesrs.getContactsWithApp = function (callback) {
+_self.users.getContactsWithApp = function (callback) {
     var handler = createEventHandler(callback);
     return exec(handler.onSuccess, handler.onError, _ID, "users/getContactsWithApp", args);
 };

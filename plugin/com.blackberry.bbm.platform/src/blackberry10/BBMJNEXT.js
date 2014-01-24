@@ -107,7 +107,7 @@ JNEXT.BBM = function ()
 
     _self.self.profilebox.getItemIcon = function (options, pluginResult) {
         _self.profileBoxGetItemIconHandlers.push(pluginResult);
-        return JNEXT.invoke(_self.m_id, "self.profilebox.getItemIcon " JSON.stringify(options));
+        return JNEXT.invoke(_self.m_id, "self.profilebox.getItemIcon " + JSON.stringify(options));
     };
 
     _self.self.profilebox.getItems = function () {
