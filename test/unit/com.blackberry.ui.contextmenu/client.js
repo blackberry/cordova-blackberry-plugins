@@ -58,7 +58,6 @@ describe("com.blackberry.ui.contextmenu client", function () {
         expect(client.CONTEXT_LINK).toEqual("LINK");
         expect(client.CONTEXT_INPUT).toEqual("INPUT");
         expect(client.CONTEXT_TEXT).toEqual("TEXT");
-        expect(client.ACTION_MENU_SERVICE).toEqual("MenuService");
     });
 
     it('expect context menu action Ids to be defined properly', function () {
@@ -74,6 +73,7 @@ describe("com.blackberry.ui.contextmenu client", function () {
         expect(client.ACTION_SAVE_LINK_AS).toEqual("SaveLinkAs");
         expect(client.ACTION_VIEW_IMAGE).toEqual("ViewImage");
         expect(client.ACTION_SELECT).toEqual("Select");
+        expect(client.ACTION_MENU_SERVICE).toEqual("MenuService");
     });
 
     it("Cannot add a menu item without a context", function () {
