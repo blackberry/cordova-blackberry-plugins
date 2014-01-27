@@ -350,6 +350,16 @@ describe("bbm.platform index", function () {
             expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
             expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "users.inviteToDownload");
         });
+
+        it("calls users getContactsWithApp", function () {
+            var success = jasmine.createSpy("success"),
+                fail = jasmine.createSpy("fail");
+
+            index.users.getContactsWithApp(success, fail, null);
+            expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
+            expect(MockPluginResult.prototype.error).not.toHaveBeenCalled();
+            expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "users.getContactsWithApp");
+        });
     });
 
     describe("bbm platform events", function () {

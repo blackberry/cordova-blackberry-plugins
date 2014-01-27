@@ -130,6 +130,17 @@ describe("bbm.platform client", function () {
             expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/registerIcon", args);
         });
 
+        it("getItemIcon calls exec", function () {
+            var args = {
+                    options : {
+                        iconId : 123
+                    }
+                };
+
+            client.self.profilebox.getItemIcon(args.options);
+            expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "self/profilebox/getItemIcon", args);
+        });
+
         it("accessible property calls exec", function () {
             var accessible = client.self.profilebox.accessible;
             accessible = accessible;
