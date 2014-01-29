@@ -1,4 +1,4 @@
-#BlackBerry 10 Cordova Plugins
+#QNX CAR Cordova Plugins
 This repo contains plugins for Apache Cordova that expose functionality of QNX CAR.
 
 ##Prerequisites
@@ -27,7 +27,4 @@ Extensions are all under the plugin/ folder. An extension must at least contain 
 
 If your extension requires native C/C++ code, a native JNEXT extension is needed.
 
-There is sample:  https://github.com/blackberry/WebWorks-Community-APIs/tree/master/BB10/TEMPLATE.
-
-For detailed docs please visit
-https://developer.blackberry.com/html5/documentation/creating_extensions_for_bb10_apps.html
+For more information, please consult the "Creating Your Own Cordova Plugin" in the HTML5 Developer's Guide that is distributed as part of the QNX SDK for Apps and Media documentation.
