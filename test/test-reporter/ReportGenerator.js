@@ -167,7 +167,7 @@ function generateReport(testResult) {
     var i,
         summary,
         testSummary = reportDocument.getElementById('TestSummary'),
-        hardwareID = testResult.HardwareID.toLowerCase(),
+        hardwareID = testResult.HardwareID,
         module = hardwareID;
 
     summary = "<pre>" +
