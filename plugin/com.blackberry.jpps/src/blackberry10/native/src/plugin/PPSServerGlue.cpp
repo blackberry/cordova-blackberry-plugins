@@ -10,7 +10,7 @@
 
 #include <sstream>
 
-#include <ppsparse.h>
+#include <sys/pps.h>
 #include <fcntl.h>
 
 namespace jpps {
