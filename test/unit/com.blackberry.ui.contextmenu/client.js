@@ -31,7 +31,10 @@ describe("com.blackberry.ui.contextmenu client", function () {
             }),
             require: function () {
                 return cordova.exec;
-            }
+            },
+            addDocumentEventHandler: jasmine.createSpy().andReturn({
+                onHasSubscribersChange: jasmine.createSpy()
+            })
         };
         client = require(_apiDir + "/www/client");
     });
