@@ -19,7 +19,27 @@
 
 var contextmenu = {},
     exec = cordova.require("cordova/exec"),
-    _ID = "com.blackberry.ui.contextmenu";
+    _ID = "com.blackberry.ui.contextmenu",
+    noop = function () {},
+    events = ["contextmenuhidden"];
+
+events.map(function (eventName) {
+    var channel = cordova.addDocumentEventHandler(eventName),
+        success = function (data) {
+            channel.fire(data);
+        },
+        fail = function (error) {
+            console.log("Error initializing " + eventName + " listener: ", error);
+        };
+
+    channel.onHasSubscribersChange = function () {
+        if (this.numHandlers === 1) {
+            exec(success, fail, _ID, "startEvent", {eventName: eventName});
+        } else if (this.numHandlers === 0) {
+            exec(noop, noop, _ID, "stopEvent", {eventName: eventName});
+        }
+    };
+});
 
 function defineReadOnlyContext(field) {
     Object.defineProperty(contextmenu, "CONTEXT_" + field, {"value": field, "writable": false});

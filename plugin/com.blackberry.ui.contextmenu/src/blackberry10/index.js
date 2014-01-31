@@ -19,8 +19,13 @@ var LIB_FOLDER = "../../lib/",
     _overlayWebView,
     _utils = require(LIB_FOLDER + 'utils'),
     _listeners = {},
-    _events = {
-        "contextmenu.hidden": true
+    _actionMap = {
+        contextmenuhidden: {
+            event: "contextmenu.hidden",
+            trigger: function (pluginResult) {
+                pluginResult.callbackOk(undefined, true);
+            }
+        }
     };
 
 function enabled(success, fail, args, env) {
@@ -115,7 +120,7 @@ function startEvent(success, fail, args, env) {
         systemEvent = _actionMap[eventName].event,
         listener = _actionMap[eventName].trigger.bind(null, result);
 
-    if (!(eventName in _events)) {
+    if (!systemEvent) {
         return;
     }
 
@@ -142,7 +147,7 @@ function stopEvent(success, fail, args, env) {
         context = _actionMap[eventName].context,
         systemEvent = _actionMap[eventName].event;
 
-    if (!(eventName in _events)) {
+    if (!systemEvent) {
         return;
     }
 
