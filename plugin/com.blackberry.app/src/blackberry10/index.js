@@ -23,7 +23,7 @@ var _config = require("./../../lib/config"),
             event: "swipedown",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         orientationchange : {
             //special case, handled in add
@@ -34,38 +34,44 @@ var _config = require("./../../lib/config"),
             event: "keyboardOpening",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardopened: {
             event: "keyboardOpened",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardclosing: {
             event: "keyboardClosing",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardclosed: {
             event: "keyboardClosed",
             trigger: function (pluginResult) {
                 pluginResult.callbackOk(undefined, true);
-            } 
+            }
         },
         keyboardposition: {
             event: "keyboardPosition",
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(JSON.parse(obj), true);
-            } 
+            }
         },
         windowstatechanged: {
             event: "stateChange",
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(obj, true);
-            } 
-        }
+            }
+        },
+        unhandledkeyinput: {
+            event: "UnhandledKeyInput",
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk(JSON.parse(obj), true);
+            }
+        },
     };
 
 function angleToOrientation(angle) {
@@ -126,7 +132,7 @@ function translateToDeviceOrientation(orientation) {
         return 'right_up';
 
     default:
-        return 'unknown';    
+        return 'unknown';
     }
 }
 
@@ -156,6 +162,8 @@ module.exports = {
             if (eventName === "orientationchange") {
                 _appEvents.removeEventListener("rotate", _listeners[eventName][env.webview.id][0]);
                 _appEvents.removeEventListener("rotateWhenLocked", _listeners[eventName][env.webview.id][1]);
+            } else if (eventName === "unhandledkeyinput") {
+                env.webview.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
             } else {
                 _appEvents.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
             }
@@ -165,6 +173,8 @@ module.exports = {
             listener = [rotateTrigger.bind(null, result), rotateWhenLockedTrigger.bind(null, result)];
             _appEvents.addEventListener("rotate", listener[0]);
             _appEvents.addEventListener("rotateWhenLocked", listener[1]);
+        } else if (eventName === "unhandledkeyinput") {
+            env.webview.addEventListener(systemEvent, listener);
         } else {
             _appEvents.addEventListener(systemEvent, listener);
         }
@@ -184,6 +194,8 @@ module.exports = {
             if (eventName  === "orientationchange") {
                 _appEvents.removeEventListener("rotate", listener[0]);
                 _appEvents.removeEventListener("rotateWhenLocked", listener[1]);
+            } else if (eventName === "unhandledkeyinput") {
+                env.webview.removeEventListener(systemEvent, listener);
             } else {
                 _appEvents.removeEventListener(systemEvent, listener);
             }
@@ -191,7 +203,7 @@ module.exports = {
             result.noResult(false);
         }
     },
-   
+
     getReadOnlyFields : function (success, fail, args, env) {
         var result = new PluginResult(args, env),
             ro = {
