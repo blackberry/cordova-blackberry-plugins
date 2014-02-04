@@ -22,9 +22,17 @@ var root = __dirname + "/../../../../",
 describe("ui.toast", function () {
     beforeEach(function () {
         GLOBAL.cordova = {
-            exec: jasmine.createSpy("exec"),
-            require: function () {
-                return cordova.exec;
+            exec: jasmine.createSpy("cordova.exec"),
+            execSync: jasmine.createSpy("cordova.execSync"),
+            unexpectedModule: jasmine.createSpy("cordova.unexpectedModule"),
+            require: function (module) {
+                if (module === 'cordova/exec') {
+                    return cordova.exec;
+                }
+                if (module === 'cordova/execSync') {
+                    return cordova.execSync;
+                }
+                return cordova.unexpectedModule;
             }
         };
         client = require(apiDir + "/www/client");
@@ -39,7 +47,7 @@ describe("ui.toast", function () {
         var message = "this is a simple toast";
 
         client.show(message);
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message });
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message }, true);
     });
 
     it("creates a complex toast with click and dismiss handlers", function () {
@@ -49,7 +57,7 @@ describe("ui.toast", function () {
             dismissCallback = jasmine.createSpy();
 
         client.show(message, { buttonText : buttonText, buttonCallback : buttonCallback, dismissCallback: dismissCallback});
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: { buttonText : buttonText, buttonCallback : buttonCallback, dismissCallback: dismissCallback}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: { buttonText : buttonText, buttonCallback : buttonCallback, dismissCallback: dismissCallback}}, true);
     });
 
     it("creates a complex toast with only click handler", function () {
@@ -58,7 +66,7 @@ describe("ui.toast", function () {
             buttonCallback = jasmine.createSpy();
 
         client.show(message,  {buttonText : buttonText, buttonCallback : buttonCallback});
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {  buttonText : buttonText, buttonCallback : buttonCallback}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {  buttonText : buttonText, buttonCallback : buttonCallback}}, true);
     });
 
     it("creates a complex toast with only dismiss handler", function () {
@@ -67,7 +75,7 @@ describe("ui.toast", function () {
             dismissCallback = jasmine.createSpy();
 
         client.show(message,  {buttonText : buttonText, dismissCallback : dismissCallback});
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message : message, options: {buttonText : buttonText, dismissCallback : dismissCallback}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message : message, options: {buttonText : buttonText, dismissCallback : dismissCallback}}, true);
     });
 
     it("creates a complex toast with no handlers", function () {
@@ -75,6 +83,6 @@ describe("ui.toast", function () {
             buttonText = "button!";
 
         client.show(message, {buttonText : buttonText});
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {buttonText: buttonText}});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "show", { message: message, options: {buttonText: buttonText}}, true);
     });
 });

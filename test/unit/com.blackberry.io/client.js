@@ -38,8 +38,16 @@ var _extDir = __dirname + "/../../../plugin",
                 }
             }
         }),
-        require: function () {
-            return cordova.exec;
+        execSync: jasmine.createSpy("cordova.execSync"),
+        unexpectedModule: jasmine.createSpy("cordova.unexpectedModule"),
+        require: function (module) {
+            if (module === 'cordova/exec') {
+                return cordova.exec;
+            }
+            if (module === 'cordova/execSync') {
+                return cordova.execSync;
+            }
+            return cordova.unexpectedModule;
         }
     };
 
@@ -57,7 +65,7 @@ describe("io client", function () {
 
     it("sandbox getter calls exec", function () {
         expect(client.sandbox).toEqual(false);
-        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sandbox");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sandbox", undefined, true);
     });
 
     it("sandbox setter calls exec", function () {
@@ -68,16 +76,16 @@ describe("io client", function () {
 
     it("home calls exec", function () {
         expect(client.home).toEqual("/home");
-        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "home");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "home", undefined, true);
     });
 
     it("sharedFolder calls exec", function () {
         expect(client.sharedFolder).toEqual("/shared");
-        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sharedFolder");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "sharedFolder", undefined, true);
     });
 
     it("SDCard calls exec", function () {
         expect(client.SDCard).toEqual("/sdcard");
-        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "SDCard");
+        expect(mockedCordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "SDCard", undefined, true);
     });
 });

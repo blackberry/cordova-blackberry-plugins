@@ -19,6 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     ID = "com.blackberry.app",
     readOnlyValues,
     noop = function () {},
@@ -59,7 +60,7 @@ function getReadOnlyFields() {
             throw data;
         };
     if (!readOnlyValues) {
-        exec(success, fail, ID, "getReadOnlyFields", null);
+        execSync(success, fail, ID, "getReadOnlyFields", undefined, true);
     }
 }
 
@@ -94,7 +95,7 @@ Object.defineProperty(_self, "orientation", {
             };
 
         try {
-            exec(success, fail, ID, "currentOrientation");
+            execSync(success, fail, ID, "currentOrientation", undefined, true);
         } catch (e) {
             console.error(e);
         }
@@ -113,7 +114,7 @@ Object.defineProperty(_self, "windowState", {
             };
 
         try {
-            exec(success, fail, ID, "windowState");
+            execSync(success, fail, ID, "windowState", undefined, true);
         } catch (e) {
             console.error(e);
         }

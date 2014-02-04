@@ -35,15 +35,23 @@ describe("system client", function () {
         };
 
         GLOBAL.cordova = {
+            exec: jasmine.createSpy("cordova.exec"),
+            execSync: jasmine.createSpy("cordova.execSync"),
+            unexpectedModule: jasmine.createSpy("cordova.unexpectedModule"),
+            require: function (module) {
+                if (module === 'cordova/exec') {
+                    return cordova.exec;
+                }
+                if (module === 'cordova/execSync') {
+                    return cordova.execSync;
+                }
+                return cordova.unexpectedModule;
+            },
             addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
                 channelRegistry[eventName] = new MockedChannel();
                 return channelRegistry[eventName];
             }),
-            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent"),
-            exec: jasmine.createSpy("cordova.exec"),
-            require: function () {
-                return cordova.exec;
-            }
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent")
         };
 
         sysClient = require(apiDir + "/www/client");
@@ -85,7 +93,7 @@ describe("system client", function () {
 
         result = sysClient.hasCapability("abc.def");
 
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "hasCapability", {"capability": "abc.def"});
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "hasCapability", {"capability": "abc.def"}, true);
         expect(result).toBeTruthy();
     });
 
@@ -98,7 +106,7 @@ describe("system client", function () {
 
         result = sysClient.getFontInfo();
 
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getFontInfo", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getFontInfo", undefined, true);
         expect(result).toBeTruthy();
     });
 
@@ -111,7 +119,7 @@ describe("system client", function () {
 
         result = sysClient.getCurrentTimezone();
 
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getCurrentTimezone", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getCurrentTimezone", undefined, true);
         expect(result).toBe("America/New_York");
     });
 
@@ -125,7 +133,7 @@ describe("system client", function () {
 
         result = sysClient.getTimezones();
 
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getTimezones", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "getTimezones", undefined, true);
         expect(result).toBe(timezones);
     });
 
@@ -143,7 +151,7 @@ describe("system client", function () {
         });
 
         expect(sysClient.deviceLockedStatus).toEqual("notLocked");
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "deviceLockedStatus", undefined);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "deviceLockedStatus", undefined, true);
     });
 
     describe("device properties and ReadOnlyFields", function () {
@@ -192,7 +200,7 @@ describe("system client", function () {
 
             it("region", function () {
                 expect(sysClient.region).toEqual("en_US");
-                expect(cordova.exec.argsForCall).toContain([jasmine.any(Function), jasmine.any(Function), ID, "region", undefined]);
+                expect(cordova.exec.argsForCall).toContain([jasmine.any(Function), jasmine.any(Function), ID, "region", undefined, true]);
             });
         });
 

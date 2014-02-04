@@ -40,14 +40,22 @@ describe("sensors", function () {
                     success(["abc"]);
                 }
             }),
+            execSync: jasmine.createSpy("cordova.execSync"),
+            unexpectedModule: jasmine.createSpy("cordova.unexpectedModule"),
+            require: function (module) {
+                if (module === 'cordova/exec') {
+                    return cordova.exec;
+                }
+                if (module === 'cordova/execSync') {
+                    return cordova.execSync;
+                }
+                return cordova.unexpectedModule;
+            },
             addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
                 channelRegistry[eventName] = new MockedChannel();
                 return channelRegistry[eventName];
             }),
-            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent"),
-            require: function () {
-                return cordova.exec;
-            }
+            fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent")
         };
         client = require(_apiDir + "/www/client");
     });
@@ -84,7 +92,7 @@ describe("sensors", function () {
     describe("setOptions", function () {
         it("calls exec", function () {
             client.setOptions("devicecompass", { delay : 1000 });
-            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "setOptions", { options : { delay : 1000, sensor : "devicecompass" } });
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "setOptions", { options : { delay : 1000, sensor : "devicecompass" } }, true);
         });
     });
 
@@ -93,7 +101,7 @@ describe("sensors", function () {
             var supportedSensors;
 
             supportedSensors = client.supportedSensors;
-            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "supportedSensors");
+            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "supportedSensors", undefined, true);
             // make sure it only gets called once
             supportedSensors = client.supportedSensors;
             expect(cordova.exec.callCount).toEqual(1);

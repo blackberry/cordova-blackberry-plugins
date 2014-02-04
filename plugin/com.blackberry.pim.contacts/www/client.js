@@ -15,6 +15,7 @@
  */
  
 var exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     _self = {},
     _ID = "com.blackberry.pim.contacts",
     contactConsts = require("./contactConsts"),
@@ -95,9 +96,9 @@ _self.getContact = function (contactId) {
             throw data;
         };
 
-    exec(success, fail, _ID, "getContact", {
+    execSync(success, fail, _ID, "getContact", {
         "contactId": contactId
-    });
+    }, true);
 
     if (obj) {
         contactUtils.populateContact(obj);
@@ -189,7 +190,7 @@ _self.getContactAccounts = function () {
         },
         accounts = [];
 
-    exec(success, fail, _ID, "getContactAccounts");
+    execSync(success, fail, _ID, "getContactAccounts", undefined, true);
 
     obj.forEach(function (account) {
         accounts.push(new ContactAccount(account));

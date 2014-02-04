@@ -19,7 +19,8 @@
 
 var io = {},
     ID = "com.blackberry.io",
-    exec = cordova.require("cordova/exec");
+    exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec");
 
 function getFieldValue(field) {
     var value,
@@ -31,7 +32,7 @@ function getFieldValue(field) {
         };
 
     try {
-        exec(success, fail, ID, field);
+        execSync(success, fail, ID, field, undefined, true);
     } catch (e) {
         console.error(e);
     }

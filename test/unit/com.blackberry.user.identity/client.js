@@ -27,10 +27,18 @@ describe("user.identity client", function () {
     beforeEach(function () {
         anyFunct = jasmine.any(Function);
         GLOBAL.cordova = {
-            require: function () {
-                return cordova.exec;
-            },
-            exec: jasmine.createSpy("cordova.exec")
+            exec: jasmine.createSpy("cordova.exec"),
+            execSync: jasmine.createSpy("cordova.execSync"),
+            unexpectedModule: jasmine.createSpy("cordova.unexpectedModule"),
+            require: function (module) {
+                if (module === 'cordova/exec') {
+                    return cordova.exec;
+                }
+                if (module === 'cordova/execSync') {
+                    return cordova.execSync;
+                }
+                return cordova.unexpectedModule;
+            }
         };
         client = require(_apiDir + "/www/client");
     });
@@ -42,28 +50,28 @@ describe("user.identity client", function () {
         anyFunct = null;
     });
 
-    it("getVersion calls exec", function () {
+    it("getVersion calls execSync", function () {
         client.getVersion();
-        expect(cordova.exec).toHaveBeenCalledWith(anyFunct, anyFunct, _ID, "getVersion");
+        expect(cordova.exec).toHaveBeenCalledWith(anyFunct, anyFunct, _ID, "getVersion", undefined, true);
     });
 
-    it("registerProvider calls exec", function () {
+    it("registerProvider calls execSync", function () {
         var args = {
                 provider: "ids:rim:bbid"
             };
 
         client.registerProvider(args.provider);
-        expect(cordova.exec).toHaveBeenCalledWith(anyFunct, anyFunct, _ID, "registerProvider", args);
+        expect(cordova.exec).toHaveBeenCalledWith(anyFunct, anyFunct, _ID, "registerProvider", args, true);
     });
 
-    it("setOption calls exec", function () {
+    it("setOption calls execSync", function () {
         var args = {
                 option: 0,
                 value: true
             };
 
         client.setOption(args.option, args.value);
-        expect(cordova.exec).toHaveBeenCalledWith(anyFunct, anyFunct, _ID, "setOption", args);
+        expect(cordova.exec).toHaveBeenCalledWith(anyFunct, anyFunct, _ID, "setOption", args, true);
     });
 
     it("getToken calls exec", function () {

@@ -19,6 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     _ID = "com.blackberry.payment";
 
 function getFieldValue(field) {
@@ -30,7 +31,7 @@ function getFieldValue(field) {
             throw data;
         };
     try {
-        exec(success, fail, _ID, field);
+        execSync(success, fail, _ID, field, undefined, true);
     } catch (e) {
         console.error(e);
     }

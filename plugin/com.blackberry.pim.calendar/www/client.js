@@ -25,6 +25,7 @@
  */
 
 var exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     _self = {},
     _ID = "com.blackberry.pim.calendar",
     CalendarEvent = require("./CalendarEvent"),
@@ -79,7 +80,7 @@ _self.getCalendarAccounts = function () {
         },
         accounts = [];
 
-    exec(success, fail, _ID, "getCalendarAccounts");
+    execSync(success, fail, _ID, "getCalendarAccounts", undefined, true);
 
     obj.forEach(function (account) {
         accounts.push(new CalendarAccount(account));
@@ -97,7 +98,7 @@ _self.getDefaultCalendarAccount = function () {
             throw data;
         };
 
-    exec(success, fail, _ID, "getDefaultCalendarAccount");
+    execSync(success, fail, _ID, "getDefaultCalendarAccount", null, true);
 
     // not a valid account - default account not accessible by app
     if (!obj || parseInt(obj.id, 10) <= 0) {
@@ -117,7 +118,7 @@ _self.getCalendarFolders = function () {
         },
         folders = [];
 
-    exec(success, fail, _ID, "getCalendarFolders");
+    execSync(success, fail, _ID, "getCalendarFolders", null, true);
 
     obj.forEach(function (props) {
         folders.push(new CalendarFolder(props));
@@ -135,7 +136,7 @@ _self.getDefaultCalendarFolder = function () {
             throw data;
         };
 
-    exec(success, fail, _ID, "getDefaultCalendarFolder");
+    execSync(success, fail, _ID, "getDefaultCalendarFolder", null, true);
 
     // not a valid folder - default folder not accessible by app
     if (!obj || obj.type <= 0) {
@@ -159,10 +160,10 @@ _self.getEvent = function (eventId, folder) {
         };
 
 
-    exec(success, fail, _ID, "getEvent", {
+    execSync(success, fail, _ID, "getEvent", {
         "eventId": eventId,
         "accountId": folder.accountId
-    });
+    }, null, true);
 
     if (obj) {
         return new CalendarEvent(calendarUtils.populateEvent(obj));

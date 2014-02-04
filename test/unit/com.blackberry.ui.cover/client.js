@@ -38,9 +38,17 @@ describe("client ui.cover", function () {
             };
         };
         GLOBAL.cordova = {
-            exec: jasmine.createSpy("exec"),
-            require: function () {
-                return cordova.exec;
+            exec: jasmine.createSpy("cordova.exec"),
+            execSync: jasmine.createSpy("cordova.execSync"),
+            unexpectedModule: jasmine.createSpy("cordova.unexpectedModule"),
+            require: function (module) {
+                if (module === 'cordova/exec') {
+                    return cordova.exec;
+                }
+                if (module === 'cordova/execSync') {
+                    return cordova.execSync;
+                }
+                return cordova.unexpectedModule;
             },
             addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {
                 channelRegistry[eventName] = new MockedChannel();
@@ -72,7 +80,7 @@ describe("client ui.cover", function () {
 
     it("coverSize calls exec with the correct parameters", function () {
         expect(client.coverSize).toEqual(undefined);
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "coverSize");
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "coverSize", undefined, true);
     });
 
     it("updateCover calls exec with the correct parameters", function () {

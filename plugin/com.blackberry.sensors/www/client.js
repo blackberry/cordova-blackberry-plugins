@@ -21,7 +21,8 @@ var _self = {},
     _ID = "com.blackberry.sensors",
     sensorArray = null,
     noop = function () {},
-    execFunc = cordova.require("cordova/exec"),
+    exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     events = ["deviceaccelerometer", "devicemagnetometer", "devicegyroscope", "devicecompass",
               "deviceproximity", "devicelight", "devicegravity", "devicerotationmatrix",
               "deviceorientation", "deviceazimuthpitchroll", "deviceholster", "devicelinearacceleration"],
@@ -36,9 +37,9 @@ var _self = {},
 
         channel.onHasSubscribersChange = function () {
             if (this.numHandlers === 1) {
-                execFunc(success, fail, _ID, "startEvent", {eventName: eventName});
+                exec(success, fail, _ID, "startEvent", {eventName: eventName});
             } else if (this.numHandlers === 0) {
-                execFunc(noop, noop, _ID, "stopEvent", {eventName: eventName});
+                exec(noop, noop, _ID, "stopEvent", {eventName: eventName});
             }
         };
         return channel;
@@ -54,7 +55,7 @@ Object.defineProperty(_self, "supportedSensors", {
             };
 
         if (sensorArray === null) {
-            execFunc(success, fail, _ID, "supportedSensors");
+            execSync(success, fail, _ID, "supportedSensors", undefined, true);
         }
         return sensorArray;
     }
@@ -70,7 +71,7 @@ _self.setOptions = function (sensor, options) {
             throw data;
         };
     args.options.sensor = sensor;
-    execFunc(success, fail, _ID, "setOptions", args);
+    execSync(success, fail, _ID, "setOptions", args, true);
     return result;
 };
 

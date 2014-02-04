@@ -18,6 +18,7 @@ var _self = {},
     _ID = "com.blackberry.user.identity",
     noop = function () {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     IDS_FAILURE = -1,  /*!< Indicates that the IDS API call function did not complete
 							successfully.  Often the application can get
 							additional information by checking the value of
@@ -63,7 +64,7 @@ _self.getVersion = function () {
             version = data;
         };
 
-	exec(response, noop, _ID, "getVersion");
+	execSync(response, noop, _ID, "getVersion", undefined, true);
 	return version;
 };
 
@@ -76,7 +77,7 @@ _self.registerProvider = function (provider) {
             obj = JSON.parse(data);
         };
 
-	exec(response, noop, _ID, "registerProvider", args);
+	execSync(response, noop, _ID, "registerProvider", args, true);
 	return obj;
 };
 
@@ -90,7 +91,7 @@ _self.setOption = function (option, value) {
             obj = JSON.parse(data);
         };
 
-	exec(response, noop, _ID, "setOption", args);
+	execSync(response, noop, _ID, "setOption", args, true);
 	return obj;
 };
 
