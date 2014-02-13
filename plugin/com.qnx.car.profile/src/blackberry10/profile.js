@@ -229,7 +229,9 @@ module.exports = {
 	 */
 	addToNavigationHistory: function(profileId, location) {
 		var timestamp = Math.floor(new Date().getTime() / 1000);		
-		var query = "SELECT id FROM nav_history WHERE profile_id={0} AND name='{1}' AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
+		//Note we use COALESCE in this case as a fix for JI:608070
+		//We should really fix this at the database level and allow the name field to be null
+		var query = "SELECT id FROM nav_history WHERE profile_id={0} AND name=COALESCE('{1}','') AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
 
 		//see if this destination is already in the history
 		var result = _qdb.resultToArray(_db.query(query));
