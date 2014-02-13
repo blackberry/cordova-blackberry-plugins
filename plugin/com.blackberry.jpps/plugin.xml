@@ -27,9 +27,11 @@
     <platform name="blackberry10">
         <lib-file src="src/blackberry10/native/device/libjpps.so" arch="device"/>
         <lib-file src="src/blackberry10/native/simulator/libjpps.so" arch="simulator"/>
+        <!-- Temporarily commented out due to QCARTWO-5876
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.jpps"/>
         </config-file>
         <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
+        -->
     </platform>
 </plugin>

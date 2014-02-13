@@ -7,6 +7,10 @@ NAME=jpps
 PLUGIN=yes
 UTILS=yes
 
+define PINFO
+PINFO DESCRIPTION=libjpps
+endef
+
 include ../../../../../../meta.mk
 
 override CCFLAGS := $(filter-out -Werror , $(CCFLAGS))

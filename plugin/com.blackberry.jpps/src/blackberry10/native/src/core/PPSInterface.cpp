@@ -8,7 +8,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <ppsparse.h>
+#include <sys/pps.h>
 #include <string.h>
 
 #include "PPSNotifyGroupManager.h"

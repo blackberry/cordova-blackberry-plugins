@@ -6,6 +6,10 @@ include $(QCONFIG)
 NAME=utils
 LDFLAGS+=-Wl,-h,libutils.so
 
+define PINFO
+PINFO DESCRIPTION=libutils
+endef
+
 include ../../../../../../meta.mk
 
 SRCS+=$(WEBWORKS_DIR)/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_reader.cpp \
