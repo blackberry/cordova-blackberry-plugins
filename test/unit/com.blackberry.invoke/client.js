@@ -27,10 +27,6 @@ var _extDir = __dirname + "/../../../plugin",
 describe("invoke client", function () {
     beforeEach(function () {
 
-        GLOBAL.window = {
-            btoa: jasmine.createSpy("window.btoa").andReturn("base64 string")
-        };
-
         mockedChannel = {
             onHasSubscribersChange: undefined,
             numHandlers: 0,
@@ -113,36 +109,6 @@ describe("invoke client", function () {
             client.invoke(request, callback);
 
             expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), undefined, _ID, "invoke", {"request": request});
-        });
-
-        it("should encode data to base64 string", function () {
-            var request = {
-                    target: "abc.xyz",
-                    data: "my string"
-                },
-                callback = jasmine.createSpy("client callback");
-
-            client.invoke(request, callback);
-
-            expect(window.btoa).toHaveBeenCalledWith("my string");
-            expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), undefined, _ID, "invoke", {
-                "request": {
-                    target: request.target,
-                    data: "base64 string"
-                }
-            });
-        });
-
-        it("should call onError if failed to encode data to base64", function () {
-            var request = {
-                    target: "abc.xyz",
-                    data: "my string"
-                },
-                onError = jasmine.createSpy("client onError");
-
-            window.btoa.andThrow("bad string");
-            client.invoke(request, null, onError);
-            expect(onError).toHaveBeenCalledWith("bad string");
         });
 
         it("should call onSuccess if invocation is successful", function () {
