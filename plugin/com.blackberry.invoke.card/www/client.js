@@ -20,6 +20,7 @@
 var _self = {},
     _ID = "com.blackberry.invoke.card",
     exec = cordova.require("cordova/exec"),
+    _btoa = require('./btoa'),
     _noop = function () {};
 
 function cb(done, cancel, invoke) {
@@ -159,7 +160,7 @@ _self.invokeTargetPicker = function (request, title, onSuccess, onError) {
 
     try {
         if (request.hasOwnProperty('data')) {
-            request.data = window.btoa(request.data);
+            request.data = _btoa(request.data);
         }
 
         exec(callback, _noop, _ID, "invokeTargetPicker", {
