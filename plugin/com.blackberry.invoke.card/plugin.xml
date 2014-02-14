@@ -28,6 +28,10 @@
         <merges target="blackberry.invoke.card" />
     </js-module>
 
+    <js-module src="www/btoa.js">
+        <merges target="blackberry.invoke.card.btoa" />
+    </js-module>
+
     <platform name="blackberry10">
         <source-file src="src/blackberry10/index.js" />
         <config-file target="www/config.xml" parent="/widget">

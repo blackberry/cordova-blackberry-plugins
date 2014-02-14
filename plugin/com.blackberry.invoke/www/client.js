@@ -19,6 +19,7 @@
 
 var channel = cordova.require("cordova/channel"),
     exec = cordova.require("cordova/exec"),
+    _btoa = require('./btoa'),
     _self = {},
     _ID = "com.blackberry.invoke",
     _invokeInterrupter,
@@ -68,7 +69,7 @@ _self.invoke = function (request, onSuccess, onError) {
             try {
                 // calling window.btoa on a string that contains unicode character will cause error
                 // it is the caller's responsibility to convert the string prior to calling invoke
-                request["data"] = window.btoa(data);
+                request["data"] = _btoa(data);
             } catch (e) {
                 if (onError && typeof onError === "function") {
                     onError(e);
