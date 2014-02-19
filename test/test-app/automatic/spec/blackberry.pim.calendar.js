@@ -84,7 +84,7 @@ function deleteEventWithMatchingPrefix(prefix, callback) {
 
     waitsFor(function () {
         return numEventsFound !== -1 && (numEventsRemoved + numEventsNotRemoved === numEventsFound);
-    }, "Not all callbacks invoked", timeout);
+    }, "Not all callbacks invoked", timeout*5);
 
     runs(function () {
         console.log("# events removed=" + numEventsRemoved + " # events found=" + numEventsFound);

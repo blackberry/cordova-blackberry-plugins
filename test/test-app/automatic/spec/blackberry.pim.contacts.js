@@ -1033,6 +1033,7 @@ describe("blackberry.pim.contacts", function () {
                 onDone = jasmine.createSpy("onDone"),
                 onCancel = jasmine.createSpy("onCancel"),
                 onInvoke = jasmine.createSpy("onInvoke").andCallFake(function () {
+                    document.addEventListener("onChildCardClosed", onCardClosed);
                     called = true;
                 }),
                 onCardClosed = jasmine.createSpy("onCardClosed").andCallFake(function (request) {
@@ -1046,9 +1047,7 @@ describe("blackberry.pim.contacts", function () {
 
             runs(function () {
                 expect(onInvoke).toHaveBeenCalled();
-
                 called = false;
-                document.addEventListener("onChildCardClosed", onCardClosed);
                 blackberry.invoke.closeChildCard();
 
                 waitsFor(function () {
@@ -1058,6 +1057,7 @@ describe("blackberry.pim.contacts", function () {
                 runs(function () {
                     // Currently the response that comes onChildCardClosed is not informative or just emtpy.
                     expect(reason).toBe("closed");
+                    document.removeEventListener("onChildCardClosed", onCardClosed);
                 });
             });
         });
@@ -1688,7 +1688,7 @@ describe("blackberry.pim.contacts", function () {
 
             waitsFor(function () {
                 return called;
-            }, "success/error callback never called", 15000);
+            }, "success/error callback never called", 50000);
 
             runs(function () {
                 expect(error).toBe(false);
@@ -1724,58 +1724,6 @@ describe("blackberry.pim.contacts", function () {
             runs(function () {
                 expect(error).toBe(false);
                 expect(findSuccessCb).toHaveBeenCalled();
-            });
-        });
-
-        it("Find populates news with an array of ContactNews when an organization is provided", function () {
-            var contactObj,
-                called = false,
-                error = false,
-                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    console.log(contacts);
-                    expect(contacts.length).toBe(1);
-
-                    if (contacts.length === 1) {
-                        expect(contacts[0].name.givenName).toBe("John");
-                        expect(contacts[0].name.familyName).toBe("WebWorksTest");
-                        expect(contacts[0].news).not.toBe(null);
-                        expect(contacts[0].news.length).toBeGreaterThan(0);
-                    }
-
-                    called = true;
-                }),
-                errorCb = jasmine.createSpy("onFindError").andCallFake(function (error) {
-                    called = true;
-                }),
-                findOptions = {
-                    filter: [{
-                        "fieldName": ContactFindOptions.SEARCH_FIELD_FAMILY_NAME,
-                        "fieldValue": "WebWorksTest"
-                    }]
-                };
-
-            contactObj = contacts.create({
-                "name": { familyName: "WebWorksTest", givenName: "John" },
-                "organizations": [ { name: "Research In Motion" } ]
-            });
-
-            try {
-                contactObj.save(function () {
-                    contacts.find(["name", "news"], findOptions, successCb, errorCb);
-                });
-            } catch (e) {
-                console.log("Error:  " + e);
-                error = true;
-            }
-
-            waitsFor(function () {
-                return called;
-            }, "success/error callback never called", 15000);
-
-            runs(function () {
-                expect(error).toBe(false);
-                expect(successCb).toHaveBeenCalled();
-                expect(errorCb).not.toHaveBeenCalled();
             });
         });
 
