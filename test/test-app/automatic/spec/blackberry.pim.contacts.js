@@ -1033,6 +1033,7 @@ describe("blackberry.pim.contacts", function () {
                 onDone = jasmine.createSpy("onDone"),
                 onCancel = jasmine.createSpy("onCancel"),
                 onInvoke = jasmine.createSpy("onInvoke").andCallFake(function () {
+                    document.addEventListener("onChildCardClosed", onCardClosed);
                     called = true;
                 }),
                 onCardClosed = jasmine.createSpy("onCardClosed").andCallFake(function (request) {
@@ -1046,9 +1047,7 @@ describe("blackberry.pim.contacts", function () {
 
             runs(function () {
                 expect(onInvoke).toHaveBeenCalled();
-
                 called = false;
-                document.addEventListener("onChildCardClosed", onCardClosed);
                 blackberry.invoke.closeChildCard();
 
                 waitsFor(function () {
@@ -1058,6 +1057,7 @@ describe("blackberry.pim.contacts", function () {
                 runs(function () {
                     // Currently the response that comes onChildCardClosed is not informative or just emtpy.
                     expect(reason).toBe("closed");
+                    document.removeEventListener("onChildCardClosed", onCardClosed);
                 });
             });
         });
@@ -1688,7 +1688,7 @@ describe("blackberry.pim.contacts", function () {
 
             waitsFor(function () {
                 return called;
-            }, "success/error callback never called", 15000);
+            }, "success/error callback never called", 50000);
 
             runs(function () {
                 expect(error).toBe(false);
@@ -1756,7 +1756,7 @@ describe("blackberry.pim.contacts", function () {
 
             contactObj = contacts.create({
                 "name": { familyName: "WebWorksTest", givenName: "John" },
-                "organizations": [ { name: "Research In Motion" } ]
+                "organizations": [ { name: "BlackBerry" } ]
             });
 
             try {
@@ -1770,7 +1770,7 @@ describe("blackberry.pim.contacts", function () {
 
             waitsFor(function () {
                 return called;
-            }, "success/error callback never called", 15000);
+            }, "success/error callback never called", 50000);
 
             runs(function () {
                 expect(error).toBe(false);
