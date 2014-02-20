@@ -406,15 +406,16 @@ JNEXT.PimContacts = function ()
             args = {};
 
         if (strEventDesc === "result") {
-            args.result = escape(strData.split(" ").slice(2).join(" "));
+            args.result = strData.split(" ").slice(2).join(" ").replace(/(\r\n|\n|\r)/gm,"");
+
             eventHandler = self.eventHandlers[arData[1]];
 
             if (eventHandler.action === "save" || eventHandler.action === "remove") {
-                eventHandler.handler(eventHandler.result, JSON.parse(decodeURIComponent(args.result)));
+                eventHandler.handler(eventHandler.result, JSON.parse(args.result));
             } else if (eventHandler.action === "find") {
-                eventHandler.handler(arData[1], eventHandler, JSON.parse(decodeURIComponent(args.result)));
+                eventHandler.handler(arData[1], eventHandler, JSON.parse(args.result));
             } else if (eventHandler.action === "invokePicker") {
-                eventHandler.handler(JSON.parse(decodeURIComponent(args.result)));
+                eventHandler.handler(JSON.parse(args.result));
             }
 
         }
