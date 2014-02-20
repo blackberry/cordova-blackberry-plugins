@@ -1727,58 +1727,6 @@ describe("blackberry.pim.contacts", function () {
             });
         });
 
-        it("Find populates news with an array of ContactNews when an organization is provided", function () {
-            var contactObj,
-                called = false,
-                error = false,
-                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    console.log(contacts);
-                    expect(contacts.length).toBe(1);
-
-                    if (contacts.length === 1) {
-                        expect(contacts[0].name.givenName).toBe("John");
-                        expect(contacts[0].name.familyName).toBe("WebWorksTest");
-                        expect(contacts[0].news).not.toBe(null);
-                        expect(contacts[0].news.length).toBeGreaterThan(0);
-                    }
-
-                    called = true;
-                }),
-                errorCb = jasmine.createSpy("onFindError").andCallFake(function (error) {
-                    called = true;
-                }),
-                findOptions = {
-                    filter: [{
-                        "fieldName": ContactFindOptions.SEARCH_FIELD_FAMILY_NAME,
-                        "fieldValue": "WebWorksTest"
-                    }]
-                };
-
-            contactObj = contacts.create({
-                "name": { familyName: "WebWorksTest", givenName: "John" },
-                "organizations": [ { name: "BlackBerry" } ]
-            });
-
-            try {
-                contactObj.save(function () {
-                    contacts.find(["name", "news"], findOptions, successCb, errorCb);
-                });
-            } catch (e) {
-                console.log("Error:  " + e);
-                error = true;
-            }
-
-            waitsFor(function () {
-                return called;
-            }, "success/error callback never called", 50000);
-
-            runs(function () {
-                expect(error).toBe(false);
-                expect(successCb).toHaveBeenCalled();
-                expect(errorCb).not.toHaveBeenCalled();
-            });
-        });
-
         it("Signal the end of all find tests", function () {
             doneTestingFind = true;
         });
