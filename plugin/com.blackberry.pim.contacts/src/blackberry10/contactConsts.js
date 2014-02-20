@@ -159,7 +159,9 @@ function populateSubKindAttributeMap() {
         MessageNotificationVibration: 84,
         MessageNotificationLED: 85,
         MessageNotificationDuringCall: 86,
-        VideoChatPin: 87
+        VideoChatPin: 87,
+        NamePrefix: 88,
+        Business: 89
     };
 
     subKindAttributeMap[ATTRIBUTE_SUBKIND.Other] = "other";
@@ -205,6 +207,7 @@ function populateSubKindAttributeMap() {
     subKindAttributeMap[ATTRIBUTE_SUBKIND.VideoChatBbPlaybook] = "BbPlaybook";
     subKindAttributeMap[ATTRIBUTE_SUBKIND.SoundRingtone] = "ringtone";
     subKindAttributeMap[ATTRIBUTE_SUBKIND.Personal] = "personal";
+    subKindAttributeMap[ATTRIBUTE_SUBKIND.Business] = "work";
 }
 
 module.exports = {

@@ -1552,6 +1552,7 @@ void PimContactsQt::createAttributeSubKindMap()
     _attributeSubKindMap["BbPlaybook"] = bbpim::AttributeSubKind::VideoChatBbPlaybook;
     _attributeSubKindMap["ringtone"] = bbpim::AttributeSubKind::SoundRingtone;
     _attributeSubKindMap["note"] = bbpim::AttributeSubKind::Other;
+    _attributeSubKindMap["business"] = bbpim::AttributeSubKind::Business;
 }
 
 void PimContactsQt::createKindAttributeMap() {
@@ -1619,6 +1620,7 @@ void PimContactsQt::createSubKindAttributeMap() {
     _subKindAttributeMap[bbpim::AttributeSubKind::VideoChatBbPlaybook] = "BbPlaybook";
     _subKindAttributeMap[bbpim::AttributeSubKind::SoundRingtone] = "ringtone";
     _subKindAttributeMap[bbpim::AttributeSubKind::Personal] = "personal";
+    _subKindAttributeMap[bbpim::AttributeSubKind::Business] = "work";
 }
 
 } // namespace webworks
