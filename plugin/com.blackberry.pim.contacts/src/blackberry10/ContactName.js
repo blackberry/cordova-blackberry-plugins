@@ -15,9 +15,9 @@
  */
 var ContactName = function (properties) {
     this.alias = properties && properties.alias ? properties.alias : "";
-    this.formatted = properties && properties.formatted ? properties.formatted : "";
     this.familyName = properties && properties.familyName ? properties.familyName : "";
     this.givenName = properties && properties.givenName ? properties.givenName : "";
+    this.formatted = properties && properties.formatted ? properties.formatted : properties.givenName + " " + properties.familyName;
     this.middleName = properties && properties.middleName ? properties.middleName : "";
     this.honorificPrefix = properties && properties.honorificPrefix ? properties.honorificPrefix : "";
     this.honorificSuffix = properties && properties.honorificSuffix ? properties.honorificSuffix : "";
