@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 describe("blackberry.invoke", function () {
-    var delay = 1500, onSuccessSpy, onErrorSpy, onChildCardClosedHandlerSpy, testInvoke;
+    var delay = 5000, onSuccessSpy, onErrorSpy, onChildCardClosedHandlerSpy, testInvoke;
 
     testInvoke = function (invokeArgs) {
         onChildCardClosedHandlerSpy = jasmine.createSpy('onChildCardClosedHandlerSpy'),
