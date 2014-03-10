@@ -24,11 +24,10 @@
     <description>BlackBerry 10 I/O APIs</description>
     <license>Apache 2.0</license>
 
-    <js-module src="www/client.js">
-        <merges target="blackberry.io" />
-    </js-module>
-
     <platform name="blackberry10">
+        <js-module src="www/client.js">
+            <merges target="blackberry.io" />
+        </js-module>
         <source-file src="src/blackberry10/index.js" />
         <config-file target="www/config.xml" parent="/widget">
             <feature name="com.blackberry.io" value="com.blackberry.io" />
