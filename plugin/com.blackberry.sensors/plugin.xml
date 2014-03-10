@@ -24,13 +24,11 @@
     <description>BlackBerry 10 Sensors APIs</description>
     <license>Apache 2.0</license>
 
-    <dependency id="com.blackberry.utils" />
-
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.sensors" />
-    </js-module>
-
     <platform name="blackberry10">
+        <dependency id="com.blackberry.utils" />
+        <js-module src="www/client.js">
+            <clobbers target="blackberry.sensors" />
+        </js-module>
         <source-file src="src/blackberry10/index.js" />
         <source-file src="src/blackberry10/sensorsEvents.js" />
         <source-file src="src/blackberry10/sensorsJNEXT.js" />

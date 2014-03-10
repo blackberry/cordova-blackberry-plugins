@@ -24,21 +24,20 @@
     <description>BlackBerry 10 Calendar APIs</description>
     <license>Apache 2.0</license>
 
-    <dependency id="com.blackberry.utils" />
-
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.pim.calendar" />
-    </js-module>
-    <js-module src="www/CalendarEvent.js" />
-    <js-module src="www/CalendarAccount.js" />
-    <js-module src="www/CalendarFolder.js" />
-    <js-module src="www/CalendarEventFilter.js" />
-    <js-module src="www/Attendee.js" />
-    <js-module src="src/blackberry10/calendarUtils.js" />
-    <js-module src="src/blackberry10/CalendarRepeatRule.js" />
-    <js-module src="src/blackberry10/CalendarFindOptions.js" />
-    <js-module src="src/blackberry10/CalendarError.js" />
     <platform name="blackberry10">
+        <dependency id="com.blackberry.utils" />
+        <js-module src="www/client.js">
+            <clobbers target="blackberry.pim.calendar" />
+        </js-module>
+        <js-module src="www/CalendarEvent.js" />
+        <js-module src="www/CalendarAccount.js" />
+        <js-module src="www/CalendarFolder.js" />
+        <js-module src="www/CalendarEventFilter.js" />
+        <js-module src="www/Attendee.js" />
+        <js-module src="src/blackberry10/calendarUtils.js" />
+        <js-module src="src/blackberry10/CalendarRepeatRule.js" />
+        <js-module src="src/blackberry10/CalendarFindOptions.js" />
+        <js-module src="src/blackberry10/CalendarError.js" />
         <source-file src="src/blackberry10/index.js" />
         <source-file src="src/blackberry10/CalendarError.js" />
         <source-file src="src/blackberry10/CalendarFindOptions.js" />
