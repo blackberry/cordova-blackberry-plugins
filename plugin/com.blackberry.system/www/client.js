@@ -51,7 +51,7 @@ function getFieldValue(field, args) {
         };
 
     try {
-        execFunc(success, fail, ID, field, args);
+        execFunc(success, fail, ID, field, args, true);
     } catch (e) {
         console.error(e);
     }

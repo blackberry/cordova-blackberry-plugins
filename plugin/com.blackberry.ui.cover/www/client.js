@@ -20,6 +20,7 @@
 var _ID = "com.blackberry.ui.cover",
     _self = {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     badges = true,
     cover = {
         cover: {
@@ -88,6 +89,8 @@ _self.updateCover = function () {
 };
 
 Object.defineProperty(_self, "coverSize", {
+    /* XXX make this constant by caching the value at plugin initialization
+     * to avoid repeated sync calls during app lifecycle */
     get: function () {
         var value,
             success = function (data, response) {
@@ -96,7 +99,7 @@ Object.defineProperty(_self, "coverSize", {
             fail = function (data, response) {
                 throw data;
             };
-        exec(success, fail, _ID, "coverSize");
+        execSync(success, fail, _ID, "coverSize", undefined, true);
         return value;
     }
 });

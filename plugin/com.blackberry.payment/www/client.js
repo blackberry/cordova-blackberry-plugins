@@ -19,6 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     _ID = "com.blackberry.payment";
 
 function getFieldValue(field) {
@@ -30,7 +31,7 @@ function getFieldValue(field) {
             throw data;
         };
     try {
-        exec(success, fail, _ID, field);
+        execSync(success, fail, _ID, field, undefined, true);
     } catch (e) {
         console.error(e);
     }
@@ -99,7 +100,7 @@ _self.purchase = function (purchase_arguments_t, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    exec(onSuccess, onFail, _ID, "purchase", args, true);
+    exec(onSuccess, onFail, _ID, "purchase", args);
 };
 
 _self.getExistingPurchases = function (refresh, success, fail) {
@@ -122,7 +123,7 @@ _self.getExistingPurchases = function (refresh, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    exec(onSuccess, onFail, _ID, "getExistingPurchases", args, true);
+    exec(onSuccess, onFail, _ID, "getExistingPurchases", args);
 };
 
 _self.cancelSubscription = function (transactionID, success, fail) {
@@ -145,7 +146,7 @@ _self.cancelSubscription = function (transactionID, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    exec(onSuccess, onFail, _ID, "cancelSubscription", args, true);
+    exec(onSuccess, onFail, _ID, "cancelSubscription", args);
 };
 
 _self.getPrice = function (args, success, fail) {
@@ -168,7 +169,7 @@ _self.getPrice = function (args, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    exec(onSuccess, onFail, _ID, "getPrice", args, true);
+    exec(onSuccess, onFail, _ID, "getPrice", args);
 };
 
 _self.checkExisting = function (args, success, fail) {
@@ -191,7 +192,7 @@ _self.checkExisting = function (args, success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    exec(onSuccess, onFail, _ID, "checkExisting", args, true);
+    exec(onSuccess, onFail, _ID, "checkExisting", args);
 };
 
 _self.checkAppSubscription = function (success, fail) {
@@ -205,7 +206,7 @@ _self.checkAppSubscription = function (success, fail) {
         },
         onFail = getXHRFailCallback(fail);
 
-    exec(onSuccess, onFail, _ID, "checkExisting", args, true);
+    exec(onSuccess, onFail, _ID, "checkExisting", args);
 };
 
 Object.defineProperty(_self, "developmentMode", {

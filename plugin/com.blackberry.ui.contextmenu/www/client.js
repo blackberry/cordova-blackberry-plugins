@@ -19,6 +19,7 @@
 
 var contextmenu = {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     _ID = "com.blackberry.ui.contextmenu",
     noop = function () {},
     events = ["contextmenuhidden"];
@@ -53,6 +54,8 @@ function defineReadOnlyActions(name, value) {
 // to enable/disable the context menu UI
 Object.defineProperty(contextmenu, "enabled", {
     get : function () {
+        /* XXX make this constant by caching the value at plugin initialization
+         * to avoid repeated sync calls during app lifecycle */
         var enabled,
             success = function (data, response) {
                 enabled = data;
@@ -61,7 +64,7 @@ Object.defineProperty(contextmenu, "enabled", {
                 throw data;
             };
         try {
-            exec(success, fail, _ID, "enabled");
+            execSync(success, fail, _ID, "enabled", {}, true);
         } catch (error) {
             console.log(error);
         }

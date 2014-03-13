@@ -19,6 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
+    execSync = cordova.require("cordova/exec"),
     _ID = "com.blackberry.push",
     PushService,
     PushPayload,
@@ -148,7 +149,7 @@ PushService.prototype.extractPushPayload = function (invokeObject) {
 
     // Send command to framework to get the Push payload object
     args = { "data" : invokeObject.data };
-    exec(success, fail, _ID, "extractPushPayload", args);
+    execSync(success, fail, _ID, "extractPushPayload", args, true);
 
     if (!payload.valid) {
         throw error_string;
