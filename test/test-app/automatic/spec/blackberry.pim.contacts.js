@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Research In Motion Limited.
+ * Copyright 2014 Research In Motion Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -431,7 +431,7 @@ describe("blackberry.pim.contacts", function () {
                     expect(contact.name).toBeDefined();
                     expect(contact.name.givenName).toBe("Alessandro");
                     expect(contact.name.alias).toBe("Alias");
-                    expect(contact.name.formatted).toBe("FormattedName");
+                    expect(contact.name.formatted).toBe(first_name + " " + last_name);
                     expect(contact.name.honorificPrefix).toBe("HonorPrefix");
                     expect(contact.ims).toContain(new_contact.ims[0]);
                     expect(contact.ims).toContain(new_contact.ims[1]);
@@ -463,7 +463,6 @@ describe("blackberry.pim.contacts", function () {
                 new_contact.name.middleName = "Middle";
                 new_contact.name.alias = "Alias";
                 new_contact.name.honorificPrefix = "HonorPrefix";
-                new_contact.name.formatted = "FormattedName";
 
                 new_contact.phoneNumbers = [ { type: "home", value: "1234567890" },
                                              { type: "work", value: "0987654321" } ];
