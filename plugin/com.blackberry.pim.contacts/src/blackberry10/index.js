@@ -406,7 +406,7 @@ JNEXT.PimContacts = function ()
             args = {};
 
         if (strEventDesc === "result") {
-            args.result = strData.split(" ").slice(2).join(" ").replace(/(\r\n|\n|\r)/gm,"");
+            args.result = strData.split(" ").slice(2).join(" ").replace(/(\r\n|\n|\r)/gm, "");
 
             eventHandler = self.eventHandlers[arData[1]];
 
