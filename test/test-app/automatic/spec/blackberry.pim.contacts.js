@@ -419,6 +419,14 @@ describe("blackberry.pim.contacts", function () {
     });
 
     describe("Create & save, clone & save, edit & save contacts", function () {
+        afterEach(function () {
+            deleteContactWithMatchingLastName("Aba");
+        });
+
+        beforeEach(function () {
+            deleteContactWithMatchingLastName("Aba");
+        });
+
         it('Can create & save a contact to the device using Contact.save()', function () {
             var first_name,
                 last_name,
