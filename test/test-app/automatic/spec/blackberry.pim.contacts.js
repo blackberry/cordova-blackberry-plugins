@@ -1837,7 +1837,6 @@ describe("blackberry.pim.contacts", function () {
                 called = false,
                 error = false,
                 successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
-                    console.log(results);
                     expect(results.length).toBe(1);
 
                     if (results.length === 1) {
@@ -1889,7 +1888,6 @@ describe("blackberry.pim.contacts", function () {
                 called = false,
                 error = false,
                 successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
-                    console.log(results);
                     expect(results.length).toBe(1);
 
                     if (results.length === 1) {
