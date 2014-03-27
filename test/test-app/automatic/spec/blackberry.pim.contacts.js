@@ -46,9 +46,9 @@ function deleteContactWithMatchingLastName(lastName) {
         },
         curIndex;
 
-    contacts.find(["name"], findOptions, function (contacts) {
-        numContactsFound = contacts.length;
-        contacts.forEach(function (c, index) {
+    contacts.find(["name"], findOptions, function (results) {
+        numContactsFound = results.length;
+        results.forEach(function (c, index) {
             curIndex = index;
             c.remove(successCb, errorCb);
             waitsFor(function () {
@@ -567,15 +567,15 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    expect(contacts).toBeDefined();
-                    expect(contacts.length).toBe(1);
+                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
+                    expect(results).toBeDefined();
+                    expect(results.length).toBe(1);
 
-                    if (contacts.length === 1) {
-                        foundContact = contacts[0];
-                        expect(contacts[0].name).toBeDefined();
-                        expect(contacts[0].name.givenName).toBe("\"John\" \\n \\t \\");
-                        expect(contacts[0].name.familyName).toBe("Doe");
+                    if (results.length === 1) {
+                        foundContact = results[0];
+                        expect(results[0].name).toBeDefined();
+                        expect(results[0].name.givenName).toBe("\"John\" \\n \\t \\");
+                        expect(results[0].name.familyName).toBe("Doe");
                         deleteContactWithMatchingLastName("Doe");
                     }
 
@@ -881,10 +881,10 @@ describe("blackberry.pim.contacts", function () {
                 errorCb = jasmine.createSpy("onRemoveError").andCallFake(function (errorObj) {
                     called = true;
                 }),
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    if (contacts.length === 1) {
-                        expect(contacts[0].id).toBeDefined();
-                        expect(contacts[0].id).toBe(foundContact.id);
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
+                    if (results.length === 1) {
+                        expect(results[0].id).toBeDefined();
+                        expect(results[0].id).toBe(foundContact.id);
                     }
 
                     called = true;
@@ -965,9 +965,9 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    expect(contacts).toBeDefined();
-                    expect(contacts.length).toBe(0);
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
+                    expect(results).toBeDefined();
+                    expect(results.length).toBe(0);
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1102,7 +1102,7 @@ describe("blackberry.pim.contacts", function () {
         it('Find with missing ContactFindOptions invokes error callback', function () {
             var error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1141,7 +1141,7 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1179,7 +1179,7 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1218,7 +1218,7 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1261,7 +1261,7 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1303,7 +1303,7 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy("onFindError").andCallFake(function (errorObj) {
@@ -1370,13 +1370,13 @@ describe("blackberry.pim.contacts", function () {
                 },
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
-                    expect(contacts.length).toBe(1);
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
+                    expect(results.length).toBe(1);
 
-                    if (contacts.length === 1) {
-                        expect(contacts[0].name.givenName).toBe("Clement");
-                        expect(contacts[0].name.familyName).toBe("Smitherman");
-                        expect(contacts[0].favorite).toBe(true);
+                    if (results.length === 1) {
+                        expect(results[0].name.givenName).toBe("Clement");
+                        expect(results[0].name.familyName).toBe("Smitherman");
+                        expect(results[0].favorite).toBe(true);
                     }
 
                     called = true;
@@ -1419,16 +1419,16 @@ describe("blackberry.pim.contacts", function () {
                 },
                 error = false,
                 called = false,
-                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    expect(contacts).toBeDefined();
-                    expect(contacts.length).toBe(1);
+                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
+                    expect(results).toBeDefined();
+                    expect(results.length).toBe(1);
 
-                    if (contacts.length === 1) {
-                        expect(contacts[0].displayName).toBeDefined();
-                        expect(contacts[0].displayName).toBe("csmitherman");
-                        expect(contacts[0].nickname).toBeDefined();
-                        expect(contacts[0].nickname).toBe("CS");
-                        expect(contacts[0].name).toBe(null);
+                    if (results.length === 1) {
+                        expect(results[0].displayName).toBeDefined();
+                        expect(results[0].displayName).toBe("csmitherman");
+                        expect(results[0].nickname).toBeDefined();
+                        expect(results[0].nickname).toBe("CS");
+                        expect(results[0].name).toBe(null);
                     }
 
                     called = true;
@@ -1493,13 +1493,13 @@ describe("blackberry.pim.contacts", function () {
                 },
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
-                    expect(contacts.length).toBe(3);
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
+                    expect(results.length).toBe(3);
 
-                    if (contacts.length === 3) {
-                        expect(contacts[0].name.givenName).toBe("Dawn");
-                        expect(contacts[1].name.givenName).toBe("Donna");
-                        expect(contacts[2].name.givenName).toBe("Daniel");
+                    if (results.length === 3) {
+                        expect(results[0].name.givenName).toBe("Dawn");
+                        expect(results[1].name.givenName).toBe("Donna");
+                        expect(results[2].name.givenName).toBe("Daniel");
                     }
 
                     called = true;
@@ -1552,12 +1552,12 @@ describe("blackberry.pim.contacts", function () {
                 },
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
-                    expect(contacts.length).toBe(2);
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
+                    expect(results.length).toBe(2);
 
-                    if (contacts.length === 2) {
-                        expect(contacts[0].name.givenName).toBe("Dawn");
-                        expect(contacts[1].name.givenName).toBe("Donna");
+                    if (results.length === 2) {
+                        expect(results[0].name.givenName).toBe("Dawn");
+                        expect(results[1].name.givenName).toBe("Donna");
                     }
 
                     called = true;
@@ -1592,8 +1592,8 @@ describe("blackberry.pim.contacts", function () {
                 },
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
-                    expect(contacts.length).toBe(4);
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
+                    expect(results.length).toBe(4);
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy().andCallFake(function (error) {
@@ -1621,8 +1621,8 @@ describe("blackberry.pim.contacts", function () {
             var findOptions = {},
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
-                    expect(contacts.length).not.toBeLessThan(5); // in case there are other contacts not for test purpose
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
+                    expect(results.length).not.toBeLessThan(5); // in case there are other contacts not for test purpose
                     called = true;
                 }),
                 findErrorCb = jasmine.createSpy().andCallFake(function (error) {
@@ -1679,18 +1679,18 @@ describe("blackberry.pim.contacts", function () {
                 },
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
                     var temp = [];
 
-                    contacts.forEach(function (c) {
+                    results.forEach(function (c) {
                         if (c.name && (c.name.familyName === "Smitherman" || c.name.familyName === "Simpson")) {
                             temp.push(c.name.givenName + " " + c.name.familyName);
                         }
                     });
 
-                    expect(contacts.length).not.toBeLessThan(5); // in case there are other contacts not for test purpose
+                    expect(results.length).not.toBeLessThan(5); // in case there are other contacts not for test purpose
 
-                    if (contacts.length === 5) {
+                    if (results.length === 5) {
                         expect(temp[0]).toBe("Dawn Simpson");
                         expect(temp[1]).toBe("Donna Smitherman");
                         expect(temp[2]).toBe("Daniel Smitherman");
@@ -1730,8 +1730,8 @@ describe("blackberry.pim.contacts", function () {
                 },
                 called = false,
                 error = false,
-                findSuccessCb = jasmine.createSpy().andCallFake(function (contacts) {
-                    expect(contacts.length).toBe(4);
+                findSuccessCb = jasmine.createSpy().andCallFake(function (results) {
+                    expect(results.length).toBe(4);
                     called = true;
                 });
 
@@ -1755,15 +1755,15 @@ describe("blackberry.pim.contacts", function () {
             var contactObj,
                 called = false,
                 error = false,
-                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    console.log(contacts);
-                    expect(contacts.length).toBe(1);
+                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
+                    console.log(results);
+                    expect(results.length).toBe(1);
 
-                    if (contacts.length === 1) {
-                        expect(contacts[0].name.givenName).toBe("John");
-                        expect(contacts[0].name.familyName).toBe("WebWorksTest");
-                        expect(contacts[0].news).not.toBe(null);
-                        expect(contacts[0].news.length).toBeGreaterThan(0);
+                    if (results.length === 1) {
+                        expect(results[0].name.givenName).toBe("John");
+                        expect(results[0].name.familyName).toBe("WebWorksTest");
+                        expect(results[0].news).not.toBe(null);
+                        expect(results[0].news.length).toBeGreaterThan(0);
                     }
 
                     called = true;
@@ -1807,15 +1807,15 @@ describe("blackberry.pim.contacts", function () {
             var contactObj,
                 called = false,
                 error = false,
-                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (contacts) {
-                    console.log(contacts);
-                    expect(contacts.length).toBe(1);
+                successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
+                    console.log(results);
+                    expect(results.length).toBe(1);
 
-                    if (contacts.length === 1) {
-                        expect(contacts[0].name.givenName).toBe("Dan");
-                        expect(contacts[0].name.familyName).toBe("WebworksTestSource");
-                        expect(contacts[0].sourceAccounts.length).toBeGreaterThan(0);
-                        expect(contacts[0].sourceAccounts[0].id).toBe(2);
+                    if (results.length === 1) {
+                        expect(results[0].name.givenName).toBe("Dan");
+                        expect(results[0].name.familyName).toBe("WebworksTestSource");
+                        expect(results[0].sourceAccounts.length).toBeGreaterThan(0);
+                        expect(results[0].sourceAccounts[0].id).toBe(2);
                     }
 
                     called = true;
