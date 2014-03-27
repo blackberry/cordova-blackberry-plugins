@@ -84,10 +84,6 @@ function saveArgumentsError(contact, onSuccess, onError) {
                     return "organization." + key + " at index " + i + " should be a string";
                 }
             }
-
-            if (!contact.organizations[i].name) {
-                return "organization.name at index " + i + " should be truthy";
-            }
         }
     }
 
