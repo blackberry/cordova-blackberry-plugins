@@ -836,6 +836,79 @@ describe("blackberry.pim.contacts", function () {
                 expect(errorCb).toHaveBeenCalled();
             });
         });
+
+        it("Verify business address information populated as type business", function () {
+            var contactObj,
+                workAddress,
+                called = false,
+                error = false,
+                successCb = jasmine.createSpy("business contact is saved").andCallFake(function (results) {
+                    expect(results.length).toBe(1);
+                    var contactID = results[0].id,
+                        returnedContact = contacts.getContact(contactID);
+
+                    if (returnedContact !== null) {
+                        expect(returnedContact.name.givenName).toBe("Aaaaa");
+                        expect(returnedContact.name.familyName).toBe("Aba");
+                        expect(returnedContact.addresses[0].type).toBe(ContactAddress.WORK);
+                        expect(returnedContact.addresses[0].streetAddress).toBe("456 Industry St");
+                        expect(returnedContact.addresses[0].locality).toBe("Waterloo");
+                        expect(returnedContact.addresses[0].region).toBe("Ontario");
+                        expect(returnedContact.addresses[0].country).toBe("Canada");
+                    }
+
+                    called = true;
+                }),
+                errorCb = jasmine.createSpy("onFindError").andCallFake(function (error) {
+                    called = true;
+                }),
+                findOptions = {
+                    filter: [{
+                        "fieldName": ContactFindOptions.SEARCH_FIELD_FAMILY_NAME,
+                        "fieldValue": "Aba"
+                    }]
+                };
+
+            try {
+                contactObj = contacts.create({
+                    "name": { familyName: "Aba", givenName: "Aaaaa" }
+                });
+
+                workAddress = {
+                    "type": ContactAddress.WORK,
+                    "streetAddress": "456 Industry St",
+                    "locality": "Waterloo",
+                    "region": "Ontario",
+                    "country": "Canada"
+                };
+
+                contactObj.addresses = [workAddress];
+            } catch (e) {
+                console.log("Error: " + e);
+                error = true;
+            }
+
+            try {
+                contactObj.save(function () {
+                    var fields = ["name", "addresses"];
+                    contacts.find(fields, findOptions, successCb, errorCb);
+                });
+            } catch (e) {
+                console.log("Error:  " + e);
+                error = true;
+            }
+
+            waitsFor(function () {
+                return called;
+            }, "success/error callback never called", 15000);
+
+            runs(function () {
+                expect(error).toBe(false);
+                expect(successCb).toHaveBeenCalled();
+                expect(errorCb).not.toHaveBeenCalled();
+            });
+        });
+
     });
 
     describe("Remove contacts", function () {
