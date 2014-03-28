@@ -1889,12 +1889,14 @@ describe("blackberry.pim.contacts", function () {
                 error = false,
                 successCb = jasmine.createSpy("onFindSuccess").andCallFake(function (results) {
                     expect(results.length).toBe(1);
+                    var contactID = results[0].id,
+                        returnedContact = contacts.getContact(contactID);
 
                     if (results.length === 1) {
-                        expect(results[0].name.givenName).toBe("Dan");
-                        expect(results[0].name.familyName).toBe("WebworksTestSource");
-                        expect(results[0].sourceAccounts.length).toBeGreaterThan(0);
-                        expect(results[0].sourceAccounts[0].id).toBe(2);
+                        expect(returnedContact.name.givenName).toBe("Dan");
+                        expect(returnedContact.name.familyName).toBe("WebworksTestSource");
+                        expect(returnedContact.sourceAccounts.length).toBeGreaterThan(0);
+                        expect(returnedContact.sourceAccounts[0].id).toBe("2");
                     }
 
                     called = true;
@@ -1909,13 +1911,29 @@ describe("blackberry.pim.contacts", function () {
                     }]
                 };
 
-            contactObj = contacts.create({
-                "name": { familyName: "WebworksTestSource", givenName: "Dan" }
-            });
+            try {                
+                contactObj = contacts.create({
+                    "name": { familyName: "WebworksTestSource", givenName: "Dan" }
+                });
+                
+                workAddress = {
+                    "type": ContactAddress.WORK,
+                    "streetAddress": "456 Industry St",
+                    "locality": "Waterloo",
+                    "region": "Ontario",
+                    "country": "Canada"
+                };
+
+                contactObj.addresses = [workAddress];
+            } catch (e) {
+                console.log("Error: " + e);
+                error = true;
+            }
 
             try {
                 contactObj.save(function () {
-                    contacts.find(["name"], findOptions, successCb, errorCb);
+                    var fields = ["name"];
+                    contacts.find(fields, findOptions, successCb, errorCb);
                 });
             } catch (e) {
                 console.log("Error:  " + e);
