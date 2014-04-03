@@ -28,36 +28,36 @@ var _self = {},
     exec = cordova.require("cordova/exec");
 
 	/**
-	* execute(options) performs the screenshot.
+    * execute(options) performs the screenshot.
+    *
+    *   options is a json object containing:
+    *
+    *           rect: {x: int, y:int, w: int, h: int}
+    *
+    *               the rectangle to capture (optional, defaults to full screen)
+    *
+    *           quality: int
 	*
-	* 	options is a json object containing:
+    *               jpeg/png quality factor (1-100, default 90)
+    *
+    *           dest: string
+    *
+    *               either "data:", which returns the image as a data-URL (default) using "mime" argument
+    *               or a complete file path with extension, which saves the image to the file
+    *
+    *           mime: string
+    *
+    *               for "data:" destination, defines the mime type to encode (defaults to image/jpeg)
 	*
-	* 			rect: {x: int, y:int, w: int, h: int}
-	*
-	* 					the rectangle to capture (optional, defaults to full screen)
-	*
-	* 			quality: int
-	*
-	* 					jpeg/png quality factor (1-100, default 90)
-	*
-	* 			dest: string
-	*
-	* 					either "data:", which returns the image as a data-URL (default) using "mime" argument
-	* 					or a complete file path with extension, which saves the image to the file
-	*
-    * 			mime: string
-	*
-    * 					for "data:" destination, defines the mime type to encode (defaults to image/jpeg)
-	*
-	*			chmod: int
-	*
-	*					for screenshots to file, which chmod should be performed
-	*
-	* returns either:
-	*   - the data: url (including data: prefix)
-	*   - or error: followed by an error message
-	*   - or the full path of the destination file
-	*/
+    *           chmod: int
+    *
+    *               for screenshots to file, which chmod should be performed
+    *
+    * returns either:
+    *   - the data: url (including data: prefix)
+    *   - or error: followed by an error message
+    *   - or the full path of the destination file
+    */
 
 _self.execute = function (args) {
     var result,
@@ -68,7 +68,7 @@ _self.execute = function (args) {
         console.log("Error: " + data);
     };
 
-	args = args || {}
+    args = args || {};
 
     exec(success, fail, _ID, "execute", {userargs: args});
     return result;

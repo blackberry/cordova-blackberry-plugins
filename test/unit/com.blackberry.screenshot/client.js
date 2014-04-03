@@ -46,7 +46,7 @@ describe("screenshot client", function () {
 
     describe("execute", function () {
         it("should call exec", function () {
-            var options = {dest:'data:', mime:'image/png'};
+            var options = {dest: 'data:', mime: 'image/png'};
 
             client.execute(options);
             expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "execute", {userargs: options});

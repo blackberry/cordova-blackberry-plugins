@@ -52,7 +52,7 @@ describe("screenshot index", function () {
                 getWebViews: jasmine.createSpy("getWebViewsSpy").andCallFake(function () {
                     return [{
                         zOrder: "0"
-                    }]
+                    }];
                 })
             }
         };
@@ -68,8 +68,8 @@ describe("screenshot index", function () {
         index = null;
         GLOBAL.qnx = null;
         mockedPluginResult = {};
-        delete success;
-        delete fail;
+        success = null;
+        fail = null;
     });
 
     it("JNEXT require/createObject/registerEvents are not called upon requiring index", function () {
@@ -82,7 +82,7 @@ describe("screenshot index", function () {
         it("can call JNEXT and PluginResult", function () {
             var args = {
                     callbackId: jasmine.any(Number),
-                    userargs: encodeURIComponent(JSON.stringify({dest:'data', mime: 'image/png'}))
+                    userargs: encodeURIComponent(JSON.stringify({dest: 'data', mime: 'image/png'}))
                 };
 
             index.execute(success, fail, args, jasmine.any(Object));
@@ -94,7 +94,7 @@ describe("screenshot index", function () {
         it("can call fail callback", function () {
             var args = {
                     callbackId: jasmine.any(Number),
-                    userargs: encodeURIComponent(JSON.stringify({dest:'data', mime: 'image/png'}))
+                    userargs: encodeURIComponent(JSON.stringify({dest: 'data', mime: 'image/png'}))
                 };
 
             GLOBAL.qnx = {
@@ -102,7 +102,7 @@ describe("screenshot index", function () {
                     getWebViews: jasmine.createSpy("getWebViewsSpy").andCallFake(function () {
                         return [{
                             zOrder: "1"
-                        }]
+                        }];
                     })
                 }
             };
