@@ -68,8 +68,8 @@ _self.execute = function (args) {
         console.log("Error: " + data);
     };
 
-	if (typeof args === "undefined")
-        args = {};
+	args = args || {}
+
     exec(success, fail, _ID, "execute", {userargs: args});
     return result;
 };
