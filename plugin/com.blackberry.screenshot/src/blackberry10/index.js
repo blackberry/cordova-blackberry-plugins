@@ -46,7 +46,7 @@ module.exports = {
 		for (i = 0;i < wv.length;i++) {
 			if (wv[i].zOrder === '0') {
 				// found window handle.
-				result.ok(screenshotJNEXT.execute({
+				result.ok(screenshotJNEXT.getInstance().execute({
                     handle: wv[i].jsScreenWindowHandle,
                     userargs: userargs
 				}));
@@ -63,7 +63,8 @@ module.exports = {
 
 JNEXT.ScreenshotJNEXT = function ()
 {
-    var _self = this;
+    var _self = this,
+        hasInstance = false;
 
 	_self.execute = function (args) {
 		return JNEXT.invoke(_self._id, "execute " + JSON.stringify(args));
@@ -93,7 +94,13 @@ JNEXT.ScreenshotJNEXT = function ()
 
     _self._id = "";
 
-    _self.init();
+    _self.getInstance = function () {
+        if (!hasInstance) {
+            _self.init();
+            hasInstance = true;
+        }
+        return _self;
+    };
 };
 
 screenshotJNEXT = new JNEXT.ScreenshotJNEXT();
