@@ -23,7 +23,6 @@
 
     <description>BlackBerry 10 Screenshot APIs</description>
     <license>Apache 2.0</license>
-    <author>Jon Webb, Morgan Parlee</author>
 
     <platform name="blackberry10">
         <js-module src="www/client.js">

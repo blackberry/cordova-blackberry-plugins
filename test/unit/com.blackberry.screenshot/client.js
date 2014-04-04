@@ -51,5 +51,10 @@ describe("screenshot client", function () {
             client.execute(options);
             expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "execute", {userargs: options});
         });
+
+        it("without any arguments should call exec", function () {
+            client.execute();
+            expect(window.cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "execute", {userargs: {}});
+        });
     });
 });

@@ -59,19 +59,35 @@ var _self = {},
     *   - or the full path of the destination file
     */
 
-_self.execute = function (args) {
-    var result,
-    success = function (data, response) {
-        result = data;
-    },
-    fail = function (data, response) {
-        console.log("Error: " + data);
-    };
+_self.execute = function (args, successCallback, failCallback) {
+    var success = function (data, response) {
+            function trampoline() {
+                if (typeof successCallback === 'function') {
+                    successCallback(data, response);
+                } else {
+                    // print data by default
+                    console.log(data);
+                }
+            }
+
+            setTimeout(trampoline, 0);
+        },
+        fail = function (data, response) {
+            function trampoline() {
+                if (typeof failCallback === 'function') {
+                    failCallback(data, response);
+                } else {
+                    // print the error by default
+                    console.log("Error: " + data);
+                }
+            }
+
+            setTimeout(trampoline, 0);
+        };
 
     args = args || {};
 
     exec(success, fail, _ID, "execute", {userargs: args});
-    return result;
 };
 
 module.exports = _self;

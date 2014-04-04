@@ -21,16 +21,17 @@ describe("blackberry.screenshot", function () {
         onErrorSpy = jasmine.createSpy("onErrorSpy");
     });
 
+    afterEach(function () {
+        onSuccessSpy = null;
+        onErrorSpy = null;
+    });
+
     it("blackberry.user.screenshot should exist", function () {
         expect(blackberry.screenshot).toBeDefined();
     });
 
     describe("execute", function () {
-        it("should function with no arguments", function () {
-            expect(blackberry.screenshot.execute()).toEqual(jasmine.any(String));
-        });
-
-        it("should function with arguments", function () {
+        it("should function with provided callbacks", function () {
             options = {
                 rect: {
                     x: 0,
@@ -42,7 +43,15 @@ describe("blackberry.screenshot", function () {
                 mime: "image/png"
             };
 
-            expect(blackberry.screenshot.execute(options)).toEqual(jasmine.any(String));
+            blackberry.screenshot.execute(options, onSuccessSpy, onErrorSpy);
+
+            waitsFor(function () {
+                return onSuccessSpy.callCount;
+            }, "success callback should be called", 10000);
+
+            runs(function () {
+                expect(onErrorSpy).not.toHaveBeenCalled();
+            });
         });
     });
 });
