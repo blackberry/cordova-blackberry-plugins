@@ -1,27 +1,23 @@
 /*
-* client.js
-*
-* Defines the JS client side of WebWorks BB10 screenshot extension
-*
-* https://github.com/jonwebb/webworks-bb10-screenshot
-*
-* Author: Jon Webb, jon@jonwebb.net
-*
-* Portions Copyright 2013 Innovatology.
-* Portions Copyright 2014 Blackberry Limited
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * https://github.com/jonwebb/webworks-bb10-screenshot
+ *
+ * Author: Jon Webb, jon@jonwebb.net
+ *
+ * Portions Copyright 2013 Innovatology.
+ * Portions Copyright 2014 BlackBerry Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 var _self = {},
     _ID = "com.blackberry.screenshot",
@@ -61,33 +57,25 @@ var _self = {},
 
 _self.execute = function (args, successCallback, failCallback) {
     var success = function (data, response) {
-            function trampoline() {
-                if (typeof successCallback === 'function') {
-                    successCallback(data, response);
-                } else {
-                    // print data by default
-                    console.log(data);
-                }
+            if (typeof successCallback === 'function') {
+                successCallback(data, response);
+            } else {
+                // print data by default
+                console.log(data);
             }
-
-            setTimeout(trampoline, 0);
         },
         fail = function (data, response) {
-            function trampoline() {
-                if (typeof failCallback === 'function') {
-                    failCallback(data, response);
-                } else {
-                    // print the error by default
-                    console.log("Error: " + data);
-                }
+            if (typeof failCallback === 'function') {
+                failCallback(data, response);
+            } else {
+                // print the error by default
+                console.log("Error: " + data);
             }
-
-            setTimeout(trampoline, 0);
         };
 
     args = args || {};
 
-    exec(success, fail, _ID, "execute", {userargs: args});
+    exec(success, fail, _ID, "execute", {userargs: args}, true);
 };
 
 module.exports = _self;
