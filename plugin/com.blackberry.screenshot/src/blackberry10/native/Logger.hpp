@@ -26,23 +26,23 @@ namespace webworks {
 
 class Logger {
 public:
-	explicit Logger(const char* name, ScreenshotJS *parent = NULL);
-	virtual ~Logger();
-	int debug(const char* message);
-	int info(const char* message);
-	int notice(const char* message);
-	int warn(const char* message);
-	int error(const char* message);
-	int critical(const char* message);
-	int setVerbosity(_Uint8t verbosity);
-	_Uint8t getVerbosity();
-	slog2_buffer_t hiPriorityBuffer();
-	slog2_buffer_t lowPriorityBuffer();
+    explicit Logger(const char* name, ScreenshotJS *parent = NULL);
+    virtual ~Logger();
+    int debug(const char* message);
+    int info(const char* message);
+    int notice(const char* message);
+    int warn(const char* message);
+    int error(const char* message);
+    int critical(const char* message);
+    int setVerbosity(_Uint8t verbosity);
+    _Uint8t getVerbosity();
+    slog2_buffer_t hiPriorityBuffer();
+    slog2_buffer_t lowPriorityBuffer();
 private:
-	ScreenshotJS *m_pParent;
-	slog2_buffer_set_config_t buffer_config;
-	slog2_buffer_t buffer_handle[2];
-	int log(slog2_buffer_t buffer, _Uint8t severity, const char* message);
+    ScreenshotJS *m_pParent;
+    slog2_buffer_set_config_t buffer_config;
+    slog2_buffer_t buffer_handle[2];
+    int log(slog2_buffer_t buffer, _Uint8t severity, const char* message);
 };
 
 } /* namespace webworks */

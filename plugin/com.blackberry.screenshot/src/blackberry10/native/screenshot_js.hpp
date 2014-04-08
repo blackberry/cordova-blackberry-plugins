@@ -19,15 +19,14 @@
  * limitations under the License.
  */
 
-
 #ifndef SCREENSHOT_JS_HPP_
 #define SCREENSHOT_JS_HPP_
 
 #define VERSION "1.0" // extension version number
 #define TRACE 0 // send trace events back to JS?
 
-#include <string.h>
-#include "public/plugin.h"
+#include <string>
+#include <plugin.h>
 #include <json/reader.h>
 #include "screenshot_ndk.hpp"
 #include "Logger.hpp"

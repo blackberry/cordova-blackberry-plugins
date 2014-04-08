@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-#include "Logger.hpp"
+ma#include "Logger.hpp"
 #include "screenshot_js.hpp"
 #include <slog2.h>
 
 namespace webworks {
 
 Logger::Logger(const char* name, ScreenshotJS *parent): m_pParent(parent) {
-	buffer_config.buffer_set_name = name;
-	buffer_config.num_buffers = 2;
-	buffer_config.verbosity_level = SLOG2_DEBUG1;
+    buffer_config.buffer_set_name = name;
+    buffer_config.num_buffers = 2;
+    buffer_config.verbosity_level = SLOG2_DEBUG1;
 
-	/* Configure the first buffer, using 7 x 4KB pages.  This larger buffer will be used for
-	   very chatty logging.  Our goal is to have 30-60 seconds of history at any given time,
-	   so we will want to log at a rate of around one log line with a string of 16 bytes
-	   long every 150 milliseconds.
-	*/
+    /* Configure the first buffer, using 7 x 4KB pages.  This larger buffer will be used for
+       very chatty logging.  Our goal is to have 30-60 seconds of history at any given time,
+       so we will want to log at a rate of around one log line with a string of 16 bytes
+       long every 150 milliseconds.
+    */
 
-	buffer_config.buffer_config[0].buffer_name = "low_priority";
-	buffer_config.buffer_config[0].num_pages = 7;
+    buffer_config.buffer_config[0].buffer_name = "low_priority";
+    buffer_config.buffer_config[0].num_pages = 7;
 
 	/* Configure the second buffer, which we will use for high level info logging that is very
 	   infrequent, but we want a longer history (hours or maybe even over a day or two).  This

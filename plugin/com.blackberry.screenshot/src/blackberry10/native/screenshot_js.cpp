@@ -30,10 +30,10 @@
 #include <json/reader.h>
 #include "screenshot_js.hpp"
 
-#if TRACE==1
-	#define trace(x) NotifyTrace(x)
+#if TRACE == 1
+    #define trace(x) NotifyTrace(x)
 #else
-	#define trace(x) ;
+    #define trace(x) ;
 #endif
 
 using namespace std;
@@ -42,17 +42,17 @@ using namespace std;
  * Screenshot constructor
  */
 ScreenshotJS::ScreenshotJS(const std::string& id)  {
-	m_pLogger = new webworks::Logger("ScreenshotJS", this);
-	m_pTemplateController = new webworks::ScreenshotNDK();
-	m_id = id;
+    m_pLogger = new webworks::Logger("ScreenshotJS", this);
+    m_pTemplateController = new webworks::ScreenshotNDK();
+    m_id = id;
 }
 
 /**
  * Screenshot destructor
  */
 ScreenshotJS::~ScreenshotJS() {
-	delete m_pTemplateController;
-	delete m_pLogger;
+    delete m_pTemplateController;
+    delete m_pLogger;
 }
 
 /**
@@ -85,28 +85,28 @@ bool ScreenshotJS::CanDelete() {
  * called by JNext to invoke methods on our object
  */
 std::string ScreenshotJS::InvokeMethod(const std::string& command) {
-	trace("InvokeMethod");
-	trace("command="+command);
+    trace("InvokeMethod");
+    trace("command="+command);
 
-	int space;
-	std::string strCommand;
-	std::string strArgs;
-	Json::Reader jsr;
-	Json::Value args;
+    int space;
+    std::string strCommand;
+    std::string strArgs;
+    Json::Reader jsr;
+    Json::Value args;
 
-	/* split command and arguments */
-	space = command.find_first_of(" ");
-	if(space<0)
-		return "error:No arguments specified";
+    /* split command and arguments */
+    space = command.find_first_of(" ");
+    if(space<0)
+        return "error:No arguments specified";
 
-	strCommand = command.substr(0, space);
-	strArgs = command.substr(space+1, command.length());
-	if(!jsr.parse(strArgs, args))
-		return "error:parsing JSON arguments";
+    strCommand = command.substr(0, space);
+    strArgs = command.substr(space+1, command.length());
+    if(!jsr.parse(strArgs, args))
+        return "error:parsing JSON arguments";
 
-	/* which method is being invoked? */
-	if (strCommand == "execute") {
-    	return m_pTemplateController->execute(args);
+    /* which method is being invoked? */
+    if (strCommand == "execute") {
+        return m_pTemplateController->execute(args);
     }
 
     return "error:unsupported method "+strCommand;
@@ -116,16 +116,16 @@ std::string ScreenshotJS::InvokeMethod(const std::string& command) {
  * Send an event to JavasCript side
  */
 void ScreenshotJS::NotifyEvent(const std::string& event) {
-	std::string eventString = m_id + " ";
-	eventString.append(event);
-	SendPluginEvent(eventString.c_str(), m_pContext);
+    std::string eventString = m_id + " ";
+    eventString.append(event);
+    SendPluginEvent(eventString.c_str(), m_pContext);
 }
 /**
  * Send a trace event to JavaScript side
  */
 #ifdef TRACE
-	void ScreenshotJS::NotifyTrace(const std::string& output) {
-		std::string traceOutput = "trace: "+output;
-		m_pLogger->debug(traceOutput.c_str());
-	}
+    void ScreenshotJS::NotifyTrace(const std::string& output) {
+        std::string traceOutput = "trace: "+output;
+        m_pLogger->debug(traceOutput.c_str());
+    }
 #endif
