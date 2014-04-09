@@ -25,12 +25,12 @@ namespace webworks {
 
 class ScreenshotNDK {
 public:
-	explicit ScreenshotNDK(ScreenshotJS *parent = NULL);
-	virtual ~ScreenshotNDK();
-	std::string execute(Json::Value args);
+    explicit ScreenshotNDK(ScreenshotJS *parent = NULL);
+    virtual ~ScreenshotNDK();
+    std::string execute(Json::Value args);
 
 private:
-	ScreenshotJS *m_pParent;
+    ScreenshotJS *m_pParent;
 };
 
 } // namespace webworks

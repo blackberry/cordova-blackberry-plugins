@@ -19,6 +19,7 @@
  * limitations under the License.
  */
 
+
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -26,17 +27,19 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cpp/sstream>
 #include <json/reader.h>
+#include <cpp/sstream>
+#include <string>
+
 #include "screenshot_js.hpp"
 
 #if TRACE == 1
     #define trace(x) NotifyTrace(x)
 #else
-    #define trace(x) ;
+    #define trace(x) {}
 #endif
 
-using namespace std;
+/*using namespace std;*/
 
 /**
  * Screenshot constructor
@@ -96,12 +99,12 @@ std::string ScreenshotJS::InvokeMethod(const std::string& command) {
 
     /* split command and arguments */
     space = command.find_first_of(" ");
-    if(space<0)
+    if (space < 0)
         return "error:No arguments specified";
 
     strCommand = command.substr(0, space);
     strArgs = command.substr(space+1, command.length());
-    if(!jsr.parse(strArgs, args))
+    if (!jsr.parse(strArgs, args))
         return "error:parsing JSON arguments";
 
     /* which method is being invoked? */

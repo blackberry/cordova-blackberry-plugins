@@ -17,8 +17,8 @@
 #ifndef LOGGER_HPP_
 #define LOGGER_HPP_
 
-#include <string>
 #include <slog2.h>
+#include <string>
 
 class ScreenshotJS;
 

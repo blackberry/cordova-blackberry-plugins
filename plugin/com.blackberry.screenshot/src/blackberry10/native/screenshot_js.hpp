@@ -25,14 +25,15 @@
 #define VERSION "1.0" // extension version number
 #define TRACE 0 // send trace events back to JS?
 
-#include <string>
 #include <plugin.h>
 #include <json/reader.h>
-#include "screenshot_ndk.hpp"
+#include <string>
 #include "Logger.hpp"
+#include "screenshot_ndk.hpp"
+
+
 
 class ScreenshotJS: public JSExt {
-
 public:
     explicit ScreenshotJS(const std::string& id);
     virtual ~ScreenshotJS();
