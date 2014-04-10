@@ -17,7 +17,7 @@ var onSuccess,
     onError,
     onSuccessFlag,
     onErrorFlag,
-    delay = 750;
+    delay = 7000;
 
 describe("blackberry.invoke", function () {
     beforeEach(function () {
@@ -26,17 +26,16 @@ describe("blackberry.invoke", function () {
         onSuccess = jasmine.createSpy("success callback").andCallFake(
             function () {
                 onSuccessFlag = true;
-            });
+        });
         onError = jasmine.createSpy("error callback").andCallFake(
             function () {
                 onErrorFlag = true;
-            });
+        });
     });
 
     afterEach(function () {
         onSuccess = null;
         onError = null;
-        request = null;
         onSuccessFlag = false;
         onErrorFlag = false;
     });
@@ -248,106 +247,100 @@ describe("blackberry.invoke", function () {
         });
     });
 
-    describe("Cards", function () {
-        var request = {
-                target: "com.webworks.test.functional.invoke.card.target",
-            },
-            onChildCardClosed,
-            onChildCardStartPeek,
-            onChildCardEndPeek,
-            confirm;
-
-        beforeEach(function () {
-            onChildCardClosed = jasmine.createSpy("onChildCardClosed event");
-            onChildCardStartPeek = jasmine.createSpy("onChildCardStartPeek event");
+    it('invoke should invoke camera card', function () {
+        var request = {action: "bb.action.CAPTURE", target: "sys.camera.card"},
+            confirm,
+            onChildCardClosed = jasmine.createSpy("onChildCardClosed event"),
+            onChildCardStartPeek = jasmine.createSpy("onChildCardStartPeek event"),
             onChildCardEndPeek = jasmine.createSpy("onChildCardEndPeek event");
             document.addEventListener("onChildCardClosed", onChildCardClosed);
             document.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
             document.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
-        });
 
-        afterEach(function () {
-            onChildCardClosed = null;
-            onChildCardStartPeek = null;
-            onChildCardEndPeek = null;
-            document.removeEventListener("onChildCardClosed", onChildCardClosed);
-            document.removeEventListener("onChildCardStartPeek", onChildCardStartPeek);
-            document.removeEventListener("onChildCardEndPeek", onChildCardEndPeek);
-            confirm = null;
-        });
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
 
-        it('invoke should invoke card', function () {
-            try {
-                blackberry.invoke.invoke(request, onSuccess, onError);
-            } catch (e) {
-                console.log(e);
-            }
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
 
-            waitsFor(function () {
-                return onSuccessFlag || onErrorFlag;
-            }, "The callback flag should be set to true", delay);
+        runs(function () {
+            waits(delay);
 
             runs(function () {
+                confirm = window.confirm("Did it invoke camera card?");
+                expect(confirm).toEqual(true);
+                expect(onSuccess).toHaveBeenCalled();
+                expect(onError).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    it('invoke should not invoke card whith invalid target name', function () {
+        var request =  {target: "net.rim.webworks.invoke.invoke.invalid.card.target"},
+            confirm,
+            onChildCardClosed = jasmine.createSpy("onChildCardClosed event"),
+            onChildCardStartPeek = jasmine.createSpy("onChildCardStartPeek event"),
+            onChildCardEndPeek = jasmine.createSpy("onChildCardEndPeek event");
+            document.addEventListener("onChildCardClosed", onChildCardClosed);
+            document.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
+            document.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
+
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            confirm = window.confirm("Did it NOT invoke card?");
+            expect(confirm).toEqual(true);
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(onError).toHaveBeenCalled();
+        });
+    });
+
+    it('invoke should be able to call closeChildCard after successfully invoking a card', function () {
+        var request = {action: "bb.action.CAPTURE", target: "sys.camera.card"},
+            confirm,
+            onChildCardClosed = jasmine.createSpy("onChildCardClosed event"),
+            onChildCardStartPeek = jasmine.createSpy("onChildCardStartPeek event"),
+            onChildCardEndPeek = jasmine.createSpy("onChildCardEndPeek event");
+            document.addEventListener("onChildCardClosed", onChildCardClosed);
+            document.addEventListener("onChildCardStartPeek", onChildCardStartPeek);
+            document.addEventListener("onChildCardEndPeek", onChildCardEndPeek);
+
+        alert("This test will invoke card and close it without user interaction.");
+
+        try {
+            blackberry.invoke.invoke(request, onSuccess, onError);
+        } catch (e) {
+            console.log(e);
+        }
+
+        waitsFor(function () {
+            return onSuccessFlag || onErrorFlag;
+        }, "The callback flag should be set to true", delay);
+
+        runs(function () {
+            expect(onSuccessFlag).toEqual(true);
+            if (onSuccessFlag) {
                 waits(delay);
 
                 runs(function () {
                     blackberry.invoke.closeChildCard();
-                    confirm = window.confirm("Did it invoke card and then closed?");
+                    confirm = window.confirm("Did you see card opened and then closed by ITSELF?");
                     expect(confirm).toEqual(true);
-                    expect(onSuccess).toHaveBeenCalled();
-                    expect(onError).not.toHaveBeenCalled();
                 });
-            });
-        });
-
-        it('invoke should not invoke card whith invalid target name', function () {
-            request.target = "net.rim.webworks.invoke.invoke.invalid.card.target";
-
-            try {
-                blackberry.invoke.invoke(request, onSuccess, onError);
-            } catch (e) {
-                console.log(e);
             }
-
-            waitsFor(function () {
-                return onSuccessFlag || onErrorFlag;
-            }, "The callback flag should be set to true", delay);
-
-            runs(function () {
-                confirm = window.confirm("Did it NOT invoke card?");
-                expect(confirm).toEqual(true);
-                expect(onSuccess).not.toHaveBeenCalled();
-                expect(onError).toHaveBeenCalled();
-            });
-        });
-
-        it('invoke should be able to call closeChildCard after successfully invoking a card', function () {
-            request.target = "com.webworks.test.functional.invoke.card.target";
-
-            alert("This test will invoke card and close it without user interaction.");
-
-            try {
-                blackberry.invoke.invoke(request, onSuccess, onError);
-            } catch (e) {
-                console.log(e);
-            }
-
-            waitsFor(function () {
-                return onSuccessFlag || onErrorFlag;
-            }, "The callback flag should be set to true", delay);
-
-            runs(function () {
-                expect(onSuccessFlag).toEqual(true);
-                if (onSuccessFlag) {
-                    waits(delay);
-
-                    runs(function () {
-                        blackberry.invoke.closeChildCard();
-                        confirm = window.confirm("Did you see card opened and then closed by ITSELF?");
-                        expect(confirm).toEqual(true);
-                    });
-                }
-            });
         });
     });
 });
