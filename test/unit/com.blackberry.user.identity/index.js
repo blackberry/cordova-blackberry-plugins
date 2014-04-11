@@ -126,10 +126,14 @@ describe("user.identity index", function () {
                 option: 0,
                 value: true
             },
+            expectedOptions = {
+                option: 0,
+                value: "true"
+            },
             args = encoderStringifier(options);
 
         index.setOption(null, null, args, null);
-        expect(JNEXT.invoke).toHaveBeenCalledWith(jasmine.any(String), "setOption " + JSON.stringify(options));
+        expect(JNEXT.invoke).toHaveBeenCalledWith("1", "setOption " + JSON.stringify(expectedOptions));
         expect(MockPluginResult.prototype.ok).toHaveBeenCalled();
     });
 
