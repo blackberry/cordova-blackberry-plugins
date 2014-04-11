@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+* Copyright 2014 BlackBerry Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+<html>
+    <head>
+        <title>Custom Context Menu API test</title>
+        <script src="local:///cordova.js" type="text/javascript"></script>
+        <script src="script.js" type="text/javascript"></script>
+        <style type="text/css">
+            p {font-size:small}
+            Button {
+                width: 100%;
+                height: 100px;
+                font-size: 200%;
+            }
+            body{
+                font-size:large;
+                background-color:#FFCCCC
+            }
+            h2 {
+              text-align: center
+            }
+        </style>
+
+    </head>
+    <p>
+    <button onclick="document.location ='local:///manual//ContextMenu//index.htm';" />Back to Main Page</button><br /><br /><br />
+        <div align="left">
+            <h2>Manipulate customContext with defineCustomContext API</h2><br />
+            
+            <h2>Test #1</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addLinkContextToCustom()">add LINK</button><br /><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #2</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addInputContextToCustom()">add INPUT</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #3</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addTextContextToCustom()">add TEXT</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #4</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addImageContextToCustom()">add IMAGE</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #5</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addImageLinkContextToCustom()">add IMAGE_LINK</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #6</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addMenuServiceToCustom()">add Menu Service Items</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #7</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addPlatformToCustom()">Add Platform Items</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #8</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="addAllContextAndMenuServiceAndPlatformToCustom()">Add Menu Service, Platform and ALL</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <h2>Test #9</h2><br />
+            Invoke the Context menu for the following links to verify what is in the context menu<br />
+            <button onclick="removeAdditionalContextsFromCustom()">Remove additional contexts</button><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />            
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <button onclick="document.location ='local:///manual//ContextMenu//index.htm';" />Back to Main Page</button><br /><br />
+        </div>
+        </p>
+    
+    </body>
+</html>
+
+
+
+
+
+
+

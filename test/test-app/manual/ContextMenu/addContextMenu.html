@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!--
+* Copyright 2014 BlackBerry Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+<html>
+    <head>
+        <title>Add Context Menu tests</title>
+        <script src="local:///cordova.js" type="text/javascript"></script>
+        <script src="script.js" type="text/javascript"></script>
+        <style type="text/css">
+            p {font-size:small}
+            Button {
+                width: 100%;
+                height: 100px;
+                font-size: 200%;
+            }
+            body{
+                font-size:large;
+                background-color:#C7E771
+            }
+            h2 {
+              text-align: center
+            }
+        </style>
+    </head>
+
+    <button onclick="document.location ='local:///manual//ContextMenu//index.htm';" />Back to Main Page</button><br />
+    <br />
+        <h1 align="center">Add Context Menu tests</h1>
+
+        The following buttons will change the context menu of each of the below items in the app. 
+        <div align="left">
+            <br />
+            
+            <h2>Test #1 - Change the copy action in the context menu</h2>
+            <button onclick="overridePlatform()">Change the copy action in the context menus</button>
+            <br />
+            The above button will only affect the phone number link or any text link. When you click on the button, go to the telephone link and check to see if the "copy" option in the context menu has been changed to say "CustomCopy!" and the icon is now orange. Select custom copy and an alert will show up to say "Wow you successfully overrode the platform menu item Copy"<br />
+        <br />
+        <a href="tel:654-2343-23423">A phone number link for context tests</a><br/>
+        <a href="http://www.google.com">This is a link</a><br />
+        <br />
+        Select the above telephone link or text link and invoke the context menu. Verify that you have the following in the context menu:<br />
+        <ul>
+            <li>Copy - with the new icon and label</li>
+            <li>Copy Link</li>
+            <li>Save link as (only for text link)</li>
+            <li>Call (only for telephone link)</li>
+            <li>Send Text Message (only for telephone link)</li>
+            <li>Add to Contact (only for telephone link)</li>
+            <li>Share</li>
+            <li>Open in Phone (only for telephone link)</li>
+            <li>Open in Browser (only for text link)</li>
+            <li>Dismiss Selection</li>
+        </ul>
+        <h4>For telephone link:</h4>
+        If you pull out the context menu, at the top it should say "A phone number link for context tests" with the phone number<br />
+        <h4>For text link:</h4>
+        If you pull out the context menu, at the top it should say "This is a link" with the URL<br />
+        
+        <h2>Test #2</h2><br />
+            <button onclick="clearCopyOverride()">Clear the changes in the Copy action<br />The Copy selection should have reverted back to default</button><br />
+            Check the following links/images to verify that the copy selection is NOT in the context menu
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            
+            
+            <br />
+            <h2>Test #3</h2><br />
+            <button onclick="overrideMenuServiceShare()">Create a new menu item called CustomMenuOption</button><br />
+            <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+                Select the above links to invoke the context menu. Verify that you have this in the menu:
+            <ul>
+                <li>CustomMenuOption</li>
+            </ul><br />
+            
+            <h2>Test #4</h2><br />
+            <button onclick="clearMSOverride()">Clear the custom option button and put the context menu back to default </button>
+                Pushing the above button removed the custom share button.
+                Check the following links/images to verify that the share selection is now back to the default icon and settings.<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+                
+            
+            
+            <h2>Test #5</h2><br/>
+            <button onclick="disableContextMenu()">Disable Context Menu</button><br />
+            Select items below to try to invoke the context menu. Verify that no context menu to shows up
+                phone number:<br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br/>
+                external site:<br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                local image link:<br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <br />
+                
+                
+            <h2>Test #6</h2><br />
+            <button onclick="reenableContextMenu()">Enable Context Menu</button>
+            <br />
+            Select anything below to try to invoke the context menu. Verify that the context menu shows up
+            Verify that the Context Image Link was added from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            
+            
+            <h2>Test #7</h2><br />
+            <button onclick="addMenuItemContextAll()">Add custom item [CONTEXT_ALL]</button><br />
+            The above button will add a new context menu with the label "All". Select any image or link below and invoke the context menu allow you see the new item in the context menu.
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            
+            <br />
+            <h2>Test #8</h2><br />
+            <button onclick="removeMenuItemContextAll()">Remove custom item [CONTEXT_ALL]</button><br />
+            Verify that the following links do NOT have the "ALL" selection in the context menu:
+            <br />
+            <a href="http://www.google.com">This is a link</a><br />
+            <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="200" height="150" /><br />
+            <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="200" height="120"></a><br />
+            <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+            <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            
+            
+            <h2>Test #9</h2><br />
+            <button onclick="addMenuItemContextLink()">Add custom item [CONTEXT_LINK]</button><br />
+            Verify that a context link Link was added to the context menu for the following items:<br />
+            <a href="http://www.google.com">This is a link</a><br />
+            <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+            <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+            <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+            <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            Verify that the context menu option "LINK" is on the following listed items:
+            <ul>
+                <li>This is a link</li>
+                <li>w3c Image link</li>
+                <li>This is a phone number link for context texts</li>
+            </ul>
+            
+            
+            <h2>Test #10</h2><br />
+            <button onclick="removeMenuItemContextLink()">Remove custom item [CONTEXT_LINK]</button><br />
+            Verify that the context "link" was removed from the context menu all the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />           
+            <br />
+            
+            
+            <h2>Test #11 - Supported only in 10.1 devices and playbook. Starting in 10.2? the CCM was moved to the TCM because there was complaints in cutting and pasting. The API works, but it just won't show up for text</h2><br />
+            <button onclick="addMenuItemContextInput()">Add custom item [CONTEXT_INPUT]</button><br />
+            Verify that an a context Input was added to the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            <br />
+            
+            
+            <h2>Test #12 - Supported only in 10.1 devices and playbook. Starting in 10.2 the CCM was moved to the TCM because there was complaints in cutting and pasting</h2><br />
+            <button onclick="removeMenuItemContextInput()">Remove custom item [CONTEXT_INPUT]</button><br />
+            Verify that the Context Input was removed from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            <br />
+            
+            
+            <h2>Test #13 - Supported only in 10.1 devices and playbook. Starting in 10.2 the CCM was moved to the TCM because there was complaints in cutting and pasting</h2><br />
+            <button onclick="addMenuItemContextIText()">Add custom item [CONTEXT_TEXT]</button><br />
+            Verify that the Context Text was added from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+                Input box: <input type="text" name="input" /><br />
+                Search box: <input id="mysearch" type="search" placeholder="search"><br/>
+                
+
+            <br />
+            <br />
+            
+            
+            <h2>Test #14 - supported only in 10.1 devices and playbook. Starting in 10.2 the CCM was moved to the TCM because there was complaints in cutting and pasting</h2><br />
+            <button onclick="removeMenuItemContextIText()">Remove custom item [CONTEXT_TEXT]</button><br />
+            Verify that the Context Text was removed from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+                Input box: <input type="text" name="input" /><br />
+                Search box: <input id="mysearch" type="search" placeholder="search"><br/>
+            <br />
+            <br />
+            
+            
+            <h2>Test #15</h2><br />
+            <button onclick="addMenuItemContextImage()">Add custom item [CONTEXT_IMAGE]</button><br />
+            Verify that the Context Image was added to the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            <br />
+            
+            
+            <h2>Test #16</h2><br />
+            <button onclick="removeMenuItemContextImage()">Remove custom item [CONTEXT_IMAGE]</button><br />
+            Verify that the Context Image  was removed from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            <br />
+            
+            
+            <h2>Test #17</h2><br />
+            <button onclick="addMenuItemContextImageLink()">Add custom item [CONTEXT_IMAGE_LINK]</button><br />
+            Verify that the Context Image Link was added from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            <br />
+            
+            <h2>Test #18</h2><br />
+            <button onclick="removeMenuItemContextImageLink()">Remove custom item [CONTEXT_IMAGE_LINK]</button><br />
+            Verify that the Context Image Link was removed from the context menu for the following items:<br />
+                <a href="http://www.google.com">This is a link</a><br />
+                <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+                <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+                <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+                <a href="tel:654-2343-23423">A phone number link for context tests</a><br />
+            <br />
+            <br />
+            <button onclick="document.location ='local:///manual//ContextMenu//index.htm';" /> Back to Main Page</button><br />
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>
