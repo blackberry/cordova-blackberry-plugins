@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Research In Motion Limited.
+ * Copyright 2014 BlackBerry Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #include <tokenizer.h>
 #include <stdio.h>
 #include <sys/slog.h>
-#include <QDebug>
 #include <string>
 #include "barcodescanner_js.hpp"
 #include "barcodescanner_ndk.hpp"
@@ -26,15 +25,9 @@
  * Default constructor.
  */
 BarcodeScannerJS::BarcodeScannerJS(const std::string& id) {
-        qDebug() << "I enterted the constructor";
         m_id = id;
-        qDebug() << "Im about to set the logger";
         m_pLogger = new webworks::Logger("BarcodeScannerJS", this);
-
-        qDebug() << "im about to set the controller";
         m_pBarcodeScannerController = new webworks::BarcodeScannerNDK(this);
-
-        qDebug() << "does this work constructor";
 }
 
 /**
@@ -59,14 +52,9 @@ char* onGetObjList() {
  * an object is created on the JavaScript server side.
  */
 JSExt* onCreateObject(const string& className, const string& id) {
-    qDebug() << "before returning BarcodeScannerJS";
-
     if (className == "BarcodeScannerJS") {
-        qDebug() << "I entered the if statement";
         return new BarcodeScannerJS(id);
     }
-
-    qDebug() << "does this work onCreateObject";
     return NULL;
 }
 
@@ -88,8 +76,6 @@ string BarcodeScannerJS::InvokeMethod(const string& command) {
     int index = command.find_first_of(" ");
     std::string strCommand = command.substr(0, index);
     std::string args = command.substr(index + 1, command.length());
-
-    qDebug() << "does this work InvokeMethod";
 
     if (strCommand == "startRead") {
         m_pBarcodeScannerController->startRead(args);

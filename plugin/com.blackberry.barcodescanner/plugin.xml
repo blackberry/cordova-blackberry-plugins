@@ -35,6 +35,7 @@
             <feature name="com.blackberry.barcodescanner" value="com.blackberry.barcodescanner" />
         </config-file>
         <dependency id="com.blackberry.io" />
+        <dependency id="org.apache.cordova.file" />
         <dependency id="com.blackberry.utils" />
     </platform>
 </plugin>

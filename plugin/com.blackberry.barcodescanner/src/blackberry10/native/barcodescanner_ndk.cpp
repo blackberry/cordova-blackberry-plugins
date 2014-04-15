@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Research In Motion Limited.
+ * Copyright 2014 BlackBerry Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,7 @@
 #include <img/img.h>
 #include <stdio.h>
 #include <camera/camera_api.h>
-#include <QDebug>
 #include <string>
-//#include <stream>
 #include <sstream>
 #include "barcodescanner_ndk.hpp"
 #include "barcodescanner_js.hpp"
@@ -197,7 +195,6 @@ static uint32_t rotation = 0;
         (void) handle;
         (void) arg;
 
-        qDebug() << "image_callback, standard JPEG images";
         if (buf->frametype == CAMERA_FRAMETYPE_JPEG) {
             fprintf(stderr, "still image size: %lld\n", buf->framedesc.jpeg.bufsize);
 
@@ -279,7 +276,6 @@ static uint32_t rotation = 0;
      * Constructor for Barcode Scanner NDK class
      */
     BarcodeScannerNDK::BarcodeScannerNDK(BarcodeScannerJS *parent) {
-        qDebug() << "i got to scannerNDK";
         //m_pParent->getLog()->debug("Constructor");
 
         m_pParent     = parent;
@@ -305,11 +301,9 @@ static uint32_t rotation = 0;
         camera_error_t err;
         // Open the camera first before running any operations on it
         printf("startRead ndk cpp");
-        qDebug() << "startRead start";
 
         err = camera_open(CAMERA_UNIT_REAR, CAMERA_MODE_RW | CAMERA_MODE_ROLL, &mCameraHandle);
         if (err != CAMERA_EOK){
-            qDebug() << "i went into if gg";
 #ifdef DEBUG
             fprintf(stderr, " Ran into an issue when initializing the camera = %d\n ", err);
 #endif
@@ -323,17 +317,14 @@ static uint32_t rotation = 0;
         // We want maximum framerate from the viewfinder which will scan for codes
         int numRates = 0;
         err = camera_get_photo_vf_framerates(mCameraHandle, true, 0, &numRates, NULL, NULL);
-        qDebug() << "first vf_framerates";
         double* camFramerates = new double[numRates];
         bool maxmin = false;
         err = camera_get_photo_vf_framerates(mCameraHandle, true, numRates, &numRates, camFramerates, &maxmin);
-        qDebug() << "second vf_framerates";
         // QC8960 doesn't allow for changing the rotation, so we'll just take note of it here and rotate later.
         uint32_t* rotations = new uint32_t[8];
         int numRotations = 0;
         bool nonsquare = false;
         err = camera_get_photo_rotations(mCameraHandle, CAMERA_FRAMETYPE_JPEG, true, 8, &numRotations, rotations, &nonsquare);
-        qDebug() << "photo_rotations";
         rotation = rotations[0] / 91;
 
         // We're going to turn on burst mode for the camera and set maximum framerate for the viewfinder
@@ -393,7 +384,6 @@ static uint32_t rotation = 0;
 
         // Now start capturing burst frames in JPEG format for sending to the front end.
         err = camera_start_burst(mCameraHandle, NULL, NULL, NULL, &image_callback, NULL);
-        qDebug() << "camera_start_burst ran";
         if (err != CAMERA_EOK) {
 #ifdef DEBUG
             fprintf(stderr, "Ran into an issue when starting up the camera in burst mode\n");
@@ -405,7 +395,6 @@ static uint32_t rotation = 0;
             return EIO;
         }
 
-        qDebug() << "i finished";
         std::string successEvent = "community.barcodescanner.started.native";
         root["successful"] = true;
         m_pParent->NotifyEvent(successEvent + " " + writer.write(root) + " " + callbackId);

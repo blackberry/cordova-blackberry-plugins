@@ -1,18 +1,18 @@
 /*
-* Copyright 2013 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2014 BlackBerry Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 var barcodescannerJNEXT,
     resultObjs = {},
     readCallbackId,
@@ -25,13 +25,15 @@ module.exports = {
     // methods to start and stop scanning
     startRead: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
+
         readCallbackId = result.callbackId;
         resultObjs[readCallbackId] = result;
         result.ok(barcodescannerJNEXT.getInstance().startRead(result.callbackId), true);
-        success()
+        success();
     },
     stopRead: function (success, fail, args, env) {
         var result = new PluginResult(args, env);
+
         resultObjs[result.callbackId] = result;
         result.ok(barcodescannerJNEXT.getInstance().stopRead(result.callbackId), true);
         success();
@@ -67,14 +69,11 @@ JNEXT.BarcodeScannerJNEXT = function () {
         JNEXT.registerEvents(self);
     };
 
-    // ************************
-    // Enter your methods here
-    // ************************
-
     // Fired by the Event framework (used by asynchronous callbacks)
 
     self.onEvent = function (strData) {
-        var arData = strData.split(" "),
+        var result,
+            arData = strData.split(" "),
             receivedEvent = arData[0],
             data = receivedEvent +  " " + arData[1],
             callbackId = arData[2] || "",
@@ -86,19 +85,17 @@ JNEXT.BarcodeScannerJNEXT = function () {
                 "community.barcodescanner.ended.native"
             ];
 
-
-        console.log(strData);
-        if(receivedEvent === "community.barcodescanner.started.native") {
+        if (receivedEvent === "community.barcodescanner.started.native") {
             endedFlag = false;
         }
 
-        if(receivedEvent === "community.barcodescanner.ended.native") {
+        if (receivedEvent === "community.barcodescanner.ended.native") {
             startedFlag = false;
             endedFlag = true;
             result = resultObjs[callbackId];
-            result.callbackOk(data, true)
+            result.callbackOk(data, true);
             delete resultObjs[readCallbackId];
-            readCallbackId = null
+            readCallbackId = null;
         }
 
         if (!endedFlag) {
@@ -109,8 +106,8 @@ JNEXT.BarcodeScannerJNEXT = function () {
                 result = resultObjs[readCallbackId];
             }
 
-            if (events.indexOf(receivedEvent) != -1) {
-                result.callbackOk(data, true)
+            if (events.indexOf(receivedEvent) !== -1) {
+                result.callbackOk(data, true);
             }
         }
 
@@ -124,9 +121,6 @@ JNEXT.BarcodeScannerJNEXT = function () {
         return JNEXT.invoke(self.m_id, "stopRead " + callbackId);
     };
 
-    // ************************
-    // End of methods to edit
-    // ************************
     self.m_id = "";
 
     self.getInstance = function () {
