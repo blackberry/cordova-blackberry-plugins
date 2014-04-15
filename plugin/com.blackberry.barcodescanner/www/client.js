@@ -18,7 +18,6 @@ var _self = {},
     _ID = "com.blackberry.barcodescanner",
     exec = cordova.require("cordova/exec"),
     reading = null,
-    canvas,
     latestFrame,
     fsSize = 1024 * 1024,
     codefoundCallback,
@@ -26,7 +25,12 @@ var _self = {},
     readFile,
     errorHandler,
     frameAvailable,
-    FileError;
+    FileError,
+    canvas = {
+        style: {
+            display: null
+        }
+    };
 
 errorHandler = function (e) {
     var msg = '';
@@ -132,7 +136,7 @@ _self.startRead = function (codeFoundCb, errorFoundCb, args) {
         errorFoundCb(data);
     };
 
-    exec(success, failure, _ID, "startRead", null);
+    exec(success, failure, _ID, "startRead", null, true);
 };
 
 _self.stopRead = function (successCb, failureCb) {
@@ -157,7 +161,7 @@ _self.stopRead = function (successCb, failureCb) {
         failureCb(data);
     };
 
-    exec(success, failure, _ID, "stopRead", null);
+    exec(success, failure, _ID, "stopRead", null, true);
 };
 
 module.exports = _self;
