@@ -10,8 +10,7 @@ UTILS=yes
 include ../../../../../../meta.mk
 
 SRCS+=barcodescanner_ndk.cpp \
-      barcodescanner_js.cpp \
-      Logger.cpp
+      barcodescanner_js.cpp
 
 include $(MKFILES_ROOT)/qtargets.mk
 

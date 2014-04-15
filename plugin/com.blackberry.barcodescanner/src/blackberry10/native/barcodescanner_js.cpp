@@ -26,7 +26,6 @@
  */
 BarcodeScannerJS::BarcodeScannerJS(const std::string& id) {
         m_id = id;
-        m_pLogger = new webworks::Logger("BarcodeScannerJS", this);
         m_pBarcodeScannerController = new webworks::BarcodeScannerNDK(this);
 }
 
@@ -35,7 +34,6 @@ BarcodeScannerJS::BarcodeScannerJS(const std::string& id) {
  */
 BarcodeScannerJS::~BarcodeScannerJS() {
         delete m_pBarcodeScannerController;
-        delete m_pLogger;
 }
 
 /**
@@ -91,13 +89,7 @@ string BarcodeScannerJS::InvokeMethod(const string& command) {
 
 // Notifies JavaScript of an event
 void BarcodeScannerJS::NotifyEvent(const std::string& event) {
-    //(void) event;
-
     std::string eventString = m_id + " ";
     eventString.append(event);
     SendPluginEvent(eventString.c_str(), m_pContext);
-}
-
-webworks::Logger* BarcodeScannerJS::getLog() {
-    return m_pLogger;
 }

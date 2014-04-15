@@ -22,7 +22,6 @@
 #include <plugin.h>
 #include <string>
 #include "barcodescanner_ndk.hpp"
-#include "Logger.hpp"
 
 class BarcodeScannerJS: public JSExt {
 public:
@@ -31,11 +30,9 @@ public:
     virtual bool CanDelete();
     virtual std::string InvokeMethod(const std::string& command);
     void NotifyEvent(const std::string& event);
-    webworks::Logger* getLog();
 private:
     std::string m_id;
     webworks::BarcodeScannerNDK *m_pBarcodeScannerController;
-    webworks::Logger *m_pLogger;
 };
 
 #endif /* BarcodeScannerJS_HPP_ */
