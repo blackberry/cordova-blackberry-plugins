@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget 
-    xmlns="http://www.w3.org/ns/widgets" 
-    xmlns:rim="http://www.blackberry.com/ns/widgets" 
-    version="1.0.0" 
-    id="WebWorksTest" 
+<widget
+    xmlns="http://www.w3.org/ns/widgets"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
+    version="1.0.0"
+    id="WebWorksTest"
     rim:header="RIM:WebWorks/App">
     <name>WebWorks Test Application</name>
     <name xml:lang="fr-FR">WebWorks Test App-fr</name>
@@ -63,6 +63,7 @@
     <access uri="https://atg05-yyz.labyyz.testnet.rim.net/"/>
     <access uri="file:///accounts/1000/appData"/>
     <access uri="http://169.254.0.2/" subdomains="true"/>
+    <access uri="http://ci0000001875214.rim.net/" subdomains="true"/>
 
     <icon rim:hover="false" src="img/windowcover.png"/>
     <icon rim:hover="true" src="img/windowcover.png"/>

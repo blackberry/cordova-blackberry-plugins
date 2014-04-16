@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-var upload_source,
-    upload_target;
+var upload_target = "http://ci0000001875214.rim.net/upload.php";
 
 function testConstantValue(field, value) {
     expect(blackberry.io.filetransfer[field]).toBeDefined();
@@ -39,10 +38,83 @@ describe("blackberry.io.filetransfer", function () {
         expect(blackberry.io.filetransfer).toBeDefined();
     });
 
-    it('blackberry.io.filetransfer.* should be defined', function () {
+    it('blackberry.io.filetransfer.FILE_NOT_FOUND_ERR should be defined', function () {
         testConstantValue("FILE_NOT_FOUND_ERR", 1);
+    });
+
+    it('blackberry.io.filetransfer.INVALID_URL_ERR should be defined', function () {
         testConstantValue("INVALID_URL_ERR", 2);
+    });
+
+    it('blackberry.io.filetransfer.CONNECTION_ERR should be defined', function () {
         testConstantValue("CONNECTION_ERR", 3);
+    });
+
+    it('blackberry.io.filetransfer.PERMISSIONS_ERR should be defined', function () {
+        testConstantValue("PERMISSIONS_ERR", 4);
+    });
+
+    describe("blackberry.io.filetransfer.download", function () {
+        it('blackberry.io.filetransfer.download should exist', function () {
+            expect(blackberry.io.filetransfer.download).toBeDefined();
+        });
+
+        it('blackberry.io.filetransfer.download can download a file', function () {
+            var result,
+                failCallback = jasmine.createSpy('failCallback ');
+
+            runs(function () {
+                blackberry.io.filetransfer.download(
+                    "http://www.w3.org/2011/Talks/0928-webtv-nem-fd/slides.pdf",
+                        blackberry.io.sharedFolder + "/downloads/W3html5TV.pdf",
+                        function(callbackResult) {
+                            result = callbackResult;
+                        }, failCallback);
+            })
+
+            waitsFor(function() {
+                return result;
+            }, "Timeout occurred downloading file", 20000);
+
+            runs(function () {
+                expect(result).toBeDefined();
+                expect(result.name).toEqual("slides.pdf");
+                expect(result.fullPath).toBeDefined();
+                expect(failCallback.callCount).toEqual(0);
+            })
+        });
+    });
+
+    describe("blackberry.io.filetransfer.upload", function () {
+        it('blackberry.io.filetransfer.upload should exist', function () {
+            expect(blackberry.io.filetransfer.upload).toBeDefined();
+        });
+
+        it('blackberry.io.filetransfer.upload can upload a file', function () {
+            var result,
+                failCallback = jasmine.createSpy('failCallback ');
+
+            runs(function () {
+                blackberry.io.filetransfer.upload(
+                    blackberry.io.sharedFolder + "/../app/native/img/blackberry10.jpg",
+                    upload_target,
+                        function(callbackResult) {
+                            result = callbackResult;
+                        }, failCallback);
+            })
+
+            waitsFor(function() {
+                return result;
+            }, "Timeout occurred uploading file", 20000);
+
+            runs(function () {
+                expect(result).toBeDefined();
+                expect(result.response).toEqual("1");
+                expect(result.responseCode).toEqual(200);
+                expect(result.bytesSent).not.toEqual(0);
+                expect(failCallback.callCount).toEqual(0);
+            })
+        });
     });
 });
 
