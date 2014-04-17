@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-var _utils = require("./../../lib/utils"),
-    _appEvents = require("./../../lib/events/applicationEvents"),
+var _appEvents = require("./../../lib/events/applicationEvents"),
     _listeners = {},
     _actionMap = {
         entercover: {
@@ -32,12 +31,7 @@ var _utils = require("./../../lib/utils"),
         }
     };
 
-function processCover(cover) {
-    if (cover.cover.type === 'file') {
-        cover.cover.path = _utils.translatePath(cover.cover.path).replace(/file:\/\//, '');
-    }
-    return cover;
-}
+
 
 module.exports = {
 
@@ -78,40 +72,74 @@ module.exports = {
     },
 
     resetCover: function (success, fail, args, env) {
-        var result = new PluginResult(args, env);
+        var app = window.qnx.webplatform.getApplication(),
+            name = JSON.parse(decodeURIComponent(args.name)),
+            reset = {};
         try {
-            window.qnx.webplatform.getApplication().updateCover({"cover": "reset"});
-            result.ok(null, false);
+            if (app.updateCovers) {
+                reset[name] = { cover: "reset" };
+                app.updateCovers(reset);
+            } else {
+                app.updateCover({ cover: "reset"});
+            }
+            success();
         } catch (e) {
             console.log(e);
-            result.error("Unable to reset cover");
+            fail("Unable to reset cover");
         }
     },
 
-    coverSize: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            coverSize,
-            response;
+    coverSizes: function (success, fail, args, env) {
+        var app = window.qnx.webplatform.getApplication(),
+            coverSizes;
         try {
-            coverSize = window.qnx.webplatform.getApplication().coverSize;
-            response = (typeof coverSize === "string") ? JSON.parse(coverSize) : coverSize;
-            result.ok(response, false);
+            if (app.coverSizes) {
+                coverSizes = (typeof app.coverSizes === "string") ? JSON.parse(app.coverSizes) : app.coverSizes;
+            } else {
+                coverSizes = { fullSize: (typeof app.coverSize === 'string') ? JSON.parse(app.coverSize) : app.coverSize };
+            }
+            success(coverSizes);
         } catch (e) {
             console.log(e);
-            result.error("Unable to get coverSize");
+            fail("Unable to get coverSize");
         }
     },
 
-    updateCover: function (success, fail, args, env) {
-        var result = new PluginResult(args, env),
-            processedCover;
+    updateCovers: function (success, fail, args, env) {
+        var i,
+            translatedCovers = {},
+            app = window.qnx.webplatform.getApplication(),
+            covers = JSON.parse(decodeURIComponent(args.covers));
+        for (i = 0; i < covers.length; i++) {
+            translatedCovers[covers[i].name] = {
+                cover: {
+                    type: covers[i].type
+                },
+                text: covers[i].text,
+                transition: covers[i].transition,
+                badges: covers[i].badges
+            };
+            if (covers[i].type === 'file') {
+                translatedCovers[covers[i].name].cover.path = covers[i].path.replace(/file:\/\//, '');
+                if (translatedCovers[covers[i].name].cover.path.indexOf('local:///') === 0) {
+                    translatedCovers[covers[i].name].cover.path =                    
+                        app.getEnv("HOME").replace("/data", "/app/native/") + 
+                        translatedCovers[covers[i].name].cover.path.substring(9);
+                }
+            } else if (covers[i].type === 'snapshot') {
+                translatedCovers[covers[i].name].cover.capture = covers[i].capture;
+            }
+        }
         try {
-            processedCover = processCover(JSON.parse(decodeURIComponent(args.cover)));
-            window.qnx.webplatform.getApplication().updateCover(processedCover);
-            result.ok(null, false);
+            if (app.updateCovers) {
+                app.updateCovers(translatedCovers);
+            } else {
+                app.updateCover(translatedCovers.fullSize);
+            }
+            success();
         } catch (e) {
             console.log(e);
-            result.error("Unable to update cover");
+            fail("Unable to update cover");
         }
     }
 };
