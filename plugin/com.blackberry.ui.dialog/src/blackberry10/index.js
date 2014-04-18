@@ -110,18 +110,18 @@ module.exports = {
             };
             overlayWebView.showDialog(messageObj, function (result) {
                 if (args.type === 0) {//Ok dialog
-                    returnValue.return = "Ok";
+                    returnValue["return"] = "Ok";
                 } else if (args.type === 4) {//Confirm Dialog
                     if (result.ok) {
-                        returnValue.return = "Ok";
+                        returnValue["return"] = "Ok";
                     } else {
-                        returnValue.return = "Cancel";
+                        returnValue["return"] = "Cancel";
                     }
                 } else {
                     if (result.ok) {
-                        returnValue.return = "Ok";
+                        returnValue["return"] = "Ok";
                     } else {
-                        returnValue.return = "Cancel";
+                        returnValue["return"] = "Cancel";
                     }
                     returnValue.promptText = (result.oktext) ? decodeURIComponent(result.oktext) : null;
                 }
@@ -137,9 +137,9 @@ module.exports = {
             };
             overlayWebView.showDialog(messageObj, function (result) {
                 if (result.ok) {
-                    returnValue.return = buttons[args.type][0];
+                    returnValue["return"] = buttons[args.type][0];
                 } else {
-                    returnValue.return = buttons[args.type][1];
+                    returnValue["return"] = buttons[args.type][1];
                 }
                 pluginResult.callbackOk(returnValue, false);
             });

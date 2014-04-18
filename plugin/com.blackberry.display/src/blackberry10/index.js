@@ -28,17 +28,19 @@ module.exports = {
         var result = new PluginResult(args, env),
             views = qnx.webplatform.getWebViews(),
             handle = null,
-            z = -1;
+            z = -1,
+            values,
+            i;
 
-        args = JSON.parse(decodeURIComponent(args["input"]));
-        for (var i = 0; i < views.length; i++) {
-            if (views[i].visible && views[i].zOrder > z){
+        args = JSON.parse(decodeURIComponent(args.input));
+        for (i = 0; i < views.length; i++) {
+            if (views[i].visible && views[i].zOrder > z) {
                 z = views[i].zOrder;
                 handle = views[i].jsScreenWindowHandle;
             }
         }
         if (handle !== null) {
-            var values = { value: args, handle: handle };
+            values = { value: args, handle: handle };
             result.ok(preventSleep.getInstance().setPreventSleep(result.callbackId, values), false);
         } else {
             result.error("Unable to get window handle", false);

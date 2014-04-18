@@ -29,7 +29,7 @@ describe("display client", function () {
         GLOBAL.cordova = {
             exec: jasmine.createSpy().andCallFake(function (success, fail, ID, func, args) {
                 if (apis.indexOf(func) !== -1) {
-                    if(func === "isSleepPrevented") {
+                    if (func === "isSleepPrevented") {
                         success(_isSleepPrevented);
                     } else {
                         _isSleepPrevented = args.input;

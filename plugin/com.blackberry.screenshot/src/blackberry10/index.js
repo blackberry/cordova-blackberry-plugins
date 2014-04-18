@@ -33,7 +33,7 @@ module.exports = {
             i;
 
 		// userargs are encoded and need decoding & parsing into a json object
-		userargs = JSON.parse(decodeURIComponent(args["userargs"]));
+		userargs = JSON.parse(decodeURIComponent(args.userargs));
 		// which window handle should we use?
 		wv = qnx.webplatform.getWebViews();
 		for (i = 0;i < wv.length;i++) {

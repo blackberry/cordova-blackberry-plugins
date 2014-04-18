@@ -34,7 +34,7 @@ _self.setPreventSleep = function (option, onSuccess, onFail) {
 };
 
 _self.getPreventSleepStatus = function (onSuccess, onFail) {
-   exec(function (result) {
+    exec(function (result) {
         invokeCallback(onSuccess, result);
     }, function (error) {
         invokeCallback(onFail, error);

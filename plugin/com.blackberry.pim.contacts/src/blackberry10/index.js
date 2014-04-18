@@ -231,7 +231,7 @@ module.exports = {
             attributes.emails = nativeEmails;
         }
 
-        attributes["isWork"] = !_utils.isPersonal();
+        attributes.isWork = !_utils.isPersonal();
 
         if (attributes.id && attributes.id !== null) {
             attributes.id = window.parseInt(attributes.id);
@@ -264,7 +264,7 @@ module.exports = {
 
     invokeContactPicker: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
-            options = JSON.parse(decodeURIComponent(args["options"])),
+            options = JSON.parse(decodeURIComponent(args.options)),
             callback = function (args, reason) {
                 result.callbackOk({
                     "type": "doneCancel",
