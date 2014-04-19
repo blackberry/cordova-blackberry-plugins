@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-describe("blackberry.screenshot", function () {
+describe("blackberry.barcodescanner", function () {
     var onSuccessSpy, onErrorSpy, options;
 
     beforeEach(function () {
@@ -26,33 +26,8 @@ describe("blackberry.screenshot", function () {
         onErrorSpy = null;
     });
 
-    it("blackberry.screenshot should exist", function () {
-        expect(blackberry.screenshot).toBeDefined();
-    });
-
-    describe("execute", function () {
-        it("should function with provided callbacks", function () {
-            options = {
-                rect: {
-                    x: 0,
-                    y: 0,
-                    w: 100,
-                    h: 100
-                },
-                dest: "data:",
-                mime: "image/png"
-            };
-
-            blackberry.screenshot.execute(options, onSuccessSpy, onErrorSpy);
-
-            waitsFor(function () {
-                return onSuccessSpy.callCount;
-            }, "success callback should be called", 10000);
-
-            runs(function () {
-                expect(onErrorSpy).not.toHaveBeenCalled();
-            });
-        });
+    it("blackberry.barcodescanner should exist", function () {
+        expect(blackberry.barcodescanner).toBeDefined();
     });
 });
 
