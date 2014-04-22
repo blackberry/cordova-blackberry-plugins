@@ -22,6 +22,7 @@
   <dependency id="com.blackberry.app" />
   <dependency id="com.blackberry.bbm.platform" />
   <dependency id="com.blackberry.connection" />
+  <dependency id="com.blackberry.device" />
   <dependency id="com.blackberry.identity" />
   <dependency id="com.blackberry.invoke" />
   <dependency id="com.blackberry.invoke.card" />
@@ -33,6 +34,7 @@
   <dependency id="com.blackberry.pim.calendar" />
   <dependency id="com.blackberry.pim.contacts" />
   <dependency id="com.blackberry.push" />
+  <dependency id="com.blackberry.screenshot" />
   <dependency id="com.blackberry.sensors" />
   <dependency id="com.blackberry.system" />
   <dependency id="com.blackberry.ui.contextmenu" />
