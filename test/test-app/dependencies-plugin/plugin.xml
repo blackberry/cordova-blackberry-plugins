@@ -22,7 +22,7 @@
   <dependency id="com.blackberry.app" />
   <dependency id="com.blackberry.bbm.platform" />
   <dependency id="com.blackberry.connection" />
-  <dependency id="com.blackberry.device" />
+  <dependency id="com.blackberry.display" />
   <dependency id="com.blackberry.identity" />
   <dependency id="com.blackberry.invoke" />
   <dependency id="com.blackberry.invoke.card" />
