@@ -17,16 +17,19 @@
  * under the License.
  */
 
-    function takeScreenshot() {
-			// configure options
-		var options = {dest:'data:', mime:'image/png'};
-		// perform screenshot
-		var screenshot = blackberry.screenshot.execute(options);
-		// check result
-		if(screenshot.substr(0,5)=="data:") {
-			document.getElementById("myimage").src = screenshot;
-		}
-		else {
-			alert(screenshot);
-		}
-	}
+function takeScreenshot() {
+    // configure options
+    var options = {dest:'data:', mime:'image/png'};
+    function handler(screenshot, response) {
+        // check result
+        if(screenshot.substr(0,5)=="data:") {
+            document.getElementById("myimage").src = screenshot;
+        }
+        else {
+            alert(screenshot);
+        }
+    }
+    // perform screenshot
+
+    blackberry.screenshot.execute(options, handler, handler);
+}
