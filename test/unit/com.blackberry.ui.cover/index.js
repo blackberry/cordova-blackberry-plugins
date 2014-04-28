@@ -140,7 +140,7 @@ describe("index ui.cover", function () {
             expect(success).toHaveBeenCalled();
             expect(fail).not.toHaveBeenCalled();
             expect(mockedUpdateCovers).toHaveBeenCalledWith(output);
-         });
+        });
 
         it("updateCovers converts local:/// path", function () {
             var success = jasmine.createSpy(),
@@ -166,7 +166,7 @@ describe("index ui.cover", function () {
             expect(success).toHaveBeenCalled();
             expect(fail).not.toHaveBeenCalled();
             expect(mockedUpdateCovers).toHaveBeenCalledWith(output);
-         });
+        });
 
     });
 
