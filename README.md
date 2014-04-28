@@ -73,7 +73,7 @@ Extensions are all under the plugin/ folder. An extension must at least contain 
 
 If your extension requires native C/C++ code, a native JNEXT extension is needed.
 
-There is sample:  https://github.com/blackberry/WebWorks-Community-APIs/tree/master/BB10/TEMPLATE.
+There is sample:  https://github.com/blackberry/WebWorks-Community-APIs/tree/master/BB10/Template.
 
 For detailed docs please visit
 https://developer.blackberry.com/html5/documentation/creating_extensions_for_bb10_apps.html
