@@ -65,7 +65,7 @@ _self.Label = function (label, size, wrap) {
     this.label = label;
     this.size = size;
     this.wrap = typeof wrap === 'undefined' ? true : !!wrap; 
-}
+};
 
 _self.Cover = function (name, type) {
     var coverType = type;
