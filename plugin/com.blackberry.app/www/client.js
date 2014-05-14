@@ -22,8 +22,12 @@ var _self = {},
     ID = "com.blackberry.app",
     readOnlyValues,
     noop = function () {},
-    events = ["swipedown", "pause", "resume", "orientationchange", "keyboardopening", "keyboardopened",
-              "keyboardclosing", "keyboardclosed", "keyboardposition", "windowstatechanged", "unhandledkeyinput"];
+    events = ["swipedown",
+              "orientationchange",
+              "keyboardopening", "keyboardopened", "keyboardclosing", "keyboardclosed", "keyboardposition",
+              "windowstatechanged",
+              "unhandledkeyinput",
+              ];
 
 events.map(function (eventName) {
     var channel = cordova.addDocumentEventHandler(eventName),
