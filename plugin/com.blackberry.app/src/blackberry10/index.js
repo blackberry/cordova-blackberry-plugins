@@ -66,6 +66,12 @@ var _config = require("./../../lib/config"),
                 pluginResult.callbackOk(obj, true);
             }
         },
+        backbutton: {
+            event: "systemKeyPress-Back",
+            trigger: function (pluginResult, obj) {
+                pluginResult.callbackOk({type: "backbutton"}, true);
+            }
+        },
         menubutton: {
             event: "UnhandledKeyInput",
             trigger: function (pluginResult, obj) {

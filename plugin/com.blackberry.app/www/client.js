@@ -28,6 +28,7 @@ var _self = {},
               "windowstatechanged",
               "unhandledkeyinput",
               "menubutton",
+              "backbutton",
               ];
 
 events.map(function (eventName) {
