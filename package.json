@@ -23,7 +23,8 @@
     "shelljs": "0.1.3"
   },
   "dev-dependencies": {
-    "cordova": "*"
+    "cordova": "*",
+    "jake": "0.7.13"
   },
   "bundledDependencies": [
     "connect",
