@@ -27,6 +27,7 @@ var _self = {},
               "keyboardopening", "keyboardopened", "keyboardclosing", "keyboardclosed", "keyboardposition",
               "windowstatechanged",
               "unhandledkeyinput",
+              "menubutton",
               ];
 
 events.map(function (eventName) {

@@ -66,6 +66,15 @@ var _config = require("./../../lib/config"),
                 pluginResult.callbackOk(obj, true);
             }
         },
+        menubutton: {
+            event: "UnhandledKeyInput",
+            trigger: function (pluginResult, obj) {
+                var e = JSON.parse(obj);
+                if (e.character === 61543 && !e.keyDown) {
+                    pluginResult.callbackOk({type: "menubutton"}, true);
+                }
+            }
+        },
         unhandledkeyinput: {
             event: "UnhandledKeyInput",
             trigger: function (pluginResult, obj) {
