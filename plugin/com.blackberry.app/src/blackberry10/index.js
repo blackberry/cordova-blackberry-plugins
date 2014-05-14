@@ -162,7 +162,7 @@ module.exports = {
             if (eventName === "orientationchange") {
                 _appEvents.removeEventListener("rotate", _listeners[eventName][env.webview.id][0]);
                 _appEvents.removeEventListener("rotateWhenLocked", _listeners[eventName][env.webview.id][1]);
-            } else if (eventName === "unhandledkeyinput") {
+            } else if (systemEvent === "UnhandledKeyInput") {
                 env.webview.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
             } else {
                 _appEvents.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
@@ -173,7 +173,7 @@ module.exports = {
             listener = [rotateTrigger.bind(null, result), rotateWhenLockedTrigger.bind(null, result)];
             _appEvents.addEventListener("rotate", listener[0]);
             _appEvents.addEventListener("rotateWhenLocked", listener[1]);
-        } else if (eventName === "unhandledkeyinput") {
+        } else if (systemEvent === "UnhandledKeyInput") {
             env.webview.addEventListener(systemEvent, listener);
         } else {
             _appEvents.addEventListener(systemEvent, listener);
@@ -194,7 +194,7 @@ module.exports = {
             if (eventName  === "orientationchange") {
                 _appEvents.removeEventListener("rotate", listener[0]);
                 _appEvents.removeEventListener("rotateWhenLocked", listener[1]);
-            } else if (eventName === "unhandledkeyinput") {
+            } else if (systemEvent === "UnhandledKeyInput") {
                 env.webview.removeEventListener(systemEvent, listener);
             } else {
                 _appEvents.removeEventListener(systemEvent, listener);
