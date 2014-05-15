@@ -24,13 +24,11 @@
     <description>BlackBerry 10 User Identity APIs</description>
     <license>Apache 2.0</license>
 
-    <dependency id="com.blackberry.utils" />
-
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.user.identity" />
-    </js-module>
-
     <platform name="blackberry10">
+        <dependency id="com.blackberry.utils" />
+        <js-module src="www/client.js">
+            <clobbers target="blackberry.user.identity" />
+        </js-module>
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>read_personally_identifiable_information</rim:permit>
         </config-file>

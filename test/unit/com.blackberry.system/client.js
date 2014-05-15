@@ -76,19 +76,6 @@ describe("system client", function () {
         });
     });
 
-    it("hasCapability", function () {
-        var result;
-
-        cordova.exec.andCallFake(function (success) {
-            success(true);
-        });
-
-        result = sysClient.hasCapability("abc.def");
-
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "hasCapability", {"capability": "abc.def"});
-        expect(result).toBeTruthy();
-    });
-
     it("getFontInfo", function () {
         var result;
 

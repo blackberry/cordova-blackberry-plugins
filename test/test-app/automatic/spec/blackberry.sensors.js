@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Research In Motion Limited.
+ * Copyright 2014 BlackBerry Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,16 @@ describe("blackberry.sensors", function () {
             waits(1000);
         });
 
-        it('should be able to get a list of supported sensors', function () {
+        it('should be able to get an array of supported sensors', function () {
             runs(function () {
-                expect(blackberry.sensors.supportedSensors).toEqual(jasmine.any(String));
+                var supportedSensors = blackberry.sensors.supportedSensors;
+
+                expect(supportedSensors.length).toBeGreaterThan(0);
+                expect(supportedSensors).toEqual(jasmine.any(Array));
+
+                for (var i = 0; i < supportedSensors.length; i++) {
+                    expect(supportedSensors[i]).toEqual(jasmine.any(String));
+                }
             });
         });
 

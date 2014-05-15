@@ -37,7 +37,7 @@ describe("sensors", function () {
         GLOBAL.cordova = {
             exec: jasmine.createSpy().andCallFake(function (success, fail, service, action, args) {
                 if (action === "supportedSensors") {
-                    success(["abc"]);
+                    success(JSON.stringify(["abc"]));
                 }
             }),
             addDocumentEventHandler: jasmine.createSpy("cordova.addDocumentEventHandler").andCallFake(function (eventName) {

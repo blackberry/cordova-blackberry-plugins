@@ -96,8 +96,8 @@ module.exports = {
         var result = new PluginResult(args, env),
             value, 
             developmentMode_args;
-        if (args && args["developmentMode"]) {
-            value = JSON.parse(decodeURIComponent(args["developmentMode"]));
+        if (args && args.developmentMode) {
+            value = JSON.parse(decodeURIComponent(args.developmentMode));
             developmentMode_args = {
                 "developmentMode" : value
             };
@@ -121,9 +121,9 @@ JNEXT.Payment = function ()
 
     self.getErrorObject = function (state, errorID, errorText) {
         var result = {}, successState = {}, errorObject = {};
-        successState["state"] = state;
-        errorObject["errorID"] = errorID;
-        errorObject["errorText"] = errorText;
+        successState.state = state;
+        errorObject.errorID = errorID;
+        errorObject.errorText = errorText;
         result.successState = {};
         result.successState = successState;
         result.errorObject = {};

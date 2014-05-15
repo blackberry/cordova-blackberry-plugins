@@ -48,10 +48,12 @@ JNEXT.IDS = function ()
 			setOptionsOpts.option = -1;
 		}
 
-        // Make sure value is a string/number/boolean to pass to C as a string
-		if ((typeof(setOptionsOpts.value) !== "string") &&
-				(typeof(setOptionsOpts.value) !== "number") &&
-				(typeof(setOptionsOpts.value) !== "boolean")) {
+        // Make sure value is a string to pass to C
+		if ((typeof(setOptionsOpts.value) === "number") || (typeof(setOptionsOpts.value) === "boolean")) {
+			setOptionsOpts.value = setOptionsOpts.value.toString();
+		}
+
+		if (typeof(setOptionsOpts.value) !== "string") {
 			setOptionsOpts.value = "";
 		}
 		return JNEXT.invoke(self.m_id, "setOption " + JSON.stringify(setOptionsOpts));

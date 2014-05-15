@@ -25,13 +25,11 @@
     <description>BlackBerry 10 Payment APIs</description>
     <license>Apache 2.0</license>
 
-    <dependency id="com.blackberry.utils" />
-
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.payment" />
-    </js-module>
-
     <platform name="blackberry10">
+        <dependency id="com.blackberry.utils" />
+        <js-module src="www/client.js">
+            <clobbers target="blackberry.payment" />
+        </js-module>
         <source-file src="src/blackberry10/index.js" />
         <lib-file src="src/blackberry10/native/device/libpaymentjnext.so" arch="device"/>
         <lib-file src="src/blackberry10/native/simulator/libpaymentjnext.so" arch="simulator"/>

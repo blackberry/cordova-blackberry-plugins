@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<!--
+* Copyright 2014 BlackBerry Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+<html>
+    <head>
+        <title>Context Menu API test</title>
+        <script src="local:///cordova.js" type="text/javascript"></script>
+        <script src="script.js" type="text/javascript"></script>
+        <style type="text/css">
+            p {font-size:small}
+            Button {
+                width: 600px;
+                height: 100px;
+                font-size: 200%;
+            }
+            body{
+                font-size: large;
+                background-color:#5795f2
+            }
+            h2 {
+              text-align: center
+            }
+        </style>
+    </head>
+    <p>
+    <input id="BackButton" type="button" value="Back to Main Page" onclick="document.location ='local:///manual//ContextMenu//index.htm';" /><br />
+
+    <br />
+        <h1 align="center">Context Menu tests</h1>
+        <h2>Test #1 - Verify the Context Menu on Hyperlinks</h2>
+        <a href="http://www.google.com">This is a link</a><br />
+        You should get the following in the context menu:
+        <ul>
+            <li>copy</li>
+            <li>copy link</li>
+            <li>save link as</li>
+            <li>share</li>
+            <li>open in browser</li>
+            <li>cancel</li>
+        </ul>
+        <br />
+        <br />
+        <h2>Test #2 - Verify if there is a context menu on input boxes - After 10.2 context menus for text is no longer supported and all option have been moved to the Text Context Menu (TCM)</h2>
+        Input box: <input type="text" name="input" /><br />
+        Steps:<br />
+        <ol>
+            <li>Don't type any text in the input box. Try to invoke the context menu. No context menu should ever show up (starting 10.2+)</li>
+            <li>Type text in the input box. Try to invoke the context menu. No context menu should show up (starting 10.2+)</li>
+        </ol>
+        <br />
+        <br />
+        <h2>Test #3 - Verify if there is a context menu on search boxes- After 10.2 context menus for text is no longer supported and all option have been moved to the Text Context Menu (TCM)</h2>
+        <label for="mysearch">Search box:</label>
+        <input id="mysearch" type="search" placeholder="search"><br/>
+        Steps:<br />
+        <ol>
+            <li>Don't type any text in the search input box. Try to invoke the context menu. No context menu should ever show up (starting in 10.2 builds)</li>
+        </ol>
+
+        <br />
+        <h2>Test #4 - Verify the context menu on a image with alternate text</h2>
+        <h4>Image:</h4>
+        <img border="0" src="local:///img/blackberry10.jpg" alt="Pulpit rock" width="304" height="228" /><br />
+        Select the above image and invoke the context menu. You shoud get the following in the menu:
+        <ul>
+            <li>Copy Image Link</li>
+            <li>Save Image</li>
+            <li>View Image</li>
+            <li>Share</li>
+            <li>Set As</li>
+            <li>Cancel</li>
+        </ul>
+
+        <br />
+        <br />
+        <h2>Test #5 - Verify that context menu on a local image with sizing</h2>
+        <h4>Local image link:</h4>
+        <a href="http://www.cnn.com"><img src="local:///img/barney.jpg" width="250" height="150"></a><br />
+        Select the above image and invoke the context menu. You should get the following in the menu:
+        <ul>
+            <li>Copy Link</li>
+            <li>Copy Image Link</li>
+            <li>Save Link As</li>
+            <li>Save Image</li>
+            <li>View Image</li>
+            <li>Share</li>
+            <li>Set As</li>
+            <li>Dismiss Selection</li>
+        </ul>
+        <br />
+        <br />
+        <h2>Test #6 - Verify the context menu on a remote image</h2>
+        <h4>Remote Image Link (w3):</h4>
+        <a href="http://www.w3.org"><img src="http://www.w3.org/2008/site/images/logo-w3c-mobile-lg.png"></a><br />
+        <br />
+        Select the above w3c image and invoke the context menu. Verify that you have the following in the menu:<br />
+        <ul>
+            <li>Copy Link</li>
+            <li>Copy Image Link</li>
+            <li>Save Link As</li>
+            <li>Save Image</li>
+            <li>View Image</li>
+            <li>Share</li>
+            <li>Open in Browser</li>
+            <li>Dismiss Selection</li>
+        </ul>
+        <br />
+        <br />
+        <h2>Test #7 - Verify the context menu on a phone number</h2>
+        <h4>Telephone</h4>
+        <a href="tel:654-2343-23423">A phone number link for context tests</a><br/>
+        <br />
+        Select the above telephone link and invoke the context menu. Verify that you have the following in the context menu:<br />
+        <ul>
+            <li>Copy</li>
+            <li>Copy Link</li>
+            <li>Call</li>
+            <li>Send Text Message</li>
+            <li>Add to Contact</li>
+            <li>Share</li>
+            <li>Open in Phone</li>
+            <li>Dismiss Selection</li>
+        </ul>
+        If you pull out the context menu, at the top it should say "A phone number link for context tests" with the phone number
+        <br />
+    <br />
+    <input id="back" type="button" value="Back to Main Page" onclick="document.location ='local:///manual//ContextMenu//index.htm';" /><br />
+
+    </p>
+    </body>
+</html>

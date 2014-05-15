@@ -47,7 +47,7 @@ var _self = {},
 Object.defineProperty(_self, "supportedSensors", {
     get: function () {
         var success = function (data, response) {
-                sensorArray = data;
+                sensorArray = JSON.parse(data);
             },
             fail = function (data, response) {
                 throw data;

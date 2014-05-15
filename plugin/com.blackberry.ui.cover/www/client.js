@@ -1,4 +1,7 @@
 /*
+
+ Copyright 2014 BlackBerry Ltd. 
+
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
  distributed with this work for additional information
@@ -20,15 +23,7 @@
 var _ID = "com.blackberry.ui.cover",
     _self = {},
     exec = cordova.require("cordova/exec"),
-    badges = true,
-    cover = {
-        cover: {
-            type: 'snapshot',
-            capture: {}
-        }
-    },
-    events = ["entercover", "exitcover"],
-    textLabels = [];
+    events = ["entercover", "exitcover"];
 
 events.map(function (eventName) {
     var channel = cordova.addDocumentEventHandler(eventName),
@@ -47,77 +42,17 @@ events.map(function (eventName) {
     };
 });
 
-_self.setContent = function (type, options) {
-    switch (type) {
-    case _self.TYPE_IMAGE:
-        if (cover.cover.capture) {
-            delete cover.cover.capture;
-        }
-        cover.cover.type = type;
-        cover.cover.path = options.path;
-        break;
-    case _self.TYPE_SNAPSHOT:
-        if (cover.cover.path) {
-            delete cover.cover.path;
-        }
-        cover.cover.type = type;
-        cover.cover.capture = options;
-        break;
-    default:
-        break;
-    }
+_self.resetCover = function (name, success, fail) {
+    exec(success, fail, _ID, "resetCover", { "name": name});
 };
 
-_self.setTransition = function (transition) {
-    cover["transition"] = transition;
+_self.updateCovers = function (covers, success, fail) {
+    exec(success, fail, _ID, "updateCovers", {"covers": covers});
 };
 
-_self.resetCover = function () {
-    delete cover["text"];
-    delete cover["transition"];
-    delete cover["badges"];
-    _self.labels = [];
-    _self.showBadges = true;
-    exec(function () {}, function () {}, _ID, "resetCover");
+_self.getCoverSizes = function (success, fail) {
+    exec(success, fail, _ID, "coverSizes");
 };
-
-_self.updateCover = function () {
-    cover["text"] = _self.labels;
-    cover["badges"] = _self.showBadges;
-    exec(function () {}, function () {}, _ID, "updateCover", {"cover": cover});
-};
-
-Object.defineProperty(_self, "coverSize", {
-    get: function () {
-        var value,
-            success = function (data, response) {
-                value = data;
-            },
-            fail = function (data, response) {
-                throw data;
-            };
-        exec(success, fail, _ID, "coverSize");
-        return value;
-    }
-});
-
-Object.defineProperty(_self, "labels", {
-    get: function () {
-        return textLabels;
-    },
-    set: function (newLabels) {
-        textLabels = newLabels;
-    }
-});
-
-Object.defineProperty(_self, "showBadges", {
-    get: function () {
-        return badges;
-    },
-    set: function (value) {
-        badges = value;
-    }
-});
 
 Object.defineProperty(_self, "TYPE_IMAGE", {"value": "file", "writable": false});
 Object.defineProperty(_self, "TYPE_SNAPSHOT", {"value": "snapshot", "writable": false});
@@ -125,5 +60,38 @@ Object.defineProperty(_self, "TRANSITION_FADE", {"value": "fade", "writable": fa
 Object.defineProperty(_self, "TRANSITION_NONE", {"value": "none", "writable": false});
 Object.defineProperty(_self, "TRANSITION_DEFAULT", {"value": "default", "writable": false});
 Object.defineProperty(_self, "TRANSITION_SLIDE", {"value": "slide", "writable": false});
+
+_self.Label = function (label, size, wrap) {
+    this.label = label;
+    this.size = size;
+    this.wrap = typeof wrap === 'undefined' ? true : !!wrap; 
+};
+
+_self.Cover = function (name, type) {
+    var coverType = type;
+    this.name = name;
+    this.__defineGetter__('type', function () {
+        return coverType;
+    });
+    this.__defineSetter__('type', function (val) {
+        coverType = val;
+        if (val === 'file') {
+            delete this.capture;
+            this.path = '';
+        } else if (val === 'snapshot') {
+            delete this.file;
+            this.capture = {
+                x: 0, 
+                y: 0,
+                width: 100,
+                height: 200
+            };
+        }
+    });
+    this.type = coverType;
+    this.text = [];
+    this.transition = 'default';
+    this.badges = true;
+};
 
 module.exports = _self;

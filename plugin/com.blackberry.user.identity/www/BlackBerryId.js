@@ -64,16 +64,6 @@ defineReadOnlyField(_self, "UID_KEY", "urn:bbid:uid");
 defineReadOnlyField(_self, "EMAIL_KEY", "urn:bbid:email");
 
 /*
- * BlackBerry ID core property - Date of Birth.
- */
-defineReadOnlyField(_self, "DATE_OF_BIRTH_KEY", "urn:bbid:dob");
-
-/*
- * BlackBerry ID core property - Country.
- */
-defineReadOnlyField(_self, "COUNTRY_KEY", "urn:bbid:cc");
-
-/*
  * BlackBerry ID core property type.
  */
 defineReadOnlyField(_self, "CORE_PROPERTY_TYPE", "0");
@@ -97,11 +87,6 @@ defineReadOnlyField(_self, "BBID_AUTHENTICATE", "0");
  * Confirm Email challenge type.
  */
 defineReadOnlyField(_self, "BBID_CONFIRM_EMAIL", "1");
-
-/*
- * Date of Birth challenge type.
- */
-defineReadOnlyField(_self, "BBID_DATE_OF_BIRTH_CHALLENGE", "2");
 
 /*
  * Default challenge flag.
