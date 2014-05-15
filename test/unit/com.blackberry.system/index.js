@@ -98,11 +98,6 @@ describe("system index", function () {
 
     });
 
-    it("hasCapability", function () {
-        sysIndex.hasCapability(undefined, undefined, {"capability": "network.wlan"}, undefined);
-        expect(mockedPluginResult.ok).toHaveBeenCalledWith(true, false);
-    });
-
     describe("qnx.webplatform.device properties", function () {
 
         it("can call fail if a property isn't present", function () {

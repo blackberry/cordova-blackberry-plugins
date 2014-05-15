@@ -191,7 +191,7 @@ _self.findEvents = function (findOptions, onFindSuccess, onFindError) {
             var realEvents = [];
 
             searchResult.events.forEach(function (event) {
-                event["folder"] = searchResult.folders[event.accountId + "-" + event.folderId];
+                event.folder = searchResult.folders[event.accountId + "-" + event.folderId];
                 realEvents.push(new CalendarEvent(calendarUtils.populateEvent(event)));
             });
 

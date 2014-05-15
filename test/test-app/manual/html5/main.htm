@@ -7,6 +7,19 @@
         <script src="local:///js/jquery-1.7.2.min.js"></script>
         <script src="local:///js/jquery.mobile-1.1.1.min.js"></script>
         <link rel="stylesheet" href="local:///css/jquery.mobile-1.1.1.min.css" />
+		<style type="text/css">
+			td {
+				padding: 5px;
+			}
+			th {
+				width: 50px;
+			}
+			button {
+				width: 100%;
+				height: 100px;
+				font-size: 200%;
+			}
+		</style>
 		<script language="javascript" type="text/javascript">
             function do_LocalImageTest() {
                 document.location.href = "local_Image_Testing.htm";
@@ -64,8 +77,7 @@
 	</head>
 	<body>
 
-        <input id="backButton" type="button" value="Back" onclick="document.location.href = 'local:///index.htm';" />
-
+        <input id="BackButton" type="button" value="Back to Main Page" onclick="document.location ='local:///manual//index.htm';" /><br /><br />
 	    <p> This WebWorks Smoke Test includes the following tests: </p>
 		<ol>
 		<li> Local CSS, Local JS file, Local Image, Local Html</li>
@@ -89,9 +101,9 @@
 		<p>
             <input id="Button4" type="button" value="Local JS File Test" onclick="return do_LocalJSFileTest()" /></p>
 	    <p>
-            <input id="Button6" type="button" value="AJAX call on local page" onclick="return do_AjaxTest()" /></p>
+            <input id="Button5" type="button" value="AJAX call on local page" onclick="return do_AjaxTest()" /></p>
 		<p>
-            <input id="Button7" type="button" value="Web DataBase Test" onclick="return do_WebDataBaseTest()" /></p>
+            <input id="Button6" type="button" value="Web DataBase Test" onclick="return do_WebDataBaseTest()" /></p>
 		<p>
             <input id="Button7" type="button" value="WebWorker Test" onclick="return do_WebWorkerTest()" /></p>
 		<p>
@@ -109,12 +121,17 @@
             <p>
                 <input id="Button17" type="button" value="Input Test" onclick="return do_input_Test()" /></p>
             <p>
-                <input id="Button178" type="button" value="Input File Types" onclick="document.location ='local:///manual/html5/input_types.html';" />
+                <input id="Button18" type="button" value="HTML5 Input Types" onclick="document.location ='local:///manual/html5/input_types.html';" />
             </p>
 			<p>
                 <input id="Button19" type="button" value="Get User Media" onclick="document.location ='local:///manual/html5/getUserMediaTest.htm';" />
             </p>
     </ol>
+    <br />
+    <br />
+        <input id="BackButton2" type="button" value="Back to Main Page" onclick="document.location ='local:///manual//index.htm';" /><br />
 
+    <br />
+    <br />
 	</body>
 </html>

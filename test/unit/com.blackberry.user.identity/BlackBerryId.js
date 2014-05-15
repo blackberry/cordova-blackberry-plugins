@@ -31,14 +31,11 @@ describe("user.identity.blackberry.blackberryid", function () {
         expect(bbId.LASTNAME_KEY).toEqual("urn:bbid:lastname");
         expect(bbId.UID_KEY).toEqual("urn:bbid:uid");
         expect(bbId.EMAIL_KEY).toEqual("urn:bbid:email");
-        expect(bbId.DATE_OF_BIRTH_KEY).toEqual("urn:bbid:dob");
-        expect(bbId.COUNTRY_KEY).toEqual("urn:bbid:cc");
         expect(bbId.CORE_PROPERTY_TYPE).toEqual("0");
         expect(bbId.ASSURANCE_OFFLINE_AUTHENTICATED).toEqual("0");
         expect(bbId.ASSURANCE_ONLINE_AUTHENTICATED).toEqual("1");
         expect(bbId.BBID_AUTHENTICATE).toEqual("0");
         expect(bbId.BBID_CONFIRM_EMAIL).toEqual("1");
-        expect(bbId.BBID_DATE_OF_BIRTH_CHALLENGE).toEqual("2");
         expect(bbId.BBID_CHALLENGE_DEFAULT).toEqual("0");
         expect(bbId.NOTIFY_STARTED).toEqual("0");
         expect(bbId.NOTIFY_STOPPED).toEqual("1");

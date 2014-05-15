@@ -51,18 +51,6 @@ describe("blackberry.system", function () {
         testSystemReadOnly("DENY");
     });
 
-    it("blackberry.system.hasCapability should exist", function () {
-        expect(blackberry.system.hasCapability).toBeDefined();
-    });
-
-    it("blackberry.system.hasCapability should return true for wifi", function () {
-        expect(blackberry.system.hasCapability("network.wlan")).toBeTruthy();
-    });
-
-    it("blackberry.system.hasCapability should return false for unknown capability", function () {
-        expect(blackberry.system.hasCapability("bake.cookies")).toBeFalsy();
-    });
-
     it("blackberry.system.deviceLockedStatus should be defined", function () {
         expect(blackberry.system.deviceLockedStatus).toBeDefined();
         expect(blackberry.system.deviceLockedStatus).toBeOneOf(["passwordLocked", "notLocked", "screenLocked"]);

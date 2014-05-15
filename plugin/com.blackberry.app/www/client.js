@@ -124,14 +124,14 @@ Object.defineProperty(_self, "windowState", {
 Object.defineProperty(_self, "name", {
     get: function () {
         getReadOnlyFields();
-        return getLocalizedText(readOnlyValues["name"]);
+        return getLocalizedText(readOnlyValues.name);
     }
 });
 
 Object.defineProperty(_self, "description", {
     get: function () {
         getReadOnlyFields();
-        return getLocalizedText(readOnlyValues["description"]);
+        return getLocalizedText(readOnlyValues.description);
     }
 });
 
