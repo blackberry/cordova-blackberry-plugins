@@ -22,7 +22,7 @@ var _self = {},
     deviceProperties,
     noop = function () {},
     execFunc = cordova.require("cordova/exec"),
-    events = ["batterystatus", "batterylow", "batterycritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
+    events = ["batterystatus", "batterylow", "batterycritical", "datalockstatechanged", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"],
     channels = events.map(function (eventName) {
         var thisChannel = cordova.addDocumentEventHandler(eventName),
             success = function (data) {
@@ -108,6 +108,8 @@ defineGetter("language", function () {
     return navigator.language;
 });
 defineGetter("deviceLockedStatus");
+defineGetter("dataLockState");
+defineGetter("dataLockTime");
 
 defineReadOnlyField(_self, "ALLOW", 0);
 defineReadOnlyField(_self, "DENY", 1);

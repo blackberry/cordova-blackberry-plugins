@@ -56,7 +56,7 @@ describe("system client", function () {
     });
 
     it("defines events", function () {
-        var events = ["batterystatus", "batterylow", "batterycritical", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"];
+        var events = ["batterystatus", "batterylow", "batterycritical", "datalockstatechanged", "languagechanged", "regionchanged", "fontchanged", "perimeterlocked", "perimeterunlocked"];
         events.forEach(function (event) {
             var channel;
 
@@ -131,6 +131,24 @@ describe("system client", function () {
 
         expect(sysClient.deviceLockedStatus).toEqual("notLocked");
         expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "deviceLockedStatus", undefined);
+    });
+
+    it("dataLockState", function () {
+        cordova.exec.andCallFake(function (success, fail, service, action, args) {
+            success("notLocked");
+        });
+
+        expect(sysClient.dataLockState).toEqual("notLocked");
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "dataLockState", undefined);
+    });
+
+    it("dataLockTime", function () {
+        cordova.exec.andCallFake(function (success, fail, service, action, args) {
+            success(0);
+        });
+
+        expect(sysClient.dataLockTime).toEqual(0);
+        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), ID, "dataLockTime", undefined);
     });
 
     describe("device properties and ReadOnlyFields", function () {
