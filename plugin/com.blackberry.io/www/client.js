@@ -64,5 +64,7 @@ Object.defineProperty(io, "sandbox", {
 defineGetter("home");
 defineGetter("sharedFolder");
 defineGetter("SDCard");
+defineGetter("dataLockOperationalHome");
+defineGetter("dataLockStartupHome");
 
 module.exports = io;

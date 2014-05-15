@@ -49,6 +49,16 @@ module.exports = {
         result.ok(getHomeDir(), false);
     },
 
+    dataLockOperationalHome: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
+        result.ok(getHomeDir() + "/../_operational_data/", false);
+    },
+
+    dataLockStartupHome: function (success, fail, args, env) {
+        var result = new PluginResult(args, env);
+        result.ok(getHomeDir() + "/../_startup_data/", false);
+    },
+
     sharedFolder: function (success, fail, args, env) {
         var home = getHomeDir(),
             result = new PluginResult(args, env);

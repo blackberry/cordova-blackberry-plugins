@@ -328,4 +328,70 @@ describe("system index", function () {
             expect(mockedPluginResult.error).not.toHaveBeenCalled();
         });
     });
+
+    describe("dataLockState", function () {
+        var mockApplication;
+
+        beforeEach(function () {
+            mockApplication = {};
+
+            mockApplication.getDataLockState = jasmine.createSpy("getDataLockState").andCallFake(function (callback) {
+                callback("notLocked");
+            });
+
+            GLOBAL.window = {
+                qnx: {
+                    webplatform: {
+                        getApplication: jasmine.createSpy().andReturn(mockApplication)
+                    }
+                }
+            };
+        });
+
+        afterEach(function () {
+            mockApplication.getDataLockState = null;
+            mockApplication = null;
+            delete GLOBAL.window;
+        });
+
+        it("returns status from webplatform", function () {
+            sysIndex.dataLockState();
+            expect(mockApplication.getDataLockState).toHaveBeenCalledWith(jasmine.any(Function));
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith("notLocked", false);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("dataLockTime", function () {
+        var mockApplication;
+
+        beforeEach(function () {
+            mockApplication = {};
+
+            mockApplication.getDataLockTime = jasmine.createSpy("getDataLockTime").andCallFake(function (callback) {
+                callback(0);
+            });
+
+            GLOBAL.window = {
+                qnx: {
+                    webplatform: {
+                        getApplication: jasmine.createSpy().andReturn(mockApplication)
+                    }
+                }
+            };
+        });
+
+        afterEach(function () {
+            mockApplication.getDataLockTime = null;
+            mockApplication = null;
+            delete GLOBAL.window;
+        });
+
+        it("returns status from webplatform", function () {
+            sysIndex.dataLockTime();
+            expect(mockApplication.getDataLockTime).toHaveBeenCalledWith(jasmine.any(Function));
+            expect(mockedPluginResult.ok).toHaveBeenCalledWith(0, false);
+            expect(mockedPluginResult.error).not.toHaveBeenCalled();
+        });
+    });
 });

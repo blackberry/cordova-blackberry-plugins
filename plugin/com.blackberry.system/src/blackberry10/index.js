@@ -43,6 +43,14 @@ var Whitelist = require("../../lib/policy/whitelist").Whitelist,
                 pluginResult.callbackOk(data, true);
             }
         },
+        datalockstatechanged: {
+            context: _applicationEvents,
+            event: "dataLockStateChange",
+            triggerEvent: "datalockstatechanged",
+            trigger: function (pluginResult, state, lockTime) {
+                pluginResult.callbackOk({'state': state, 'lockTime': lockTime}, true);
+            }
+        },
         languagechanged: {
             context: _applicationEvents,
             event: "systemLanguageChange",
@@ -210,6 +218,50 @@ module.exports = {
                 result.ok(state, false);
             };
             window.qnx.webplatform.getApplication().isDeviceLocked(callback);
+        } catch (err) {
+            result.error(err.message, false);
+        }
+    },
+
+    dataLockState: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            func,
+            callback;
+
+        try {
+            callback = function (state) {
+                result.ok(state, false);
+            };
+            func = window.qnx.webplatform.getApplication().getDataLockState;
+            if (!func) {
+                /* If this is used with an older BB10 version that does not support data lock,
+                 * hardcode the response
+                 */
+                callback("notLocked");
+            }
+            func(callback);
+        } catch (err) {
+            result.error(err.message, false);
+        }
+    },
+
+    dataLockTime: function (success, fail, args, env) {
+        var result = new PluginResult(args, env),
+            func,
+            callback;
+
+        try {
+            callback = function (lockTime) {
+                result.ok(lockTime, false);
+            };
+            func = window.qnx.webplatform.getApplication().getDataLockTime;
+            if (!func) {
+                /* If this is used with an older BB10 version that does not support data lock,
+                 * hardcode the response
+                 */
+                callback(0);
+            }
+            func(callback);
         } catch (err) {
             result.error(err.message, false);
         }
