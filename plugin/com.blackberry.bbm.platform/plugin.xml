@@ -26,11 +26,10 @@
 
     <dependency id="com.blackberry.utils" />
 
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.bbm.platform" />
-    </js-module>
-
     <platform name="blackberry10">
+        <js-module src="www/client.js">
+            <clobbers target="blackberry.bbm.platform" />
+        </js-module>
         <source-file src="src/blackberry10/index.js" />
         <source-file src="src/blackberry10/BBMEvents.js" />
         <source-file src="src/blackberry10/BBMJNEXT.js" />

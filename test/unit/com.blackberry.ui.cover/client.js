@@ -21,6 +21,8 @@ var _extDir = __dirname + "/../../../plugin",
     _ID = "com.blackberry.ui.cover",
     _apiDir = _extDir + "/" + _ID,
     client,
+    success,
+    fail,
     channelRegistry = {},
     MockedChannel;
 
@@ -49,6 +51,8 @@ describe("client ui.cover", function () {
             fireDocumentEvent: jasmine.createSpy("cordova.fireDocumentEvent")
         };
         client = require(_apiDir + "/www/client");
+        success = jasmine.createSpy("success");
+        fail = jasmine.createSpy("fail");
     });
 
     afterEach(function () {
@@ -66,30 +70,36 @@ describe("client ui.cover", function () {
     });
 
     it("reset cover calls exec with the correct parameters", function () {
-        client.resetCover();
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "resetCover");
+        client.resetCover("fullSize", success, fail);
+        expect(cordova.exec).toHaveBeenCalledWith(success, fail, _ID, "resetCover", {name: "fullSize"});
     });
 
-    it("coverSize calls exec with the correct parameters", function () {
-        expect(client.coverSize).toEqual(undefined);
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "coverSize");
+    it("getCoverSizes calls exec with the correct parameters", function () {
+        client.getCoverSizes(success, fail);
+        expect(cordova.exec).toHaveBeenCalledWith(success, fail, _ID, "coverSizes");
     });
 
     it("updateCover calls exec with the correct parameters", function () {
-        client.setContent(client.TYPE_IMAGE, {path: "/path/to/an/image.png"});
-        client.setTransition(client.TRANSITION_DEFAULT);
-        client.labels.push({"label": "Text Label", "size": 8, "color": "#FF0000", "wrap": false});
-        client.showBadges = false;
-        client.updateCover();
-        expect(cordova.exec).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function), _ID, "updateCover", {"cover": {
-            cover: {
-                type: client.TYPE_IMAGE,
-                path: "/path/to/an/image.png"
-            },
-            transition: client.TRANSITION_DEFAULT,
-            text: [{"label": "Text Label", "size": 8, "color": "#FF0000", "wrap": false}],
-            badges: false
-        }});
+        var covers = {
+            fullSize: {
+                cover: {
+                    type: "snapshot",
+                    capture: {
+                        x: 0,
+                        y: 0,
+                        width: 100,
+                        height: 200
+                    }
+                },
+                text: [{
+                    label: "Label", 
+                    size: 3
+                }],
+                transition: "default",
+                badges: true
+            }
+        };
+        client.updateCovers(covers, success, fail);
+        expect(cordova.exec).toHaveBeenCalledWith(success, fail, _ID, "updateCovers", {"covers": covers}); 
     });
-
 });

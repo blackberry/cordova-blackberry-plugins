@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Research In Motion Limited.
+ * Copyright 2014 BlackBerry Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,48 @@
  */
 
 describe("blackberry.ui.cover", function () {
-    it('blackberry.ui.cover.coverSize should exist', function () {
-        expect(blackberry.ui.cover.coverSize).toBeDefined();
+
+    it('getCoverSizes', function () {
+        var sizes;
+        waitsFor(function () {
+            return sizes;
+        }, 2000);
+        runs(function () {
+            expect(sizes.fullSize).toBeDefined();
+            expect(sizes.fullSize.width).toBeGreaterThan(0);
+            expect(sizes.fullSize.height).toBeGreaterThan(0);
+        });
+        blackberry.ui.cover.getCoverSizes(function () {
+            sizes = arguments[0];
+        });
     });
 
-    it('can get coverSize', function () {
-        var size = blackberry.ui.cover.coverSize;
-        if ((screen.availHeight === 1280 && screen.availWidth === 768) || (screen.availHeight === 768 && screen.availWidth === 1280)) {
-            expect(size.width).toBe(334);
-            expect(size.height).toBe(396);
-        } else if (screen.availHeight === 720 && screen.availWidth === 720) {
-            expect(size.width).toBe(310);
-            expect(size.height).toBe(211);
-        } else {
-            //unknown device size
-        }
+    it('updateCovers', function () {
+        var flag = false,
+            cover = new blackberry.ui.cover.Cover('fullSize', blackberry.ui.cover.TYPE_SNAPSHOT);
+        cover.text.push(new blackberry.ui.cover.Label('Test app cover', 12));
+        waitsFor(function () {
+            return flag;
+        }, 2000);
+        runs(function () {
+            expect(flag).toBe(true);
+        });
+        blackberry.ui.cover.updateCovers([cover], function () {
+            flag = true;
+        });
     });
 
-    it('allows an application to update the window cover', function () {
-        var exThrown = false,
-            capture = { "x": 0, "y": 0, "width": 100, "height": 200 },
-            label = {"label": "BlackBerry WebWorks Test", "size": 8};
-        try {
-            blackberry.ui.cover.setContent(blackberry.ui.cover.TYPE_SNAPSHOT, capture);
-            blackberry.ui.cover.labels.push(label);
-            blackberry.ui.cover.updateCover();
-        } catch (exception) {
-            exThrown = true;
-        }
-        expect(exThrown).toBe(false);
+    it('resetCover', function () {
+        var flag = false;
+        waitsFor(function () {
+            return flag;
+        }, 2000);
+        runs(function () {
+            expect(flag).toBe(true);
+        });
+        blackberry.ui.cover.resetCover('fullSize', function () {
+            flag = true;
+        });
     });
+
 });

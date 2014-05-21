@@ -71,7 +71,7 @@ var _config = require("./../../lib/config"),
             trigger: function (pluginResult, obj) {
                 pluginResult.callbackOk(JSON.parse(obj), true);
             }
-        },
+        }
     };
 
 function angleToOrientation(angle) {

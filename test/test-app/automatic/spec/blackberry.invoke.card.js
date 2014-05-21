@@ -21,6 +21,9 @@ describe("blackberry.invoke.card", function () {
         expect(blackberry.invoke.card.invokeCalendarPicker).toBeDefined();
         expect(blackberry.invoke.card.invokeCalendarComposer).toBeDefined();
         expect(blackberry.invoke.card.invokeEmailComposer).toBeDefined();
+        expect(blackberry.invoke.card.invokeIcsViewer).toBeDefined();
+        expect(blackberry.invoke.card.invokeMediaPlayer).toBeDefined();
+        expect(blackberry.invoke.card.invokeTargetPicker).toBeDefined();
     });
 
     it('blackberry.invoke should exist', function () {
@@ -271,6 +274,45 @@ describe("blackberry.invoke.card", function () {
             reason;
 
         blackberry.invoke.card.invokeEmailComposer({}, function (data) {
+        },
+        function (reason) {
+            flag = true;
+        }, errorSpy);
+
+        expect(errorSpy).not.toHaveBeenCalled();
+
+        waits(delay / 4);
+
+        runs(function () {
+            flag = false;
+
+            document.addEventListener("onChildCardClosed", function (request) {
+                reason = request.reason;
+                flag = true;
+            });
+
+            blackberry.invoke.closeChildCard();
+            waitsFor(function () {
+                return flag;
+            }, delay);
+            runs(function () {
+                expect(reason).toBe("closed");
+            });
+        });
+    });
+
+    it('open the targetPicker card and then close to make sure it actually opens.', function () {
+        var delay = 20000,
+            flag = false,
+            errorSpy = jasmine.createSpy(),
+            request = {
+                action : 'bb.action.SHARE',
+                 mime : 'text/plain',
+                data : 'Some awesome text',
+                target_type: ["VIEWER", "CARD"]
+            };
+
+        blackberry.invoke.card.invokeTargetPicker(request, "Sharing Text", function (data) {
         },
         function (reason) {
             flag = true;

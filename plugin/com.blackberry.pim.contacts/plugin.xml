@@ -24,28 +24,26 @@
     <description>BlackBerry 10 Contacts APIs</description>
     <license>Apache 2.0</license>
 
-    <dependency id="com.blackberry.utils" />
-    <dependency id="com.blackberry.pim.lib" />
-
-    <js-module src="www/client.js">
-        <clobbers target="blackberry.pim.contacts" />
-    </js-module>
-    <js-module src="www/Contact.js" />
-    <js-module src="www/ContactAccount.js" />
-    <js-module src="src/blackberry10/contactConsts.js" />
-    <js-module src="src/blackberry10/ContactError.js" />
-    <js-module src="src/blackberry10/contactUtils.js" />
-    <js-module src="src/blackberry10/ContactFindOptions.js" />
-    <js-module src="src/blackberry10/ContactPickerOptions.js" />
-    <js-module src="src/blackberry10/ContactName.js" />
-    <js-module src="src/blackberry10/ContactOrganization.js" />
-    <js-module src="src/blackberry10/ContactAddress.js" />
-    <js-module src="src/blackberry10/ContactField.js" />
-    <js-module src="src/blackberry10/ContactPhoto.js" />
-    <js-module src="src/blackberry10/ContactNews.js" />
-    <js-module src="src/blackberry10/ContactActivity.js" />
-
     <platform name="blackberry10">
+        <dependency id="com.blackberry.utils" />
+        <dependency id="com.blackberry.pim.lib" />
+        <js-module src="www/client.js">
+            <clobbers target="blackberry.pim.contacts" />
+        </js-module>
+        <js-module src="www/Contact.js" />
+        <js-module src="www/ContactAccount.js" />
+        <js-module src="src/blackberry10/contactConsts.js" />
+        <js-module src="src/blackberry10/ContactError.js" />
+        <js-module src="src/blackberry10/contactUtils.js" />
+        <js-module src="src/blackberry10/ContactFindOptions.js" />
+        <js-module src="src/blackberry10/ContactPickerOptions.js" />
+        <js-module src="src/blackberry10/ContactName.js" />
+        <js-module src="src/blackberry10/ContactOrganization.js" />
+        <js-module src="src/blackberry10/ContactAddress.js" />
+        <js-module src="src/blackberry10/ContactField.js" />
+        <js-module src="src/blackberry10/ContactPhoto.js" />
+        <js-module src="src/blackberry10/ContactNews.js" />
+        <js-module src="src/blackberry10/ContactActivity.js" />
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>access_pimdomain_contacts</rim:permit>
         </config-file>

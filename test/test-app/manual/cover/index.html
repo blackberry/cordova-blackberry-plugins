@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <script type="text/javascript" src="local:///cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <title>Window Cover Test</title>
+    </head>
+    <body>
+        <h1>Window Cover Test</h1>
+        <input type="button" value="Back to Manual Tests" onclick="window.location ='local:///manual//index.htm';" />
+        <br />
+        <h2>getCoverSizes</h2>
+        <input type="button" onclick="app.getCoverSizes();" value="getCoverSizes" />
+        <br />   
+        <textarea id="sizes" rows="6" ></textarea>
+
+        <h2>updateCovers</h2>
+        <input type="button" onclick="app.fsSnapshot();" value="fullSize snapshot" />
+        <br />
+        <input type="button" onclick="app.fsImage();" value="fullSize image" />
+        <br />
+        <input type="button" onclick="app.hsSnapshot();" value="halfSize snapshot" />
+        <br />
+        <input type="button" onclick="app.hsImage();" value="halfSize image" />
+        <br />
+        <input type="button" onclick="app.both();" value="fullSize and halfSize" />
+
+        <h2>resetCover</h2>
+        <input type="button" onclick="app.fsReset();" value="fullSize" />
+        <br />
+        <input type="button" onclick="app.hsReset();" value="halfSize" />
+
+    </body>
+</html>

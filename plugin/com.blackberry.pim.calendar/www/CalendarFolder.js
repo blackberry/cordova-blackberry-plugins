@@ -26,7 +26,7 @@ var CalendarFolder = function (properties) {
     this.readonly = properties && typeof properties.readonly !== "undefined" ? properties.readonly : false;
     this.type = properties && typeof properties.type !== "undefined" ? properties.type : -1; // TODO
     this.visible = properties && typeof properties.visible !== "undefined" ? properties.visible : true;
-    this.default = properties && typeof properties.default !== "undefined" ? properties.default : false;
+    this["default"] = properties && typeof properties["default"] !== "undefined" ? properties["default"] : false;
     this.enterprise = properties && typeof properties.enterprise !== "undefined" ? properties.enterprise : false;
 };
 
