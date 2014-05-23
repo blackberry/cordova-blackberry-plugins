@@ -37,8 +37,9 @@ var _ID = "com.qnx.browser",
  * @private
  */
 function onUpdate(data) {
-	var keys = Object.keys(_watches);
-	for (var i = 0; i < keys.length; i++) {
+	var keys = Object.keys(_watches),
+		i;
+	for (i = 0; i < keys.length; i++) {
 		setTimeout(_watches[keys[i]](data), 0);
 	}
 }
@@ -75,7 +76,6 @@ module.exports = {
 		if (Object.keys(_watches).length === 1) {
 			window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
 		}
-
 		return watchId;
 	},
 
@@ -94,6 +94,49 @@ module.exports = {
 			if (Object.keys(_watches).length === 0) {
 				window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
 			}
+		}
+	},
+	
+	/**	
+	 * Initialize the browser plugin
+	 * @param {String} chromeUrl The url of the webview that will handle all the UI and application logic
+	 * @param {Number} uiHeight the height you wish for your ui to be when the overlay is hidden
+	 * @param {Number} overlayHeight the height you wish for your ui to be when the overlay is shown	
+	 * @memberOf module:car.browser
+	 * @method init
+	 * @example
+	 * 
+	 *	var	chromeUrl = "local:///index.html",
+	 *		uiHeight = 50,
+	 *		overlayHeight = 50;
+	 *
+	 * car.browser.init(chromeUrl, uiHeight, overlayHeight);
+	 */
+	init : function (chromeUrl, uiHeight, overlayHeight) {
+		var args = {};
+
+		if (chromeUrl && chromeUrl !== undefined && chromeUrl !== '') {
+			args.url = chromeUrl;
+		} else {
+			console.error("Error: qnx.browser.init requires a valid url to be passed in '", chromeUrl, "' is not valid");
+		}
+		
+		if (uiHeight && uiHeight !== undefined) {
+			args.uiHeight = uiHeight;
+		} else {
+			console.error("Error: qnx.browser.init requires a valid uiHeight to be passed in '", uiHeight, "' is not valid");
+		}
+
+		if (overlayHeight && overlayHeight) {
+			args.overlayHeight = overlayHeight;
+		} else {
+			console.error("Error: qnx.browser.init requires a valid overlayHeight to be passed in '", overlayHeight, "' is not valid");
+		}
+
+		try {
+			window.cordova.exec(null, null, _ID, 'init', args);
+		} catch (e) {
+			console.error(e);
 		}
 	},
 
@@ -140,10 +183,64 @@ module.exports = {
 			console.error(e);
 		}
 	},
+
+	/**
+	 * Hide the overlay
+	 * @param {Function} success The function to call when the overlay is hidden.
+	 * @param {Function} failure The function to call if there is an error hiding the overlay.
+	 * @memberOf module:car.browser 
+	 * @method hideOverlay
+	 * @example
+	 *
+	 * //define callback functions
+	 * function success() {
+	 *		console.log("Overlay hidden");
+	 * }
+	 * 
+	 * function failure(e) {
+	 *		console.error("There was an error hiding the overlay: ", e);
+	 * }
+	 * car.browser.hideOverlay(success, failure);
+	 */
+	hideOverlay: function (success, fail) {
+		try {
+			window.cordova.exec(success, fail, _ID, 'hideOverlay');
+		} catch (e) {
+			console.error(e);
+		}
+	},
+
+	/**
+	 * Show the overlay
+	 * @param {Function} success The function to call when the overlay is shown.
+	 * @param {Function} failure The function to call if there is an error showing the overlay.
+	 * @memberOf module:car.browser 
+	 * @method showOverlay
+	 * @example
+	 *
+	 * //define callback functions
+	 * function success() {
+	 *		console.log("Overlay shown");
+	 * }
+	 * 
+	 * function failure(e) {
+	 *		console.error("There was an error showing the overlay: ", e);
+	 * }
+	 * car.browser.showOverlay(success, failure);
+	 */
+	showOverlay: function (success, fail) {
+		try {
+			window.cordova.exec(success, fail, _ID, 'showOverlay');
+		} catch (e) {
+			console.error(e);
+		}
+	},
+
 	/**
 	 * Create a new tab(webview)
 	 * @param {Function} success The function to call when the tab is created successfully.
 	 * @param {Function} failure The function to call when there is a error creating a tab.
+	 * @param optional {Object} options used for configuring a webview 
 	 * @return {String} An ID for the newly created tab.
 	 * @memberOf module:car.browser 
 	 * @method addTab
@@ -159,9 +256,27 @@ module.exports = {
 	 * }
 	 * car.browser.addTab(success, failure);
 	 */
-	addTab: function (success, fail) {
+	addTab: function (success, fail, options) {
+		var args = {};
+
+		if (options.x !== undefined) {
+			args.x = options.x;
+		}
+		if (options.y !== undefined) {
+			args.y = options.y;
+		}
+		if (options.width !== undefined) {
+			args.width = options.width;
+		}
+		if (options.height !== undefined) {
+			args.height = options.height;
+		}
+		if (options.url !== undefined) {
+			args.url = options.url;
+		}
+
 		try {
-			window.cordova.exec(success, fail, _ID, 'addTab');
+			window.cordova.exec(success, fail, _ID, 'addTab', args);
 		} catch (e) {
 			console.error(e);
 		}

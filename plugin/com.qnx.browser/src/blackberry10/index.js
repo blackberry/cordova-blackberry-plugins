@@ -79,6 +79,26 @@ module.exports = {
 	 * @param {Object} args The arguments supplied
 	 * @param {Object} env Environment variables
 	 */
+	init: function (success, fail, args, env) {
+		var result = new PluginResult(args, env),
+			fixedArgs = null,
+			data = null;
+
+		try {
+			fixedArgs = _wwfix.parseArgs(args);
+			data = _browser.init(fixedArgs);
+			result.ok(data, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
+	},
+	/**
+	 * Returns the current browser parameters
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
+	 */
 	setDefaultTabParameters: function (success, fail, args, env) {
 		var result = new PluginResult(args, env),
 			fixedArgs = null,
@@ -93,6 +113,42 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 
+	},
+
+	/**
+	 * Returns the current browser parameters
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
+	 */
+	hideOverlay: function (success, fail, args, env) {
+		var result = new PluginResult(args, env);
+
+		try {
+			_browser.hideOverlay();
+			result.ok(undefined, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
+	},
+
+	/**
+	 * Returns the current browser parameters
+	 * @param {Function} success Function to call if the operation is a success
+	 * @param {Function} fail Function to call if the operation fails
+	 * @param {Object} args The arguments supplied
+	 * @param {Object} env Environment variables
+	 */
+	showOverlay: function (success, fail, args, env) {
+		var result = new PluginResult(args, env);
+
+		try {
+			_browser.showOverlay();
+			result.ok(undefined, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
 	},
 
 	/**

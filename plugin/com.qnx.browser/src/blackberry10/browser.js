@@ -22,7 +22,9 @@
  */
 var _tabList = {},
 	_defaultZOrder = 1,
-	_activeZOrder = 2,
+	_lastActiveZOrder = 2,
+	_activeZOrder = 3,
+	_chromeZOrder = 4,
 	_lastActiveTabId = null,
 	_activeTabId = null,
 	_x = 0,
@@ -30,36 +32,84 @@ var _tabList = {},
 	_width = screen.width,
 	_height = screen.height,
 	_url =  "www.qnx.com",
-	_triggerUpdate;
+	_overlay,
+	_overlayHeight,
+	_chromeHeight,
+	_tabTrigger = [],
+	_chromeWebview,
+	resourceRequest = require("../../lib/webkitHandlers/networkResourceRequested");
+
+/**
+ *	Private method to triggers updates on all the watch functions.
+ */
+function triggerUpdate(e) {
+	var callback,
+		i;
+
+	for (i = 0; i < _tabTrigger.length; i++) {
+		callback = _tabTrigger[i];
+		callback(e);
+	}
+}
 
 /**
  *	Private method to re-order the tabs placing the active tab at the correct z-order
  */
-function reorderTabs(tabId) {
-	// for (var i = 0; i < _tabList.length; i++) {
-	if (_tabList[tabId].id === tabId) {
-		_tabList[tabId].zOrder = _activeZOrder;
-		
-		if (_activeTabId !== null) {
-			_lastActiveTabId = _activeTabId;
-		}
-		
-		_activeTabId = tabId;
-		_tabList[tabId].visible = true;
+function reorderTabs(tabId, removedTab) {
+	var tab,
+		killedTab = removedTab ? removedTab : -1;
 
-	} else {
-		_tabList[tabId].zOrder = _defaultZOrder;
-		_tabList[tabId].visible = false;
+	//Set the tab visibility and z-order first
+	//so we don't see the other tabs shift and flicker
+	// _tabList[tabId].visible = true;
+	_tabList[tabId].zOrder = _activeZOrder;
+
+	for (tab in _tabList ) {	
+		if (_tabList[tab].id !== tabId) {
+			_tabList[tab].zOrder = _defaultZOrder;
+		}
 	}
-	// }
+	if (_activeTabId !== null && _activeTabId !== killedTab) {
+		_lastActiveTabId = _activeTabId;
+	}
+	_activeTabId = tabId;
+
+	triggerUpdate({
+		webview: tabId,
+		type: "ActiveTab",
+	});
+
 }
 
 /**
  *	Private method applies the default parameters to newly created webviews
  */
-function applyDefaultParams(webview) {
-	webview.setGeometry(_x, _y, _width, _height);
-	webview.url = _url;
+function applyDefaultParams(webview, args) {
+
+	var x = _x,
+		y = _y,
+		w = _width,
+		h = _height,
+		url = _url;
+
+	if (args.x !== undefined) {
+		x = args.x;
+	}
+	if (args.y !== undefined) {
+		y = args.y;
+	}
+	if (args.width !== undefined) {
+		w = args.width;
+	}
+	if (args.height !== undefined) {
+		h = args.height;
+	}
+	if (args.url !== undefined) {
+		url = args.url;
+	}
+
+	webview.setGeometry(x, y, w, h);
+	webview.url = url;
 }
 
 /**
@@ -67,11 +117,11 @@ function applyDefaultParams(webview) {
  *	a supplied "tabId"
  */
 function getWebview(tabId) {
-	// for (var i =  0; i < _tabList.length; i++) {
+	var tab = -1;
 	if (_tabList[tabId].id === tabId) {	
-		return _tabList[tabId];
+		tab = _tabList[tabId];
 	}
-	// }
+	return tab;
 }
 
 /**
@@ -79,27 +129,36 @@ function getWebview(tabId) {
  *	triggered. Sets the default parameters and attaches the 
  *	event listeners for Location Change and page load progress. 
  */
-function onWebviewCreated(webview) {
+function onWebviewCreated(webview, args) {
+
 	console.log("Webview:", webview.id, " created");
+	triggerUpdate({
+		type : "WebviewCreated",
+		webview : webview.id
+	});
 	webview.addEventListener("LocationChange", function (e) {
 		e = JSON.parse(e);
-		if (_triggerUpdate && e.type === "LocationChange") {
+		if (_tabTrigger.length > 0 && e.type === "LocationChange") {
 			e.webview = webview.id;
-			_triggerUpdate(e);
+			e.title = webview.title;
+			e.url = webview.url;
+			triggerUpdate(e);
 		}
 	});
 	webview.addEventListener("PropertyLoadProgressEvent", function (e) {
-		if (_triggerUpdate && e) {
-			_triggerUpdate({
+		if (_tabTrigger.length > 0 && e) {
+			triggerUpdate({
 				progress: e,
 				type: "PropertyLoadProgressEvent",
 				webview: webview.id
 			});
 		}
 	});
-	applyDefaultParams(webview);
+	applyDefaultParams(webview, args);
 	_activeTabId = webview.id;
 	webview.visible = true;
+
+
 }
 
 /*
@@ -112,9 +171,24 @@ module.exports = {
 	 * @param {Function} trigger The trigger function to call when the event is fired
 	 */
 	setTriggerUpdate: function (trigger) {
-		_triggerUpdate = trigger;
+		_tabTrigger.push(trigger);
 	},
 
+	init : function (args) {
+		var webviews = qnx.webplatform.getWebViews(),
+			wv;
+		for (wv in webviews) {
+			if (webviews[wv].url === args.url) {
+				_chromeHeight = args.uiHeight;
+				_overlayHeight =  _chromeHeight + args.overlayHeight;
+				_chromeWebview = webviews[wv];
+				_chromeWebview.zOrder = _chromeZOrder;
+				_chromeWebview.setBackgroundColor(0x00ffffff);
+				_chromeWebview.setGeometry(0, 0, _width, _chromeHeight);
+				break;
+			}
+		}
+	},
 	/**
 	 *	Sets the default parameters that are applied to each "tab" when its created.
 	 *	@param {Object} object containing configuration parameters
@@ -138,6 +212,20 @@ module.exports = {
 	},
 
 	/**
+	* Creates a request to hide the overlay
+	*/
+	hideOverlay: function () {
+		_chromeWebview.setGeometry(0, 0, _width, _chromeHeight);
+	},
+
+	/**
+	* Creates a request to show the overlay
+	*/
+	showOverlay: function () {
+		_chromeWebview.setGeometry(0, 0, _width, _overlayHeight);
+	},
+
+	/**
 	* Creates a request to create a tab
 	* @param args {Object} The startup data for the webview
 	* @returns {number} the number of the newly created webview
@@ -147,7 +235,7 @@ module.exports = {
 		//TODO: in the future add support so we can pass in config parameters
 		// right into the createWebView method instead of an empty object
 		webview = qnx.webplatform.createWebView({}, function () {
-			onWebviewCreated(webview);
+			onWebviewCreated(webview, args);
 		});
 		_tabList[webview.id] = webview;
 		return webview.id;
@@ -159,18 +247,55 @@ module.exports = {
 	* @returns {number} the id of the recently removed webview
 	*/
 	removeTab: function (tabId) {
-		var id;
-		if (_tabList[tabId].id === tabId) {
+		var tab,
+			lastActive = null,
 			id = _tabList[tabId].id;
-			if (_lastActiveTabId !== null) {
-				reorderTabs(_lastActiveTabId);
+
+		if (tabId === _activeTabId) {
+
+			//if there was a "last active tab" switch to it
+			lastActive = _lastActiveTabId;
+			_lastActiveTabId = null;
+			//check to make sure the "last active tab" isn't the one being removed
+			if (lastActive === null || lastActive === tabId) {
+				//search for a valid tab to become visible
+				for (tab in _tabList ) {
+					if (parseInt(tab) !== _tabList[tabId].id) {
+						lastActive = _tabList[tab].id;
+						break;
+					}	
+				}
+				//if there isn't one, it means the user is closing the only tab, create a new one
+				if (lastActive === null) {
+					lastActive = this.addTab({});
+				}
 			}
-			_tabList[tabId].destroy();
-			return id;
+
+			reorderTabs(lastActive, tabId);
+
 		} else {
-			console.error("Browser.js removeTab, tabId:" + tabId + " is not valid.");
+			//this ensures that current tab stays active in the ui
+			reorderTabs(_activeTabId, tabId);
 		}
 
+		//Because of a bug in webplatform we need to bind to the destroyed event
+		//Normally this should be accomplished by using a callback passed into the destroy method
+		_tabList[tabId].addEventListener("Destroyed", 
+			function (args) {
+				//Now we call delete to fully remove it since its internal cleanup has finished
+				_tabList[tabId].delete();
+				delete _tabList[tabId];
+			}
+		);
+
+		_tabList[tabId].destroy();
+
+		triggerUpdate({
+			type : "WebviewRemoved",
+			webview : id
+		});
+
+		return id;
 	},
 	/**
 	 * Returns the id of the currently active tab
