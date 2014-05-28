@@ -25,6 +25,7 @@ var _tabList = {},
 	_lastActiveZOrder = 2,
 	_activeZOrder = 3,
 	_chromeZOrder = 4,
+	_UIWebviewZOrder = 5,
 	_lastActiveTabId = null,
 	_activeTabId = null,
 	_x = 0,
@@ -154,6 +155,17 @@ function onWebviewCreated(webview, args) {
 			});
 		}
 	});
+
+	//We bind directly because adding an event listener through addEventListener doens't work for 'SSLHandshakingFailed'
+	webview.onSSLHandshakingFailed = function (e) {
+		if (_tabTrigger.length > 0 && e) {
+			triggerUpdate({
+				certificateInfo: e,
+				type: "SSLHandshakingFailed",
+				webview: webview.id
+			});
+		}
+	};
 	applyDefaultParams(webview, args);
 	_activeTabId = webview.id;
 	webview.visible = true;
@@ -185,7 +197,9 @@ module.exports = {
 				_chromeWebview.zOrder = _chromeZOrder;
 				_chromeWebview.setBackgroundColor(0x00ffffff);
 				_chromeWebview.setGeometry(0, 0, _width, _chromeHeight);
-				break;
+			} else if (webviews[wv].dialog) {
+				//since this is the UI dialog boost the default zOrder otherwise it will be clipped by the UI webview
+				webviews[wv].zOrder = _UIWebviewZOrder;
 			}
 		}
 	},
@@ -346,5 +360,16 @@ module.exports = {
 		} else {
 			console.error("qnx.browser.stop() cannot be called when there are no tabs.");
 		}
+	},
+
+	/**
+	 *	Adds an exception for an SSL certificate that isn't trusted
+	 *	@param tabId {Number} the id of the webview that triggered the sslHandshakeFailure
+	 *	@param streamId {Number} the streamId of the sslHandshakeFailure
+	 *	@param sslAction {String} can be one of the following "SSLActionTrust", "SSLActionReject", "SSLActionNone"
+	 *	
+	 */
+	continueSSLHandshake: function (tabId, streamId, sslAction) {
+		qnx.callExtensionMethod("webview.continueSSLHandshaking", tabId, streamId, sslAction);
 	}
 };
