@@ -291,26 +291,4 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-
-	/**
-	 * Continues the browser SSL handshake when a certificate isn't trusted
-	 * @param {Function} success Function to call if the operation is a success
-	 * @param {Function} fail Function to call if the operation fails
-	 * @param {Object} args The arguments supplied
-	 * @param {Object} env Environment variables
-	 */
-	continueSSLHandshake: function (success, fail, args, env) {
-		var result = new PluginResult(args, env),
-		fixedArgs = null,
-		data = null;
-
-		try {
-			fixedArgs = _wwfix.parseArgs(args);
-			data = _browser.continueSSLHandshake(fixedArgs.tabId, fixedArgs.streamId, fixedArgs.sslAction);
-				
-			result.ok(data, false);
-		} catch (e) {
-			result.error(JSON.stringify(e), false);
-		}
-	}
 };

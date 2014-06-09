@@ -25,14 +25,15 @@ var _tabList = {},
 	_lastActiveZOrder = 2,
 	_activeZOrder = 3,
 	_chromeZOrder = 4,
-	_UIWebviewZOrder = 5,
+	_uiWebviewZOrder = 5,
+	_uiWebview,
 	_lastActiveTabId = null,
 	_activeTabId = null,
 	_x = 0,
 	_y = 0,
 	_width = screen.width,
 	_height = screen.height,
-	_url =  "www.qnx.com",
+	_url =  "http://www.qnx.com",
 	_overlay,
 	_overlayHeight,
 	_chromeHeight,
@@ -106,7 +107,7 @@ function applyDefaultParams(webview, args) {
 		h = args.height;
 	}
 	if (args.url !== undefined) {
-		url = args.url;
+		url = checkUrlProtocol(args.url);
 	}
 
 	webview.setGeometry(x, y, w, h);
@@ -155,22 +156,41 @@ function onWebviewCreated(webview, args) {
 			});
 		}
 	});
+	webview.enableDialogRequestedEvents = true;
 
-	//We bind directly because adding an event listener through addEventListener doens't work for 'SSLHandshakingFailed'
-	webview.onSSLHandshakingFailed = function (e) {
-		if (_tabTrigger.length > 0 && e) {
-			triggerUpdate({
-				certificateInfo: e,
-				type: "SSLHandshakingFailed",
-				webview: webview.id
-			});
-		}
-	};
+	/*
+	 *	This hooks up the dialog authentication responses and
+	 *	ssl handshake dialogs. However in webplatform 10.3 there is
+	 *	a bug where the Authentication dialog is broken, it will appear
+	 *	but won't accept interaction. The bug is tracked by the following
+	 *	Jira ticket https://jira.bbqnx.net/browse/BRWSR-17162
+	 */ 
+	_uiWebview.dialog.subscribeTo(webview);
+
 	applyDefaultParams(webview, args);
 	_activeTabId = webview.id;
 	webview.visible = true;
 
 
+}
+
+/**
+ *	Private utility method used to check if a url has the
+ *	"http" or "https" protocol specified in the url if it
+ *	is just empty e.g. "qnx.com" we append "http://" to it
+ */
+
+function checkUrlProtocol(url) {
+	var subString,
+		verifiedUrl = url;
+
+	subString = verifiedUrl.substring(0, 4);
+
+	if (subString !== "http") {
+		verifiedUrl = "http://" + verifiedUrl;
+	}
+
+	return verifiedUrl;
 }
 
 /*
@@ -199,7 +219,8 @@ module.exports = {
 				_chromeWebview.setGeometry(0, 0, _width, _chromeHeight);
 			} else if (webviews[wv].dialog) {
 				//since this is the UI dialog boost the default zOrder otherwise it will be clipped by the UI webview
-				webviews[wv].zOrder = _UIWebviewZOrder;
+				webviews[wv].zOrder = _uiWebviewZOrder;
+				_uiWebview = webviews[wv];
 			}
 		}
 	},
@@ -221,7 +242,7 @@ module.exports = {
 			_height = args.height;
 		}
 		if (args.url !== undefined) {
-			_url = args.url;
+			_url = checkUrlProtocol(args.url);
 		}
 	},
 
@@ -335,7 +356,8 @@ module.exports = {
 	 */
 	updateUrl: function (url) {
 		var webview = getWebview(_activeTabId);
-		webview.url = url;
+
+		webview.url = checkUrlProtocol(url);
 		return url;
 	},
 
@@ -360,16 +382,5 @@ module.exports = {
 		} else {
 			console.error("qnx.browser.stop() cannot be called when there are no tabs.");
 		}
-	},
-
-	/**
-	 *	Adds an exception for an SSL certificate that isn't trusted
-	 *	@param tabId {Number} the id of the webview that triggered the sslHandshakeFailure
-	 *	@param streamId {Number} the streamId of the sslHandshakeFailure
-	 *	@param sslAction {String} can be one of the following "SSLActionTrust", "SSLActionReject", "SSLActionNone"
-	 *	
-	 */
-	continueSSLHandshake: function (tabId, streamId, sslAction) {
-		qnx.callExtensionMethod("webview.continueSSLHandshaking", tabId, streamId, sslAction);
 	}
 };
