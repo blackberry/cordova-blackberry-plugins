@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -17,23 +18,22 @@
  under the License.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.screenshot"
-    version="1.0.0">
-
-    <description>BlackBerry 10 Screenshot APIs</description>
-    <license>Apache 2.0</license>
-
-    <platform name="blackberry10">
-        <js-module src="www/client.js">
-            <clobbers target="blackberry.screenshot" />
-        </js-module>
-        <source-file src="src/blackberry10/index.js" />
-        <lib-file src="src/blackberry10/native/device/libscreenshot.so" arch="device"/>
-        <lib-file src="src/blackberry10/native/simulator/libscreenshot.so" arch="simulator"/>
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.screenshot" value="com.blackberry.screenshot" />
-        </config-file>
-        <dependency id="com.blackberry.utils" />
-    </platform>
+  xmlns:rim="http://www.blackberry.com/ns/widgets"
+  id="com.blackberry.screenshot"
+  version="1.0.0">
+  <name>BlackBerry 10 Screenshot</name>
+  <description>BlackBerry 10 Screenshot APIs</description>
+  <license>Apache 2.0</license>
+  <platform name="blackberry10">
+    <js-module src="www/client.js">
+      <clobbers target="blackberry.screenshot"/>
+    </js-module>
+    <source-file src="src/blackberry10/index.js"/>
+    <lib-file src="src/blackberry10/native/device/libscreenshot.so" arch="device"/>
+    <lib-file src="src/blackberry10/native/simulator/libscreenshot.so" arch="simulator"/>
+    <config-file target="www/config.xml" parent="/widget">
+      <feature name="com.blackberry.screenshot" value="com.blackberry.screenshot"/>
+    </config-file>
+    <dependency id="com.blackberry.utils"/>
+  </platform>
 </plugin>

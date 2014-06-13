@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -17,26 +18,23 @@
  under the License.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.invoke"
-    version="1.0.0">
-
-    <description>BlackBerry 10 Invoke APIs</description>
-    <license>Apache 2.0</license>
-
-
-
-    <platform name="blackberry10">
-        <js-module src="www/client.js">
-            <merges target="blackberry.invoke" />
-        </js-module>
-        <js-module src="www/btoa.js">
-            <merges target="blackberry.invoke.btoa" />
-        </js-module>
-        <source-file src="src/blackberry10/index.js" />
-        <source-file src="src/blackberry10/invocationEvents.js" />
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.invoke" value="com.blackberry.invoke" />
-        </config-file>
-    </platform>
+  xmlns:rim="http://www.blackberry.com/ns/widgets"
+  id="com.blackberry.invoke"
+  version="1.0.0">
+  <name>BlackBerry 10 Invoke</name>
+  <description>BlackBerry 10 Invoke APIs</description>
+  <license>Apache 2.0</license>
+  <platform name="blackberry10">
+    <js-module src="www/client.js">
+      <merges target="blackberry.invoke"/>
+    </js-module>
+    <js-module src="www/btoa.js">
+      <merges target="blackberry.invoke.btoa"/>
+    </js-module>
+    <source-file src="src/blackberry10/index.js"/>
+    <source-file src="src/blackberry10/invocationEvents.js"/>
+    <config-file target="www/config.xml" parent="/widget">
+      <feature name="com.blackberry.invoke" value="com.blackberry.invoke"/>
+    </config-file>
+  </platform>
 </plugin>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -17,29 +18,27 @@
  under the License.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.bbm.platform"
-    version="1.0.0">
-
-    <description>BlackBerry 10 BBM Platform APIs</description>
-    <license>Apache 2.0</license>
-
-    <dependency id="com.blackberry.utils" />
-
-    <platform name="blackberry10">
-        <js-module src="www/client.js">
-            <clobbers target="blackberry.bbm.platform" />
-        </js-module>
-        <source-file src="src/blackberry10/index.js" />
-        <source-file src="src/blackberry10/BBMEvents.js" />
-        <source-file src="src/blackberry10/BBMJNEXT.js" />
-        <lib-file src="src/blackberry10/native/device/libbbm.so" arch="device"/>
-        <lib-file src="src/blackberry10/native/simulator/libbbm.so" arch="simulator"/>
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.bbm.platform" value="com.blackberry.bbm.platform" />
-        </config-file>
-        <config-file target="www/config.xml" parent="/widget/rim:permissions">
-            <rim:permit>bbm_connect</rim:permit>
-        </config-file>
-    </platform>
+  xmlns:rim="http://www.blackberry.com/ns/widgets"
+  id="com.blackberry.bbm.platform"
+  version="1.0.0">
+  <name>BlackBerry 10 BBM Platform</name>
+  <description>BlackBerry 10 BBM Platform APIs</description>
+  <license>Apache 2.0</license>
+  <dependency id="com.blackberry.utils"/>
+  <platform name="blackberry10">
+    <js-module src="www/client.js">
+      <clobbers target="blackberry.bbm.platform"/>
+    </js-module>
+    <source-file src="src/blackberry10/index.js"/>
+    <source-file src="src/blackberry10/BBMEvents.js"/>
+    <source-file src="src/blackberry10/BBMJNEXT.js"/>
+    <lib-file src="src/blackberry10/native/device/libbbm.so" arch="device"/>
+    <lib-file src="src/blackberry10/native/simulator/libbbm.so" arch="simulator"/>
+    <config-file target="www/config.xml" parent="/widget">
+      <feature name="com.blackberry.bbm.platform" value="com.blackberry.bbm.platform"/>
+    </config-file>
+    <config-file target="www/config.xml" parent="/widget/rim:permissions">
+      <rim:permit>bbm_connect</rim:permit>
+    </config-file>
+  </platform>
 </plugin>
