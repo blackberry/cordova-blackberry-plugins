@@ -27,6 +27,10 @@
     "jake": "0.7.13",
     "jshint": "2.4.*"
   },
+  "scripts": {
+    "test": "npm run hint",
+    "hint": "node node_modules/jake/bin/cli hint"
+  },
   "bundledDependencies": [
     "connect",
     "argsparser"
