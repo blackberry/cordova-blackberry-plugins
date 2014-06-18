@@ -22,9 +22,10 @@
     "elementtree": "0.1.5",
     "shelljs": "0.1.3"
   },
-  "dev-dependencies": {
+  "devDependencies": {
     "cordova": "*",
-    "jake": "0.7.13"
+    "jake": "0.7.13",
+    "jshint": "2.4.*"
   },
   "bundledDependencies": [
     "connect",

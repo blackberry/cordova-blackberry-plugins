@@ -38,7 +38,7 @@ function _lintJS() {
     var options = ["--reporter", "scripts/reporter.js"],
         files = ["."];
 
-    return utils.execCommandWithJWorkflow('jshint ' + files.concat(options).join(' '), {cwd: _c.TEMP});
+    return utils.execCommandWithJWorkflow(path.join(path.dirname(__dirname), 'node_modules', 'jshint', 'bin', 'jshint') + ' ' + files.concat(options).join(' '), {cwd: _c.TEMP});
 }
 
 function _lintCPP() {
