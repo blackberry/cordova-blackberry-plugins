@@ -1860,7 +1860,7 @@ describe("blackberry.pim.contacts", function () {
 
             contactObj = contacts.create({
                 "name": { familyName: "WebWorksTest", givenName: "John" },
-                "organizations": [ { name: "Research In Motion" } ]
+                "organizations": [ { name: "Forbes" } ]
             });
 
             try {
