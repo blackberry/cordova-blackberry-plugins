@@ -25,7 +25,6 @@
   <description>BlackBerry 10 System APIs</description>
   <license>Apache 2.0</license>
   <platform name="blackberry10">
-    <dependency id="com.blackberry.jpps"/>
     <dependency id="com.blackberry.utils"/>
     <js-module src="www/client.js">
       <clobbers target="blackberry.system"/>

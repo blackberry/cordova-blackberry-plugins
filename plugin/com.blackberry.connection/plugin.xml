@@ -28,7 +28,6 @@
     <js-module src="www/client.js">
       <clobbers target="blackberry.connection"/>
     </js-module>
-    <dependency id="com.blackberry.jpps"/>
     <dependency id="com.blackberry.utils"/>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
