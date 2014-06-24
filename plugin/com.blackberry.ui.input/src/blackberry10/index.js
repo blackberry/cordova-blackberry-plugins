@@ -108,6 +108,9 @@ function updateShift(o) {
         case "landscape-secondary":
             _shift = {x: - _screenHeight - _keyboardOffset, y: 0};
             break;
+
+        default:
+            _shift = {x: 0, y: 0};
     }
 
     _orientation = o;
