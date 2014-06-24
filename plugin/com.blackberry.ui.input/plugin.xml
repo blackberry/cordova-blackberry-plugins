@@ -21,7 +21,8 @@
     id="com.blackberry.ui.input"
     version="1.0.0">
 
-    <description>BlackBerry 10 Keyboard Gestures</description>
+    <description>BlackBerry 10 Touch-Enabled Keyboard</description>
+    <name>BlackBerry 10 Touch-Enabled Keyboard</name>
     <license>Apache 2.0</license>
 
     <platform name="blackberry10">
