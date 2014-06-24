@@ -22,7 +22,7 @@ var _self = {},
     deviceProperties,
     noop = function () {},
     execFunc = cordova.require("cordova/exec"),
-    events = ["keyboardtouchstart", "keyboardtouchmove", "keyboardtouchend"],
+    events = ["touchenabledkeyboard"],
     channels = events.map(function (eventName) {
         var thisChannel = cordova.addDocumentEventHandler(eventName),
             success = function (data) {

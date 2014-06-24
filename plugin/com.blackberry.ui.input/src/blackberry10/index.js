@@ -47,26 +47,9 @@ var _screenHeight = getScreenHeight(),
     _appEvents = require("./../../lib/events/applicationEvents"),
     _orientation,
     _shift,
-    _eventMap = {
-        TouchPressed: "keyboardtouchstart",
-        TouchMoved: "keyboardtouchmove",
-        TouchReleased: "keyboardtouchend"
-    },
+    _type = "touchenabledkeyboard",
     _actionMap = {
-        keyboardtouchstart: {
-            event: "keyboardtouchstart",
-            trigger: function (pluginResult, data) {
-                pluginResult.callbackOk(data, true);
-            }
-        },
-        keyboardtouchmove: {
-            event: "keyboardtouchmove",
-            trigger: function (pluginResult, data) {
-                pluginResult.callbackOk(data, true);
-            }
-        },
-        keyboardtouchend: {
-            event: "keyboardtouchend",
+        touchenabledkeyboard: {
             trigger: function (pluginResult, data) {
                 pluginResult.callbackOk(data, true);
             }
@@ -86,13 +69,13 @@ var _screenHeight = getScreenHeight(),
      *
      * The matrix needs to be picked to do something useful
      */
-    _listeners = {};
+    _listeners = [];
 
 updateShift("portrait-primary");
 
 function updateShift(o) {
     o = o || 'unknown';
-    switch(o) {
+    switch (o) {
         case "portrait-primary":
             _shift = {x: 0, y: - _screenHeight - _keyboardOffset};
             break;
@@ -118,30 +101,33 @@ function updateShift(o) {
 }
 
 /* This takes an UnhandledTouch event:
- * filters it,
- * transforms the coordinates,
- * and then should send that off to the application...
+ * transforms the coordinates for each point,
+ * and then sends that off to the application...
  */
 function processTouchEvent(env, e) {
-    var point, state, type, listener;
+    var listener,
+        touches = [];
     e = JSON.parse(e);
     if (e.touchSourceDevice !== 'CapacitiveKeyboard' ||
         !e.touchPoints ||
         !e.touchPoints.length) {
         return;
     }
-    point = e.touchPoints[0];
-    state = point.state;
-    type = _eventMap[state];
-    if (!_listeners[type] ||
-        !_listeners[type][env.webviewId]) {
+    if (!_listeners[env.webviewId]) {
         return;
     }
-    listener = _listeners[type][env.webviewId];
+    e.touchPoints.forEach(function (point) {
+        touches.push({
+            keyboardX: point.screenPosition.x + _shift.x,
+            keyboardY: point.screenPosition.y + _shift.y,
+            state: point.state,
+            identifier: point.id
+        });
+    });
+    listener = _listeners[env.webviewId];
     listener({
-        type: type,
-        x: point.screenPosition.x + _shift.x,
-        y: point.screenPosition.y + _shift.y,
+        type: _type,
+        touches: touches,
         timeStamp: e.timeStamp
     });
 }
@@ -223,7 +209,7 @@ function register(env) {
 
     try {
         qnx.webplatform.getWebViewById(env.webview.id).on("UnhandledTouch", processTouchEvent);
-    } catch(e) {
+    } catch (e) {
         console.log(e);
     }
     _appEvents.addEventListener("rotate", rotateTrigger);
@@ -231,12 +217,12 @@ function register(env) {
 }
 
 function unregister(env) {
-    if (!listenerCount--) {
+    if (!(listenerCount--)) {
         return;
     }
     try {
         qnx.webplatform.getWebViewById(env.webview.id).un("UnhandledTouch", processTouchEvent);
-    } catch(e) {
+    } catch (e) {
         console.log(e);
     }
     _appEvents.removeEventListener("rotate", rotateTrigger);
@@ -251,22 +237,18 @@ module.exports = {
             ev = _actionMap[eventName],
             listener = ev.trigger.bind(null, result);
 
-        if (!_listeners[eventName]) {
-            _listeners[eventName] = {};
-        }
-
-        if (!_listeners[eventName][env.webview.id]) {
+        if (!_listeners[env.webview.id]) {
             register(env);
         }
 
-        _listeners[eventName][env.webview.id] = listener;
+        _listeners[env.webview.id] = listener;
         result.noResult(true);
     },
 
     stopEvent: function (success, fail, args, env) {
         var result = new PluginResult(args, env),
             eventName = JSON.parse(decodeURIComponent(args.eventName)),
-            listener = _listeners[eventName][env.webview.id],
+            listener = _listeners[env.webview.id],
             ev = _actionMap[eventName];
 
         if (!listener) {
