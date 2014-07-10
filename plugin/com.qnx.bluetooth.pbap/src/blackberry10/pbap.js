@@ -150,7 +150,7 @@ module.exports = {
 	init: function() {
 		try {
 			//_statusPPS
-			_statusPPS = _pps.createObject("/pps/services/bluetooth/phonebook/status", _pps.PPSMode.DELTA);
+			_statusPPS = _pps.create("/pps/services/bluetooth/phonebook/status", _pps.PPSMode.DELTA);
 			_statusPPS.onNewData = onStatusEvent;
 			_statusPPS.open(_pps.FileMode.RDONLY);
 		} catch(ex) {
@@ -161,7 +161,7 @@ module.exports = {
 		
 		try {
 			//writing pps commands
-			_commandPPS = _pps.createObject("/pps/services/bluetooth/phonebook/control", _pps.PPSMode.DELTA);
+			_commandPPS = _pps.create("/pps/services/bluetooth/phonebook/control", _pps.PPSMode.DELTA);
 			_commandPPS.open(_pps.FileMode.WRONLY);
 		} catch(ex) {
 			var err = 'qnx.phonebook::init [pbap.js] Error opening /pps/services/bluetooth/phonebook/control';

@@ -168,15 +168,15 @@ module.exports = {
 	 * Initializes the extension 
 	 */
 	init: function() {
-		_statusPPS = _pps.createObject("/pps/qnxcar/navigation/status", _pps.PPSMode.DELTA);
+		_statusPPS = _pps.create("/pps/qnxcar/navigation/status", _pps.PPSMode.DELTA);
 		_statusPPS.onNewData = onStatusEvent;
 		_statusPPS.open(_pps.FileMode.RDONLY);
 
-		_controlReaderPPS = _pps.createObject("/pps/qnxcar/navigation/control", _pps.PPSMode.DELTA);
+		_controlReaderPPS = _pps.create("/pps/qnxcar/navigation/control", _pps.PPSMode.DELTA);
 		_controlReaderPPS.onNewData = onControlEvent;
 		_controlReaderPPS.open(_pps.FileMode.RDONLY);
 
-		_controlWriterPPS = _pps.createObject("/pps/qnxcar/navigation/control", _pps.PPSMode.DELTA);
+		_controlWriterPPS = _pps.create("/pps/qnxcar/navigation/control", _pps.PPSMode.DELTA);
 		_controlWriterPPS.open(_pps.FileMode.WRONLY);
 	},
 

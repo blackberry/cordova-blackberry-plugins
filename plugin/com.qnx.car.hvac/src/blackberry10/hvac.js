@@ -55,7 +55,7 @@ module.exports = {
 	 */
 	init: function() {
 		//readerPPS
-		_readerPPS = _pps.createObject("/pps/qnxcar/hvac", _pps.PPSMode.DELTA);
+		_readerPPS = _pps.create("/pps/qnxcar/hvac", _pps.PPSMode.DELTA);
 		_readerPPS.onNewData = function(event) {
 			if (_triggerUpdate && event && event.data) {
 				_triggerUpdate(dataFormat(event.data));
@@ -64,7 +64,7 @@ module.exports = {
 		_readerPPS.open(_pps.FileMode.RDONLY);
 
 		//writerPPS
-		_writerPPS = _pps.createObject("/pps/qnxcar/hvac", _pps.PPSMode.DELTA);
+		_writerPPS = _pps.create("/pps/qnxcar/hvac", _pps.PPSMode.DELTA);
 		_writerPPS.open(_pps.FileMode.WRONLY);
 	},
 	

@@ -39,7 +39,7 @@ var _pps = qnx.webplatform.pps,
  */
 function init () {
 	try {
-		_windowGroupPPS = _pps.createObject("/pps/system/navigator/windowgroup", _pps.PPSMode.DELTA);
+		_windowGroupPPS = _pps.create("/pps/system/navigator/windowgroup", _pps.PPSMode.DELTA);
 		_windowGroupPPS.open(_pps.FileMode.WRONLY);
 	} catch (ex) {
 		console.error('Error in webworks ext: application.event/application.js:init():', ex);
@@ -122,13 +122,13 @@ module.exports = {
 
 		//listen for app commands
 		if (typeof _commandReaderPPS === "undefined") {
-			_commandReaderPPS = _pps.createObject("/pps/system/navigator/command", _pps.PPSMode.DELTA);
+			_commandReaderPPS = _pps.create("/pps/system/navigator/command", _pps.PPSMode.DELTA);
 			_commandReaderPPS.onNewData = onCommand;
 			_commandReaderPPS.open(_pps.FileMode.RDONLY);
 		}	
 		//listen for startup arguments
 		if (typeof _appdataReaderPPS === "undefined") {
-			_appdataReaderPPS = _pps.createObject("/pps/system/navigator/appdata?f=" + _key, _pps.PPSMode.DELTA);
+			_appdataReaderPPS = _pps.create("/pps/system/navigator/appdata?f=" + _key, _pps.PPSMode.DELTA);
 			_appdataReaderPPS.onFirstReadComplete = onAppDataReady;
 			_appdataReaderPPS.onNewData = onAppData;
 			_appdataReaderPPS.open(_pps.FileMode.RDONLY);

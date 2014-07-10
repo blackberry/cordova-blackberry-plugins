@@ -378,7 +378,7 @@ module.exports = {
 	init:function () {
 		try {
 			//_statusPPS
-			_statusPPS = _pps.createObject("/pps/services/bluetooth/messages/status", _pps.PPSMode.DELTA);
+			_statusPPS = _pps.create("/pps/services/bluetooth/messages/status", _pps.PPSMode.DELTA);
 			_statusPPS.onNewData = onStatusEvent;
 			_statusPPS.open(_pps.FileMode.RDONLY);
 		} catch (ex) {
@@ -389,7 +389,7 @@ module.exports = {
 
 		try {
 			//writing pps commands
-			_controlPPS = _pps.createObject("/pps/services/bluetooth/messages/control", _pps.PPSMode.DELTA);
+			_controlPPS = _pps.create("/pps/services/bluetooth/messages/control", _pps.PPSMode.DELTA);
 			_controlPPS.open(_pps.FileMode.WRONLY);
 		} catch (ex) {
 			var err = 'qnx.message::init [message.js] Error opening /pps/services/bluetooth/messages/control';
@@ -399,7 +399,7 @@ module.exports = {
 
 		try {
 			//receiving notifications
-			_notificationPPS = _pps.createObject("/pps/services/bluetooth/messages/notification", _pps.PPSMode.DELTA);
+			_notificationPPS = _pps.create("/pps/services/bluetooth/messages/notification", _pps.PPSMode.DELTA);
 			_notificationPPS.onNewData = onNotificationEvent;
 			_notificationPPS.open(_pps.FileMode.RDONLY);
 		} catch (ex) {

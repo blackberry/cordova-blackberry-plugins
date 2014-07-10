@@ -34,7 +34,7 @@ module.exports = {
 	 * Initializes the extension 
 	 */
 	init: function() {
-		_readerPPS = _pps.createObject("/pps/qnxcar/sensors", _pps.PPSMode.DELTA);
+		_readerPPS = _pps.create("/pps/qnxcar/sensors", _pps.PPSMode.DELTA);
 		_readerPPS.onNewData = function(event) {
 			if (_triggerUpdate && event && event.data) {
 				_triggerUpdate(event.data);

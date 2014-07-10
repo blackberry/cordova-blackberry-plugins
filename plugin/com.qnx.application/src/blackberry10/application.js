@@ -33,7 +33,7 @@ module.exports = {
 	 */
 		init: function () {
 		//writer
-		_writerPPS = _pps.createObject("/pps/services/app-launcher", _pps.PPSMode.DELTA);
+		_writerPPS = _pps.create("/pps/services/app-launcher", _pps.PPSMode.DELTA);
 		_writerPPS.open(_pps.FileMode.WRONLY);
 	},
 

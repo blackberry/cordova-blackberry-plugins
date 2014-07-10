@@ -35,10 +35,10 @@ module.exports = {
 	 * Initializes the extension 
 	 */
 	init: function() {
-		_themesReaderPPS = _pps.createObject("/pps/qnxcar/themes", _pps.PPSMode.DELTA);
+		_themesReaderPPS = _pps.create("/pps/qnxcar/themes", _pps.PPSMode.DELTA);
 		_themesReaderPPS.open(_pps.FileMode.RDONLY);
 
-		_profileThemeReaderPPS = _pps.createObject("/pps/qnxcar/profile/theme", _pps.PPSMode.DELTA);
+		_profileThemeReaderPPS = _pps.create("/pps/qnxcar/profile/theme", _pps.PPSMode.DELTA);
 		_profileThemeReaderPPS.onNewData = function(event) {
 			if (_triggerUpdate && event && event.data) {
 				_triggerUpdate(this.getActive());
@@ -46,7 +46,7 @@ module.exports = {
 		}.bind(this);
 		_profileThemeReaderPPS.open(_pps.FileMode.RDONLY);
 
-		_profileThemeWriterPPS = _pps.createObject("/pps/qnxcar/profile/theme", _pps.PPSMode.DELTA);
+		_profileThemeWriterPPS = _pps.create("/pps/qnxcar/profile/theme", _pps.PPSMode.DELTA);
 		_profileThemeWriterPPS.open(_pps.FileMode.WRONLY);
 	},
 
