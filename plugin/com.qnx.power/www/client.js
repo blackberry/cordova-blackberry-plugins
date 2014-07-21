@@ -1,5 +1,6 @@
 /*
- * Copyright 2014  QNX Software Systems Limited
+ * Copyright 2014. 
+ * QNX Software Systems Limited. ALl rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -18,10 +19,9 @@
  */
  
 /**
- * @name qnx.power
+ * @module qnx.power
  * @static
- *
- * Controls shutdown and reboot for the target 
+ * @description Controls the shutdown and reboot of the target.
  */
 
 var _self = {},
@@ -30,15 +30,15 @@ var _self = {},
 
 
 /**
- * @desc Initiate a shutdown request
+ * @description Initiate a shutdown request.
  * @param {Function} successCallback The function to call when successful.
- * @param {Function} [errorCallback] The function to call if there is an error.
+ * @param {Function} [errorCallback] The function to call if there's an error.
  * @param {String} [reason] The zone to filter the results by.
- * @param {String} fast 1- fast shutdown without logging 0- slow with logging
- * @memberOf module:car.power
+ * @param {String} fast Whether to use fast or slow shutdown. Set to "1" for fast shutdown(without
+ *                      logging), otherwise set to "0" for slow showdown (with with logging).
+ * @memberOf module:qnx.power
  * @method shutdown
  * @example 
- *
  * //define your callback function(s)
  * function successCallback(audioMixerItems) {
  * 		console.log("Shutdown Initiated")			
@@ -50,8 +50,7 @@ var _self = {},
  *
  *
  * //call the method
- * car.power.shutdown(successCallback, errorCallback, "userRequest","1");
- *
+ * qnx.power.shutdown(successCallback, errorCallback, "userRequest","1");
  *
  */
 _self.shutdown = function (successCallback, errorCallback, reason, fast) {
@@ -67,15 +66,15 @@ _self.shutdown = function (successCallback, errorCallback, reason, fast) {
 
 
 /**
- * @desc Initiate a reboot request
+ * @description Initiate a reboot request.
  * @param {Function} successCallback The function to call when successful.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @param {String} [reason] The zone to filter the results by.
- * @param {String} fast 1- fast reboot without logging 0- slow with logging
- * @memberOf module:car.power
+ * @param {String} fast Whether to use fast or slow reboot. Set to "1" for fast reboot (without
+ *                      logging), otherwise set to "0" for slow reboot (with with logging).
+ * @memberOf module:qnx.power
  * @method reboot
  * @example 
- *
  * //define your callback function(s)
  * function successCallback(audioMixerItems) {
  * 		console.log("Shutdown Initiated")			
@@ -87,9 +86,7 @@ _self.shutdown = function (successCallback, errorCallback, reason, fast) {
  *
  *
  * //call the method
- * car.power.reboot(successCallback, errorCallback, "userRequest","1");
- *
- *
+ * qnx.power.reboot(successCallback, errorCallback, "userRequest","1");
  */
 _self.reboot = function (successCallback, errorCallback, reason, fast) {
 	var args = {};

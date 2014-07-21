@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -23,11 +24,13 @@ module.exports = {};
  * @memberOf module:car.mediaplayer
  * @name TrackSessionEvent
  *
- * @description  Tracksession event enumeration
+ * @description  The track session event enumeration. A track session
+ *               represents the session information for a media track and is
+ *               identified by a <code>trackSessionId</code>.
  *
- * @property CREATED The tracksession is created.
- * @property DESTROYED The tracksession is destroyed.
- * @property APPENDED The tracksession is appended. 
+ * @property CREATED The track session is created.
+ * @property DESTROYED The track session is destroyed.
+ * @property APPENDED The track session is appended. 
  */  
 Object.defineProperties(module.exports,
 {

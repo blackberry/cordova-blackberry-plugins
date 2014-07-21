@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -19,7 +20,7 @@
 
 /**
  * @module car.mediaplayer
- * @description Provides media playback, browse, and search
+ * @description Provide capabilities to play, browse, and search media.
  */
 
 var _ID = "com.qnx.car.mediaplayer",
@@ -39,7 +40,7 @@ var _ID = "com.qnx.car.mediaplayer",
 	_watchesTrack = {};
 
 /**
- * Handles media source events
+ * @description Handle media source events.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -51,7 +52,7 @@ function onMediaSourceChange(data) {
 }
 
 /**
- * Handles track session events
+ *  @description Handle track session events.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -63,7 +64,7 @@ function onTrachSessionChange(data) {
 }
 
 /**
- * Handles player state events
+ *  @description Handle player state events.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -75,7 +76,7 @@ function onPlayerStateChange(data) {
 }
 
 /**
- * Handles track position events
+ *  @description Handle track position events.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -87,7 +88,7 @@ function onTrackPositionChange(data) {
 }
 
 /**
- * Handles track events
+ *  @description Handle track events.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -100,18 +101,18 @@ function onTrackChange(data) {
 
 
 /**
- * @description <p>The <b>car.mediaplayer</b> MediaPlayer instance constructor
- * <p>Open the specified player and return an instance of the MediaPlayer object,
+ * @description The <code>car.mediaplayer</code> <code>Mediaplayer</code> instance constructor.
+ * <p>Open the specified player and return an instance of the <code>Mediaplayer</code> object,
  * which is used to perform actions on the media player and to receive update events
  * through watchers.
  * @name MediaPlayer
  * @param {String} playerName The name of the player to open. If the player does not exist, it is automatically created.
- * @returns {MediaPlayer} The <b>car.mediaplayer.MediaPlayer</b> instance.
+ * @returns {MediaPlayer} The <code>car.mediaplayer.MediaPlayer</code> instance.
  * @memberOf module:car.mediaplayer
  * @constructor
  * @example
  *
- * // Instantiate a media player object, specifying the player name
+ * // Instantiate a Mediaplayer object, specifying the player name
  * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
  *
  *
@@ -135,15 +136,15 @@ function onTrackChange(data) {
  */
 var MediaPlayer = function(playerName) {
 	/**
-	 * Reference to this object instance.
+	 * @description A reference to this object's instance.
 	 * @private
 	 */
 	var self = this;
 	
 	/**
-	 * Opens the specified player name.
+	 * @description Open the specified player name.
 	 * @param {String} name The player name to open. If the player does not exist it will automatically be created.
-	 * @returns {Boolean} True if the player was opened successfully, False if not.
+	 * @returns {Boolean} A value of <code>true</code> if the media player was successfully opened, otherwise <code>false</code>.
 	 * @private
 	 */
 	var open = function(playerName) {
@@ -168,9 +169,9 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Closes the specified player name.
+	 * @description Close the specified player name.
 	 * @param {String} name The player name to close.
-	 * @returns {Boolean} True if the player was closed successfully, False if not.
+	 * @returns {Boolean} A value of <code>true</code> when the media player was closed successfully, otherwise <code>false</code>.
 	 * @private
 	 */
 	var close = function(playerName) {
@@ -194,8 +195,7 @@ var MediaPlayer = function(playerName) {
 	};
 
 	/**
-	 * Return the list of available media sources connected to the device
-	 *
+	 * @description Return the list of available media sources connected to the device.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
@@ -299,7 +299,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Browse a media source for media
+	 * @description Browse a media source for media.
 	 * @param {Number} mediaSourceId The ID of the media source to be retrieved.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
@@ -402,7 +402,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Search for media in a specific media source
+	 * @description Search for media in a specific media source.
 	 * @param {Number} mediaSourceId The ID of the media source.
 	 * @param {String} searchTerm The term to search for.
 	 * @param {Function} success The function to call on success.
@@ -486,14 +486,14 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Create a new tracksession
+	 * @description Create a new track session.
 	 * @param {Number} mediaSourceId The ID of the media source.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
-	 * @param {?String} [mediaNodeId=null] The media node ID on which to base the tracksession.
-	 * @param {Number} [index=0] The index of the item within the tracksession to set as current after creating
-	 * the tracksession.
-	 * @param {Number} [limit=-1] The maximum number of media nodes to add to the tracksession. A limit of -1
+	 * @param {?String} [mediaNodeId=null] The media node ID on which to base the track session.
+	 * @param {Number} [index=0] The index of the item within the track session to set as current after creating
+	 * the track session.
+	 * @param {Number} [limit=-1] The maximum number of media nodes to add to the track session. A limit of -1
 	 * indicates no limit.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method createTrackSession	 
@@ -503,7 +503,7 @@ var MediaPlayer = function(playerName) {
 	 * function successCallback(result) {
 	 * 	console.log("tracksession id = " + result.trackSessionId + "\n");
 	 * 	
-	 * 	// Play the new tracksession
+	 * 	// Play the new track session
 	 * 	mediaPlayer.play();
 	 * }
 	 * 
@@ -514,7 +514,7 @@ var MediaPlayer = function(playerName) {
 	 * // Instantiate a media player object, specifying the player name
 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
 	 * 
-	 * // Create a tracksession from a folder node ID, setting the third track as first to play
+	 * // Create a track session from a folder node ID, setting the third track as first to play
 	 * mediaPlayer.createTrackSession(0, successCallback, errorCallback, '/songs-7', 2);
 	 *
 	 *
@@ -550,8 +550,8 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Destroy an existing tracksession
-	 * @param {Number} trackSessionId The ID of the tracksession to destroy.
+	 * @description Destroy an existing track session.
+	 * @param {Number} trackSessionId The ID of the track session to destroy.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method destroyTrackSession	 
 	 * @example
@@ -559,7 +559,7 @@ var MediaPlayer = function(playerName) {
 	 * // Instantiate a media player object, specifying the player name
 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
 	 * 
-	 * // Destroy the tracksession by its ID
+	 * // Destroy the track session by its ID
 	 * mediaPlayer.destroyTrackSession(10);
 	 *
 	 *
@@ -587,7 +587,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Retrieve the current tracksession information
+	 * @description Retrieve the current track session information.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
@@ -607,7 +607,7 @@ var MediaPlayer = function(playerName) {
 	 * // Instantiate a media player object, specifying the player name
 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
 	 * 
-	 * // Get the current tracksession info
+	 * // Get the current track session information
 	 * mediaPlayer.getTrackSessionInfo(successCallback, errorCallback);
 	 *
 	 *
@@ -638,7 +638,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Retrieve media from the current tracksession
+	 * @description Retrieve media from the current track session.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
@@ -667,7 +667,7 @@ var MediaPlayer = function(playerName) {
 	 * // Instantiate a media player object, specifying the player name
 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
 	 * 
-	 * // Get the third through fifth tracksession items
+	 * // Get the third through fifth track session items
 	 * mediaPlayer.getTrackSessionItems(successCallback, errorCallback, 3, 2);
 	 *
 	 *
@@ -721,7 +721,7 @@ var MediaPlayer = function(playerName) {
 	};
 
 	/**
-	 * Retrieve information for the currently playing track 
+	 * @description Retrieve information for the currently playing track.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
 	 * @memberOf module:car.mediaplayer.MediaPlayer	 
@@ -811,7 +811,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Retrieve the current playback position, in milliseconds, of the current track.
+	 * @description Retrieve the current playback position(in milliseconds) of the current track.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
 	 * @memberOf module:car.mediaplayer.Mediaplayer	 
@@ -859,7 +859,7 @@ var MediaPlayer = function(playerName) {
 	};
 
 	/**
-	 * Retrieve metadata for the specified media
+	 * @description Retrieve metadata for the specified media.
 	 * @param {Number} mediaSourceId The ID of the node's media source.
 	 * @param {String} mediaNodeId The ID of the media node to retrieve metadata for.
 	 * @param {Function} success The function to call on success.
@@ -931,7 +931,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Retrieve extended metadata properties for the specified media.
+	 * @description Retrieve extended metadata properties for the specified media.
 	 * @param {Number} mediaSourceId The ID of the node's media source.
 	 * @param {String} mediaNodeId The ID of the media node to retrieve metadata for.
 	 * @param {String[]} properties An array of extended metadata property names to retrieve.
@@ -989,7 +989,7 @@ var MediaPlayer = function(playerName) {
 	};
 
 	/**
-	 * Return the state of the media player
+	 * @description Return the state of the media player.
 	 * @param {Function} success The function to call on success.
 	 * @param {Function} [error] The function to call on error.
 	 * @memberOf module:car.mediaplayer.MediaPlayer	 
@@ -1043,7 +1043,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Start or resume playback of the current tracksession
+	 * @description Start or resume playback of the current track session.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method play	 
 	 * @example
@@ -1078,7 +1078,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Pause playback
+	 * @description Pause playback.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method pause	 
 	 * @example
@@ -1113,7 +1113,7 @@ var MediaPlayer = function(playerName) {
 	};
 
 	/**
-	 * Stop playback
+	 * @description Stop playback.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method stop	 
 	 * @example
@@ -1148,7 +1148,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Skip to the next track in the active tracksession
+	 * @@description Skip to the next track in the active track session.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method next	 
 	 * @example
@@ -1183,7 +1183,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Skip to the previous track in the active tracksession
+	 * @description Skip to the previous track in the active track session.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method previous	 
 	 * @example
@@ -1218,8 +1218,8 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Jump to the specified index in the current tracksession
-	 * @param {Number} index The index of the track within the current tracksession.
+	 * @description Jump to the specified index in the current track session.
+	 * @param {Number} index The index of the track within the current track session.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method jump
 	 * @example
@@ -1227,7 +1227,7 @@ var MediaPlayer = function(playerName) {
 	 * // Instantiate a media player object, specifying the player name
 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
 	 * 
-	 * // Jump to another track in the active tracksession
+	 * // Jump to another track in the active track session
 	 * mediaPlayer.jump(4);
 	 *
 	 *
@@ -1254,7 +1254,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Seek to a specific position in the current track
+	 * @description Seek to a specific position in the current track.
 	 * @param {Number} position The track position (in ms).
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method seek
@@ -1290,7 +1290,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Set the playback rate of the media player
+	 * @description Set the playback rate of the media player.
 	 * @param {Number} playbackRate The playback rate. A rate of 1.0 is regular play speed. Negative numbers result in
 	 * reverse playback.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
@@ -1327,8 +1327,8 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Set the shuffle mode for the active tracksession.
-	 * @param {MediaPlayer.ShuffleMode} shuffleMode The shuffle mode. Use values from the <b>MediaPlayer.ShuffleMode</b> enumeration.
+	 * @description Set the shuffle mode for the active track session.
+	 * @param {MediaPlayer.ShuffleMode} shuffleMode The shuffle mode. Use values from the <code>MediaPlayer.ShuffleMode</code> enumeration.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method shuffle
 	 * @example
@@ -1363,8 +1363,8 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Set the repeat mode for the active tracksession
-	 * @param {MediaPlayer.RepeatMode} repeatMode The repeat mode. Use values from the <b>MediaPlayer.RepeatMode</b> enumeration.
+	 * @description Set the repeat mode for the active track session.
+	 * @param {MediaPlayer.RepeatMode} repeatMode The repeat mode. Use values from the <code>MediaPlayer.RepeatMode</code> enumeration.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method repeat
 	 * @example
@@ -1399,7 +1399,7 @@ var MediaPlayer = function(playerName) {
 	};
 
 	/**
-	 * Watch for changes to media sources
+	 * @description Watch for changes to media sources.
 	 * @param {Function} callback The function to call when a change is detected.
 	 * @return {Number} The watch ID.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
@@ -1429,7 +1429,7 @@ var MediaPlayer = function(playerName) {
 	
 
 	/**
-	 * Watch for changes to tracksessions
+	 * @description Watch for changes to track sessions.
 	 * @param {Function} callback The function to call when a change is detected.
 	 * @return {Number} The watch ID.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
@@ -1458,7 +1458,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Watch for changes to the media player state
+	 * @description Watch for changes to the media player state.
 	 * @param {Function} callback The function to call when a change is detected.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method watchPlayerState
@@ -1487,7 +1487,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Watch for changes to the current track
+	 * @description Watch for changes to the current track.
 	 * @param {Function} callback The function to call when a change is detected.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method watchTrack
@@ -1516,7 +1516,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Watch for changes to the current track's position
+	 * @description Watch for changes to the current track's position.
 	 * @param {Function} callback The function to call when a change is detected.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method watchTrackPosition
@@ -1545,7 +1545,7 @@ var MediaPlayer = function(playerName) {
 	};
 	
 	/**
-	 * Remove a watch
+	 * @description Remove a watch.
 	 * @param {Number} watchId The watch ID.
 	 * @memberOf module:car.mediaplayer.MediaPlayer
 	 * @method cancelWatch

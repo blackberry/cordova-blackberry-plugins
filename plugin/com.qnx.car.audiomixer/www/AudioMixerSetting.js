@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -24,8 +25,8 @@ module.exports = {},
  * @memberOf module:car.audiomixer
  * @name AudioMixerSetting
  *
- * @description <p>Audio mixer settings enumeration
- * <p>All values indicate a level within a range from 0 to 100%.
+ * @description Audio mixer settings enumeration.
+ * <p>All values indicate a level within a range from 0 to 100%.</p>
  *
  * @property {Number} VOLUME The volume setting. 
  * @property {String} BASS The bass setting.

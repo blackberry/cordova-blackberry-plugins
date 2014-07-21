@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,8 +21,7 @@
 /**
  * @module car.theme
  * @static
- *
- * @description Provides access to HMI theming 
+ * @description Provide access to HMI theming.
  */
 
 var _self = {},
@@ -31,7 +31,7 @@ var _self = {},
 
 
 /**
- * Load a theme and inject the stylesheet into the DOM
+ * @description Load a theme and inject the stylesheet into the DOM.
  * @param {Object} theme The theme to load.
  * @private
  */
@@ -55,8 +55,8 @@ function loadTheme(theme) {
  }
 
 /**
- * Handles update events for this extension
- * @param data {Array} The updated data provided by the event 
+ * @description Handles update events for this extension.
+ * @param data {Array} The updated data provided by the event.
  * @private
  */
 function onUpdate(data) {
@@ -67,7 +67,7 @@ function onUpdate(data) {
 }
 
 /**
- * Watch for theme changes
+ * @description Watch for theme changes.
  * @param {Function} callback The function to call when a change is detected.
  * @return {String} An ID for the added watch.
  * @memberOf module:car.theme
@@ -94,8 +94,8 @@ _self.watchTheme = function (callback) {
 
 
 /**
- * Stop watching theme changes
- * @param {String} watchId The watch ID as returned by <i>car.theme.watchTheme()</i>.
+ * @description Stop watching theme changes.
+ * @param {String} watchId The watch ID as returned by <code>car.theme.watchTheme()</code>.
  * @memberOf module:car.theme
  * @method cancelWatch
  * @example
@@ -112,7 +112,7 @@ _self.cancelWatch = function (watchId) {
 }
 
 /**
- * Return a list of available themes
+ * @description Return a list of available themes.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.theme
@@ -161,7 +161,7 @@ _self.getList = function(successCallback, errorCallback) {
 };
 
 /**
- * Return the current theme
+ * @description Get the current theme.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.theme
@@ -204,7 +204,7 @@ _self.getActive = function(successCallback, errorCallback) {
 };
 
 /**
- * Change the current theme
+ * @description Change the current theme.
  * @param {String} themeId The ID of the new theme.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.

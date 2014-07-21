@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013-2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,7 +21,6 @@
 /**
  * @module qnx.settings
  * @static
- *
  * @description Provides access to system settings.
  */
 
@@ -49,14 +49,15 @@ _events.map(function (eventName) {
 });
 
 /*
- * Exports are the publicly accessible functions
+ * Exports are the publicly accessible functions.
  */
 module.exports = {
 	/**
-	 * Return system settings
-	 * @param {Array} settings A list of settings to get [optional]; if omitted, all settings are returned
+	 * @description Return the system settings.
+	 * <p><b>Note</b>: The list of settings isn't fixed and depends on your system configuration.</p>
+	 * @param {Array} [service] A list of settings to retrieve. When this parameter is omitted,
+	 *                         all settings are returned.
 	 * @returns {Object} The requested settings.
-	 * NOTE: the list of settings is not fixed and depends on your system configuration
 	 */
 	get: function (settings) {
    		var value = null,
@@ -79,9 +80,9 @@ module.exports = {
 	},
 	
 	/**
-	 * Set one or more system settings
+	 * @description Set one or more system settings.
+	 * <p><b>Note</b>: The list of settings isn't fixed and depends on your system configuration.</p>
 	 * @param {Object} args The system settings to set. 
-	 * NOTE: the list of settings is not fixed and depends on your system configuration
 	 */
 	set: function (args) {
 	    window.cordova.exec(null, null, _ID, 'set', args);

@@ -1,5 +1,6 @@
 /*
- * Copyright 2014  QNX Software Systems Limited
+ * Copyright 2014.
+*  QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -81,7 +82,7 @@ module.exports = {
 
 	/**	
 	 * Stop watching webview changes
-	 * @param {Number} watchId The watch ID returned by <i>car.browser.watchTab()</i>.
+	 * @param {Number} watchId The watch ID returned by <code>car.browser.watchTab()</code>.
 	 * @memberOf module:car.browser
 	 * @method cancelWatch
 	 * @example

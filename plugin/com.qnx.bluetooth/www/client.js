@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013-2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -18,10 +19,12 @@
  */
 
 /**
- * @name qnx.bluetooth
- * @static
- *
+ * 
+ * @module qnx.bluetooth
  * @deprecated
+ * @static
+ * @description Manage Bluetooth operations.
+ *
  */
 
 
@@ -49,33 +52,34 @@ _events.map(function (eventName) {
 
 
 /*
- * Exports are the publicly accessible functions
+ * Exports are the publicly accessible functions.
  */
 module.exports = {
-	/* TODO Please make sure that constants below are identical to ones in bluetooth.js*/
-	/** To exchange legacy PIN (usually hardcoded) */
+	/* Ensure that the constants below are identical to ones in bluetooth.js.*/
+
+	/** To exchange legacy PINs (usually hardcoded). */
 	LEGACY_PIN:"LEGACY_PIN",
-	/** To allow remote device connect. */
+	/** To allow remote device connections. */
 	AUTHORIZE:"AUTHORIZE",
-	/** Request to display dialog to enter authorization passkey */
+	/** Request to display dialog to enter authorization passkey. */
 	PASS_KEY:"PASS_KEY",
-	/** Request to display dialog to confirm displayed  passkey*/
+	/** Request to display dialog to confirm displayed  passkey. */
 	ACCEPT_PASS_KEY:"ACCEPT_PASS_KEY",
-	/** Request to display dialog display passkey*/
+	/** Request to display dialog display passkey. */
 	DISPLAY_PASS_KEY:"DISPLAY_PASS_KEY",
-	/** Defines Handsfree Profile ID */
+	/** Defines the Hands-Free Profile ID. */
 	SERVICE_HFP:"0x111E",
-	/** Defines Message Access Profile ID */
+	/** Defines the Message Access Profile ID. */
 	SERVICE_MAP:"0x1134",
-	/** Defines Serial Port Profile ID */
+	/** Defines the Serial Port Profile ID. */
 	SERVICE_SPP:"0x1101",
-	/** Defines Phonebook Access Profile ID */
+	/** Defines the Phonebook Access Profile ID. */
 	SERVICE_PBAP:"0x1130",
-	/** Defines Personal Area Network ID */
+	/** Defines the Personal Area Network ID. */
 	SERVICE_PAN : "0x1115",
-	/** Defines Advanced Audio Distribution Profile / Audio/Video Remote Control Profile ID */
+	/** Defines the Advanced Audio Distribution Profile, Audio, or Video Remote Control Profile ID. */
 	SERVICE_AVRCP : "0x110B",
-	/** Defines all allowed Profile ID for current device*/
+	/** Defines all the allowed Profile IDs for current device. */
 	SERVICE_ALL:"ALL",
 
 	/** Not discoverable or connectable. */
@@ -91,17 +95,18 @@ module.exports = {
 
 
 	/**
-	 * Connect to specified service on device with specified MAC address
-	 * @param {String} service Service identifier
-	 * @param {String} mac MAC address of the device
+	 * @description Connect to the specified service on device with the specified MAC address.
+	 * @param {String} service The service identifier.
+	 * @param {String} mac The MAC address of the device.
 	 * */
 	connectService:function (service, mac) {
 		window.cordova.exec(null, null, _ID, 'connectService', { service:service, mac:mac });
 	},
 
 	/**
-	 * Return a list of paired devices
-	 * @return {Object} The currently paired device, or null
+	 * @description Get a list of paired devices.
+	 * @return {Object} The currently paired device, otherwise <code>null</code> 
+	 *         if no device is paired.
 	 */
 	getPaired:function () {
    		var value = null,
@@ -121,8 +126,8 @@ module.exports = {
 	},
 
 	/**
-	 * Get a list of connected devices for Bluetooth services
-	 * @param {String} service [optional] The Bluetooth service (e.g. SERVICE_HFP)
+	 * @description Get a list of connected devices for Bluetooth services.
+	 * @param {String} [service] The Bluetooth service (e.g., <code>SERVICE_HFP</code>).
 	 */
 	getConnectedDevices:function (service) {
    		var value = null,

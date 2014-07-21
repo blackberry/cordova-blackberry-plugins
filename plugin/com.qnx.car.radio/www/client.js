@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,8 +21,7 @@
 /**
  * @module car.radio
  * @static
- *
- * @description Manages the radio interface
+ * @description Manage the radio interface.
  */
 
 var _ID = "com.qnx.car.radio",
@@ -31,8 +31,8 @@ var _ID = "com.qnx.car.radio",
 	_watchesPresets = {};
 
 /**
- * Handles radio update events
- * @param data {Array} The updated data provided by the event 
+ * @description Handle radio update events.
+ * @param data {Array} The updated data provided by the event.
  * @private
  */
 function onUpdateRadio(data) {
@@ -43,8 +43,8 @@ function onUpdateRadio(data) {
 }
 
 /**
- * Handles preset update events 
- * @param data {Array} The updated data provided by the event 
+ * @description Handle preset update events.
+ * @param data {Array} The updated data provided by the event.
  * @private
  */
 function onUpdatePresets(data) {
@@ -55,7 +55,7 @@ function onUpdatePresets(data) {
 }
 
 /**
- * Watch for metadata updates
+ * @description Watch for metadata updates.
  * @param {Function} callback The function to call when a change is detected.
  * @return {Number} An ID for the added watch.
  * @memberOf module:car.radio
@@ -88,7 +88,7 @@ _self.watchRadio = function (callback) {
 };
 
 /**
- * Watch for preset updates
+ * @description Watch for preset updates.
  * @param {Function} callback The function to call when a change is detected.
  * @return {Number} An ID for the added watch.
  * @memberOf module:car.radio
@@ -120,8 +120,8 @@ _self.watchPresets = function (callback) {
 };
 
 /**
- * Stop watching for metadata updates
- * @param {Number} watchId The watch ID as returned by <i>car.radio.watchRadio()</i> or <i>car.radio.watchPresets()</i>.
+ * @description Stop watching for metadata updates.
+ * @param {Number} watchId The watch ID as returned by <code>car.radio.watchRadio()</code> or <code>car.radio.watchPresets()</code>.
  * @memberOf module:car.radio
  * @method cancelWatch   
  * @example
@@ -144,7 +144,7 @@ _self.cancelWatch = function (watchId) {
 };
 
 /**
- * Return the list of available tuners
+ * @description Return the list of available tuners.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
@@ -213,7 +213,7 @@ _self.getTuners = function(successCallback, errorCallback) {
 };
 		
 /**
- * Set the active tuner by name
+ * @description Set the active tuner by name.
  * @param {String} tuner The name of tuner to set as active.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -259,9 +259,9 @@ _self.setTuner = function(tuner, successCallback, errorCallback) {
 };
 
 /**
- * @description <p>Tune to a specific station, optionally targeting a specific tuner
- * <p>If the specified tuner is not the active tuner, then the station will be 
- * automatically selected the next time that tuner is set as active.
+ * @description Tune to a specific station, optionally, targeting a specific tuner.
+ * <p>If the specified tuner is not the active tuner, then the station is
+ * automatically selected the next time that tuner is set as active. </p>
  * @param {Number} station The target station.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -311,9 +311,9 @@ _self.setStation = function(station, successCallback, errorCallback, tuner) {
 };
 
 /**
- * @description <p>Get the presets for the current tuner
+ * @description Get the presets for the current tuner.
  * <p>Optionally, a tuner name can be specified, returning
- * presets for the specified tuner.
+ * presets for the specified tuner. </p>
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @param {String} [tuner] The tuner of the presets. If not specified, the active tuner is used.
@@ -382,8 +382,8 @@ _self.getPresets = function(successCallback, errorCallback, tuner) {
 };
 
 /**
- * @description <p>Set the current station as a preset at the specified index
- * <p>You can optionally specify a different station and tuner as a preset. 
+ * @description Set the current station as a preset at the specified index
+ * <p>Optionally, you can specify a different station and tuner as a preset. </p>
  * @param {Number} index The preset index.
  * @param {String} group The preset group.
  * @param {Number} [station] The station to set as the preset. If this is not specified, the current station is used.
@@ -439,7 +439,7 @@ _self.setPreset = function(index, group, station, tuner, successCallback, errorC
 };
 
 /**
- * Seek for the next radio station in the specified direction
+ * @description Seek for the next radio station in the specified direction.
  * @param {String} direction The direction to seek ('up' or 'down').
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -485,7 +485,7 @@ _self.seek = function(direction, successCallback, errorCallback) {
 };
 
 /**
- * Scan for available radio stations in the specified direction
+ * @description Scan for available radio stations in the specified direction.
  * @param {String} direction The direction to seek ('up' or 'down').
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -531,7 +531,7 @@ _self.scan = function(direction, successCallback, errorCallback) {
 };
 
 /**
- * Stop station scanning if in progress
+ * @description Stop station scanning if in progress.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
@@ -573,7 +573,7 @@ _self.scanStop = function(successCallback, errorCallback) {
 };
 
 /**
- * Get the current station metadata
+ * @description Get the metadata of the current station.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio

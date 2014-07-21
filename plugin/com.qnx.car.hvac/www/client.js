@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,8 +21,7 @@
 /**
  * @module car.hvac
  * @static
- *
- * @description Controls the HVAC system 
+ * @description Control the HVAC system.
  */
 
 var _self = {},
@@ -37,7 +37,7 @@ _self.HvacSetting = require('./HvacSetting');
 _self.HvacFanDirection = require('./HvacFanDirection');
 
 /**
- * Handles update events for this extension
+ * @description Handle update events for this plugin.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -49,7 +49,7 @@ function onUpdate(data) {
 }
 
 /**
- * Watch for HVAC changes
+ * @description Watch for HVAC changes.
  * @param {Function} callback The function to call when a change is detected.
  * @return {String} An ID for the added watch.
  * @memberOf module:car.hvac
@@ -80,8 +80,8 @@ _self.watchHvac = function (callback) {
 }
 
 /**
- * Stop watching HVAC items
- * @param {String} watchId The watch ID returned by <i>car.hvac.watchHvac()</i>.
+ * @description Stop watching HVAC items.
+ * @param {String} watchId The watch ID returned by <code>car.hvac.watchHvac()</code>.
  * @memberOf module:car.hvac
  * @method cancelWatch
  * @example
@@ -99,13 +99,13 @@ _self.cancelWatch = function (watchId) {
 
 
 /**
- * @desc <p>Return HVAC settings for the specified filter
- * <p>If successful, <i>car.hvac.get()</i> calls the <i>successCallback</i> function with an array of setting objects
- * containing the setting (<b>car.hvac.HvacSetting</b>), the zone (<b>car.Zone</b>), and the value (number/string/boolean).
+ *@description Return HVAC settings for the specified filter.
+ * <p>If successful, <code>car.hvac.get()</code> calls the <code>successCallback</code> function with an array of setting objects
+ * containing the setting (<code>car.hvac.HvacSetting</code>), the zone (<code>car.Zone</code>), and the value (number/string/boolean).
  * @param {Function} successCallback The function to call with the result.
  * @param {Function} [errorCallback] The function to call if there is an error.
- * @param {Array} [settings] An array of <b>car.hvac.HvacSetting</b> values to whitelist.
- * @param {Array} [zones] An array of <b>car.Zone</b> values to whitelist. 
+ * @param {Array} [settings] An array of <code>car.hvac.HvacSetting</code> values to whitelist.
+ * @param {Array} [zones] An array of <code>car.Zone</code> values to whitelist. 
  * @memberOf module:car.hvac
  * @method get
  * @see car.hvac.HvacSetting  
@@ -192,9 +192,9 @@ _self.get = function(successCallback, errorCallback, settings, zones) {
 };
 
 /**
- * Save an HVAC setting
- * @param {String} setting A <b>car.hvac.HvacSetting</b> value.
- * @param {String} zone A <b>car.Zone</b> value.
+ * @description Save an HVAC setting.
+ * @param {String} setting A <code>car.hvac.HvacSetting</code> value.
+ * @param {String} zone A <code>car.Zone</code> value.
  * @param {Mixed} value The value to save.
  * @param {Function} [successCallback] The function to call with the result.
  * @param {Function} [errorCallback] The function to call if there is an error.

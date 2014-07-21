@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,8 +21,7 @@
  /**
  * @module car.navigation 
  * @static
- *
- * @description Provides GPS navigation control
+ * @description Provide GPS navigation control.
  */
 
 var _self = {},
@@ -30,8 +30,8 @@ var _self = {},
 	_watches = {};
 
 /**
- * Handles update events for this extension
- * @param data {Array} The updated data provided by the event 
+ * @description Handle update events for this extension.
+ * @param data {Array} The updated data provided by the event.
  * @private
  */
 function onUpdate(data) {
@@ -42,7 +42,7 @@ function onUpdate(data) {
 }
 
 /**
- * Watch for navigation updates
+ * @description Watch for navigation updates.
  * @param {Function} callback The function to call when a change is detected.
  * @return {String} An ID for the added watch.
  * @memberOf module:car.navigation
@@ -67,8 +67,8 @@ _self.watchNavigation = function (callback) {
 }
 
 /**
- * Stop watching for navigation updates
- * @param {String} watchId The watch ID returned by <i>car.navigation.watchNavigation()</i>.
+ * @description Stop watching for navigation updates.
+ * @param {String} watchId The watch ID returned by <code>car.navigation.watchNavigation()</code>.
  * @memberOf module:car.navigation
  * @method cancelWatch 
  * @example
@@ -85,7 +85,7 @@ _self.cancelWatch = function (watchId) {
 }
 
 /**
- * Get the current user's preferred locations
+ * @description Get the current user's preferred locations.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -168,7 +168,7 @@ _self.getFavourites = function(successCallback, errorCallback) {
 };
 
 /**
- * Add a location to the current user's preferred locations
+ * @description Add a location to the current user's preferred locations.
  * @param {Object} location The location to add.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -214,8 +214,8 @@ _self.addFavourite = function(location, successCallback, errorCallback) {
 };
 
 /**
- * Remove a location from the current user's preferred locations
- * @param {Number} favouriteId The ID to remove as returned by <i>car.navigation.getFavourites()</i>.
+ * @description Remove a location from the current user's preferred locations.
+ * @param {Number} favouriteId The ID to remove as returned by <code>car.navigation.getFavourites()</code>.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -260,7 +260,7 @@ _self.removeFavourite = function(favouriteId, successCallback, errorCallback) {
 };
 
 /**
- * Get the current user's navigation history
+ * @description Get the current user's navigation history.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -343,7 +343,7 @@ _self.getHistory = function(successCallback, errorCallback) {
 };
 
 /**
- * Clear the current user's navigation history
+ * @description Clear the current user's navigation history.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -385,7 +385,7 @@ _self.clearHistory = function(successCallback, errorCallback) {
 };
 
 /**
- * Browse the Point of Interest (POI) database near a location
+ * @description Browse the Point of Interest (POI) database near a location.
  * @param {Number} [categoryId] A category ID to browse; defaults to 0 for root category
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -476,7 +476,7 @@ _self.browsePOI = function(categoryId, successCallback, errorCallback, location)
 };
 
 /**
- * Search the Point of Interest (POI) database near a location
+ * @description Search the Point of Interest (POI) database near a location.
  * @param {String} name The name of the location.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -567,10 +567,10 @@ _self.searchPOI = function(name, successCallback, errorCallback, location) {
 };
 
 /**
- * Show a set of locations on a map
+ * @description Show a set of locations on a map.
  * @param {Array} locations An array of locations to show on the map as returned by
- * <i>car.navigation.browsePOI()</i>, <i>car.navigation.search()</i>,
- * <i>car.navigation.getFavourites()</i>, or <i>car.navigation.getHistory()</i>.
+ * <code>car.navigation.browsePOI()</code>, <code>car.navigation.search()</code>,
+ * <code>car.navigation.getFavourites()</code>, or <code>car.navigation.getHistory()</code>.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -623,7 +623,7 @@ _self.showOnMap = function(locations, successCallback, errorCallback) {
 };
 
 /**
- * Zoom the current map
+ * @description Zoom the current map.
  * @param {Number} scale The zoom scale, relative to the current view.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -679,7 +679,7 @@ _self.zoomMap = function(scale, successCallback, errorCallback) {
 };
 
 /**
- * Pan the current map
+ * @description Pan the current map.
  * @param {Number} deltaX The number of pixels to move the map on the X axis.
  * @param {Number} deltaY The number of pixels to move the map on the Y axis.
  * @param {Function} [successCallback] The function to call on success.
@@ -728,7 +728,7 @@ _self.panMap = function(deltaX, deltaY, successCallback, errorCallback) {
 };
 
 /**
- * Find a location based on a partial address
+ * @description Find a location based on a partial address.
  * @param {Object} location The location to search for.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -807,7 +807,7 @@ _self.searchAddress = function(location, successCallback, errorCallback) {
 };
 
 /**
- * Navigate to a specific location
+ * @description Navigate to a specific location.
  * @param {Object} location The location to navigate to.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -860,7 +860,7 @@ _self.navigateTo = function(location, successCallback, errorCallback) {
 };
 
 /**
- * Cancel the navigation if it is in progress
+ * @description Cancel the navigation if it is in progress.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -905,7 +905,7 @@ _self.cancelNavigation = function(successCallback, errorCallback) {
 };
 
 /**
- * Get the current navigation route
+ * @description Get the current navigation route.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation
@@ -972,7 +972,7 @@ _self.getRoute = function (successCallback, errorCallback) {
 };
 
 /**
- * Get details about the current status of the navigation engine
+ * @description Get details about the current status of the navigation engine.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.navigation

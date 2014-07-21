@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013-2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,8 +21,8 @@
 /**
  * @module qnx.application.event
  * @static
- *
- * @description Send events to an application, as well as to pause, resume, and reselect events 
+ * @description Send events to an application. The events include pause, resume,
+*               and and reselect events.
  */
 
 var _ID = "com.qnx.application.event",
@@ -48,21 +49,21 @@ _events.map(function (eventName) {
 });
 
 /*
- * Exports are the publicly accessible functions
+ * Exports are the publicly accessible functions.
  */
 module.exports = {
 
 	/**
-	 * Register the key (application name) for pause, resume, and reselect events
-	 * @param {String} key The application key
+	 * @description Register the key (application name) for pause, resume, and reselect events.
+	 * @param {String} key The application key.
 	 */
 	register: function(key) {
 		window.cordova.exec(null, null, _ID, 'register', { key: key });
 	},
 	
 	/**
-	 * Get the screen window group name for the specified key
-	 * @param {String} key The application key
+	 * @description Get the screen window group name for the specified key.
+	 * @param {String} key The application key.
 	 */
 	getWindowGroup: function(key) {
    		var value = null,
@@ -85,8 +86,9 @@ module.exports = {
 	},
 
 	/**
-	 * Get the data passed to the application on startup
-	 * @return {Mixed} The data passed to the application on startup, or null
+	 * @description Get the data passed to the application on startup.
+	 * @return {Mixed} The data passed to the application on startup, otherwise
+	 *                 <code>null</code> when no data is passed to the application.
 	 */
 	getData: function() {
    		var value = null,

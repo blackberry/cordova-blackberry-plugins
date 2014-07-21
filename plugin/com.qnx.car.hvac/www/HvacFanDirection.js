@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -23,7 +24,7 @@ module.exports = {};
  * @memberOf module:car.hvac
  * @name HvacFanDirection
  *
- * @description Fan direction enumeration
+ * @description Fan direction enumeration.
  *
  * @property DEFROST The fan is set to defrost the front window.
  * @property DEFROST_AND_FEET The fan is directed to the front window and the feet.
