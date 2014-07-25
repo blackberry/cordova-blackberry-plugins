@@ -20,11 +20,8 @@
 
 /**
  * @module qnx.application
- * @description This plugin exists as a temporary stop gap measure until full cordova migration. 
- * 				DO NOT USE THIS PLUGIN IN ANY NEW APPLICATIONS.
- *
- * @deprecated
- * @private
+ * @static
+ * @description Manage applications created using Cordova.
  */
 
 var _ID = "com.qnx.application";
@@ -34,7 +31,7 @@ var _ID = "com.qnx.application";
  */
 module.exports = {
 	/**
-	 * Create a request to start an application.
+	 * @description Create a request to start an application.
 	 * @param {String} id The ID of the application to start.
 	 * @param {Object} data The startup data for the application.
 	 */
@@ -61,5 +58,23 @@ module.exports = {
 			console.error(e);
 		}
 		return value;
+	},
+	/**
+	 * @description Retrieve a list of applications installed on the device.
+	 * @returns {Object} A collection of installed application objects (Qt, native, and Cordova).
+	 * @example
+	 * {
+	 *    key: {String}{
+	 *    name: {String},
+	 *    group: {String},
+	 *    id: {String},
+	 *    uri: {String},
+	 *    icon: {String},
+	 },
+	 * [...]
+	 * }
+	 */
+	getList: function () {
+		// To be implemented
 	},
 };
