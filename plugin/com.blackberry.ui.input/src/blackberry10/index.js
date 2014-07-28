@@ -37,8 +37,8 @@
  */
 function getScreenHeight() { return screen.height; }
 function getScreenWidth() { return screen.width; }
-function getKeyboardOffset() { return 72; }
-function getKeyboardHeight() { return 480; }
+function getKeyboardOffset() { return ('keyboardOffset' in wp.device && wp.device.keyboardOffset || "0") - 0; }
+function getKeyboardHeight() { return ('keyboardHeight' in wp.device && wp.device.keyboardHeight || "0") - 0; }
 
 var _screenHeight = getScreenHeight(),
     _screenWidth = getScreenWidth(),
