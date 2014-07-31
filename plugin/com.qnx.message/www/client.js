@@ -411,15 +411,6 @@ module.exports = {
 	},
 
 	/**
-	 * @description Get a list of folders by type.
-	 * @param {Number} accountId The message account ID.
-	 * @param {Number} [parentFolderId] The parent folder ID. If not specified, the entire folder tree is returned.
-	 */
-	getFolders:function (accountId, parentFolderId) {
-		// TODO Implement
-	},
-
-	/**
 	 * @description Retrieve message from the database.
 	 *              <p> First, determine if the message exists in database and then return it. If the message
 	 *              doesn't exist, initiate a PPS request to fetch the message using the provided message handle.

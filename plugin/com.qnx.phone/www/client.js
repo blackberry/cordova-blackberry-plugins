@@ -142,30 +142,6 @@ module.exports = {
 	    window.cordova.exec(null, null, _ID, 'redial');
 	},
 	/**
-	 * @description Put a call on hold or release a call from hold.
-	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use. </p>
-	 * @param {String} callId Reserved for future use. <p>ID to identify a call.
-	 *        With the existing implementation of the Hands-free service, there's only one active call. </p>
-	 * @param {Boolean} value <code>true</code> to put current call on hold, <code>false</code> to release current call from hold.
-	 * @param {String} [service] Reserved for future use. Identifier of the phone service. 
-	 *        When no parameter specified, function call is routed to the default service (currently the Hands-free service).
-	 */
-	hold: function (callId, value, service) {
-		//TODO Implement this function and add appropriate events
-	},
-	/**
-	 * @description Mute audio input for the incoming phone call (mute microphone).
-	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use. </p>
-	 * @param {String} callId Reserved for future use. <p> ID to identify a call.
-	 *        With the existing implementation of the Hands-free service, there's only one active call. </p>
-	 * @param {Boolean} value A value of <code>true</code> to mute, <code>false</code> to unmute.
-	 * @param {String} [service] Reserved for future use. Identifier of the Phone service.
-	 *        When no parameter specified, function call is routed to the default service (currently the Hands-free service).
-	 * */
-	mute: function (callId, value, service) {
-		//TODO Implement this function and add appropriate events
-	},
-	/**
 	 * @description Return the current state of the phone.
 	 * <p><b>Note</b>: The <code>service</code> parameter isn't available for use.
 	 * @param {String} [service] Reserved for future use. <p> Identifier of the phone service.
@@ -187,15 +163,5 @@ module.exports = {
 			console.error(e);
 		}
 		return value;
-	},
-	/**
-	 * @description Call this method to return the list of active calls.</p>
-	 * <p><b>Note</b>: The <code>service</code> parameter isn't available for use.
-	 * @param {String} [service] Reserved for future use. <p>Identifier of the phone service. 
-	 *        When no parameter is specified, the function call is routed to the default service (currently the Hands-free service).</p>
-	 * @return {Object} List of active calls.
-	 * */
-	getActiveCalls: function (service) {
-		//TODO Implement this function
 	}
 };
