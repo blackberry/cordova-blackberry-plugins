@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebWorks Smoke Test: CKB Input</title>
+		<script src="local:///cordova.js" type="text/javascript"></script>
+    <script src="local:///js/jquery-1.7.2.min.js"></script>
+    <link rel="stylesheet" href="local:///css/jquery.mobile-1.1.1.min.css" />
+</head>
+<body>
+  <button onclick="document.location ='local:///manual//index.htm';">Back</button>
+  <button onclick="addListenerToTouchKB();">Add listener to TouchKeyboard event</button>
+  <p>Add listener to touchenabledkeyboard event, touch the CKB and move your fingers</p>
+  <div>
+    <div id="TouchPressed">TouchPressed: N/A</div>
+  </div>
+  <div>
+    <div id="TouchMoved">TouchMoved: N/A</div>
+  </div>
+  <div>
+    <div id="TouchReleased">TouchReleased: N/A</div>
+  </div>
+ <div>
+   <div id="x-coordinate">X: </div>
+    <div id="y-coordinate">Y: </div>
+  </div>
+  <script src="input-test.js"></script>
+
+</body>
+</html>

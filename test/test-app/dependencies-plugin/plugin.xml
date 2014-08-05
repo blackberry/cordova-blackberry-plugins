@@ -40,6 +40,7 @@
   <dependency id="com.blackberry.ui.contextmenu" />
   <dependency id="com.blackberry.ui.cover" />
   <dependency id="com.blackberry.ui.dialog" />
+  <dependency id="com.blackberry.ui.input" />
   <dependency id="com.blackberry.ui.toast" />
   <dependency id="com.blackberry.user.identity" />
 </plugin>
