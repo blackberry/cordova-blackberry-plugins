@@ -120,7 +120,7 @@ function onTrackChange(data) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.mediaplayer/open?playerName=playerName
+ * http://&lt;car-ip&gt;/car/mediaplayer/open?playerName=playerName
  *
  * Success Response:
  * {
@@ -239,7 +239,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getMediaSources
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getMediaSources
 	 *
 	 * Success Response:
 	 * {
@@ -340,7 +340,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/browse?mediaSourceId=0&limit=10&offset=0
+	 * http://&lt;car-ip&gt;/car/mediaplayer/browse?mediaSourceId=0&limit=10&offset=0
 	 *
 	 * Success Response:
 	 * {
@@ -444,7 +444,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/search?mediaSourceId=0&searchTerm=ong&limit=10&offset=0
+	 * http://&lt;car-ip&gt;/car/mediaplayer/search?mediaSourceId=0&searchTerm=ong&limit=10&offset=0
 	 *
 	 * Success Response:
 	 * {
@@ -522,7 +522,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/createTrackSession?mediaSourceId=0&mediaNodeId=/songs-7&index=2
+	 * http://&lt;car-ip&gt;/car/mediaplayer/createTrackSession?mediaSourceId=0&mediaNodeId=/songs-7&index=2
 	 *
 	 * Success Response:
 	 * {
@@ -567,7 +567,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/destroyTrackSession?trackSessionId=10
+	 * http://&lt;car-ip&gt;/car/mediaplayer/destroyTrackSession?trackSessionId=10
 	 *
 	 * Success Response:
 	 * {
@@ -615,7 +615,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getTrackSessionInfo
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getTrackSessionInfo
 	 *
 	 * Success Response:
 	 * {
@@ -675,7 +675,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getTrackSessionItems?limit=3&offset=2
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getTrackSessionItems?limit=3&offset=2
 	 *
 	 * Success Response:
 	 * {
@@ -769,7 +769,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getCurrentTrack
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getCurrentTrack
 	 *
 	 * Success Response:
 	 * {
@@ -837,7 +837,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getCurrentTrackPosition
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getCurrentTrackPosition
 	 *
 	 * Success Response:
 	 * {
@@ -896,7 +896,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getMetadata?mediaSourceId=0&mediaNodeId=/songs/1
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getMetadata?mediaSourceId=0&mediaNodeId=/songs/1
 	 *
 	 * Success Response:
 	 * {
@@ -961,7 +961,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getMetadata?mediaSourceId=0&mediaNodeId=/songs/1&properties=composer,bpm
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getMetadata?mediaSourceId=0&mediaNodeId=/songs/1&properties=composer,bpm
 	 *
 	 * Success Response:
 	 * {
@@ -1018,7 +1018,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/getPlayerState
+	 * http://&lt;car-ip&gt;/car/mediaplayer/getPlayerState
 	 *
 	 * Success Response:
 	 * {
@@ -1059,7 +1059,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/play
+	 * http://&lt;car-ip&gt;/car/mediaplayer/play
 	 *
 	 * Success Response:
 	 * {
@@ -1094,7 +1094,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/pause
+	 * http://&lt;car-ip&gt;/car/mediaplayer/pause
 	 *
 	 * Success Response:
 	 * {
@@ -1129,7 +1129,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/stop
+	 * http://&lt;car-ip&gt;/car/mediaplayer/stop
 	 *
 	 * Success Response:
 	 * {
@@ -1164,7 +1164,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/next
+	 * http://&lt;car-ip&gt;/car/mediaplayer/next
 	 *
 	 * Success Response:
 	 * {
@@ -1199,7 +1199,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/previous
+	 * http://&lt;car-ip&gt;/car/mediaplayer/previous
 	 *
 	 * Success Response:
 	 * {
@@ -1235,7 +1235,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/jump?index=4
+	 * http://&lt;car-ip&gt;/car/mediaplayer/jump?index=4
 	 *
 	 * Success Response:
 	 * {
@@ -1271,7 +1271,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/seek?position=20000
+	 * http://&lt;car-ip&gt;/car/mediaplayer/seek?position=20000
 	 *
 	 * Success Response:
 	 * {
@@ -1308,7 +1308,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/setPlaybackRate?playbackRate=1.5
+	 * http://&lt;car-ip&gt;/car/mediaplayer/setPlaybackRate?playbackRate=1.5
 	 *
 	 * Success Response:
 	 * {
@@ -1344,7 +1344,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/shuffle?shuffleMode=1
+	 * http://&lt;car-ip&gt;/car/mediaplayer/shuffle?shuffleMode=1
 	 *
 	 * Success Response:
 	 * {
@@ -1380,7 +1380,7 @@ var MediaPlayer = function(playerName) {
 	 * @example REST
 	 *
 	 * Request:
-	 * http://&lt;car-ip&gt;/car.mediaplayer/repeat?repeatMode=2
+	 * http://&lt;car-ip&gt;/car/mediaplayer/repeat?repeatMode=2
 	 *
 	 * Success Response:
 	 * {

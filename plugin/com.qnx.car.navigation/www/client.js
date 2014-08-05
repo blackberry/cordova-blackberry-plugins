@@ -123,7 +123,7 @@ _self.cancelWatch = function (watchId) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/getFavourites
+ * http://&lt;car-ip&gt;/car/navigation/getFavourites
  *
  * Success Response:
  * {
@@ -195,7 +195,7 @@ _self.getFavourites = function(successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/addFavourite?city=Toronto&country=Canada&latitude=43.645256&longitude=-79.389229&name=Starbucks&number=224&postalCode=M5V&province=Ontario&street=Wellington%20St%20W
+ * http://&lt;car-ip&gt;/car/navigation/addFavourite?city=Toronto&country=Canada&latitude=43.645256&longitude=-79.389229&name=Starbucks&number=224&postalCode=M5V&province=Ontario&street=Wellington%20St%20W
  *
  * Success Response:
  * {
@@ -239,7 +239,7 @@ _self.addFavourite = function(location, successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/removeFavourite?favouriteId=2
+ * http://&lt;car-ip&gt;/car/navigation/removeFavourite?favouriteId=2
  *
  * Success Response:
  * {
@@ -298,7 +298,7 @@ _self.removeFavourite = function(favouriteId, successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/getHistory
+ * http://&lt;car-ip&gt;/car/navigation/getHistory
  *
  * Success Response:
  * {
@@ -367,7 +367,7 @@ _self.getHistory = function(successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/clearHistory
+ * http://&lt;car-ip&gt;/car/navigation/clearHistory
  *
  * Success Response:
  * {
@@ -427,7 +427,7 @@ _self.clearHistory = function(successCallback, errorCallback) {
  * @example REST - without location filter
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/browsePOI?categoryId=7
+ * http://&lt;car-ip&gt;/car/navigation/browsePOI?categoryId=7
  *
  * 
  *
@@ -435,7 +435,7 @@ _self.clearHistory = function(successCallback, errorCallback) {
  * This example would be equivalent to: car.navigation.browsePOI(7, successCallback, errorCallback, { city: "Mississaugua", country: "Canada" });
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/browsePOI?categoryId=7&city=Mississaugua&country=Canada
+ * http://&lt;car-ip&gt;/car/navigation/browsePOI?categoryId=7&city=Mississaugua&country=Canada
  *
  *
  *
@@ -526,7 +526,7 @@ _self.browsePOI = function(categoryId, successCallback, errorCallback, location)
  * This example would be equivalent to: car.navigation.searchPOI("starbucks", successCallback, errorCallback, { city: "Toronto", country: "Canada" });
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/searchPOI?name=starbucks&city=Toronto&country=Canada
+ * http://&lt;car-ip&gt;/car/navigation/searchPOI?name=starbucks&city=Toronto&country=Canada
  *
  *
  *
@@ -601,7 +601,7 @@ _self.searchPOI = function(name, successCallback, errorCallback, location) {
  *	To encode/serialize from JavaScript: encodeURIComponent(JSON.stringify(myLocations));
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/showOnMap?locations=%5B%7B%22id%22%3A1%2C%22name%22%3A%22Starbucks%22%2C%22number%22%3A%22224%22%2C%22street%22%3A%22Wellington%20St%20W%22%2C%22city%22%3A%22Toronto%22%2C%22province%22%3A%22Ontario%22%2C%22postalCode%22%3A%22M5V%22%2C%22country%22%3A%22Canada%22%2C%22type%22%3Anull%2C%22distance%22%3A344%2C%22latitude%22%3A43.645256%2C%22longitude%22%3A-79.389229%7D%2C%7B%22id%22%3A2%2C%22name%22%3A%22Starbucks%22%2C%22number%22%3A%22208%22%2C%22street%22%3A%22Queens%20Quay%20W%22%2C%22city%22%3A%22Toronto%22%2C%22province%22%3A%22Ontario%22%2C%22postalCode%22%3A%22M5J%22%2C%22country%22%3A%22Canada%22%2C%22type%22%3Anull%2C%22distance%22%3A515%2C%22latitude%22%3A43.639709%2C%22longitude%22%3A-79.382027%7D%5D
+ * http://&lt;car-ip&gt;/car/navigation/showOnMap?locations=%5B%7B%22id%22%3A1%2C%22name%22%3A%22Starbucks%22%2C%22number%22%3A%22224%22%2C%22street%22%3A%22Wellington%20St%20W%22%2C%22city%22%3A%22Toronto%22%2C%22province%22%3A%22Ontario%22%2C%22postalCode%22%3A%22M5V%22%2C%22country%22%3A%22Canada%22%2C%22type%22%3Anull%2C%22distance%22%3A344%2C%22latitude%22%3A43.645256%2C%22longitude%22%3A-79.389229%7D%2C%7B%22id%22%3A2%2C%22name%22%3A%22Starbucks%22%2C%22number%22%3A%22208%22%2C%22street%22%3A%22Queens%20Quay%20W%22%2C%22city%22%3A%22Toronto%22%2C%22province%22%3A%22Ontario%22%2C%22postalCode%22%3A%22M5J%22%2C%22country%22%3A%22Canada%22%2C%22type%22%3Anull%2C%22distance%22%3A515%2C%22latitude%22%3A43.639709%2C%22longitude%22%3A-79.382027%7D%5D
  *
  *
  * Success Response:
@@ -651,13 +651,13 @@ _self.showOnMap = function(locations, successCallback, errorCallback) {
  * @example REST - zoom in
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/zoomMap?scale=2
+ * http://&lt;car-ip&gt;/car/navigation/zoomMap?scale=2
  *
  *
  * @example REST - zoom out
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/zoomMap?scale=0.5
+ * http://&lt;car-ip&gt;/car/navigation/zoomMap?scale=0.5
  *
  *
  * Success Response:
@@ -705,7 +705,7 @@ _self.zoomMap = function(scale, successCallback, errorCallback) {
  * @example REST - pan the map
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/panMap?deltaX=100&deltaY=100
+ * http://&lt;car-ip&gt;/car/navigation/panMap?deltaX=100&deltaY=100
  *
  *
  * Success Response:
@@ -769,7 +769,7 @@ _self.panMap = function(deltaX, deltaY, successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/searchAddress?number=224&street=Wellington&city=Toronto&province=Ontario
+ * http://&lt;car-ip&gt;/car/navigation/searchAddress?number=224&street=Wellington&city=Toronto&province=Ontario
  *
  *
  *
@@ -837,7 +837,7 @@ _self.searchAddress = function(location, successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/navigateTo?city=Toronto&country=Canada&latitude=43.645256&longitude=-79.389229&name=Starbucks&number=224&postalCode=M5V&province=Ontario&street=Wellington%20St%20W
+ * http://&lt;car-ip&gt;/car/navigation/navigateTo?city=Toronto&country=Canada&latitude=43.645256&longitude=-79.389229&name=Starbucks&number=224&postalCode=M5V&province=Ontario&street=Wellington%20St%20W
  *
  *
  *
@@ -885,7 +885,7 @@ _self.navigateTo = function(location, successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/cancelNavigation
+ * http://&lt;car-ip&gt;/car/navigation/cancelNavigation
  *
  *
  *
@@ -940,7 +940,7 @@ _self.cancelNavigation = function(successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/getRoute
+ * http://&lt;car-ip&gt;/car/navigation/getRoute
  *
  *
  *
@@ -1003,7 +1003,7 @@ _self.getRoute = function (successCallback, errorCallback) {
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car.navigation/getStatus
+ * http://&lt;car-ip&gt;/car/navigation/getStatus
  *
  *
  *
