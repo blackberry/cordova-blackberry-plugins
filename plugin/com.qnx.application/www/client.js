@@ -75,6 +75,19 @@ module.exports = {
 	 * }
 	 */
 	getList: function () {
-		// To be implemented
+		var value = null,
+			success = function (data, response) {
+				value = data;
+			},
+			fail = function (data, response) {
+				throw data;
+			};
+
+		try {
+			window.cordova.exec(success, fail, _ID, 'getList', null);
+			return value;
+		} catch (e) {
+			console.error(e);
+		}
 	},
 };

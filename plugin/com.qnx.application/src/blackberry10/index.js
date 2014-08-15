@@ -65,4 +65,25 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
+
+	/**
+	 * Creates a request to get the list of installed applications
+	 * @param success {Function} Function to call if the operation is a success
+	 * @param fail {Function} Function to call if the operation fails
+	 * @param args {Object} The arguments supplied. Available arguments for this call are: 
+	 *	{
+	 *		id: {String},
+	 *	}
+	 * @param env {Object} Environment variables
+	 */
+
+	getList: function (success, fail, args, env) {
+		var result = new PluginResult(args, env)
+		try {
+			var data = _application.getList();
+			result.ok(data, false);
+		} catch (e) {
+			result.error(JSON.stringify(e), false);
+		}
+	}
 };
