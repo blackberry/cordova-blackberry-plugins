@@ -130,7 +130,7 @@ _self.cancelWatch = function (watchId) {
  *
  * @example REST - Single zone.
  * Request:
- * http://<car-ip>/car/audiomixer/get?zone=all
+ * http://&lt;car-ip&gt;/car/audiomixer/get?zone=all
  *
  * Response:
  * {
@@ -143,7 +143,7 @@ _self.cancelWatch = function (watchId) {
  *
  * @example REST - Multizone.
  * Request:
- * http://<car-ip>/car/audiomixer/get
+ * http://&lt;car-ip&gt;/car/audiomixer/get
  *
  * Success Response:
  * {
@@ -191,7 +191,7 @@ _self.get = function(successCallback, errorCallback, zone) {
  *
  * @example REST
  * Request:
- * http://<car-ip>/car/audiomixer/set?setting=volume&zone=all&value=50
+ * http://&lt;car-ip&gt;/car/audiomixer/set?setting=volume&zone=all&value=50
  *
  * Success Response:
  * {
