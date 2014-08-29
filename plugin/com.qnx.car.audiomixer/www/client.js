@@ -18,10 +18,9 @@
  */
  
 /**
- * @name car.audiomixer
  * @static
- *
- * Controls the audio mixer 
+ * @module car.audiomixer
+ * @description Control the audio mixer.
  */
 
 var _self = {},
@@ -35,8 +34,8 @@ _self.AudioMixerSetting = require('./AudioMixerSetting');
 
 
 /**
- * Handles update events for this extension
- * @param data {Array} The updated data provided by the event 
+ * @description Handle update events for this extension.
+ * @param data {Array} The updated data provided by the event.
  * @private
  */
 function onUpdate(data) {
@@ -47,13 +46,12 @@ function onUpdate(data) {
 }
 
 /**
- * Watch for audio mixer changes
+ * @description Monitor for audio mixer changes.
  * @param {Function} callback The function to call when a change is detected.
- * @return {String} An ID for the added watch.
+ * @return {String} The identifier (ID) for the added watch.
  * @memberOf module:car.audiomixer 
  * @method watchAudioMixer
  * @example
- * 
  * //define a callback function
  * function myCallback(audioMixerItems) {
  *		//iterate through the changed items
@@ -79,8 +77,8 @@ _self.watchAudioMixer = function (callback) {
 
 
 /**	
- * Stop watching audio mixer changes
- * @param {Number} watchId The watch ID returned by <i>car.audiomixer.watchAudioMixer()</i>.
+ * @description Stop watching audio mixer changes.
+ * @param {Number} watchId The watch ID returned by <code>car.audiomixer.watchAudioMixer()</code>.
  * @memberOf module:car.audiomixer
  * @method cancelWatch
  * @example
@@ -98,8 +96,9 @@ _self.cancelWatch = function (watchId) {
 
 
 /**
- * @desc <p>Return the audio mixer settings for a specific zone
- * <p>If successful, <i>car.audiomixer.get()</i> calls the <i>successCallback</i> function with the <b>car.Zone</b> object for the specific zone.
+ * @description Return the audio mixer settings for a specific zone.
+ * <p>If the call is successful, <code>car.audiomixer.get()</code> calls the <code>successCallback</code>
+ * function with the <code>car.Zone</code> object for the specific zone.</p>
  * @param {Function} successCallback The function to call with the result on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @param {String} [zone] The zone to filter the results by.
@@ -107,7 +106,6 @@ _self.cancelWatch = function (watchId) {
  * @method get
  * @see car.Zone 
  * @example 
- *
  * //define your callback function(s)
  * function successCallback(audioMixerItems) {
  *		//iterate through all the audio mixer items
@@ -122,7 +120,7 @@ _self.cancelWatch = function (watchId) {
  *		console.log(error.code, error.msg);
  * }
  *
- * //Optional: provide a car.Zone filter to retrieve values for only that zone.
+ * //Optional: Provide a car.Zone filter to retrieve values for only that zone.
  * //If omitted, settings for all zones will be returned.
  * var zone = car.Zone.FRONT;
  *
@@ -130,10 +128,9 @@ _self.cancelWatch = function (watchId) {
  * car.audiomixer.get(successCallback, errorCallback, zone);
  *
  *
- * @example REST - single zone
- *
+ * @example REST - Single zone.
  * Request:
- * http://<car-ip>/car/audiomixer/get?zone=all
+ * http://&lt;car-ip&gt;/car/audiomixer/get?zone=all
  *
  * Response:
  * {
@@ -144,10 +141,9 @@ _self.cancelWatch = function (watchId) {
  * }
  *
  *
- * @example REST - multi zone
- *
+ * @example REST - Multizone.
  * Request:
- * http://<car-ip>/car/audiomixer/get
+ * http://&lt;car-ip&gt;/car/audiomixer/get
  *
  * Success Response:
  * {
@@ -174,12 +170,12 @@ _self.get = function(successCallback, errorCallback, zone) {
 
 
 /**
- * Save an audio mixer setting
- * @param {String} setting A <b>car.audiomixer.AudioMixerSetting</b> value.  
- * @param {String} zone A <b>car.Zone</b> value.   
+ * @description Save an audio mixer setting.
+ * @param {String} setting The <code>car.audiomixer.AudioMixerSetting</code> value.  
+ * @param {String} zone A <code>car.Zone</code> value.   
  * @param {Number} value The value to save.
- * @param {Function} [successCallback] The function to call on success.
- * @param {Function} [errorCallback] The function to call if there is an error.
+ * @param {Function} [successCallback] The function to call when the function call is successful.
+ * @param {Function} [errorCallback] The function to call if there's an error.
  * @memberOf module:car.audiomixer
  * @method set
  * @see car.audiomixer.AudioMixerSetting
@@ -194,9 +190,8 @@ _self.get = function(successCallback, errorCallback, zone) {
  *
  *
  * @example REST
- *
  * Request:
- * http://<car-ip>/car/audiomixer/set?setting=volume&zone=all&value=50
+ * http://&lt;car-ip&gt;/car/audiomixer/set?setting=volume&zone=all&value=50
  *
  * Success Response:
  * {

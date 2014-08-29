@@ -32,7 +32,7 @@ var	_pps = qnx.webplatform.pps,
 function init() {
 	try {
 		// readerPPS
-		_readerPPS = _pps.createObject("/pps/qnxcar/system/settings", _pps.PPSMode.DELTA);
+		_readerPPS = _pps.create("/pps/qnxcar/system/settings", _pps.PPSMode.DELTA);
 		_readerPPS.onNewData = function(event) {
 			if (_triggerUpdate && event && event.data) {
 				_triggerUpdate(event.data);
@@ -40,7 +40,7 @@ function init() {
 		};
 
 		// writerPPS
-		_writerPPS = _pps.createObject("/pps/qnxcar/system/settings", _pps.PPSMode.DELTA);
+		_writerPPS = _pps.create("/pps/qnxcar/system/settings", _pps.PPSMode.DELTA);
 		
 		// Open the PPS objects
 		if(!_readerPPS.open(_pps.FileMode.RDONLY) || !_writerPPS.open(_pps.FileMode.WRONLY)) {

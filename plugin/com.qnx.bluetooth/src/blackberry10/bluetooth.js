@@ -226,7 +226,7 @@ module.exports = {
 	init:function () {
 
 		/* Initialise PPS object which populated when user Paired with device */
-		_pairedDevicesPPS = _pps.createObject("/pps/services/bluetooth/paired_devices/.all", _pps.PPSMode.DELTA);
+		_pairedDevicesPPS = _pps.create("/pps/services/bluetooth/paired_devices/.all", _pps.PPSMode.DELTA);
 
 		/* We have to monitor onFirstReadComplete and onNewData event to capture all devices */
 		_pairedDevicesPPS.onFirstReadComplete = onPairedDevice;
@@ -235,16 +235,16 @@ module.exports = {
 		_pairedDevicesPPS.open(_pps.FileMode.RDONLY);
 
 		/* Initialise PPS object to send commands and data to the PPS-Bluetooth */
-		_controlPPS = _pps.createObject("/pps/services/bluetooth/control", _pps.PPSMode.DELTA);
+		_controlPPS = _pps.create("/pps/services/bluetooth/control", _pps.PPSMode.DELTA);
 		_controlPPS.open(_pps.FileMode.WRONLY);
 
 		/* Initialise PPS object responsible for notifying about BluettothStake state changes */
-		_statusPPS = _pps.createObject("/pps/services/bluetooth/status", _pps.PPSMode.DELTA);
+		_statusPPS = _pps.create("/pps/services/bluetooth/status", _pps.PPSMode.DELTA);
 		_statusPPS.onNewData = onStatusPPSChange;
 		_statusPPS.open(_pps.FileMode.RDONLY);
 
 		/* Initialise PPS object which indicates what services currently connected and what is MAC of devices */
-		_servicesPPS = _pps.createObject("/pps/services/bluetooth/services", _pps.PPSMode.DELTA);
+		_servicesPPS = _pps.create("/pps/services/bluetooth/services", _pps.PPSMode.DELTA);
 		_servicesPPS.onNewData = onServicesPPSChange;
 		_servicesPPS.open(_pps.FileMode.RDONLY);
 

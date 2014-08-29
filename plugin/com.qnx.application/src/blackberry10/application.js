@@ -22,7 +22,59 @@
  */
 
 var _pps = qnx.webplatform.pps,
-	_writerPPS; 
+	_writerPPS,
+	_readerPPS,
+	_appObjList = {}; 
+
+/**
+ * Builds a list of application names and an organized group of application objects
+ * for convenient retrieval later.
+ */
+function buildNameList () {
+	var applications;
+		
+	applications = _readerPPS.data.applications;
+
+	// reinitialize _appObjList
+	delete _appObjList;
+	_appObjList = {};
+
+	for (var key in applications) {
+		var item = applications[key],
+			itemData = item.split(",");
+			
+		// skip if this is the android player
+		if (key.indexOf('sys.android') == 0)
+			continue;
+
+		// create an app object then adjust for variances in the applications pps object
+		var appData = {
+			name: itemData[1],
+			group: itemData[2],
+			id: key,
+			uri: 'null',
+			icon: 'default'
+		};
+
+		// some applications use sys.uri or uri to identify themselves as chromeless browser apps
+		if (appData.id.indexOf("sys.uri") != -1) {
+			appData.uri = itemData[10];
+		} else {
+			if (appData.id.indexOf("uri") != -1) {
+				appData.uri = itemData[3];
+			}
+		}
+
+		// some applications have the icon in a different path
+		appData.icon = (appData.id.indexOf("uri") === 0) ? itemData[0] : ("/" + key + "/" + itemData[0]);
+
+		// some webworks applications append the icon dimensions in the middle of the path. 
+		appData.icon = appData.icon.replace(/{(\d+x\d+)}/g, "");
+
+		_appObjList[appData.name] = appData;
+
+	}
+}
 
 /*
  * Exports are the publicly accessible functions
@@ -31,10 +83,38 @@ module.exports = {
 	/**
 	 * Initializes the extension 
 	 */
-		init: function () {
+	init: function () {
+		//reader
+		_readerPPS = _pps.create("/pps/system/navigator/applications/applications", _pps.PPSMode.DELTA);
+		_readerPPS.onNewData = function (event) {
+			buildNameList();
+			// if (event) {
+			// 	if (event.changed) {
+			// 		if (_installedTrigger) { 
+			// 			_installedTrigger(event); 
+			// 		}
+			// 	} else if (event.remove) {
+			// 		if (_uninstalledTrigger) { 
+			// 			_uninstalledTrigger(event); 
+			// 		}
+			// 	}
+			// }
+		};
+		
 		//writer
-		_writerPPS = _pps.createObject("/pps/services/app-launcher", _pps.PPSMode.DELTA);
-		_writerPPS.open(_pps.FileMode.WRONLY);
+		_writerPPS = _pps.create("/pps/services/app-launcher", _pps.PPSMode.DELTA);
+
+
+		// Open the PPS objects
+		if(!_readerPPS.open(_pps.FileMode.RDONLY) || !_writerPPS.open(_pps.FileMode.WRONLY)) {
+
+			console.error('qnx.application application.js::init() - Error opening PPS objects.');
+
+			_readerPPS.close();
+			_writerPPS.close();
+		}
+		
+		buildNameList();
 	},
 
 	/**
@@ -45,5 +125,13 @@ module.exports = {
 	start: function(id,data){
 		var obj = {id:id, cmd:"launch app",app:id,dat:data};
 		_writerPPS.write({req:obj});
+	},
+
+	/**
+	 * Returns the list of applications
+	 * @return {Object} A collection of the installed application objects
+	 */
+	getList: function() {
+		return _appObjList;
 	}
 };

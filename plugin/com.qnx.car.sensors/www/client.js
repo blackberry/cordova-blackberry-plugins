@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,7 +21,6 @@
 /**
  * @module car.sensors
  * @static
- *
  * @description Provides access to custom automotive sensors.
  */
 
@@ -35,8 +35,8 @@ _self.Sensor = require('./Sensor');
 
 
 /**
- * Handles update events for this extension
- * @param data {Array} The updated data provided by the event 
+ * @description Handles update events for this plugin.
+ * @param data {Array} The updated data provided by the event.
  * @private
  */
 function onUpdate(data) {
@@ -48,7 +48,7 @@ function onUpdate(data) {
 
 
 /**
- * Watch for sensor changes
+ * @description Watch for sensor changes.
  * @param {Function} callback The function to call when a change is detected.
  * @return {String} An ID for the added watch.
  * @memberOf module:car.sensors
@@ -79,8 +79,8 @@ _self.watchSensors = function (callback) {
 
 
 /**
- * Stop watching sensor changes
- * @param {Number} watchId The watch ID as returned by <i>car.sensors.watchSensors()</i>.
+ * @description Stop watching sensor changes.
+ * @param {Number} watchId The watch ID as returned by <code>car.sensors.watchSensors()</code>.
  * @memberOf module:car.sensors
  * @method cancelWatch 
  * @example
@@ -97,12 +97,12 @@ _self.cancelWatch = function (watchId) {
 }
 
 /**
- * @description <p>Return the current vehicle sensors
- * <p>If successful, the <i>successCallback</i> method is called with an object describing
- * the available sensors, their location (if applicable), and their values.
+ * @description Return the sensors of the current vehicle.
+ * <p>If successful, the <code>successCallback</code> method is called with an object describing
+ * the available sensors, its location (if applicable), and its values.
  * @param {Function} successCallback The function to call with the result on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
- * @param {Array} [sensors] A list of <b>car.sensor.Sensor</b> values to whitelist.
+ * @param {Array} [sensors] A list of <code>car.sensor.Sensor</code> values to whitelist.
  * @memberOf module:car.sensors
  * @method get 
  * @example 

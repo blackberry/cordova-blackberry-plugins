@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013-2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -19,23 +20,20 @@
 
 /**
  * @module qnx.application
- * @description This plugin exists as a temporary stop gap measure until full cordova migration. 
- * 				DO NOT USE THIS PLUGIN IN ANY NEW APPLICATIONS.
- *
- * @deprecated
- * @private
+ * @static
+ * @description Manage applications created using Cordova.
  */
 
 var _ID = "com.qnx.application";
 
 /*
- * Exports are the publicly accessible functions
+ * Exports are the publicly accessible functions.
  */
 module.exports = {
 	/**
-	 * Create a request to start an application
-	 * @param {String} id The ID of the application to start
-	 * @param {Object} data The startup data for the application
+	 * @description Create a request to start an application.
+	 * @param {String} id The ID of the application to start.
+	 * @param {Object} data The startup data for the application.
 	 */
 	start: function (id, data) {
 		if (!data || data === undefined) {
@@ -60,5 +58,36 @@ module.exports = {
 			console.error(e);
 		}
 		return value;
+	},
+	/**
+	 * @description Retrieve a list of applications installed on the device.
+	 * @returns {Object} A collection of installed application objects (Qt, native, and Cordova).
+	 * @example
+	 * {
+	 *    key: {String}{
+	 *    name: {String},
+	 *    group: {String},
+	 *    id: {String},
+	 *    uri: {String},
+	 *    icon: {String},
+	 },
+	 * [...]
+	 * }
+	 */
+	getList: function () {
+		var value = null,
+			success = function (data, response) {
+				value = data;
+			},
+			fail = function (data, response) {
+				throw data;
+			};
+
+		try {
+			window.cordova.exec(success, fail, _ID, 'getList', null);
+			return value;
+		} catch (e) {
+			console.error(e);
+		}
 	},
 };

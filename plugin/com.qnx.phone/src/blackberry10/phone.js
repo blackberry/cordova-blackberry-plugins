@@ -67,7 +67,7 @@ module.exports = {
 	 */
 	init:function () {
 		//readerPPS
-		_hfpControlPPS = _pps.createObject("/pps/services/handsfree/control", _pps.PPSMode.DELTA);
+		_hfpControlPPS = _pps.create("/pps/services/handsfree/control", _pps.PPSMode.DELTA);
 
 		try{
 			_hfpControlPPS.open(_pps.FileMode.WRONLY);
@@ -75,7 +75,7 @@ module.exports = {
 			throw new Error("qnx.phone::init [phone.js] PPS object /pps/services/handsfree/status cannot be opened")
 		}
 
-		_hfpStatusPPS = _pps.createObject("/pps/services/handsfree/status", _pps.PPSMode.DELTA);
+		_hfpStatusPPS = _pps.create("/pps/services/handsfree/status", _pps.PPSMode.DELTA);
 		_hfpStatusPPS.onNewData = function (event) {
 			if (event && event.data && event.data.cmd_status) {
 				var cmd_status = event.data.cmd_status;

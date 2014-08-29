@@ -55,7 +55,7 @@ module.exports = {
 	 */
 	init: function() {
 		//audio mixer reader
-		_mixerReaderPPS = _pps.createObject("/pps/services/audio/mixer", _pps.PPSMode.DELTA);
+		_mixerReaderPPS = _pps.create("/pps/services/audio/mixer", _pps.PPSMode.DELTA);
 		_mixerReaderPPS.onNewData = function(event) {
 			if (_triggerUpdate && event && event.data)  {
 				_triggerUpdate(dataFormat(event.data));
@@ -64,11 +64,11 @@ module.exports = {
 		_mixerReaderPPS.open(_pps.FileMode.RDONLY);
 
 		//audio mixer writer
-		_mixerWriterPPS = _pps.createObject("/pps/services/audio/mixer", _pps.PPSMode.DELTA);
+		_mixerWriterPPS = _pps.create("/pps/services/audio/mixer", _pps.PPSMode.DELTA);
 		_mixerWriterPPS.open(_pps.FileMode.WRONLY);
 
 		//volume reader
-		_volumeReaderPPS = _pps.createObject("/pps/services/audio/status", _pps.PPSMode.DELTA);
+		_volumeReaderPPS = _pps.create("/pps/services/audio/status", _pps.PPSMode.DELTA);
 		_volumeReaderPPS.onNewData = function(event) {
 			if (_triggerUpdate && event && event.data && !isNaN(event.data["output.speaker.volume"])) {
 				_triggerUpdate(dataFormat({ volume: event.data["output.speaker.volume"] }));
@@ -78,7 +78,7 @@ module.exports = {
 		_volumeReaderPPS.open(_pps.FileMode.RDONLY);
 
 		//volume writer
-		_volumeWriterPPS = _pps.createObject("/pps/services/audio/control", _pps.PPSMode.DELTA);
+		_volumeWriterPPS = _pps.create("/pps/services/audio/control", _pps.PPSMode.DELTA);
 		_volumeWriterPPS.open(_pps.FileMode.WRONLY);
 
 	},

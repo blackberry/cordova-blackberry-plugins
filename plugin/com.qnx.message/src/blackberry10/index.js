@@ -222,17 +222,6 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-
-	/**
-	 * Gets a list of folders for the specified account.
-	 * @param success {Function} Function to call if the operation is a success
-	 * @param fail {Function} Function to call if the operation fails
-	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
-	 * @param env {Object} Environment variables
-	 */
-	getFolders: function(success, fail, args, env) {
-		// TODO Implement
-	},
 	
 	/**
 	 * Method retrieves message from the database, check first if message exist in database and return is, if not initiated

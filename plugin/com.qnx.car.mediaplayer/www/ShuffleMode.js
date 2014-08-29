@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -23,7 +24,7 @@ module.exports = {};
  * @memberOf module:car.mediaplayer
  * @name ShuffleMode
  *
- * @description  Shuffle mode enumeration
+ * @description The shuffle mode enumeration.
  *
  * @property SHUFFLE_OFF Shuffle mode is off.
  * @property SHUFFLE_ON Shuffle mode is on.

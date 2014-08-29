@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+*  QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,25 +21,17 @@
 
 /**
  * @module car.Zone
- * @description Provides the zone enumeration
- *
- */
- 
-/**
  * @static
- * @memberOf module:car.Zone
- * @name Zone
- *
- * @description  <p>Zone enumeration
+ * @description The zone enumeration.
  * <p>This enumeration provides a list of available zones for convenience. It can be used
  * with the following APIs:
  * <ul>
- * <li><b>car.hvac</b>
- * <li><b>car.audiomixer</b>
+ * <li><code>car.hvac</code>
+ * <li><code>car.audiomixer</code>
  * </ul>
- * 
- * <p>Note that not all zones are present in all vehicles and that
- * zones can be different for each extension.  
+ * </p>
+ * <p><b>Note</b>: Not all zones are available in vehicles. In addition, zones
+ *                 can be different for each extension.  
  *
  * @property ALL  The entire vehicle.
  * @property FRONT The first row. 

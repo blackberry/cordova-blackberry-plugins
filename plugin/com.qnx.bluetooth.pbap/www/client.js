@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013-2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -19,33 +20,34 @@
 
 
 /**
- * Allows access to address book information over Bluetooth PBAP.
+ * @module qnx.bluetooth_pbap
+ * @static
+ * @deprecated
+ * @description Allow access to address book information over 
+ *              Bluetooth Phone Book Access Profile (PBAP). <br/>
  *
- * <h3>Events</h3>
- * <dl><dt><h4>bluetoothpbapstatechange</h4></dt>
- * <dd><p>Fired when the state of a service has changed</p>
- * <h5>Event data</h5>
+ * <br/><h2>Events</h2>
+ * <dl><dt><h3>bluetoothpbapstatechange</h3></dt>
+ * <dd><p>Fired when the state of a service has changed.</p>
+ * <h4>Event data</h4>
  * <p>{Object}</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  * <pre><code>{
  *      service: 'SERVICE_BLUETOOTH',
  *      state: 'STATE_CONNECTED'
  * }</code></pre></dd></dl>
  *
  * <dl><dt><h4>bluetoothpbapstatuschange</h4></dt>
- * <dd><p>Fired when the status of the contact service has changed,
- * e.g. the contact store is refreshing or service is ready</p>
- * <h5>Event data</h5>
+ * <dd><p>Fired when the status of the contact service has changed.
+ * E.g., the contact store is refreshing or service is ready.</p>
+ * <h4>Event data</h4>
  * <p>{Object}</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  * <pre><code>{
  *      service: 'SERVICE_BLUETOOTH'
  *      status: 'REFRESHING'
  *}</code></pre></dd></dl>
  * 
- * @module qnx.bluetooth.pbap
- * @static
- * @deprecated
  */
  
 
@@ -74,55 +76,56 @@ _events.map(function (eventName) {
 
 /**
  * @static
- * The <code>qnx.bluetooth.pbap.Contact</code> constructor function. Contact object instances represent contacts
- * stored on the device from which the PBAP contacts were synchronized.
- * @param {Object} [properties] The properties argument can be used to initialize the Contact instance's properties.
+ * The <code>qnx.bluetooth.pbap.Contact</code> constructor function. <code>Contact</code> object instances 
+ * represent contacts stored on the device from which the PBAP contacts were synchronized.
+ * @param {Object} [properties] The properties argument can be used to initialize the <code>Contact</code>
+ *                              instance's properties.
  * 
  * @example
- * // The following code demonstrates how to create a new Contact object with its name
+ * // The following code shows how to create a new <code>Contact</code> object with its name
  * // defaulted to 'John Doe'
  * var contact = new qnx.bluetooth.pbap.Contact({ firstName: 'John', lastName: 'Doe'});
  * 
- * @property {String} anniversary The anniversary of the Contact in ISO 8601 format.
- * @property {String} birthday The birthday of the Contact in ISO 8601 format.
- * @property {String} categories A comma-separated list of categories to which this Contact belongs.
- * @property {String} company The Contact's company.
- * @property {String} email1 Primary email address.
- * @property {String} email2 Secondary email address.
- * @property {String} email3 Tertiary email address.
- * @property {String} faxPhone The Contact's fax number.
- * @property {String} firstName First name.
- * @property {String} homeAddress1 Primary home address information.
- * @property {String} homeAddress2 Secondary home address inofrmation.
- * @property {String} homeAddressCity Home address city.
- * @property {String} homeAddressCountry Home address country.
- * @property {String} homeAddressStateProvince Home address state or province.
- * @property {String} homeAddressZipPostal Home address zip or postal code.
- * @property {String} homePhone Primary home phone number.
- * @property {String} homePhone2 Secondary home phone number.
- * @property {String} jobTitle The Contact's job title.
- * @property {String} lastName Last name.
- * @property {String} mobilePhone Mobile phone number.
+ * @property {String} anniversary The anniversary of the contact in ISO 8601 format.
+ * @property {String} birthday The birthday of the contact in ISO 8601 format.
+ * @property {String} categories A comma-separated list of categories to which this <code>Contact</code> belongs.
+ * @property {String} company The contact's company.
+ * @property {String} email1 Primary email address of the contact.
+ * @property {String} email2 Secondary email address of the contact.
+ * @property {String} email3 Tertiary email address of the contact.
+ * @property {String} faxPhone The contact's fax number.
+ * @property {String} firstName The contact's first name.
+ * @property {String} homeAddress1 The contact's primary home address information.
+ * @property {String} homeAddress2 The contact's secondary home address information.
+ * @property {String} homeAddressCity The contact's home address city.
+ * @property {String} homeAddressCountry The contact's home address country.
+ * @property {String} homeAddressStateProvince The contact's home address state or province.
+ * @property {String} homeAddressZipPostal The contact's home address zip or postal code.
+ * @property {String} homePhone The contact's primary home phone number.
+ * @property {String} homePhone2 The contact's secondary home phone number.
+ * @property {String} jobTitle The contact's job title.
+ * @property {String} lastName The contact's last name.
+ * @property {String} mobilePhone The contact's mobile phone number.
  * @property {String} note Additional contact information.
- * @property {String} otherPhone Other phone number.
- * @property {String} pagerPhone Pager number.
- * @property {String} picture The fully qualified system path to the Contact's photo.
- * @property {String} pin The Contact's device PIN.
- * @property {String} title The Contact's title or titles.
- * @property {String} uid Unique identifier for this Contact.
+ * @property {String} otherPhone The contact's other phone number.
+ * @property {String} pagerPhone The contact's pager number.
+ * @property {String} picture The fully qualified system path to the contact's photo.
+ * @property {String} pin The contact's device PIN.
+ * @property {String} title The contact's title or titles.
+ * @property {String} uid THe unique identifier for this <code>Contact</code>.
  * @property {String} user1 User-defined field.
  * @property {String} user2 User-defined field.
  * @property {String} user3 User-defined field.
  * @property {String} user4 User-defined field.
- * @property {String} webpage The Contact's webpage URI.
- * @property {String} workAddress1 Primary work address information.
- * @property {String} workAddress2 Secondary work address information.
- * @property {String} workAddressCity Work address city.
- * @property {String} workAddressCountry Work address country.
- * @property {String} workAddressStateProvince Work address state or province.
- * @property {String} workAddressZipPostal Work address zip or postal code.
- * @property {String} workPhone Primary work phone number.
- * @property {String} workPhone2 Secondary work phone number.
+ * @property {String} webpage The contact's webpage URI.
+ * @property {String} workAddress1 The contact's primary work address.
+ * @property {String} workAddress2 The contact's secondary work address.
+ * @property {String} workAddressCity The contact's city of work.
+ * @property {String} workAddressCountry The contact's country of work.
+ * @property {String} workAddressStateProvince The contact's work address state or province.
+ * @property {String} workAddressZipPostal The contact's  work address zip or postal code.
+ * @property {String} workPhone The contact's primary work phone number.
+ * @property {String} workPhone2 The contact's secondary work phone number.
  */
 function Contact(properties) {
 	this.anniversary = null;
@@ -175,9 +178,10 @@ function Contact(properties) {
 	};
 	
 	/**
-	 * qnx.bluetooth.pbap.Contact instance function to create or update the Contact in the device PIM storage.
-	 * If creating a new contact, the Contact's uid property will be updated to the new unique identifier for the
-	 * created Contact.
+	 * <code>qnx.bluetooth.pbap.Contact</code> instance function to create or update the 
+	 * <code>Contact</code> in the device PIM storage. If creating a new contact, the 
+	 * <code>Contact.uid</code> property is updated to the new unique identifier for the
+	 * created contact.
 	 * @inner
 	 * @deprecated Unsupported.
 	 */
@@ -198,7 +202,8 @@ function Contact(properties) {
 	};
 	
 	/**
-	 * qnx.bluetooth.pbap.Contact instance function to remove this Contact from the device PIM storage.
+	 * <code>qnx.bluetooth.pbap_xyz.Contact</code> instance function to remove this 
+	 * Contact from the device PIM storage.
 	 * @inner
 	 * @deprecated Unsupported.
 	 */
@@ -209,16 +214,18 @@ function Contact(properties) {
 
 /**
  * @static
- * The <code>qnx.bluetooth.pbap.FilterExpression</code> constructor function. <code>FilterExpression</code> objects
- * can be used to filter the results of the <code>qnx.bluetooth.pbap.find()</code> function.
+ * The <code>qnx.bluetooth.pbap.FilterExpression</code> constructor function. 
+ * <code>FilterExpression</code> objects can be used to filter the results of the
+ * <code>qnx.bluetooth.pbap.find()</code> function.
  * @param {String|qnx.bluetooth.pbap.FilterExpression} leftField The field name or FilterExpression.
- * @param {String} operator The filter operator, e.g. '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
- * @param {String|qnx.bluetooth.pbap.FilterExpression} rightField The field value or additional FilterExpression.
+ * @param {String} operator The filter operator, e.g., '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
+ * @param {String|qnx.bluetooth.pbap.FilterExpression} rightField The field value or additional 
+ *                                                                FilterExpression.
  * 
  * @example
  * // The following code demonstrates how to create a new FilterExpression and get a
  * // list of contacts filtered by last name = 'Doe'
- * var filter = new qnx.bluetooth.pbap.FilterExpression(qnx.bluetooth.pbap.FIELD_LAST_NAME, '=', 'Doe'),
+ * var filter = new qnx.bluetooth.pbap.FilterExpression(qnx.bluetooth.pbap.FIELD_LAST_NAME,'=', 'Doe'),
  *     filteredContacts = qnx.bluetooth.pbap.find(filter);
  * 
  * @example
@@ -232,7 +239,7 @@ function Contact(properties) {
  *     filteredContacts = qnx.bluetooth.pbap.find(filter);
  * 
  * @property {String|qnx.bluetooth.pbap.FilterExpression} leftField The field name or FilterExpression.
- * @property {String} operator The filter operator, e.g. '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
+ * @property {String} operator The filter operator, e.g., '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
  * @property {String|qnx.bluetooth.pbap.FilterExpression} rightField The field value or additional FilterExpression.
  */
 function FilterExpression(leftField, operator, rightField) {
@@ -246,43 +253,43 @@ function FilterExpression(leftField, operator, rightField) {
  */
 module.exports = {
 	/* State constants */
-	/** PBAP service in process of connecting*/
+	/** The Bluetooth PBAP service is in the process of connecting.*/
 	STATE_CONNECTING:	'STATE_CONNECTING',
-	/** PBAP service connected state */
+	/** The Bluetooth PBAP service is in the connected state. */
 	STATE_CONNECTED:	'STATE_CONNECTED',
-	/** PBAP service disconnected state */
+	/** The Bluetooth PBAP service is in the disconnected state. */
 	STATE_DISCONNECTED:	'STATE_DISCONNECTED',
 	
 	/* Status constants */
-	/** PBAP service ready status */
+	/** The Bluetooth PBAP service is ready. */
 	STATUS_READY:		'STATUS_READY',
-	/** PBAP service refreshing status */
+	/** The Bluetooth PBAP service is refreshing. */
 	STATUS_REFRESHING:	'STATUS_REFRESHING',
-	/** PBAP service error status */
+	/** An error occurred in the Bluetooth PBAP service. */
 	STATUS_ERROR:		'STATUS_ERROR',
 
 	/* Filter constants */
-	/** <code>homePhone</code> field name for use in FilterExpression */
+	/** <code>homePhone</code> field name for use in FilterExpression. */
 	FIELD_HOME_PHONE:'home_phone',
-	/** <code>homePhone2</code> field name for use in FilterExpression */
+	/** <code>homePhone2</code> field name for use in FilterExpression. */
 	FIELD_HOME_PHONE_2:'home_phone_2',
-	/** <code>workPhone</code> field name for use in FilterExpression */
+	/** <code>workPhone</code> field name for use in FilterExpression. */
 	FIELD_WORK_PHONE:'work_phone',
-	/** <code>workPhone2</code> field name for use in FilterExpression */
+	/** <code>workPhone2</code> field name for use in FilterExpression. */
 	FIELD_WORK_PHONE_2:'work_phone_2',
-	/** <code>mobilePhone</code> field name for use in FilterExpression */
+	/** <code>mobilePhone</code> field name for use in FilterExpression. */
 	FIELD_MOBILE_PHONE:'mobile_phone',
-	/** <code>otherPhone</code> field name for use in FilterExpression */
+	/** <code>otherPhone</code> field name for use in FilterExpression. */
 	FIELD_OTHER_PHONE:'other_phone',
-	/** <code>firstName</code> field name for use in FilterExpression */
+	/** <code>firstName</code> field name for use in FilterExpression. */
 	FIELD_FIRST_NAME:'first_name',
-	/** <code>lastName</code> field name for use in FilterExpression */
+	/** <code>lastName</code> field name for use in FilterExpression. */
 	FIELD_LAST_NAME:'last_name',
-	/** <code>email1</code> field name for use in FilterExpression */
+	/** <code>email1</code> field name for use in FilterExpression. */
 	FIELD_EMAIL_1:'email_1',
-	/** <code>email2</code> field name for use in FilterExpression */
+	/** <code>email2</code> field name for use in FilterExpression. */
 	FIELD_EMAIL_2:'email_2',
-	/** <code>email3</code> field name for use in FilterExpression */
+	/** <code>email3</code> field name for use in FilterExpression. */
 	FIELD_EMAIL_3:'email_3',
 
 	Contact: Contact,
@@ -290,16 +297,20 @@ module.exports = {
 	FilterExpression: FilterExpression,
 	
 	/**
-	 * Returns an array of zero or more {@link qnx.bluetooth.pbap.Contact} instances.
+	 * Return an array of zero or more {@link qnx.bluetooth.pbap.Contact} instances.
+	 *
 	 * @param {qnx.bluetooth.pbap.FilterExpression} [filter] The
-	 * <code>qnx.bluetooth.pbap.FilterExpression</code> to apply against the phone book database.
+	 *        <code>qnx.bluetooth.pbap.FilterExpression</code> to apply against the phone book database.
 	 * @param {String} [orderBy] The field name to order by. If this parameter is
-	 * not specified, the results will be sorted first by last name ascending, then first name ascending.
-	 * @param {Boolean} [isAscending] If an <code>orderBy</code> parameter is supplied, changes the order
-	 * direction to ascending if true, descending if false. If an <code>orderBy</code> parameter
-	 * is not specified, <code>isAscending</code> has no effect. Defaults to false.
-	 * @param {Number} [limit] The maximum number of Contact instances to return. Defaults to -1 (no limit).
-	 * @param {Number} [offset] Specifies the record offset. Defaults to 0 (no offset).
+	 *        not specified, the results are sorted by last name ascending and then
+	 *        first name ascending.
+	 * @param {Boolean} [isAscending] If an <code>orderBy</code> parameter is supplied,
+	 *        changes the order direction to ascending when <code>true</code>, descending when 
+	 *        <code>false</code>. If an <code>orderBy</code> parameter is not specified, 
+	 *        <code>isAscending</code> has no effect. The default is <code>false</code>.
+	 * @param {Number} [limit] The maximum number of <code>Contact</code> instances to return.
+	 *        Default is -1 (no limit).
+	 * @param {Number} [offset] The record offset to use. Default is 0 (no offset).
 	 */
 	find: function(filter, orderBy, isAscending, limit, offset) {
 		var args = {};
@@ -332,9 +343,10 @@ module.exports = {
 	},
 	
 	/**
-	 * Get the current state of the PBAP service
+	 * Get the current state of the PBAP service.
 	 * @returns {String} The contact service state. Possible values are
-	 * qnx.bluetooth.pbap state constants, or null if the service state is not available
+	 * <code>qnx.bluetooth.pbap</code> state constants, or <code>null</code> when the
+	 * service state is not available.
 	 */
 	getState: function() {
    		var value = null,
@@ -355,9 +367,10 @@ module.exports = {
 	},
 
 	/**
-	 * Get the current status of the PBAP service
+	 * Get the current status of the PBAP service.
 	 * @returns {String} The contact service status. Possible values are
-	 * qnx.bluetooth.pbap status constants, or null if the service status is not available
+	 * <code>qnx.bluetooth.pbap</code> status constants, or <code>null</code> when the
+	 * service status is not available.
 	 */
 	getStatus: function() {
    		var value = null,
@@ -378,7 +391,7 @@ module.exports = {
 	},
 
 	/**
-	 * Force the PBAP phone book data to be refreshed from the device
+	 * Force the Bluetooth PBAP phone book data to be refreshed from the device.
 	 */
 	refresh: function() {
 		window.cordova.exec(null, null, _ID, 'refresh');

@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013-2014. 
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -18,40 +19,41 @@
  */
 
 /**
- * Provide the functionality of a phone
  *
- * <h3>Events</h3>
- * <dl><dt><h4>phoneready</h4></dt>
- * <dd><p>Triggered when phone is idle (no incoming, outgoing, active calls) and ready to accept commands</p>
- * <h5>callback parameter event</h5>
+ * @module qnx.phone
+ * @static
+ * @description Provide the functionality of a phone.<br/><br/>
+ *
+ * <h2>Events</h2>
+ * <dl><dt><h3>phoneready</h3></dt>
+ * <dd><p>Triggered when the phone is idle (no incoming, outgoing, or active calls) and ready to accept commands.</p>
+ * <h4>Callback parameter event</h4>
  * <p>{Object}</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  *<pre><code>{
  *      service: {String}       // identifies the phone service
  *}</code></pre></dd></dl>
  *
- * <h4>phonecallactive</h4>
- * <p>Triggered when active phone call (recipient accepted the outgoing call or incoming call accepted locally)</p>
- * <h5>callback parameter event</h5> 
+ * <h3>phonecallactive</h3>
+ * <p>Triggered when an active phone call is made (recipient accepted the outgoing call or locally accepted the incoming call).</p>
+ * <h4>Callback parameter event</h4> 
  * <p>{Object}</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  *<pre><code>{
  *      service: {String}		// identifies the phone service
- *      callId: {String}		// incoming call phone number in case of Handsfree, can be BBID etc
+ *      callId: {String}		// incoming call phone number in case of hands-free call, can be BBID etc.
  *}</code></pre></dd></dl>
  * 
- * <h4>phoneincoming</h4>
- * <p>Triggered when there is incoming call, phone is ringing</p>
- * <h5>callback parameter event</h5>
+ * <h3>phoneincoming</h3>
+ * <p>Triggered when there's incoming call (phone is ringing).</p>
+ * <h4>Callback parameter event</h4>
  * <p>{Object}</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  * <pre><code>{
  *      service: {String}	// identifies the phone service
- *      callId: {String}	// incoming call phone number in case of Handsfree, can be BBID etc
+ *      callId: {String}	// incoming call phone number in the case of hands-free call, can be BBID etc.
  *}</code></pre></dd></dl>
  *
- * @module qnx.phone
- * @static
  */
 
 
@@ -85,81 +87,66 @@ _events.map(function (eventName) {
 
 
 /*
- * Exports are the publicly accessible functions
+ * Exports are the publicly accessible functions.
  */
 module.exports = {	
 	/**
-	 * Defines identifier for HFP service
+	 * Defines the identifier for the Hands-Free Profile(HFP) service.
 	 * */
 	SERVICE_HFP: "SERVICE_HFP",
 
 	/**
 	 * 
-	 * Dial a number
-	 * @param {String} number Number to dial
-	 * @param {String} service [optional] Identifier of the phone service; 
-	 * if no parameter specified, function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
+	 * @description Dial a number.
+	 * <p><b>Note</b>: The <code>service</code> parameter is reserved for future use. </p>
+	 * <p>When no parameters are specified, the function call is routed to the default service (Hands-Free service).</p>
+     * @param {String} number The number to dial.
+	 * @param {String} [service] Reserved for future use. Identifier of the phone service.
 	 */
 	dial: function (number, service) {
 		window.cordova.exec(null, null, _ID, 'dial', { number: number });
 	},
 	/**
-	 * Accept incoming call
-	 * @param {String} callId ID to identify a call
-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, 
-	 * function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
+	 * @description Accept an incoming call.
+	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use.</p>
+	 * @param {String} callId Reserved for future use. <p>ID to identify a call.
+	 *        With existing implementations of the Hands-free service, there's only one active call.</p>
+	 * @param {String} [service] Reserved for future use. <p>Identifier of the phone service. 
+	 *        When no parameter is specified, the function call is routed to the default service
+	 *        (currently the Hands-free service).</p>
 	 */
 	accept: function (callId, service) {
 	    window.cordova.exec(null, null, _ID, 'accept');
 	},
 	/**
-	 * Hang up current active call
-	 * @param {String} callId ID to identify a call
-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
-	 * @param {String} service [optional]Identifier of the phone service, if no parameter specified, function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
+	 * @description Hang up current active call.
+	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use.</p>
+	 * @param {String} [callId] Reserved for future use. <p>The identifier that identifies a call.
+	 *        With existing implementations of the Hands-free service, there's only one active call.</p>
+	 * @param {String} [service] Reserved for future use. <p>Identifier of the 
+	          phone service, if no parameter specified, function call is routed to the default service (currently the Hands-free service).</p> 
+	 *
 	 * */
 	hangup: function (callId, service) {
 	    window.cordova.exec(null, null, _ID, 'hangup');
 	},
 	/**
-	 * Redial last called number
-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
-	 * */
+	 * @description Redial last called number.
+	 * <p><b>Note</b>: The <code>callId</code> parameter is reserved for future use. </p>
+	 * @param {String} [service] Reserved for future use. 
+	 *        <p>Identifier of the phone service. If no parameter is specified, the function 
+	 *        is routed to the default service (currently the Hands-free service). </p>
+	 * 
+	 */
 	redial: function (service) {
 	    window.cordova.exec(null, null, _ID, 'redial');
 	},
 	/**
-	 * Put a call on hold
-	 * @param {String} callId ID to identify a call
-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
-	 * @param {Boolean} value True to put current call on hold, false to release current call from hold
-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
-	 * */
-	hold: function (callId, value, service) {
-		//TODO Implement this function and add appropriate events
-	},
-	/**
-	 * Mute audio input for incoming phone call (mute mic)
-	 * @param {String} callId ID to identify a call
-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
-	 * @param {Boolean} value True to mute, false to unmute
-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
-	 * */
-	mute: function (callId, value, service) {
-		//TODO Implement this function and add appropriate events
-	},
-	/**
-	 * Return the current state of the phone
-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
-	 * TODO Currently service is not in use
-	 * @returns {String} Current state of the phone
+	 * @description Return the current state of the phone.
+	 * <p><b>Note</b>: The <code>service</code> parameter isn't available for use.
+	 * @param {String} [service] Reserved for future use. <p> Identifier of the phone service.
+	 *        When no parameter specified, function call is routed to the default service (currently the Hands-free service).</p>
+	 * @returns {String} The current state of the phone.
 	 * */
 	getState: function (service) {
    		var value = null,
@@ -176,14 +163,5 @@ module.exports = {
 			console.error(e);
 		}
 		return value;
-	},
-	/**
-	 * Call this method to return the list of active calls
-	 * @param {String} service Identifier of the phone service, if no parameter specified function call will be routed to default, currently Handsfree, service [optional]
-	 * TODO Currently service is not in use
-	 * @return {Object} List of active calls
-	 * */
-	getActiveCalls: function (service) {
-		//TODO Implement this function
 	}
 };

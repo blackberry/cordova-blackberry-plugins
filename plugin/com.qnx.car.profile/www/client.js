@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,8 +21,7 @@
 /**
  * @module car.profile
  * @static
- *
- * @description Manages the system user information
+ * @description Manage the system's user information.
  */
 
 var _self = {},
@@ -31,7 +31,7 @@ var _self = {},
 
 
 /**
- * Handles update events for this extension
+ * @description Handle update events for this extension.
  * @param data {Array} The updated data provided by the event 
  * @private
  */
@@ -43,7 +43,7 @@ function onUpdate(data) {
 }
 
 /**
- * Watch for profile changes
+ * @description Watch for profile changes.
  * @param {Function} callback The function to call when a change is detected.
  * @return {String} An ID for the added watch.
  * @memberOf module:car.profile
@@ -74,8 +74,8 @@ _self.watchProfile = function (callback) {
 }
 
 /**
- * Stop watching profile changes
- * @param {String} watchId The watch ID returned by <i>car.profile.watchProfile()</i>.
+ * @description Stop watching profile changes.
+ * @param {String} watchId The watch ID returned by <code>car.profile.watchProfile()</code>.
  * @memberOf module:car.profile
  * @method cancelWatch 
  * @example
@@ -92,7 +92,7 @@ _self.cancelWatch = function (watchId) {
 }
 
 /**
- * Retrieve the current profile information
+ * @description Retrieve the current profile information.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.profile
@@ -146,7 +146,7 @@ _self.getActive = function(successCallback, errorCallback) {
 };
 
 /**
- * Change the active profile
+ * @description Change the active profile.
  * @param {Number} profileId The ID of the profile to make active.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -183,7 +183,7 @@ _self.setActive = function(profileId, successCallback, errorCallback) {
 };
 
 /**
- * Return a list of available profiles
+ * @description Return the list of available profiles.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.profile
@@ -250,7 +250,7 @@ _self.getList = function(successCallback, errorCallback) {
 
 
 /**
- * Create a new profile
+ * @description Create a new profile.
  * @param {String} name The name of the profile.
  * @param {String} [avatar] The avatar for the profile.
  * @param {String} [theme] The preferred theme for the profile.
@@ -314,7 +314,7 @@ _self.addProfile = function(name, avatar, theme, bluetoothDeviceId, successCallb
 
 
 /**
- * Update an existing profile
+ * @description Update an existing profile.
  * @param {Number} profileId The ID of the profile.
  * @param {String} [name] The name of the profile.
  * @param {String} [avatar] The avatar for the profile.
@@ -376,7 +376,7 @@ _self.updateProfile = function(profileId, name, avatar, theme, bluetoothDeviceId
 };
 
 /**
- * Delete an existing profile
+ * @description Delete an existing profile.
  * @param {Number} profileId The ID of the profile.
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
@@ -419,7 +419,7 @@ _self.deleteProfile = function(profileId, successCallback, errorCallback) {
 };
 
 /**
- * Retrieve settings for the current profile
+ * @description Retrieve settings for the current profile.
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @param {Array} [settings] A list of settings to whitelist.
@@ -476,7 +476,7 @@ _self.getSettings = function(successCallback, errorCallback, settings) {
 };
 
 /**
- * Set the value of a setting for the current profile
+ * @description Set the value of a setting for the current profile.
  * @param {String} key The key of the setting.
  * @param {Mixed} value The value of the setting.
  * @param {Function} [successCallback] The function to call on success.

@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -22,13 +23,12 @@ module.exports = {},
  * @static
  * @memberOf module:car.hvac
  * @name HvacSetting
- *
- * @description  HVAC settings enumeration
+ * @description The HVAC settings enumeration.
  *
  *
  * @property {Number}  FAN_SPEED The fan speed (0 to 6; 0 for off).
  * @property {String}  FAN_DIRECTION The fan direction. Use the values from
- *					   <b>car.hvac.HvacFanDirection</b>.
+ *					   <code>car.hvac.HvacFanDirection</code>.
  * @property {Boolean} AIR_CONDITIONING The air conditioning (true for on).
  * @property {Boolean} AIR_RECIRCULATION The air recirculation (true for on).
  * @property {Boolean} ZONE_LINK Zone Link. When on, both left and right zones are controlled by

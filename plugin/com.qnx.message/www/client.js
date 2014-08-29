@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+*  QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -19,9 +20,12 @@
 
 
 /**
- * Allow access to device messages (Email, SMS, MMS)
- *
- * <h3>Events</h3>
+ * @module qnx.message
+ * @static
+ * @deprecated
+ * @description Allow access to device messages (Email, SMS, MMS).
+ * 
+ * <br/><h2>Events</h2>
  *     
  * <dl><dt><h4>messageservicestatechange</h4></dt>
  * <dd><p>Fired when a message service state has changed.</p>
@@ -32,11 +36,11 @@
  *      'CONNECTED'
  * }</code></pre></dd></dl>
  *
- * <dl><dt><h4>messageservicefindresult</h4></dt>
+ * <dl><dt><h3>messageservicefindresult</h3></dt>
  * <dd><p>Fired when a <code>qnx.message.find</code> operation has returned data.</p>
- * <h5>Event data</h5>
+ * <h4>Event data</h4>
  * <p>{Array} Array of <code>qnx.message.Message</code> objects.</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  * <pre><code>[
  *{
  *      handle: 123456,
@@ -63,16 +67,16 @@
  *}
  *]</code></pre></dd></dl>
  *
- * <dl><dt><h4>messageservicefindresult</h4></dt>
+ * <dl><dt><h3>messageservicefindresult</h3></dt>
  * <dd><p>Fired when a <code>qnx.message.find</code> operation has failed.</p>
  * <h5>Event data</h5>
  * <p>{String} The error message.</p>
  *
- * <h4>messageservicemessageresult</h4>
+ * <h3>messageservicemessageresult</h3>
  * <p>Fired when a <code>qnx.message.getMessage</code> operation has returned data.</p>
- * <h5>Event data</h5>
+ * <h4>Event data</h4>
  * <p>{qnx.message.Message} The <code>qnx.message.Message</code> object.</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  * <pre><code>{
  *      handle: 123456,
  *      type: 'EMAIL',
@@ -86,16 +90,16 @@
  *      ...
  *}</code></pre></dd></dl>
  *
- * <dl><dt><h4>messageservicemessagefail</h4></dt>
+ * <dl><dt><h3>messageservicemessagefail</h3></dt>
  * <dd><p>Fired when a <code>qnx.message.getMessage</code> operation has failed.</p>
- * <h5>Event data</h5>
+ * <h4>Event data</h4>
  * <p>{String} The error message.</p></dd></dl>
  *
- * <dl><dt><h4>messageservicenotification</h4></dt>
+ * <dl><dt><h3>messageservicenotification</h3></dt>
  * <dd><p>Fired when a message service notification event has occured.</p>
- * <h5>Event data</h5>
+ * <h4>Event data</h4>
  * <p>{Object}</p>
- * <h5>Example</h5>
+ * <h4>Example</h4>
  *<pre><code>{
  *      type:	'NOTIFICATION_NEW_MESSAGE',
  *      message:
@@ -111,9 +115,6 @@
  *      }
  *}</code></pre></dd></dl>
  * 
- * @module qnx.message
- * @static
- * @deprecated
  */
 
 
@@ -142,7 +143,7 @@ _events.map(function (eventName) {
 
 
 /**
- * Message object constructor.
+ * @description The <code>Message</code> object constructor.
  * @param {Object} properties The properties argument can be used to initialize the Messages's properties.
  */
 function Message(properties) {
@@ -180,7 +181,7 @@ function Message(properties) {
 	};
 
 	/**
-	 * Save this message to the device MAP storage
+	 * @description Save this message to the device MAP storage.
 	 */
 	this.save = function () {
    		var args = {
@@ -201,14 +202,14 @@ function Message(properties) {
 
 
 	/**
-	 * Remove this message from the device MAP storage
+	 *  @description Remove this message from the device MAP storage.
 	 */
 	this.remove = function () {
 		window.cordova.exec(null, null, _ID, 'remove', { contact:this });
 	};
 
 	/**
-	 * Move this message to different folder
+	 * @description Move this message to different folder.
 	 * @param {Number} folder The folder ID to which the message will be moved.
 	 */
 	this.move = function (folder) {
@@ -216,7 +217,7 @@ function Message(properties) {
 	};
 
 	/**
-	 * Send this message
+	 *  @description Send this message.
 	 */
 	this.send = function () {
 		window.cordova.exec(null, null, _ID, 'send', { contact:this });
@@ -225,7 +226,7 @@ function Message(properties) {
 
 function FilterExpression(leftField, operator, rightField) {
 	// Filter on:
-	// - Message types (SMS, Email, etc)
+	// - Message types (SMS, Email, etc.)
 	// - Sender email
 	// - Subject (partial matching)
 	// - Date range?
@@ -235,86 +236,87 @@ function FilterExpression(leftField, operator, rightField) {
 };
 
 /*
- * Exports are the publicly accessible functions
+ * Exports are the publicly accessible functions.
  */
 module.exports = {
 	/* Service states */
-	/** Service Connected and ready to accept commands */
+	
+	/** The service is connected and ready to accept commands. */
 	STATE_CONNECTED:'STATE_CONNECTED',
-	/** Service Disconnected*/
+	/** The service is disconnected. */
 	STATE_DISCONNECTED:'STATE_DISCONNECTED',
-	/** Service in process of connecting*/
+	/** The service in process of connecting. */
 	STATE_CONNECTING:'STATE_CONNECTING',
-	/** Service Initializing*/
+	/** The service is in the process of initializing. */
 	STATE_INITIALIZING:'STATE_INITIALIZING',
 
 	/* Message types */
-	/** Defines message of EMAIL type */
+	/** Message type of email. */
 	MESSAGE_TYPE_EMAIL:'EMAIL',
-	/** Defines message of SMS_GSM type */
+	/** Message type of short message service(SMS) message sent over GSM. */
 	MESSAGE_TYPE_SMS_GSM:'SMS_GSM',
-	/** Defines message of SMS_CDMA type */
+	/** Message type of SMS message sent over CDMA. */
 	MESSAGE_TYPE_SMS_CDMA:'SMS_CDMA',
-	/** Defines message of MMS type */
+	/** Message type of multimedia messaging service(MMS) message. */
 	MESSAGE_TYPE_MMS:'MMS',
 
 	/* Message folders */
-	/** root INBOX folder*/
+	/** The root <i>inbox</i> folder. */
 	FOLDER_INBOX:'inbox/',
-	/** root DRAFTS folder*/
+	/** The root <i>drafts</i> folder. */
 	FOLDER_DRAFTS:'drafts/',
-	/** root OUTBOX folder*/
+	/** The root <i>outbox</i> folder. */
 	FOLDER_OUTBOX:'outbox/',
-	/** root SENT folder*/
+	/** The root <i>sent</i> folder. */
 	FOLDER_SENT:'sent/',
 
 	/* Notification types */
-	/** Notification type for new messages */
+	/** Notification type for new messages. */
 	NOTIFICATION_NEW_MESSAGE:'NOTIFICATION_NEW_MESSAGE',
-	/** Notification type for delivery of sent message successful */
+	/** Notification type for delivery of sent message successful. */
 	NOTIFICATION_DELIVERY_SUCCESS:'NOTIFICATION_DELIVERY_SUCCESS',
-	/** Notification type for sending of message successful */
+	/** Notification type for sending of message successful. */
 	NOTIFICATION_SENDING_SUCCESS:'NOTIFICATION_SENDING_SUCCESS',
-	/** Notification type for delivery of sent message failed */
+	/** Notification type for delivery of sent message failed. */
 	NOTIFICATION_DELIVERY_FAILURE:'NOTIFICATION_DELIVERY_FAILURE',
-	/** Notification type for sending of message failed */
+	/** Notification type for sending of message failed. */
 	NOTIFICATION_SENDING_FAILURE:'NOTIFICATION_SENDING_FAILURE',
-	/** Notification type when phone memory is full */
+	/** Notification type when phone memory is full. */
 	NOTIFICATION_MEMORY_FULL:'NOTIFICATION_MEMORY_FULL',
-	/** Notification type when phone memory is available */
+	/** Notification type when phone memory is available. */
 	NOTIFICATION_MEMORY_AVAILABLE:'NOTIFICATION_MEMORY_AVAILABLE',
-	/** Notification type when message is deleted*/
+	/** Notification type when message is deleted. */
 	NOTIFICATION_MESSAGE_DELETED:'NOTIFICATION_MESSAGE_DELETED',
-	/** Notification type when message moved */
+	/** Notification type when message moved. */
 	NOTIFICATION_MESSAGE_SHIFT:'NOTIFICATION_MESSAGE_SHIFT',
 
 	/* Filter constants */
-	/** Defines constant to identify Message Type field for filtering */
+	/** Constant that identifies the Message Type field for filtering. */
 	FIELD_MESSAGE_TYPE:'type',
-	/** Defines constant to identify Folder Path field for filtering */
+	/** Constant that identifies the Folder Path field for filtering. */
 	FIELD_FOLDER_PATH:'folder_path',
-	/** Defines constant to identify Message Handle field for filtering */
+	/** Constant that identifies Message Handle field for filtering */
 	FIELD_HANDLE:'handle',
-	/** Defines constant to identify Sender's Email field for filtering */
+	/** Constant that identifies Sender's Email field for filtering */
 	FIELD_SENDER_EMAIL:'sender_email',
-	/** Defines constant to identify Sender's Number field for filtering */
+	/** Constant that identifies Sender's Number field for filtering */
 	FIELD_SENDER_NUMBER:'sender_number',
 
 	/**
-	 * The <code>qnx.messages.FilterExpression</code> constructor function. <code>FilterExpression</code> objects
+	 * @description The <code>qnx.messages.FilterExpression</code> constructor function. <code>FilterExpression</code> objects
 	 * can be used to filter the results of the <code>qnx.messages.find()</code> function.
 	 * @return {qnx.messages.FilterExpression} The <code>FilterExpression</code> constructor function.
 	 */
 	FilterExpression:FilterExpression,
 
 	/**
-	 * The <code>message.Message</code> constructor function.
+	 * @description The <code>message.Message</code> constructor function.
 	 */
 	Message:Message,
 
 	/**
-	 * Return a list of message accounts
-	 * @param messageType {String} [optional] Filter returned accounts by supported message type.
+	 * @description Return a list of message accounts.
+	 * @param  {String} [messageType]  Filter returned accounts by supported message type.
 	 * @return {Array} The list of message accounts.
 	 * @example
 	 * [
@@ -354,17 +356,17 @@ module.exports = {
 	},
 	
 	/**
-	 * Return an array of zero or more messages
-	 * @param {qnxcar.phonebook.filterExpression} filter [optional] The
-	 * {@link qnxcar.phonebook.filterExpression filter expression} to apply against
-	 * the phone book database.
-	 * @param {String} orderBy [optional] The field name to order by. The default order is descending,
-	 * however this can be overridden by specifying the <code>isAscending</code> parameter as 'true'. Defaults to
-	 * 'last_name'.
-	 * @param {Boolean} isAscending [optional] If an <code>orderBy</code> parameter is supplied, changes the order
-	 * direction to ascending if true, descending if false. Defaults to false.
-	 * @param {Number} limit [optional] The maximum number of Contacts to return. Defaults to -1 (no limit).
-	 * @param {Number} offset [optional] Specifies the record offset. Defaults to 0 (no offset).
+	 * @description Return an array of zero or more messages.
+	 * @param {qnxcar.phonebook.filterExpression} [filter] The
+	 *        {@link qnxcar.phonebook.filterExpression filter expression} to apply against
+	 *        the phone book database.
+	 * @param {String} [orderBy] The field name to order by. The default order is descending,
+	 *        however this can be overridden by specifying the <code>isAscending</code> parameter as <code>true</code>.
+	 *        Defaults to <code>last_name</code>.
+	 * @param {Boolean} [isAscending] If the <code>orderBy</code> parameter is supplied, this parameter changes the order
+	 *        to ascending when <code>true</code>, descending when <code>false</code>. Defaults to <code>false</code>.
+	 * @param {Number} [limit] The maximum number of Contacts to return. Defaults to -1 (no limit).
+	 * @param {Number} [offset] The record offset. Defaults to 0 (no offset).
 	 */
 	find:function (filter, orderBy, isAscending, limit, offset) {
    		var value = null,
@@ -409,29 +411,23 @@ module.exports = {
 	},
 
 	/**
-	 * Get a list of folders by type.
-	 * @param {Number} accountId The message account ID.
-	 * @param {Number} parentFolderId [optional] The parent folder ID. If not specified, the entire folder tree is returned.
-	 */
-	getFolders:function (accountId, parentFolderId) {
-		// TODO Implement
-	},
-
-	/**
-	 * Retrieve message from the database; check first to see if message exists in database and then return it, if not initiated
-	 * PPS request to fetch message by provided message handle.
-	 * The message is returned asynchronously, and can be retrieved by listening to the <code>messageservicemessageresult</code>
-	 * event. Returns a fully populated message, including full subject, contents, recipient list, and attachments.
-	 * @param {Number} accountId The ID of the account for which the message exists
-	 * @param {String} handle Unique identifier of the message of certain type
+	 * @description Retrieve message from the database.
+	 *              <p> First, determine if the message exists in database and then return it. If the message
+	 *              doesn't exist, initiate a PPS request to fetch the message using the provided message handle.
+	 *              The message is returned asynchronously, and can be retrieved by listening to the
+	 *              <code>messageservicemessageresult</code> event.
+	 * @param {Number} accountId The ID of the account for which the message exists.
+	 * @param {String} handle Unique identifier of the message of certain type.
+	 * @return  A fully populated message that includes the full subject, contents, recipient list, and attachments.
 	 * */
 	getMessage:function (accountId, handle) {
 		window.cordova.exec(null, null, _ID, 'getMessage', { accountId: accountId, handle:handle });
 	},
 
 	/**
-	 * Return current state of the MAP
-	 * @return {String} Value which will indicate current state of the service, <code>STATE_CONNECTED</code>, <code>STATE_DISCONNECTED</code>, <code>STATE_INITIALIZING</code>
+	 * @description Return current state of the MAP.
+	 * @return {String} A value which that indicates the current state of the service, 
+	           <code>STATE_CONNECTED</code>, <code>STATE_DISCONNECTED</code>, <code>STATE_INITIALIZING</code>.
 	 */
 	getState:function () {
    		var value = null,

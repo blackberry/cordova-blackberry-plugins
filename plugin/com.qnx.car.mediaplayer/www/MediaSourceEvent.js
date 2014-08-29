@@ -1,5 +1,6 @@
 /*
- * Copyright 2013  QNX Software Systems Limited
+ * Copyright 2013 - 2014.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -23,11 +24,11 @@ module.exports = {};
  * @memberOf module:car.mediaplayer
  * @name MediaSourceEvent
  *
- * @description  Media source event enumeration
+ * @description The media source event enumeration.
  *
- * @property ADDED The media source is added.
- * @property REMOVED The media source is removed.
- * @property UPDATED The media source is updated.
+ * @property ADDED The media source was added.
+ * @property REMOVED The media source was removed.
+ * @property UPDATED The media source was updated.
  */ 
 Object.defineProperties(module.exports,
 {

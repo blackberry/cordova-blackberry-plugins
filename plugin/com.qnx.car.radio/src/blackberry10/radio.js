@@ -121,11 +121,11 @@ module.exports = {
 	 */
 	init: function() {
 		//_tunersPPS
-		_tunersPPS = _pps.createObject("/pps/radio/tuners", _pps.PPSMode.DELTA);
+		_tunersPPS = _pps.create("/pps/radio/tuners", _pps.PPSMode.DELTA);
 		_tunersPPS.open(_pps.FileMode.RDONLY);
 		
 		//_statusPPS
-		_statusPPS = _pps.createObject("/pps/radio/status", _pps.PPSMode.DELTA);
+		_statusPPS = _pps.create("/pps/radio/status", _pps.PPSMode.DELTA);
 		_statusPPS.onNewData = function(data) {
 			//status updates
 			if (_triggerUpdate) {
@@ -145,14 +145,14 @@ module.exports = {
 		
 		//writing pps commands
 		if (SIMULATION_MODE) {
-			_commandPPS = _pps.createObject("/pps/radio/status", _pps.PPSMode.DELTA);
+			_commandPPS = _pps.create("/pps/radio/status", _pps.PPSMode.DELTA);
 		} else {
-			_commandPPS = _pps.createObject("/pps/radio/command", _pps.PPSMode.DELTA);
+			_commandPPS = _pps.create("/pps/radio/command", _pps.PPSMode.DELTA);
 		}
 		_commandPPS.open(_pps.FileMode.WRONLY);
 
 		//status writer, used to save presets
-		_statusWriterPPS = _pps.createObject("/pps/radio/status", _pps.PPSMode.DELTA);
+		_statusWriterPPS = _pps.create("/pps/radio/status", _pps.PPSMode.DELTA);
 		_statusWriterPPS.open(_pps.FileMode.WRONLY);
 	},
 		
