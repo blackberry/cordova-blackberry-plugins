@@ -140,10 +140,10 @@ _self.cancelWatch = function (watchId) {
  * {
  *		code: 1,
  *		data: [
- *			{ setting: 'temperature', zone: 'frontLeft', value: 20 },
- *			{ setting: 'temperature', zone: 'frontRight', value: 22 },
+ *			{ setting: 'temperature', zone: 'frontleft', value: 20 },
+ *			{ setting: 'temperature', zone: 'frontright', value: 22 },
  *			{ setting: 'temperature', zone: 'rear', value: 22 },
- *			{ setting: 'airConditioning', zone: 'everywhere', value: true },
+ *			{ setting: 'airConditioning', zone: 'all', value: true },
  *			...
  *		]
  * }
@@ -158,16 +158,16 @@ _self.cancelWatch = function (watchId) {
  * @example REST - with settings and zone filters
  *
  * Request:
- * http://&lt;car-ip&gt;/car/hvac/get?settings=temperature,heatedSeats&zones=frontLeft,frontRight
+ * http://&lt;car-ip&gt;/car/hvac/get?settings=temperature,heatedSeats&zones=frontleft,frontright
  *
  * Success Response:
  * {
  *		code: 1,
  *		data: [
- *			{ setting: 'temperature', zone: 'frontLeft', value: 20 },
- *			{ setting: 'temperature', zone: 'frontRight', value: 22 },
- *			{ setting: 'heatedSeat', zone: 'frontLeft', value: 5 },
- *			{ setting: 'heatedSeat', zone: 'frontRight', value: 0 }
+ *			{ setting: 'temperature', zone: 'frontleft', value: 20 },
+ *			{ setting: 'temperature', zone: 'frontright', value: 22 },
+ *			{ setting: 'heatedSeat', zone: 'frontleft', value: 5 },
+ *			{ setting: 'heatedSeat', zone: 'frontright', value: 0 }
  *		]
  * }
  *
@@ -205,14 +205,14 @@ _self.get = function(successCallback, errorCallback, settings, zones) {
  * @example
  *
  * //set the temperature in the entire car to 50
- * car.hvac.set(car.hvac.HvacSetting.TEMPERATURE, car.Zone.EVERYWHERE, 50);
- * //NOTE: this is equivalent to doing: car.hvac.set('temperature', 'everywhere', 50);
+ * car.hvac.set(car.hvac.HvacSetting.TEMPERATURE, car.Zone.ALL, 50);
+ * //NOTE: this is equivalent to doing: car.hvac.set('temperature', 'all', 50);
  *
  *
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car/hvac/set?setting=temperature&zone=frontLeft&value=25
+ * http://&lt;car-ip&gt;/car/hvac/set?setting=temperature&zone=frontleft&value=25
  *
  * Success Response:
  * {

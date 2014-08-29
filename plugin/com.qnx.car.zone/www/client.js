@@ -41,33 +41,33 @@
  * zones can be different for each extension.  
  *
  * @property ALL  The entire vehicle.
- * @property ROW1 The first row. 
- * @property ROW2 The second row. 
- * @property ROW3 The third row. 
- * @property ROW1_LEFT The left seat in the first row. 
- * @property ROW1_CENTER The center seat in the first row. 
- * @property ROW1_RIGHT The right seat in the first row. 
- * @property ROW2_LEFT The left seat in the second row. 
- * @property ROW2_CENTER The center seat in the second row. 
- * @property ROW2_RIGHT The right seat in the second row. 
- * @property ROW3_LEFT The left seat in the third row. 
- * @property ROW3_CENTER The center seat in the third row. 
- * @property ROW3_RIGHT The right seat in the third row.
+ * @property FRONT The first row. 
+ * @property MIDDLE The middle row. 
+ * @property REAR The rear row. 
+ * @property FRONT_LEFT The left seat in the first row. 
+ * @property FRONT_CENTER The center seat in the first row. 
+ * @property FRONT_RIGHT The right seat in the first row. 
+ * @property MIDDLE_LEFT The left seat in the middle row. 
+ * @property MIDDLE_CENTER The center seat in the middle row. 
+ * @property MIDDLE_RIGHT The right seat in the middle row. 
+ * @property REAR_LEFT The left seat in the rear row. 
+ * @property REAR_CENTER The center seat in the rear row. 
+ * @property REAR_RIGHT The right seat in the rear row.
  */ 
 Object.defineProperties(module.exports,
 {
 	'ALL':				{ value: 'all',			enumerable: true, writable: false },
-	'ROW1':				{ value: 'row1',		enumerable: true, writable: false },
-	'ROW2':				{ value: 'row2',		enumerable: true, writable: false },
-	'ROW3':				{ value: 'row3',		enumerable: true, writable: false },
-	'ROW1_LEFT':		{ value: 'row1left',	enumerable: true, writable: false },
-	'ROW1_CENTER':		{ value: 'row1center',	enumerable: true, writable: false },
-	'ROW1_RIGHT':		{ value: 'row1right',	enumerable: true, writable: false },
-	'ROW2_LEFT':		{ value: 'row2left',	enumerable: true, writable: false },
-	'ROW2_CENTER':		{ value: 'row2center',	enumerable: true, writable: false },
-	'ROW2_RIGHT':		{ value: 'row2right',	enumerable: true, writable: false },
-	'ROW3_LEFT':		{ value: 'row3left',	enumerable: true, writable: false },
-	'ROW3_CENTER':		{ value: 'row3center',	enumerable: true, writable: false },
-	'ROW3_RIGHT':		{ value: 'row3right',	enumerable: true, writable: false },
+	'FRONT':			{ value: 'front',		enumerable: true, writable: false },
+	'MIDDLE':			{ value: 'middle',		enumerable: true, writable: false },
+	'REAR':				{ value: 'rear',		enumerable: true, writable: false },
+	'FRONT_LEFT':		{ value: 'frontleft',	enumerable: true, writable: false },
+	'FRONT_CENTER':		{ value: 'frontcenter',	enumerable: true, writable: false },
+	'FRONT_RIGHT':		{ value: 'frontright',	enumerable: true, writable: false },
+	'MIDDLE_LEFT':		{ value: 'middleleft',	enumerable: true, writable: false },
+	'MIDDLE_CENTER':	{ value: 'middlecenter',enumerable: true, writable: false },
+	'MIDDLE_RIGHT':		{ value: 'middleright',	enumerable: true, writable: false },
+	'REAR_LEFT':		{ value: 'rearleft',	enumerable: true, writable: false },
+	'REAR_CENTER':		{ value: 'rearcenter',	enumerable: true, writable: false },
+	'REAR_RIGHT':		{ value: 'rearright',	enumerable: true, writable: false },
 });
 
