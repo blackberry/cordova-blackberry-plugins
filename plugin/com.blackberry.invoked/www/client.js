@@ -22,10 +22,17 @@ var _self = {},
     exec = cordova.require("cordova/exec"),
     _noop = function () {},
     _events = ["invoked", "oncardresize", "oncardclosed"],
+    _lastInvoked,
     _channels = _events.map(function (eventName) {
         var channel = cordova.addDocumentEventHandler(eventName),
             success = function (data) {
                 channel.fire(data);
+                if (eventName === 'invoked') {
+                    _lastInvoked = data;
+                    Object.keys(channel.handlers).forEach(function (id) {
+                        channel.handlers[id].fired = true;
+                    });
+                }
             };
         channel.onHasSubscribersChange = function () {
             if (this.numHandlers === 1) {
@@ -34,6 +41,13 @@ var _self = {},
                      _ID, "startEvent", {eventName: eventName});
             } else if (this.numHandlers === 0) {
                 exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
+            } else if (eventName === 'invoked' && _lastInvoked) {
+                Object.keys(channel.handlers).forEach(function (id) {
+                    if (!channel.handlers[id].fired) {
+                        channel.handlers[id](_lastInvoked);
+                        channel.handlers[id].fired = true;
+                    }
+                });
             }
         };
         return channel;
