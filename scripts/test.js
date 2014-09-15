@@ -36,7 +36,7 @@ module.exports = function (done, custom) {
     //setup cordova-blackberry repos
     projectUtils.setupRepo('master', function () {
         // copy lib to temp folder
-        utils.copyFolder(path.join(_c.CORDOVA_BB10_REPOS.dir, "blackberry10/framework/lib"), path.join(_c.TEMP, "lib"));
+        utils.copyFolder(path.join(_c.CORDOVA_BB10_REPOS.dir, "framework/lib"), path.join(_c.TEMP, "lib"));
         // test files
         utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
         // filter out non-plugin files/dirs
