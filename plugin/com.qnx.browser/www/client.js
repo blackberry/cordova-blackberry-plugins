@@ -420,7 +420,7 @@ module.exports = {
 	 * @example
 	 *
 	 * //define callback functions
-	 * function success(tabId) {
+	 * function success() {
 	 *		console.log("Tab was successfully reloaded");
 	 * }
 	 * 

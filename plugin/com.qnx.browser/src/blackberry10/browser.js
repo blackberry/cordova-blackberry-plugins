@@ -158,6 +158,16 @@ function onWebviewCreated(webview, args) {
 	});
 	webview.enableDialogRequestedEvents = true;
 
+
+	//we need to do this so the open window events fire
+	qnx.webplatform.nativeCall('webview.setBlockPopups', webview.id, false);
+
+	//add Handlers for the OpenWindow event
+	webview.on("OpenWindow", function (webviewId, value, eventId, returnValue) {
+		value = JSON.parse(value);
+		createWebview({url: value.url});
+	});
+
 	/*
 	 *	This hooks up the dialog authentication responses and
 	 *	ssl handshake dialogs. However in webplatform 10.3 there is
@@ -170,7 +180,7 @@ function onWebviewCreated(webview, args) {
 	applyDefaultParams(webview, args);
 	_activeTabId = webview.id;
 	webview.visible = true;
-
+	reorderTabs(_activeTabId);
 
 }
 
@@ -193,6 +203,19 @@ function checkUrlProtocol(url) {
 	return verifiedUrl;
 }
 
+function createWebview(args) {
+
+	var webview;
+
+	webview = qnx.webplatform.createWebView({}, function () {
+		onWebviewCreated(webview, args);
+	});
+	_tabList[webview.id] = webview;
+
+	return webview;
+
+}
+
 /*
  * Exports are the publicly accessible functions
  */
@@ -206,6 +229,9 @@ module.exports = {
 		_tabTrigger.push(trigger);
 	},
 
+	/**
+	 * Does the initialization for the plugin and sets any configuration data
+	 */
 	init : function (args) {
 		var webviews = qnx.webplatform.getWebViews(),
 			wv;
@@ -223,6 +249,7 @@ module.exports = {
 				_uiWebview = webviews[wv];
 			}
 		}
+
 	},
 	/**
 	 *	Sets the default parameters that are applied to each "tab" when its created.
@@ -266,13 +293,7 @@ module.exports = {
 	* @returns {number} the number of the newly created webview
 	*/
 	addTab: function (args) {
-		var webview;
-		//TODO: in the future add support so we can pass in config parameters
-		// right into the createWebView method instead of an empty object
-		webview = qnx.webplatform.createWebView({}, function () {
-			onWebviewCreated(webview, args);
-		});
-		_tabList[webview.id] = webview;
+		var webview = createWebview(args);
 		return webview.id;
 	},
 
