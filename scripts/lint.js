@@ -15,6 +15,7 @@
  */
 var utils = require('./utils'),
     wrench = require('wrench'),
+    shell = require('shelljs'),
     path = require('path'),
     _c = require('./conf'),
     jWorkflow = require("jWorkflow"),
@@ -38,7 +39,7 @@ function _lintJS() {
     var options = ["--reporter", "scripts/reporter.js"],
         files = ["."];
 
-    return utils.execCommandWithJWorkflow('jshint ' + files.concat(options).join(' '), {cwd: _c.TEMP});
+    return utils.execCommandWithJWorkflow(process.argv[0] + ' "' + path.join(path.dirname(__dirname), 'node_modules', 'jshint', 'bin', 'jshint') + '" ' + files.concat(options).join(' '), {cwd: _c.TEMP});
 }
 
 function _lintCPP() {
@@ -46,8 +47,7 @@ function _lintCPP() {
         options = ["--R", "--filter=-whitespace/line_length,-whitespace/comments,-whitespace/labels,-whitespace/braces,-readability/streams"],
         files = ["plugin"],
         blacklist = ["com.blackberry.jpps"];
-    //Only cpplint on unix. Windows currently has an issue with cpplinting
-    if (!utils.isWindows()) {
+    if (shell.which('python')) {
         //This will expand files into an array of arrays and then reduce into a single array
         files = files.map(function (filePath) {
             //readdirSync only returns a list of fileNames, they will need to have the original path appended to them
@@ -66,7 +66,7 @@ function _lintCPP() {
         }).reduce(function (previous, current) {
             return previous.concat(current);
         });
-        returnValue = utils.execCommandWithJWorkflow('python ' + __dirname + "/../dependencies/cpplint/cpplint.py " + options.concat(files).join(' '));
+        returnValue = utils.execCommandWithJWorkflow('python "' + __dirname + '/../dependencies/cpplint/cpplint.py" ' + options.concat(files).join(' '));
     }
 
     return returnValue;

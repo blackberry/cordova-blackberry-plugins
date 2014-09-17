@@ -22,8 +22,14 @@
     "elementtree": "0.1.5",
     "shelljs": "0.1.3"
   },
-  "dev-dependencies": {
-    "cordova": "*"
+  "devDependencies": {
+    "cordova": "*",
+    "jake": "0.7.13",
+    "jshint": "2.4.*"
+  },
+  "scripts": {
+    "test": "npm run hint",
+    "hint": "node node_modules/jake/bin/cli hint"
   },
   "bundledDependencies": [
     "connect",

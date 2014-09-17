@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -17,22 +18,20 @@
  under the License.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.connection"
-    version="1.0.0">
-
-    <description>BlackBerry 10 Connection APIs</description>
-    <license>Apache 2.0</license>
-
-    <platform name="blackberry10">
-        <js-module src="www/client.js">
-            <clobbers target="blackberry.connection" />
-        </js-module>
-        <dependency id="com.blackberry.jpps"/>
-        <dependency id="com.blackberry.utils" />
-        <source-file src="src/blackberry10/index.js" />
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.connection" value="com.blackberry.connection" />
-        </config-file>
-    </platform>
+  xmlns:rim="http://www.blackberry.com/ns/widgets"
+  id="com.blackberry.connection"
+  version="1.0.0">
+  <name>BlackBerry 10 Connection</name>
+  <description>BlackBerry 10 Connection APIs</description>
+  <license>Apache 2.0</license>
+  <platform name="blackberry10">
+    <js-module src="www/client.js">
+      <clobbers target="blackberry.connection"/>
+    </js-module>
+    <dependency id="com.blackberry.utils"/>
+    <source-file src="src/blackberry10/index.js"/>
+    <config-file target="www/config.xml" parent="/widget">
+      <feature name="com.blackberry.connection" value="com.blackberry.connection"/>
+    </config-file>
+  </platform>
 </plugin>

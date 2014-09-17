@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -16,20 +17,18 @@
  specific language governing permissions and limitations
  under the License.
 -->
-
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.utils"
-    version="1.0.0">
-
-    <description>BlackBerry 10 Utilities Library</description>
-    <license>Apache 2.0</license>
-
-    <platform name="blackberry10">
-        <lib-file src="src/blackberry10/native/device/libutils.so" arch="device"/>
-        <lib-file src="src/blackberry10/native/simulator/libutils.so" arch="simulator"/>
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.utils"/>
-        </config-file>
-    </platform>
+  xmlns:rim="http://www.blackberry.com/ns/widgets"
+  id="com.blackberry.utils"
+  version="1.0.0">
+  <name>BlackBerry 10 Utilities</name>
+  <description>BlackBerry 10 Utilities Library</description>
+  <license>Apache 2.0</license>
+  <platform name="blackberry10">
+    <lib-file src="src/blackberry10/native/device/libutils.so" arch="device"/>
+    <lib-file src="src/blackberry10/native/simulator/libutils.so" arch="simulator"/>
+    <config-file target="www/config.xml" parent="/widget">
+      <feature name="com.blackberry.utils"/>
+    </config-file>
+  </platform>
 </plugin>

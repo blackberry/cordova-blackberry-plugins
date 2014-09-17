@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--
+* Copyright 2014 BlackBerry Ltd.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+<html>
+    <head>
+        <title>Keyboard</title>
+        <script src="local:///cordova.js" type="text/javascript"></script>
+        <script src="js/script.js" type="text/javascript"></script>
+        <script>
+            function onKeyboardOpening() {
+                //alert("Function is a go");
+                document.getElementById("kbAction").value = "The keyboard is Opening";
+            }
+            function onKeyboardOpened() {
+                //alert("Function is a go");
+                document.getElementById("kbAction").value = "The keyboard has Opened";
+            }
+            function onKeyboardClosing() {
+                //alert("Function is a go");
+                document.getElementById("kbAction").value = "The keyboard is Closing";
+            }
+            function onKeyboardClosed() {
+                //alert("Function is a go");
+                document.getElementById("kbAction").value = "The keyboard has Closed";
+            }
+            function onKeyboardPosition(yPosition) {
+                //alert("Function is a go");
+                document.getElementById("kbPosition").value = "The keyboard position is " + yPosition + "px";
+            }
+
+            window.addEventListener("load", function () {
+                //document.addEventListener("keyboardOpening", onKeyboardOpening);
+                document.addEventListener("keyboardOpened", onKeyboardOpened);
+                //document.addEventListener("keyboardClosing", onKeyboardClosing);
+                document.addEventListener("keyboardClosed", onKeyboardClosed);
+                document.addEventListener("keyboardPosition", onKeyboardPosition);
+            }, false);
+        </script>
+    </head>
+    <body bgcolor="White">
+        <h1 align="center">Keyboard Opened/Closed Test</h1>
+        <br />
+        <div class="toastTest1">
+            <h2>Keyboard test to cover the API call that it correctly idenbtifies the virtual keyboards <u><i>'Opened'</i></u>, and <u><i>'Closed'</i></u> states; along with the absolute <u><i>'Position'</i></u> of the virtual keyboard on the y axis of the screen.</h2><br /><br />
+        </div>
+        <br />
+        <br />
+        <table>
+            <tbody>
+                <tr>
+                    <th>Keyboard State:</th>
+                    <td><input type="text" id="kbAction" name="kbAction" autocomplete="off" value="The keyboard has..." size="45"></td>
+                </tr>
+                <tr>
+                    <th>Keyboard Position:</th>
+                    <td><input type="text" id="kbPosition" name="kbPosition" autocomplete="off" value="The keyboard position..." size="45"></td>
+                </tr>
+            </tbody>
+        </table>
+        <input id="BackButton" type="button" value="Back to Main Page" onclick="document.location ='local:///manual//index.htm';" /><br /><br />
+    </body>
+</html>

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -17,39 +18,38 @@
  under the License.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.pim.calendar"
-    version="1.0.0">
-
-    <description>BlackBerry 10 Calendar APIs</description>
-    <license>Apache 2.0</license>
-
-    <platform name="blackberry10">
-        <dependency id="com.blackberry.utils" />
-        <js-module src="www/client.js">
-            <clobbers target="blackberry.pim.calendar" />
-        </js-module>
-        <js-module src="www/CalendarEvent.js" />
-        <js-module src="www/CalendarAccount.js" />
-        <js-module src="www/CalendarFolder.js" />
-        <js-module src="www/CalendarEventFilter.js" />
-        <js-module src="www/Attendee.js" />
-        <js-module src="src/blackberry10/calendarUtils.js" />
-        <js-module src="src/blackberry10/CalendarRepeatRule.js" />
-        <js-module src="src/blackberry10/CalendarFindOptions.js" />
-        <js-module src="src/blackberry10/CalendarError.js" />
-        <source-file src="src/blackberry10/index.js" />
-        <source-file src="src/blackberry10/CalendarError.js" />
-        <source-file src="src/blackberry10/CalendarFindOptions.js" />
-        <source-file src="src/blackberry10/CalendarRepeatRule.js" />
-        <source-file src="src/blackberry10/calendarUtils.js" />
-        <lib-file src="src/blackberry10/native/device/libpimcalendar.so" arch="device"/>
-        <lib-file src="src/blackberry10/native/simulator/libpimcalendar.so" arch="simulator"/>
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.pim.calendar" value="com.blackberry.pim.calendar" />
-        </config-file>
-        <config-file target="www/config.xml" parent="/widget/rim:permissions">
-            <rim:permit>access_pimdomain_calendars</rim:permit>
-        </config-file>
-    </platform>
+  xmlns:rim="http://www.blackberry.com/ns/widgets"
+  id="com.blackberry.pim.calendar"
+  version="1.0.0">
+  <name>BlackBerry 10 Calendar</name>
+  <description>BlackBerry 10 Calendar APIs</description>
+  <license>Apache 2.0</license>
+  <platform name="blackberry10">
+    <dependency id="com.blackberry.utils"/>
+    <js-module src="www/client.js">
+      <clobbers target="blackberry.pim.calendar"/>
+    </js-module>
+    <js-module src="www/CalendarEvent.js"/>
+    <js-module src="www/CalendarAccount.js"/>
+    <js-module src="www/CalendarFolder.js"/>
+    <js-module src="www/CalendarEventFilter.js"/>
+    <js-module src="www/Attendee.js"/>
+    <js-module src="src/blackberry10/calendarUtils.js"/>
+    <js-module src="src/blackberry10/CalendarRepeatRule.js"/>
+    <js-module src="src/blackberry10/CalendarFindOptions.js"/>
+    <js-module src="src/blackberry10/CalendarError.js"/>
+    <source-file src="src/blackberry10/index.js"/>
+    <source-file src="src/blackberry10/CalendarError.js"/>
+    <source-file src="src/blackberry10/CalendarFindOptions.js"/>
+    <source-file src="src/blackberry10/CalendarRepeatRule.js"/>
+    <source-file src="src/blackberry10/calendarUtils.js"/>
+    <lib-file src="src/blackberry10/native/device/libpimcalendar.so" arch="device"/>
+    <lib-file src="src/blackberry10/native/simulator/libpimcalendar.so" arch="simulator"/>
+    <config-file target="www/config.xml" parent="/widget">
+      <feature name="com.blackberry.pim.calendar" value="com.blackberry.pim.calendar"/>
+    </config-file>
+    <config-file target="www/config.xml" parent="/widget/rim:permissions">
+      <rim:permit>access_pimdomain_calendars</rim:permit>
+    </config-file>
+  </platform>
 </plugin>

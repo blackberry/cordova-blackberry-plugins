@@ -30,7 +30,7 @@ var _self = {},
         channel.onHasSubscribersChange = function () {
             if (this.numHandlers === 1) {
                 exec(success,
-                     console.log.bind("Error initializing " + eventName + " listener: "),
+                     console.log.bind(console, "Error initializing " + eventName + " listener: "),
                      _ID, "startEvent", {eventName: eventName});
             } else if (this.numHandlers === 0) {
                 exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
