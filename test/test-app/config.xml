@@ -79,10 +79,10 @@
         #See the License for the specific language governing permissions and limitations under the License.
     </license>
 
-    <rim:invoke-target id="com.npi.webworks.test.invoke.target"><type>APPLICATION</type><filter><action>bb.action.WWTEST</action><mime-type>text/plain</mime-type></filter></rim:invoke-target>
-    <rim:invoke-target id="com.npi.webworks.test.invoke.card.target"><type>card.previewer</type><filter><action>bb.action.WWTEST</action><mime-type>text/plain</mime-type></filter></rim:invoke-target>
-    <rim:invoke-target id="com.npi.webworks.test.push.target"><type>APPLICATION</type><filter><action>bb.action.PUSH</action><mime-type>application/vnd.push</mime-type></filter></rim:invoke-target>
-    <rim:invoke-target id="com.npi.webworks.test.query.target"><type>APPLICATION</type><filter><action>bb.action.WWTEST</action><mime-type>text/plain</mime-type><property var="uris" value="file://"/></filter></rim:invoke-target>
+    <rim:invoke-target id="com.webworks.test.npi.invoke.target"><type>APPLICATION</type><filter><action>bb.action.WWTEST</action><mime-type>text/plain</mime-type></filter></rim:invoke-target>
+    <rim:invoke-target id="com.webworks.test.npi.invoke.card.target"><type>card.previewer</type><filter><action>bb.action.WWTEST</action><mime-type>text/plain</mime-type></filter></rim:invoke-target>
+    <rim:invoke-target id="com.webworks.test.npi.push.target"><type>APPLICATION</type><filter><action>bb.action.PUSH</action><mime-type>application/vnd.push</mime-type></filter></rim:invoke-target>
+    <rim:invoke-target id="com.webworks.test.npi.query.target"><type>APPLICATION</type><filter><action>bb.action.WWTEST</action><mime-type>text/plain</mime-type><property var="uris" value="file://"/></filter></rim:invoke-target>
 
     <rim:permissions>
         <rim:permit>access_shared</rim:permit>

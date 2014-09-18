@@ -78,12 +78,12 @@ describe("blackberry.invoke", function () {
                     expect(response.icon).toBeDefined();
                     expect(response.label).toBeDefined();
                     expect(response["default"]).toBeDefined();
-                    expect(response["default"]).toEqual("com.webworks.test.functional.query.target");
+                    expect(response["default"]).toEqual("com.webworks.test.npi.query.target");
                     expect(response.targets).toBeDefined();
                     expect(response.targets[0]).toBeDefined();
                     response.targets.forEach(function (target) {
                         expect(target.key).toBeDefined();
-                        expect(target.key).toEqual("com.webworks.test.functional.query.target");
+                        expect(target.key).toEqual("com.webworks.test.npi.query.target");
                         expect(target.icon).toBeDefined();
                         expect(target.icon).not.toEqual(iconPath);
                         expect(target.label).toBeDefined();

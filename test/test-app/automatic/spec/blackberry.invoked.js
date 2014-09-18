@@ -43,7 +43,7 @@ describe("blackberry.invoked", function () {
 
         runs(function () {
             blackberry.invoke.invoke({
-                target: "com.npi.webworks.test.invoke.target",
+                target: "com.webworks.test.npi.invoke.target",
                 action: "bb.action.WWTEST",
                 type: "text/plain",
                 data: "Hello from SmokeTest"
@@ -57,7 +57,7 @@ describe("blackberry.invoked", function () {
         runs(function () {
             expect(onSuccess).toHaveBeenCalled();
             expect(onError).not.toHaveBeenCalled();
-            expect(invokedTarget).toBe("com.npi.webworks.test.invoke.target");
+            expect(invokedTarget).toBe("com.webworks.test.npi.invoke.target");
             expect(invokedType).toBe("text/plain");
             expect(invokedAction).toBe("bb.action.WWTEST");
             expect(invokedData).toBe("Hello from SmokeTest");
