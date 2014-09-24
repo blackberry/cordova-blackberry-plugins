@@ -1,6 +1,6 @@
 /*
  * Copyright 2014.
-*  QNX Software Systems Limited. All rights reserved.
+ * QNX Software Systems Limited. All rights reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
@@ -20,11 +20,9 @@
 
 /**
  * @module qnx.browser
- * @description This plugin exists to enable the creation of a basic browser application. 
- *				DO NOT USE THIS PLUGIN IN ANY NEW APPLICATIONS.
- *
- * @deprecated
- * @private
+ * @description Enables the creation of a basic browser application.
+ *              Tabs for the browser are represented by WebViews.
+ * 
  */
 
 var _ID = "com.qnx.browser",
@@ -33,9 +31,9 @@ var _ID = "com.qnx.browser",
 
 
 /**
- * Handles update events for this extension
- * @param data {Array} The updated data provided by the event 
- * @private
+ * @description Handles update events for this plugin.
+ * @param {Array} data The updated data provided by the event.
+ *
  */
 function onUpdate(data) {
 	var keys = Object.keys(_watches),
@@ -46,24 +44,28 @@ function onUpdate(data) {
 }
 
 /*
- * Exports the publicly accessible functions
+ * Exports the publicly accessible functions.
  */
 module.exports = {
 
 	/**
-	 * Watch for webview updates
+	 * @description Watch for updates to a tab. A tab represents a WebView.
+	 *              <p>The following events cause an update:
+	 *              <ul>
+	 *              <li>LocationChange: The URL in the WebView changed.</li>
+	 *              <li>PropertyLoadProgressEvent: New properties are being loaded into the WebView.</li>
+	 *              </ul></p>
 	 * @param {Function} callback The function to call when a change is detected.
-	 * @return {String} An ID for the added watch.
+	 * @return {String} The identifier for the callback that was added.
 	 * @memberOf module:car.browser 
 	 * @method watchTab
 	 * @example
 	 *
-	 * //define a callback function
+	 * //Define a callback function.
 	 * function myCallback(tabUpdates) {
-	 *		//iterate through the changed items
+	 *		//Iterate through the changed items.
 	 *		for (var i=0; i&lt;tabUpdates.length; i++) {
-	 *			//Currently updates related to "LocationChange" and  "PropertyLoadProgressEvent"
-	 *			//This is iteration one and could be expanded upon
+	 *			//Currently updates related to "LocationChange" and "PropertyLoadProgressEvent".
 	 *			console.log("tab updates: " + tabUpdates[i] + '\n')	
 	 *		}
 	 * }
@@ -81,7 +83,8 @@ module.exports = {
 	},
 
 	/**	
-	 * Stop watching webview changes
+	 * @description Stop monitoring the tab for changes.
+	 *              A tab represents a WebView.
 	 * @param {Number} watchId The watch ID returned by <code>car.browser.watchTab()</code>.
 	 * @memberOf module:car.browser
 	 * @method cancelWatch
@@ -99,10 +102,10 @@ module.exports = {
 	},
 	
 	/**	
-	 * Initialize the browser plugin
-	 * @param {String} chromeUrl The url of the webview that will handle all the UI and application logic
-	 * @param {Number} uiHeight the height you wish for your ui to be when the overlay is hidden
-	 * @param {Number} overlayHeight the height you wish for your ui to be when the overlay is shown	
+	 * @description Initialize the browser plugin.
+	 * @param {String} chromeUrl The URL of the WebView that handles all the user interface and application logic.
+	 * @param {Number} uiHeight The height you want your WebView to be when the overlay is hidden.
+	 * @param {Number} overlayHeight The height you want for your WebView to be when the overlay is visible.
 	 * @memberOf module:car.browser
 	 * @method init
 	 * @example
@@ -142,20 +145,24 @@ module.exports = {
 	},
 
 	/**	
-	 * Set the default parameters to apply to a webview when its created
-	 * @param {Function} success The method to call when setDefaultTabParameters completes successfully
-	 * @param {Function} fail The method to call when setDefaultTabParameters doesn't complete successfully
+	 * @description Set the default parameters to apply to a tab when it's created.
+	 *              A tab represents a WebView.
+	 * @param {Function} success The function to call when <code>setDefaultTabParameters</code> successfully completes.
+	 * @param {Function} fail The function to call when <code>setDefaultTabParameters</code> doesn't successfully completes.
+	 * @param {Number} x The x-axis location for the top-left corner of the WebView.
+	 * @param {Number} y The y-axis location for the top-left corner of the WebView.
+	 * @param {String} url The default URL to load.
 	 * @memberOf module:car.browser
 	 * @method setDefaultTabParameters
 	 * @example
 	 * 
-	 * //define a callback functions
+	 * //Define callback functions.
 	 * function success() {
-	 *		//console.log("Default paramters successfully set");
+	 *		console.log("Default paramters successfully set");
 	 * }
 	 * 
 	 * function failure(e) {
-	 *		console.error("Failed to set default webview parameters", e);
+	 *		console.error("Failed to set default WebView parameters", e);
 	 * }
 	 * car.browser.setDefaultTabParameters(success, failure, 0, 0, 800, 400, "www.qnx.com");
 	 */
@@ -186,14 +193,14 @@ module.exports = {
 	},
 
 	/**
-	 * Hide the overlay
+	 * @description Hide the overlay.
 	 * @param {Function} success The function to call when the overlay is hidden.
-	 * @param {Function} failure The function to call if there is an error hiding the overlay.
+	 * @param {Function} failure The function to call if there's an error hiding the overlay.
 	 * @memberOf module:car.browser 
 	 * @method hideOverlay
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success() {
 	 *		console.log("Overlay hidden");
 	 * }
@@ -212,14 +219,14 @@ module.exports = {
 	},
 
 	/**
-	 * Show the overlay
+	 * @description Show the overlay. The the overlay is shown, it's made visible to the user.
 	 * @param {Function} success The function to call when the overlay is shown.
 	 * @param {Function} failure The function to call if there is an error showing the overlay.
 	 * @memberOf module:car.browser 
 	 * @method showOverlay
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success() {
 	 *		console.log("Overlay shown");
 	 * }
@@ -238,16 +245,16 @@ module.exports = {
 	},
 
 	/**
-	 * Create a new tab(webview)
+	 * @description Create a new tab. A tab represents a WebView.
 	 * @param {Function} success The function to call when the tab is created successfully.
 	 * @param {Function} failure The function to call when there is a error creating a tab.
-	 * @param optional {Object} options used for configuring a webview 
-	 * @return {String} An ID for the newly created tab.
+	 * @param {Object} [options] The settings used to configure a WebView. 
+	 * @return {String} The identifier for the new WebView.
 	 * @memberOf module:car.browser 
 	 * @method addTab
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success(tabId) {
 	 *		console.log("Tab: ", tabId, " was created ");
 	 * }
@@ -283,17 +290,17 @@ module.exports = {
 		}
 	},
 	/**
-	 * Remove a created tab(webview)
-	 * @param {Function} success The function to call the tab is removed successfully.
-	 * @param {Function} failure The function to call when there is a error removing a tab.
-	 * @return {String} The id of the removed tab.
+	 * @description Remove a created tab. A tab is represents a WebView.
+	 * @param {Function} success The function to call the tab is successfully removed.
+	 * @param {Function} failure The function to call when there's an error removing a tab.
+	 * @return {String} tabId The identifier of the tab that was removed.
 	 * @memberOf module:car.browser 
 	 * @method removeTab
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success(tabId) {
-	 *		console.log("Tab: ", tabId, " was removed ");
+	 *		console.log("Tab: ", tabId, " was removed");
 	 * }
 	 * 
 	 * function failure(e) {
@@ -318,15 +325,15 @@ module.exports = {
 	},
 
 	/**
-	 * Get the active tab(webview) id.
-	 * @param {Function} success The function to call with the tabId.
-	 * @param {Function} failure The function to call when there is a error getting the tabId.
-	 * @return {String} The id of the active tab.
+	 * @description Get the active tab. The active tab is the identifier of the WebView.
+	 * @param {Function} success The function to call with the identifier of the active WebView.
+	 * @param {Function} failure The function to call when there is a error getting the identifier of the active WebView.
+	 * @return {String} The identifier of the active WebView.
 	 * @memberOf module:car.browser 
 	 * @method getActiveTab
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success(tabId) {
 	 *		console.log("Tab: ", tabId, " is the active tab ");
 	 * }
@@ -344,15 +351,15 @@ module.exports = {
 		}
 	},
 	/**
-	 * Set the active tab(webview) id.
-	 * @param {Function} success The function to call with the active tab id.
-	 * @param {Function} failure The function to call when there is a error setting the tabId.
-	 * @return {String} The id of the active tab.
+	 * @description  Set the active tab using the identifier. The active tab represents the active WebView.
+	 * @param {Function} success The function to call with the active WebView identifier.
+	 * @param {Function} failure The function to call when there is a error setting the WebView identifier.
+	 * @return {String} tabId The identifier of the active WebView.
 	 * @memberOf module:car.browser 
 	 * @method setActiveTab
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success(tabId) {
 	 *		console.log("Tab: ", tabId, " is now the active tab ");
 	 * }
@@ -377,15 +384,15 @@ module.exports = {
 	},
 
 	/**
-	 * Update the url of the currently active tab(webview).
-	 * @param {Function} success The function to call with the updated url.
-	 * @param {Function} failure The function to call when there is a error setting the url.
-	 * @return {String} The updated url of the active tab.
+	 * @description Update the URL of the currently active tab. The active tab represents the active WebView.
+	 * @param {Function} success The function to call with the updated URL.
+	 * @param {Function} failure The function to call when there is a error setting the URL.
+	 * @return {String} url The new URL for the active WebView.
 	 * @memberOf module:car.browser 
 	 * @method updateUrl
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success(url) {
 	 *		console.log("The url of the active tabs is now:",url);
 	 * }
@@ -412,14 +419,14 @@ module.exports = {
 	},
 
 	/**
-	 * Reload the active tab(webview).
+	 * @description Reload the active tab. The active tab represents the active WebView.
 	 * @param {Function} success The function to call when reload succeeds.
-	 * @param {Function} failure The function to call when there is a error reloading the tab.
+	 * @param {Function} failure The function to call when there is a error reloading the WebView.
 	 * @memberOf module:car.browser 
 	 * @method reload
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success() {
 	 *		console.log("Tab was successfully reloaded");
 	 * }
@@ -438,16 +445,16 @@ module.exports = {
 	},
 
 	/**
-	 * Stop the active tab(webview) from loading.
+	 * @description Stop the active tab from loading. The active tab represents the active WebView.
 	 * @param {Function} success The function to call when the stop command succeeds.
-	 * @param {Function} failure The function to call when there is a error stopping the tab.
+	 * @param {Function} failure The function to call when there is a error stopping the WebView.
 	 * @memberOf module:car.browser 
 	 * @method stop
 	 * @example
 	 *
-	 * //define callback functions
+	 * //Define callback functions.
 	 * function success(tabId) {
-	 *		console.log("Tab was successfully reloaded");
+	 *		console.log("The tab was successfully reloaded");
 	 * }
 	 * 
 	 * function failure(e) {
