@@ -1,0 +1,897 @@
+From c24f6ccf14a797fe266674586be2ef74dad708fa Mon Sep 17 00:00:00 2001
+From: Nik Schultz <nschultz@qnx.com>
+Date: Tue, 22 Apr 2014 16:02:10 -0400
+Subject: [PATCH 54/61] JI:662680 CI:mlapierre Initial commit of the
+ qnx.browser cordova plugin. This plugin allows you to
+ create a browser with multiple tabs. You are able to
+ minimally control the tabs throught the plugin
+ methods
+
+---
+ plugin/com.qnx.browser/plugin.xml                  |   33 ++
+ plugin/com.qnx.browser/src/blackberry10/browser.js |  225 +++++++++++++
+ plugin/com.qnx.browser/src/blackberry10/index.js   |  240 ++++++++++++++
+ plugin/com.qnx.browser/www/client.js               |  349 ++++++++++++++++++++
+ 4 files changed, 847 insertions(+)
+ create mode 100644 plugin/com.qnx.browser/plugin.xml
+ create mode 100644 plugin/com.qnx.browser/src/blackberry10/browser.js
+ create mode 100644 plugin/com.qnx.browser/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.browser/www/client.js
+
+diff --git a/plugin/com.qnx.browser/plugin.xml b/plugin/com.qnx.browser/plugin.xml
+new file mode 100644
+index 0000000..2faad32
+--- /dev/null
++++ b/plugin/com.qnx.browser/plugin.xml
+@@ -0,0 +1,33 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.browser"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="qnx.browser" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/browser.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.browser" value="com.qnx.browser" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.browser/src/blackberry10/browser.js b/plugin/com.qnx.browser/src/blackberry10/browser.js
+new file mode 100644
+index 0000000..123a4e6
+--- /dev/null
++++ b/plugin/com.qnx.browser/src/blackberry10/browser.js
+@@ -0,0 +1,225 @@
++/*
++ * Copyright 2014  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for qnx browser functionality
++ */
++var _tabList = {},
++	_defaultZOrder = 1,
++	_activeZOrder = 2,
++	_lastActiveTabId = null,
++	_activeTabId = null,
++	_x = 0,
++	_y = 0,
++	_width = screen.width,
++	_height = screen.height,
++	_url =  "www.qnx.com",
++	_triggerUpdate;
++
++/**
++ *	Private method to re-order the tabs placing the active tab at the correct z-order
++ */
++function reorderTabs(tabId) {
++	// for (var i = 0; i < _tabList.length; i++) {
++	if (_tabList[tabId].id === tabId) {
++		_tabList[tabId].zOrder = _activeZOrder;
++		
++		if (_activeTabId !== null) {
++			_lastActiveTabId = _activeTabId;
++		}
++		
++		_activeTabId = tabId;
++		_tabList[tabId].visible = true;
++
++	} else {
++		_tabList[tabId].zOrder = _defaultZOrder;
++		_tabList[tabId].visible = false;
++	}
++	// }
++}
++
++/**
++ *	Private method applies the default parameters to newly created webviews
++ */
++function applyDefaultParams(webview) {
++	webview.setGeometry(_x, _y, _width, _height);
++	webview.url = _url;
++}
++
++/**
++ *	Private method to retrive the webview from the webview collection based on
++ *	a supplied "tabId"
++ */
++function getWebview(tabId) {
++	// for (var i =  0; i < _tabList.length; i++) {
++	if (_tabList[tabId].id === tabId) {	
++		return _tabList[tabId];
++	}
++	// }
++}
++
++/**
++ *	Private method called when the webview "created" event is 
++ *	triggered. Sets the default parameters and attaches the 
++ *	event listeners for Location Change and page load progress. 
++ */
++function onWebviewCreated(webview) {
++	console.log("Webview:", webview.id, " created");
++	webview.addEventListener("LocationChange", function (e) {
++		e = JSON.parse(e);
++		if (_triggerUpdate && e.type === "LocationChange") {
++			e.webview = webview.id;
++			_triggerUpdate(e);
++		}
++	});
++	webview.addEventListener("PropertyLoadProgressEvent", function (e) {
++		if (_triggerUpdate && e) {
++			_triggerUpdate({
++				progress: e,
++				type: "PropertyLoadProgressEvent",
++				webview: webview.id
++			});
++		}
++	});
++	applyDefaultParams(webview);
++	_activeTabId = webview.id;
++	webview.visible = true;
++}
++
++/*
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++
++	/**
++	 * Sets the trigger function to call when a webview event is fired
++	 * @param {Function} trigger The trigger function to call when the event is fired
++	 */
++	setTriggerUpdate: function (trigger) {
++		_triggerUpdate = trigger;
++	},
++
++	/**
++	 *	Sets the default parameters that are applied to each "tab" when its created.
++	 *	@param {Object} object containing configuration parameters
++	 */
++	setDefaultTabParameters: function (args) {
++		if (args.x !== undefined) {
++			_x = args.x;
++		}
++		if (args.y !== undefined) {
++			_y = args.y;
++		}
++		if (args.width !== undefined) {
++			_width = args.width;
++		}
++		if (args.height !== undefined) {
++			_height = args.height;
++		}
++		if (args.url !== undefined) {
++			_url = args.url;
++		}
++	},
++
++	/**
++	* Creates a request to create a tab
++	* @param args {Object} The startup data for the webview
++	* @returns {number} the number of the newly created webview
++	*/
++	addTab: function (args) {
++		var webview;
++		//TODO: in the future add support so we can pass in config parameters
++		// right into the createWebView method instead of an empty object
++		webview = qnx.webplatform.createWebView({}, function () {
++			onWebviewCreated(webview);
++		});
++		_tabList[webview.id] = webview;
++		return webview.id;
++	},
++
++	/**
++	* Creates a request to remove a tab
++	* @param tabId {Number} the id of the webview to remove
++	* @returns {number} the id of the recently removed webview
++	*/
++	removeTab: function (tabId) {
++		var id;
++		if (_tabList[tabId].id === tabId) {
++			id = _tabList[tabId].id;
++			if (_lastActiveTabId !== null) {
++				reorderTabs(_lastActiveTabId);
++			}
++			_tabList[tabId].destroy();
++			return id;
++		} else {
++			console.error("Browser.js removeTab, tabId:" + tabId + " is not valid.");
++		}
++
++	},
++	/**
++	 * Returns the id of the currently active tab
++	 * @returns {number} the id of the active tab
++	 */
++	getActiveTab: function () {
++		return _activeTabId;
++	},
++
++	/**
++	 *	Updates the active tab and sets it as the visible one.
++	 *	@returns {number} the id of the now active tab
++	 */
++	setActiveTab: function (tabId) {
++		reorderTabs(tabId);
++		return _activeTabId;
++	},
++
++	/**
++	 *	Updates the url of the active tab
++	 *	@param url {String} the url to update the active tab with
++	 *	@returns {String} the url passed to the active tab
++	 */
++	updateUrl: function (url) {
++		var webview = getWebview(_activeTabId);
++		webview.url = url;
++		return url;
++	},
++
++	/**
++	 *	Triggers the reload method on the active tab
++	 */
++	reload: function () {
++		if (_activeTabId !== null) {
++			var webview = getWebview(_activeTabId);
++			webview.reload();
++		} else {
++			console.error("qnx.browser.reload() cannot be called when there are no tabs.");
++		}
++	},
++	/**
++	 * Triggers the stop method on the active tab
++	 */
++	stop: function () {
++		if (_activeTabId !== null) {
++			var webview = getWebview(_activeTabId);
++			webview.stop();
++		} else {
++			console.error("qnx.browser.stop() cannot be called when there are no tabs.");
++		}
++	}
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.browser/src/blackberry10/index.js b/plugin/com.qnx.browser/src/blackberry10/index.js
+new file mode 100644
+index 0000000..ca639b1
+--- /dev/null
++++ b/plugin/com.qnx.browser/src/blackberry10/index.js
+@@ -0,0 +1,240 @@
++/*
++ * Copyright 2014  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Allows for creation, removal and control of browser tabs
++ */
++
++var _wwfix = require("../../lib/wwfix"),
++	_utils = require("./../../lib/utils"),
++	_browser = require("./browser"),
++	_eventResult;
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	startEvents: function (success, fail, args, env) {
++		_eventResult = new PluginResult(args, env);
++		try {
++			_browser.setTriggerUpdate(function (data) {
++				_eventResult.callbackOk(data, true);
++			});
++			_eventResult.noResult(true);
++		} catch (e) {
++			_eventResult.error("error in startEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stopEvents: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			//disable the event trigger
++			_browser.setTriggerUpdate(null);
++			result.ok(undefined, false);
++
++			//cleanup
++			_eventResult.noResult(false);
++			delete _eventResult;
++		} catch (e) {
++			result.error("error in stopEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	setDefaultTabParameters: function (success, fail, args, env) {
++		var result = new PluginResult(args, env),
++			fixedArgs = null,
++			data = null;
++
++		try {
++			fixedArgs = _wwfix.parseArgs(args);
++			data = _browser.setDefaultTabParameters(fixedArgs);
++				
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	addTab: function (success, fail, args, env) {
++		var result = new PluginResult(args, env),
++			fixedArgs = null,
++			data = null;
++
++		try {
++			fixedArgs = _wwfix.parseArgs(args);
++			data = _browser.addTab(fixedArgs);
++				
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	removeTab: function (success, fail, args, env) {
++		var result = new PluginResult(args, env),
++			fixedArgs = null,
++			data = null;
++
++		try {
++			fixedArgs = _wwfix.parseArgs(args);
++			data = _browser.removeTab(fixedArgs.id);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getActiveTab: function (success, fail, args, env) {
++		var result = new PluginResult(args, env),
++			// fixedArgs = null,
++			data = null;
++
++		try {
++			// fixedArgs = _wwfix.parseArgs(args);
++			data = _browser.getActiveTab();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	setActiveTab: function (success, fail, args, env) {
++		var result = new PluginResult(args, env),
++			fixedArgs = null,
++			data = null;
++
++		try {
++			fixedArgs = _wwfix.parseArgs(args);
++			data = _browser.setActiveTab(fixedArgs.id);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	updateUrl: function (success, fail, args, env) {
++		var result = new PluginResult(args, env),
++			fixedArgs = null,
++			data = null;
++
++		try {
++			fixedArgs = _wwfix.parseArgs(args);
++			data = _browser.updateUrl(fixedArgs.url);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	reload: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++
++		try {
++			_browser.reload();
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current browser parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stop: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++
++		try {
++			_browser.stop();
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	}
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.browser/www/client.js b/plugin/com.qnx.browser/www/client.js
+new file mode 100644
+index 0000000..c7050e2
+--- /dev/null
++++ b/plugin/com.qnx.browser/www/client.js
+@@ -0,0 +1,349 @@
++/*
++ * Copyright 2014  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * @module qnx.browser
++ * @description This plugin exists to enable the creation of a basic browser application. 
++ *				DO NOT USE THIS PLUGIN IN ANY NEW APPLICATIONS.
++ *
++ * @deprecated
++ * @private
++ */
++
++var _ID = "com.qnx.browser",
++	_utils = cordova.require('cordova/utils'),
++	_watches = {};
++
++
++/**
++ * Handles update events for this extension
++ * @param data {Array} The updated data provided by the event 
++ * @private
++ */
++function onUpdate(data) {
++	var keys = Object.keys(_watches);
++	for (var i = 0; i < keys.length; i++) {
++		setTimeout(_watches[keys[i]](data), 0);
++	}
++}
++
++/*
++ * Exports the publicly accessible functions
++ */
++module.exports = {
++
++	/**
++	 * Watch for webview updates
++	 * @param {Function} callback The function to call when a change is detected.
++	 * @return {String} An ID for the added watch.
++	 * @memberOf module:car.browser 
++	 * @method watchTab
++	 * @example
++	 *
++	 * //define a callback function
++	 * function myCallback(tabUpdates) {
++	 *		//iterate through the changed items
++	 *		for (var i=0; i&lt;tabUpdates.length; i++) {
++	 *			//Currently updates related to "LocationChange" and  "PropertyLoadProgressEvent"
++	 *			//This is iteration one and could be expanded upon
++	 *			console.log("tab updates: " + tabUpdates[i] + '\n')	
++	 *		}
++	 * }
++	 * 
++	 * var watchId = car.browser.watchTab(myCallback);
++	 */
++	watchTab : function (callback) {
++		var watchId = _utils.createUUID();
++		
++		_watches[watchId] = callback;
++		if (Object.keys(_watches).length === 1) {
++			window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
++		}
++
++		return watchId;
++	},
++
++	/**	
++	 * Stop watching webview changes
++	 * @param {Number} watchId The watch ID returned by <i>car.browser.watchTab()</i>.
++	 * @memberOf module:car.browser
++	 * @method cancelWatch
++	 * @example
++	 * 
++	 * car.browser.cancelWatch(watchId);
++	 */
++	cancelWatch : function (watchId) {
++		if (_watches[watchId]) {
++			delete _watches[watchId];
++			if (Object.keys(_watches).length === 0) {
++				window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
++			}
++		}
++	},
++
++	/**	
++	 * Set the default parameters to apply to a webview when its created
++	 * @param {Function} success The method to call when setDefaultTabParameters completes successfully
++	 * @param {Function} fail The method to call when setDefaultTabParameters doesn't complete successfully
++	 * @memberOf module:car.browser
++	 * @method setDefaultTabParameters
++	 * @example
++	 * 
++	 * //define a callback functions
++	 * function success() {
++	 *		//console.log("Default paramters successfully set");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("Failed to set default webview parameters", e);
++	 * }
++	 * car.browser.setDefaultTabParameters(success, failure, 0, 0, 800, 400, "www.qnx.com");
++	 */
++	setDefaultTabParameters: function (success, fail, x, y, width, height, url) {
++
++		var options = {};
++		if (x !== undefined) {
++			options.x = x;
++		}
++		if (y !== undefined) {
++			options.y = y;
++		}
++		if (width !== undefined) {
++			options.width = width;
++		}
++		if (height !== undefined) {
++			options.height = height;
++		}
++		if (url !== undefined) {
++			options.url = url;
++		}
++
++		try {
++			window.cordova.exec(success, fail, _ID, 'setDefaultTabParameters', options);
++		} catch (e) {
++			console.error(e);
++		}
++	},
++	/**
++	 * Create a new tab(webview)
++	 * @param {Function} success The function to call when the tab is created successfully.
++	 * @param {Function} failure The function to call when there is a error creating a tab.
++	 * @return {String} An ID for the newly created tab.
++	 * @memberOf module:car.browser 
++	 * @method addTab
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(tabId) {
++	 *		console.log("Tab: ", tabId, " was created ");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error creating a tab: ", e);
++	 * }
++	 * car.browser.addTab(success, failure);
++	 */
++	addTab: function (success, fail) {
++		try {
++			window.cordova.exec(success, fail, _ID, 'addTab');
++		} catch (e) {
++			console.error(e);
++		}
++	},
++	/**
++	 * Remove a created tab(webview)
++	 * @param {Function} success The function to call the tab is removed successfully.
++	 * @param {Function} failure The function to call when there is a error removing a tab.
++	 * @return {String} The id of the removed tab.
++	 * @memberOf module:car.browser 
++	 * @method removeTab
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(tabId) {
++	 *		console.log("Tab: ", tabId, " was removed ");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error removing a tab: ", e);
++	 * }
++	 * car.browser.removeTab(success, failure, 5);
++	 */
++	removeTab: function (success, fail, tabId) {
++		var args = {};
++		if (tabId === undefined || !tabId || tabId < 0) {
++			console.error("qnx.browser.removeTab requires a valid tabId, please check your input parameter: ", tabId);
++			return;
++		} else {
++			args.id = tabId;
++		}
++
++		try {
++			window.cordova.exec(success, fail, _ID, 'removeTab', args);
++		} catch (e) {
++			console.error(e);
++		}
++	},
++
++	/**
++	 * Get the active tab(webview) id.
++	 * @param {Function} success The function to call with the tabId.
++	 * @param {Function} failure The function to call when there is a error getting the tabId.
++	 * @return {String} The id of the active tab.
++	 * @memberOf module:car.browser 
++	 * @method getActiveTab
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(tabId) {
++	 *		console.log("Tab: ", tabId, " is the active tab ");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error getting the active tab: ", e);
++	 * }
++	 * car.browser.getActiveTab(success, failure);
++	 */
++	getActiveTab: function (success, fail) {
++		try {
++			window.cordova.exec(success, fail, _ID, 'getActiveTab');
++		} catch (e) {
++			console.error(e);
++		}
++	},
++	/**
++	 * Set the active tab(webview) id.
++	 * @param {Function} success The function to call with the active tab id.
++	 * @param {Function} failure The function to call when there is a error setting the tabId.
++	 * @return {String} The id of the active tab.
++	 * @memberOf module:car.browser 
++	 * @method setActiveTab
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(tabId) {
++	 *		console.log("Tab: ", tabId, " is now the active tab ");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error setting the active tab: ", e);
++	 * }
++	 * car.browser.setActiveTab(success, failure, 5);
++	 */
++	setActiveTab: function (success, fail, tabId) {
++		var args = {};
++		if (tabId !== undefined && tabId && tabId > 0) {
++			args.id = tabId;
++			try {
++				window.cordova.exec(success, fail, _ID, 'setActiveTab', args);
++			} catch (e) {
++				console.error(e);
++			}
++		} else {
++			console.error("qnx.browser.setActiveTab() requires valid param: tabId");
++		}
++	},
++
++	/**
++	 * Update the url of the currently active tab(webview).
++	 * @param {Function} success The function to call with the updated url.
++	 * @param {Function} failure The function to call when there is a error setting the url.
++	 * @return {String} The updated url of the active tab.
++	 * @memberOf module:car.browser 
++	 * @method updateUrl
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(url) {
++	 *		console.log("The url of the active tabs is now:",url);
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error updating the url: ", e);
++	 * }
++	 * car.browser.updateUrl(success, failure, "www.qnx.com");
++	 */
++	updateUrl: function (success, fail, url) {
++		var args = {};
++		if (url === undefined || !url) {
++			console.error("qnx.browser.updateUrl requires a valid url, please check your input parameter: ", url);
++			return;
++		} else {
++			args.url = url;
++		}
++
++		try {
++			window.cordova.exec(success, fail, _ID, 'updateUrl', args);
++		} catch (e) {
++			console.error(e);
++		}
++	},
++
++	/**
++	 * Reload the active tab(webview).
++	 * @param {Function} success The function to call when reload succeeds.
++	 * @param {Function} failure The function to call when there is a error reloading the tab.
++	 * @memberOf module:car.browser 
++	 * @method reload
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(tabId) {
++	 *		console.log("Tab was successfully reloaded");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error reloading the tab: ", e);
++	 * }
++	 * car.browser.reload(success, failure);
++	 */
++	reload: function (success, fail) {
++		try {
++			window.cordova.exec(success, fail, _ID, 'reload');
++		} catch (e) {
++			console.error(e);
++		}
++	},
++
++	/**
++	 * Stop the active tab(webview) from loading.
++	 * @param {Function} success The function to call when the stop command succeeds.
++	 * @param {Function} failure The function to call when there is a error stopping the tab.
++	 * @memberOf module:car.browser 
++	 * @method stop
++	 * @example
++	 *
++	 * //define callback functions
++	 * function success(tabId) {
++	 *		console.log("Tab was successfully reloaded");
++	 * }
++	 * 
++	 * function failure(e) {
++	 *		console.error("There was an error reloading the tab: ", e);
++	 * }
++	 * car.browser.stop(success, failure);
++	 */
++	stop: function (success, fail) {
++		try {
++			window.cordova.exec(success, fail, _ID, 'stop');
++		} catch (e) {
++			console.error(e);
++		}
++	}
++};
+\ No newline at end of file
+-- 
+1.7.10.msysgit.1
+

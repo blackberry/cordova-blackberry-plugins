@@ -1,0 +1,2494 @@
+From 88fbf2432786adfdf9a16c47a2eee3ccd4a8bea6 Mon Sep 17 00:00:00 2001
+From: Danyi Lin <danylin@blackberry.com>
+Date: Wed, 29 May 2013 14:25:25 -0400
+Subject: [PATCH 04/61] Fixed unit test error in nodejs 0.10+ 1. Fixed errors
+ unit test 2. Updated jasmine-node to 1.7.1 3. Fixed
+ lint error 4. Removed test/lib and use
+ cordova-blackberry/blackberry10/framework/lib instead
+ 5. Removed test/lib from lint script
+
+Reviewed by Jeffrey Heifetz <jheifetz@blackberry.com>
+Tested by Jeffrey Heifetz <jheifetz@blackberry.com>
+---
+ package.json                                       |    2 +-
+ .../src/blackberry10/index.js                      |    5 +-
+ .../src/blackberry10/index.js                      |    5 +-
+ scripts/lint.js                                    |    1 -
+ scripts/test-plugin.js                             |   87 ----
+ scripts/test.js                                    |   73 +--
+ test/lib/config.js                                 |   22 -
+ test/lib/config/default.js                         |   76 ---
+ test/lib/config/user.js                            |   49 --
+ test/lib/event.js                                  |   84 ---
+ test/lib/events/applicationEvents.js               |   34 --
+ test/lib/events/deviceEvents.js                    |   34 --
+ test/lib/exception.js                              |   69 ---
+ test/lib/overlayWebView.js                         |  143 -----
+ test/lib/policy/folderAccess.js                    |  175 -------
+ test/lib/policy/webkitOriginAccess.js              |  123 -----
+ test/lib/policy/whitelist.js                       |  317 -----------
+ test/lib/utils.js                                  |  551 --------------------
+ .../lib/webkitHandlers/networkResourceRequested.js |  126 -----
+ test/lib/webview.js                                |  264 ----------
+ test/unit/com.blackberry.identity/client.js        |    6 +-
+ 21 files changed, 47 insertions(+), 2199 deletions(-)
+ delete mode 100644 scripts/test-plugin.js
+ delete mode 100644 test/lib/config.js
+ delete mode 100644 test/lib/config/default.js
+ delete mode 100644 test/lib/config/user.js
+ delete mode 100644 test/lib/event.js
+ delete mode 100644 test/lib/events/applicationEvents.js
+ delete mode 100644 test/lib/events/deviceEvents.js
+ delete mode 100644 test/lib/exception.js
+ delete mode 100644 test/lib/overlayWebView.js
+ delete mode 100644 test/lib/policy/folderAccess.js
+ delete mode 100644 test/lib/policy/webkitOriginAccess.js
+ delete mode 100644 test/lib/policy/whitelist.js
+ delete mode 100644 test/lib/utils.js
+ delete mode 100644 test/lib/webkitHandlers/networkResourceRequested.js
+ delete mode 100644 test/lib/webview.js
+
+diff --git a/package.json b/package.json
+index e4705e5..5f40c13 100644
+--- a/package.json
++++ b/package.json
+@@ -15,7 +15,7 @@
+     "connect": "2.6.2",
+     "express": "3.0.1",
+     "argsparser": "0.0.x",
+-    "jasmine-node": "1.0.7",
++    "jasmine-node": "1.7.x",
+     "jWorkflow": "*",
+     "wrench": "1.3.9",
+     "ncp": "*",
+diff --git a/plugin/com.blackberry.pim.calendar/src/blackberry10/index.js b/plugin/com.blackberry.pim.calendar/src/blackberry10/index.js
+index 3d64650..f921912 100644
+--- a/plugin/com.blackberry.pim.calendar/src/blackberry10/index.js
++++ b/plugin/com.blackberry.pim.calendar/src/blackberry10/index.js
+@@ -49,7 +49,6 @@ function processJnextSaveOrRemoveData(result, JnextData) {
+ function processJnextFindData(eventId, eventHandler, JnextData) {
+     var data = JnextData,
+         i,
+-        l,
+         more = false,
+         resultsObject = {},
+         birthdayInfo;
+@@ -63,11 +62,11 @@ function processJnextFindData(eventId, eventHandler, JnextData) {
+     }
+ 
+     // Concatenate results; do not add the same contacts
+-    for (i = 0, l = eventHandler.searchResult.length; i < l; i++) {
++    for (i = 0; i < eventHandler.searchResult.length; i++) {
+         resultsObject[eventHandler.searchResult[i].id] = true;
+     }
+ 
+-    for (i = 0, l = data.events.length; i < l; i++) {
++    for (i = 0; i < data.events.length; i++) {
+         if (resultsObject[data.events[i].id]) {
+             // Already existing
+         } else {
+diff --git a/plugin/com.blackberry.pim.contacts/src/blackberry10/index.js b/plugin/com.blackberry.pim.contacts/src/blackberry10/index.js
+index 08402b6..9185fc7 100644
+--- a/plugin/com.blackberry.pim.contacts/src/blackberry10/index.js
++++ b/plugin/com.blackberry.pim.contacts/src/blackberry10/index.js
+@@ -118,7 +118,6 @@ function processJnextRemoveData(result, JnextData) {
+ function processJnextFindData(eventId, eventHandler, JnextData) {
+     var data = JnextData,
+         i,
+-        l,
+         more = false,
+         resultsObject = {},
+         birthdayInfo;
+@@ -132,11 +131,11 @@ function processJnextFindData(eventId, eventHandler, JnextData) {
+     }
+ 
+     // Concatenate results; do not add the same contacts
+-    for (i = 0, l = eventHandler.searchResult.length; i < l; i++) {
++    for (i = 0; i < eventHandler.searchResult.length; i++) {
+         resultsObject[eventHandler.searchResult[i].id] = true;
+     }
+ 
+-    for (i = 0, l = data.contacts.length; i < l; i++) {
++    for (i = 0; i < data.contacts.length; i++) {
+         if (resultsObject[data.contacts[i].id]) {
+             // Already existing
+         } else {
+diff --git a/scripts/lint.js b/scripts/lint.js
+index 401efd9..3029133 100644
+--- a/scripts/lint.js
++++ b/scripts/lint.js
+@@ -74,7 +74,6 @@ function _lintCPP() {
+ 
+ module.exports = function (files, complete) {
+     utils.copyFolder(path.join(_c.ROOT, "plugin"), path.join(_c.TEMP, "plugin"));
+-    utils.copyFolder(path.join(_c.ROOT, "test/lib"), path.join(_c.TEMP, "lib"));
+     utils.copyFolder(path.join(_c.ROOT, "scripts"), path.join(_c.TEMP, "scripts"));
+     utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
+     copyFile(path.join(_c.ROOT, ".jshintignore"), path.join(_c.TEMP, ".jshintignore"));
+diff --git a/scripts/test-plugin.js b/scripts/test-plugin.js
+deleted file mode 100644
+index 5157b5d..0000000
+--- a/scripts/test-plugin.js
++++ /dev/null
+@@ -1,87 +0,0 @@
+-/*
+- Licensed to the Apache Software Foundation (ASF) under one
+- or more contributor license agreements.  See the NOTICE file
+- distributed with this work for additional information
+- regarding copyright ownership.  The ASF licenses this file
+- to you under the Apache License, Version 2.0 (the
+- "License"); you may not use this file except in compliance
+- with the License.  You may obtain a copy of the License at
+-
+-     http://www.apache.org/licenses/LICENSE-2.0
+-
+- Unless required by applicable law or agreed to in writing,
+- software distributed under the License is distributed on an
+- "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- KIND, either express or implied.  See the License for the
+- specific language governing permissions and limitations
+- under the License.
+- */
+-
+-var wrench = require('wrench'),
+-    jWorkflow = require('jWorkflow'),
+-    path = require('path'),
+-    utils = require('./utils'),
+-    _c = require('./conf');
+-
+-module.exports = function (done, id) {
+-    var jasmine = require('jasmine-node'),
+-        verbose = false,
+-        colored = false,
+-        specs = path.join(_c.TEMP, "test/unit/" + id),
+-        key,
+-        test;
+-
+-    for (key in jasmine) {
+-        if (Object.prototype.hasOwnProperty.call(jasmine, key)) {
+-            global[key] = jasmine[key];
+-        }
+-    }
+-
+-    /*
+-        Folder structure in temp:
+-
+-        temp/
+-            lib/
+-            plugin/
+-                blackberry.app/
+-                    index.js
+-                    www
+-                        client.js
+-                blackberry.event/
+-                    index.js
+-                    www
+-                        client.js
+-    */
+-
+-    console.log("Test for: " + id);
+-    // index.js
+-    utils.copyFolder(path.join(_c.ROOT, "plugin", id, "src/blackberry10"), path.join(_c.TEMP, "plugin", id));
+-
+-    // lib
+-    utils.copyFolder(path.join(_c.ROOT, "test/lib"), path.join(_c.TEMP, "lib"));
+-
+-    // client.js
+-    utils.copyFolder(path.join(_c.ROOT, "plugin", id, "www"), path.join(_c.TEMP, "plugin", id, "www"));
+-
+-    // copy .js files in src/blackberry10, since they are required by .js files in www
+-    if (id.indexOf("pim") !== -1) {
+-        utils.copyFolder(path.join(_c.ROOT, "plugin", id, "src/blackberry10"), path.join(_c.TEMP, "plugin", id, "www"), {preserve: true, preserveFiles: true});
+-    }
+-
+-    // test files
+-    utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
+-
+-    test = jWorkflow.order();
+-    test.start(function (code) {
+-        console.log("-------------------");
+-        console.log("Unit Tests: ");
+-        jasmine.executeSpecsInFolder(specs, function (runner, log) {
+-            wrench.rmdirSyncRecursive(_c.TEMP, true);
+-            var failed = runner.results().failedCount === 0 ? 0 : 1;
+-            setTimeout(function () {
+-                (typeof done !== "function" ? process.exit : done)(failed);
+-            }, 10);
+-
+-        }, verbose, colored);
+-    });
+-};
+diff --git a/scripts/test.js b/scripts/test.js
+index fedcbcf..1134aee 100644
+--- a/scripts/test.js
++++ b/scripts/test.js
+@@ -15,43 +15,50 @@
+  */
+ 
+ var fs = require('fs'),
+-    jWorkflow = require('jWorkflow'),
+     path = require('path'),
+-    _c = require('./conf'),
+-    testPlugin = require('./test-plugin');
++    utils = require('./utils'),
++    projectUtils = require('./project-utils'),
++    _c = require('./conf');
+ 
+-module.exports = function (done, id) {
+-    var plugins = id ? [id] : fs.readdirSync(path.join(_c.ROOT, "plugin")),
+-        totalFailed = 0,
+-        test = function (prev, baton) {
+-            baton.take();
+-            if (/blackberry\./.test(this.plugin) && fs.existsSync(path.join(_c.ROOT, "plugin", this.plugin, "www"))) {
+-                testPlugin(function (failed) {
+-                    totalFailed += failed;
+-                    baton.pass();
+-                }, this.plugin);
+-            } else {
+-                baton.pass();
+-            }
+-        },
+-        testWorkflow = function () {
+-            var order;
+-
+-            plugins.forEach(function (plugin, idx) {
+-                if (idx === 0) {
+-                    order = jWorkflow.order(test, {plugin: plugin});
+-                } else {
+-                    order = order.andThen(test, {plugin: plugin});
+-                }
+-            });
+-
+-            return order;
++module.exports = function (done, custom) {
++    var jasmine = require('jasmine-node'),
++        plugins = (custom !==  null && fs.existsSync(custom)) ? [custom] : fs.readdirSync(path.join(_c.ROOT, "plugin")),
++        specs = [],
++        onComplete = function (runner) {
++            // remove temp folder after test finished
++            var wrench = require('wrench'),
++                totalFailed = 0;
++            wrench.rmdirSyncRecursive(path.resolve(_c.TEMP), true);
++            totalFailed = runner.results().failedCount;
++            (typeof done === "function" ? done : process.exit)(totalFailed);
+         };
+ 
++    //setup cordova-blackberry repos
++    projectUtils.setupRepo('master', function () {
++        // copy lib to temp folder
++        utils.copyFolder(path.join(_c.CORDOVA_BB10_REPOS.dir, "blackberry10/framework/lib"), path.join(_c.TEMP, "lib"));
++        // test files
++        utils.copyFolder(path.join(_c.ROOT, "test/unit"), path.join(_c.TEMP, "test/unit"));
++        // filter out non-plugin files/dirs
++        plugins.forEach(function (plugin, index) {
++            if (/blackberry\./.test(plugin) && fs.existsSync(path.join(_c.ROOT, "plugin", plugin, "www"))) {
++                specs.push(path.join(_c.TEMP, "test/unit/" + plugin));
++                // plugin index.js
++                utils.copyFolder(path.join(_c.ROOT, "plugin", plugin, "src/blackberry10"), path.join(_c.TEMP, "plugin", plugin));
++                // plugin client.js
++                utils.copyFolder(path.join(_c.ROOT, "plugin", plugin, "www"), path.join(_c.TEMP, "plugin", plugin, "www"));
++                // copy .js files in src/blackberry10, since they are required by .js files in www
++                if (plugin.indexOf("pim") !== -1) {
++                    utils.copyFolder(path.join(_c.ROOT, "plugin", plugin, "src/blackberry10"), path.join(_c.TEMP, "plugin", plugin, "www"), {preserve: true, preserveFiles: true});
++                }
++            }
++        });
+ 
+-    testWorkflow().start(function () {
+-        setTimeout(function () {
+-                (typeof done !== "function" ? process.exit : done)(totalFailed);
+-            }, 10);
++        jasmine.executeSpecsInFolder({
++            'specFolders': specs,
++            'onComplete': onComplete,
++            'isVerbose': false,
++            'showColors': true
++        });
+     });
+ };
+diff --git a/test/lib/config.js b/test/lib/config.js
+deleted file mode 100644
+index 58c59d4..0000000
+--- a/test/lib/config.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var defaults = require('./config/default'), 
+-    user = require('./config/user'), 
+-    utils = require('./utils');
+-
+-module.exports = utils.mixin(user, 
+-                 utils.mixin(defaults, {}));
+diff --git a/test/lib/config/default.js b/test/lib/config/default.js
+deleted file mode 100644
+index 31990b1..0000000
+--- a/test/lib/config/default.js
++++ /dev/null
+@@ -1,76 +0,0 @@
+-/*
+- * Copyright 2010-2011 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-module.exports = {
+-    configXML: "config.xml",
+-    configXMLDoc: null,
+-
+-    backButtonBehavior: "back",
+-    customHeaders: {},
+-    version: "1.0.0",
+-
+-    author: "",
+-    authorURL: "",
+-    authorEmail: "",
+-    copyright: "",
+-    content: "index.html",
+-    contentCharset: "",
+-    contentType: "",
+-    description: "",
+-    icon: "AIRApp_72.png",
+-    iconHover: "",
+-    id: "",
+-    license: "",
+-    licenseURL: "",
+-    name: "WebWorksAppTemplate",
+-
+-    navigationMode: "pointer",
+-
+-    preferredTransports: null,
+-    transportTimeout: 300000,
+-
+-    hasMultiAccess: false,
+-    widgetExtensions: null,
+-    featureTable: null,
+-    accessList: null,
+-    permissions: null,
+-
+-    loadingScreenColor: "#FFFFFF",
+-    backgroundImage: "",
+-    foregroundImage: "",
+-    onFirstLaunch: false,
+-    onLocalPageLoad: false,
+-    onRemotePageLoad: false,
+-    transitionType: -1,
+-    transitionDuration: 250,
+-    transitionDirection: 128,
+-
+-    disableAllCache: false,
+-    aggressiveCacheAge: 2592000,
+-    maxCacheSizeTotal: 1024,
+-    maxCacheSizeItem: 128,
+-    maxStandardCacheAge: 2592000,
+-
+-    runOnStartUp: false,
+-    allowInvokeParams: false,
+-    backgroundSource: "",
+-    foregroundSource: "index.html",
+-    debugEnabled: false,
+-    enableFormControl: true,
+-    enableChildWebView: true,
+-    enableWebSecurity: true,
+-    enablePopupBlocker: false
+-};
+diff --git a/test/lib/config/user.js b/test/lib/config/user.js
+deleted file mode 100644
+index 5e36885..0000000
+--- a/test/lib/config/user.js
++++ /dev/null
+@@ -1,49 +0,0 @@
+-/*
+- * Copyright 2010-2011 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-module.exports = {
+-    authorEmail: "guocat@gmail.com",
+-    copyright: "@Rebecca",
+-    customHeaders: {
+-        "rim-header": "RIM-Widget:rim/widget"
+-    },
+-    userAgent: "Some extremely long user agent (with) spe/cial, characters",
+-    author: "Me",
+-    version: "1.0.0.0",
+-    hasMultiAccess: true,
+-    license: "This is a license",
+-    accessList: [{
+-        allowSubDomain: false,
+-        features: [{
+-            version: "1.0.0.0",
+-            required: true,
+-            id: "blackberry.example.test"
+-        }, {
+-            version: "1.0.0.0",
+-            required: true,
+-            id: "blackberry.app"
+-        }],
+-        uri: "WIDGET_LOCAL"
+-    }],
+-    licenseURL: "",
+-    authorURL: "http://bbtools_win7_01/yui",
+-    foregroundSource: "derp.html",
+-    backgroundColor: 0xFFFF9900,
+-    content: "http://localhost/lib/public/testbed.html",
+-    description: "this is the description",
+-    configXML: "config.xml",
+-    name: "wwTest"
+-};
+diff --git a/test/lib/event.js b/test/lib/event.js
+deleted file mode 100644
+index 880e6c4..0000000
+--- a/test/lib/event.js
++++ /dev/null
+@@ -1,84 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var _handlers = {},
+-    _webview = require("./webview");
+-
+-module.exports = {
+-    trigger: function (actionEvent) {
+-        var args = Array.prototype.slice.call(arguments),
+-            executeString = "webworks.event.trigger('" + actionEvent + "', '" + escape(encodeURIComponent(JSON.stringify(args.slice(1)))) + "')";
+-
+-        if (_handlers.hasOwnProperty(actionEvent)) {
+-            _handlers[actionEvent].forEach(function (webview) {
+-                webview.executeJavaScript(executeString);
+-            });
+-        } else {
+-            //Just dump it in the content webview for consistency
+-            _webview.executeJavascript(executeString);
+-        }
+-    },
+-
+-    add: function (action, webview) {
+-        var triggerEvent;
+-
+-        if (action) {
+-            //Use action.event for old extensions that may not have triggerEvent defined
+-            triggerEvent = action.triggerEvent || action.event;
+-
+-            if (!action.once) {
+-                action.context.addEventListener(action.event, action.trigger || this.trigger);
+-            }
+-
+-            //If there are no registered listeners for this event, create an array to hold them
+-            if (!_handlers.hasOwnProperty(triggerEvent)) {
+-                _handlers[triggerEvent] = [];
+-            }
+-            //If the webview is not in the list of webviews listening to this action then add it
+-            if (!_handlers[triggerEvent].some(function (handlerWebView) {
+-                    return handlerWebView.id === webview.id;
+-                })) {
+-                _handlers[triggerEvent].push(webview);
+-            }
+-
+-        } else {
+-            throw "Action is null or undefined";
+-        }
+-    },
+-
+-    remove: function (action, webview) {
+-        if (action) {
+-            action.context.removeEventListener(action.event, action.trigger || this.trigger);
+-
+-            //Remove the webview from the _handlers
+-            if (_handlers.hasOwnProperty(action.event)) {
+-
+-                _handlers[action.event] = _handlers[action.event].filter(function (sourceWebview) {
+-                    return sourceWebview.id !== webview.id;
+-                });
+-
+-                //If the array is empty delete it
+-                if (_handlers[action.event].length === 0) {
+-                    delete _handlers[action.event];
+-                }
+-            }
+-
+-        } else {
+-            throw "Action is null or undefined";
+-        }
+-
+-    }
+-};
+diff --git a/test/lib/events/applicationEvents.js b/test/lib/events/applicationEvents.js
+deleted file mode 100644
+index 14a8f9e..0000000
+--- a/test/lib/events/applicationEvents.js
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/*
+- * Copyright 2010-2011 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-module.exports = {
+-    addEventListener: function (event, trigger) {
+-        if (event) {
+-            event = "application." + event;
+-            window.qnx.webplatform.getApplication().addEventListener(event, trigger);
+-        } else {
+-            console.warn("Attempting to register for 'falsey' event: " + event);
+-        }
+-    },
+-    removeEventListener: function (event, trigger) {
+-        if (event) {
+-            event = "application." + event;
+-            window.qnx.webplatform.getApplication().removeEventListener(event, trigger);
+-        } else {
+-            console.warn("Attempting to un-register for 'falsey' event: " + event);
+-        }
+-    }
+-};
+diff --git a/test/lib/events/deviceEvents.js b/test/lib/events/deviceEvents.js
+deleted file mode 100644
+index 939357b..0000000
+--- a/test/lib/events/deviceEvents.js
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/*
+- * Copyright 2010-2011 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-module.exports = {
+-    addEventListener: function (event, trigger) {
+-        if (event) {
+-            event = "device." + event;
+-            window.qnx.webplatform.device.addEventListener(event, trigger);
+-        } else {
+-            console.warn("Attempting to register for 'falsey' event: " + event);
+-        }
+-    },
+-    removeEventListener: function (event, trigger) {
+-        if (event) {
+-            event = "device." + event;
+-            window.qnx.webplatform.device.removeEventListener(event, trigger);
+-        } else {
+-            console.warn("Attempting to un-register for 'falsey' event: " + event);
+-        }
+-    }
+-};
+diff --git a/test/lib/exception.js b/test/lib/exception.js
+deleted file mode 100644
+index f0a8467..0000000
+--- a/test/lib/exception.js
++++ /dev/null
+@@ -1,69 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-module.exports = {
+-
+-    types: {
+-        Application: "Application",
+-        ArgumentLength: "ArgumentLength",
+-        ArgumentType: "ArgumentType",
+-        Argument: "Argument",
+-        NotificationType: "NotificationType",
+-        NotificationStateType: "NotificationStateType",
+-        DomObjectNotFound: "DomObjectNotFound",
+-        MethodNotImplemented: "MethodNotImplemented",
+-        InvalidState: "InvalidState",
+-        ApplicationState: "ApplicationState"
+-    },
+-
+-    handle: function handle(exception, reThrow) {
+-        reThrow = reThrow || false;
+-
+-        var eMsg = exception.message || "exception caught!",
+-        msg = eMsg + "\n\n" + (exception.stack || "*no stack provided*") + "\n\n";
+-
+-        console.error(msg);
+-
+-        if (reThrow) {
+-            throw exception;
+-        }
+-    },
+-
+-    raise: function raise(exceptionType, message, customExceptionObject) {
+-        var obj = customExceptionObject || {
+-                type: "",
+-                message: "",
+-
+-                toString: function () {
+-                    var result = this.name + ': "' + this.message + '"';
+-
+-                    if (this.stack) {
+-                        result += "\n" + this.stack;
+-                    }
+-                    return result;
+-                }
+-            };
+-
+-        message = message || "";
+-
+-        obj.name = exceptionType;
+-        obj.type = exceptionType;
+-        // TODO: include the exception objects original message if exists
+-        obj.message = message;
+-
+-        throw obj;
+-    }
+-};
+diff --git a/test/lib/overlayWebView.js b/test/lib/overlayWebView.js
+deleted file mode 100644
+index a2bba69..0000000
+--- a/test/lib/overlayWebView.js
++++ /dev/null
+@@ -1,143 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var CHROME_HEIGHT = 0,
+-    webview,
+-    _webviewObj;
+-
+-webview =
+-    {
+-
+-    create: function (ready, configSettings) {
+-        _webviewObj = window.qnx.webplatform.createUIWebView(function () {
+-
+-            _webviewObj.visible = true;
+-            _webviewObj.active = true;
+-            _webviewObj.zOrder = 2;
+-            _webviewObj.enableCrossSiteXHR = true;
+-            _webviewObj.setGeometry(0, 0, screen.width, screen.height);
+-            _webviewObj.addEventListener("DocumentLoadFinished", function () {
+-                _webviewObj.default.setDefaultFont();
+-                _webviewObj.visible = true;
+-            });
+-
+-            _webviewObj.allowRpc = true;
+-            _webviewObj.backgroundColor = 0x00FFFFFF;
+-            _webviewObj.sensitivity = "SensitivityTest";
+-            _webviewObj.devicePixelRatio = 1;
+-            _webviewObj.allowQnxObject = true;
+-
+-            if (ready && typeof ready === 'function') {
+-                ready();
+-            }
+-
+-            window.qnx.webplatform.getController().dispatchEvent("overlayWebView.initialized", [_webviewObj]);
+-
+-        });
+-    },
+-
+-    destroy: function () {
+-        _webviewObj.destroy();
+-    },
+-
+-    setURL: function (url) {
+-        _webviewObj.url = url;
+-    },
+-
+-    setGeometry: function (x, y, width, height) {
+-        _webviewObj.setGeometry(x, y, width, height);
+-    },
+-
+-    setSensitivity : function (sensitivity) {
+-        _webviewObj.sensitivity = sensitivity;
+-    },
+-
+-    setApplicationOrientation: function (angle) {
+-        _webviewObj.setApplicationOrientation(angle);
+-    },
+-
+-    notifyApplicationOrientationDone: function () {
+-        _webviewObj.notifyApplicationOrientationDone();
+-    },
+-
+-    executeJavascript: function (js) {
+-        _webviewObj.executeJavaScript(js);
+-    },
+-
+-    windowGroup: function () {
+-        return _webviewObj.windowGroup;
+-    },
+-
+-    notifyContextMenuCancelled: function () {
+-        _webviewObj.notifyContextMenuCancelled();
+-    },
+-
+-    bindAppWebViewToChildWebViewControls: function (appWebView) {
+-        if (_webviewObj && _webviewObj.childwebviewcontrols) {
+-            _webviewObj.childwebviewcontrols.subscribeTo(appWebView);
+-        }
+-    },
+-
+-    renderContextMenuFor: function (targetWebView) {
+-        return _webviewObj.contextMenu.subscribeTo(targetWebView);
+-    },
+-
+-    handleDialogFor: function (targetWebView) {
+-        return _webviewObj.dialog.subscribeTo(targetWebView);
+-    },
+-
+-    showDialog: function (description, callback) {
+-        return _webviewObj.dialog.show(description, callback);
+-    },
+-
+-    getWebViewObj: function (webview) {
+-        return _webviewObj;
+-    },
+-
+-    addEventListener: function (eventName, callback) {
+-        _webviewObj.addEventListener(eventName, callback);
+-    },
+-
+-    removeEventListener: function (eventName, callback) {
+-        _webviewObj.removeEventListener(eventName, callback);
+-    },
+-
+-    showToast : function (message, options) {
+-        return _webviewObj.toast.show(message, options);
+-    },
+-
+-    showInvocationList: function (request, title, success, error) {
+-        _webviewObj.invocationlist.show(request, title, success, error);
+-    }
+-};
+-
+-webview.__defineGetter__('id', function () {
+-    if (_webviewObj) {
+-        return _webviewObj.id;
+-    }
+-});
+-
+-webview.__defineGetter__('zOrder', function () {
+-    return _webviewObj.zOrder;
+-});
+-
+-webview.__defineGetter__('contextMenu', function () {
+-    if (_webviewObj) {
+-        return _webviewObj.contextMenu;
+-    }
+-});
+-
+-module.exports = webview;
+diff --git a/test/lib/policy/folderAccess.js b/test/lib/policy/folderAccess.js
+deleted file mode 100644
+index ffc6b0c..0000000
+--- a/test/lib/policy/folderAccess.js
++++ /dev/null
+@@ -1,175 +0,0 @@
+-/*
+- * Copyright 2010-2011 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var util = require("../utils");
+-
+-// Removes the start and end slashes from the path
+-function _trimSurroundingSlashes(path) {
+-    // Trim starting slash
+-    if (util.startsWith(path, "/")) {
+-        path = path.substr(1);
+-    }
+-
+-    // Trim ending slash
+-    if (util.endsWith(path, "/")) {
+-        path = path.substr(0, path.length - 1);
+-    }
+-
+-    return path;
+-}
+-
+-// Determines the depth of the given path
+-// Folder path must not include the scheme or the host
+-function _determineDepth(folderPath) {
+-    var depthCount = 0;
+-    
+-    // Replace all backslashes with forward slash
+-    folderPath = folderPath.replace("\\", "/");
+-    
+-    // Special case: "/" is the given path
+-    if (folderPath === "/") {
+-        return 0;
+-    }
+-
+-    folderPath = _trimSurroundingSlashes(folderPath);
+-
+-    // Count slashes remaining
+-    while (folderPath.indexOf("/") !== -1) {
+-        depthCount = depthCount + 1;
+-
+-        // Add 1 to skip the slash
+-        folderPath = folderPath.substring(folderPath.indexOf("/") + 1);
+-    }
+-
+-    // Add one more for the remaining folder
+-    depthCount += 1;
+-
+-    return depthCount;
+-}
+-
+-// Parse a folder path up to the desired depth
+-function _getPath(folderPath, desiredDepth) {   
+-    var depthCount = 0, builtPath = "";
+-
+-    // Special case: Desired depth is 0
+-    if (desiredDepth === 0) {
+-        return "/";
+-    }
+-
+-    // Replace all backslashes with forward slash
+-    folderPath = folderPath.replace("\\", "/");       
+-
+-    folderPath = _trimSurroundingSlashes(folderPath);
+-
+-    // Count slashes remaining
+-    while (depthCount < desiredDepth) {
+-        depthCount += 1;
+-        
+-        // Add 1 to skip the slash
+-        builtPath += "/" + folderPath.substring(0, folderPath.indexOf('/'));
+-        folderPath = folderPath.substring(folderPath.indexOf('/') + 1);
+-    }
+-
+-    return builtPath;
+-}
+-
+-function WebFolderAccessManager() {
+-    this._pathCollection = {};
+-    this._maxPathLength = 0;
+-}
+-
+-WebFolderAccessManager.prototype.addAccess = function (folderPath, access) {
+-    if (!folderPath) {
+-        folderPath = "/";
+-    }
+-
+-    // Trim surrounding slashes for consistency
+-    // The root "/" is a special case that does not need this trimming
+-    if (folderPath !== "/") {
+-        folderPath = "/" + _trimSurroundingSlashes(folderPath);
+-    }
+-
+-    folderPath = folderPath.toLowerCase();
+-
+-    this._pathCollection[folderPath] = access;
+-
+-    // Determine the depth of the path
+-    this._maxPathLength = Math.max(this._maxPathLength, _determineDepth(folderPath));
+-};
+-
+-WebFolderAccessManager.prototype.getAccess = function (folderPath) {   
+-    var depth = _determineDepth(folderPath);
+-    return this.getAccessRecursively(folderPath, depth);
+-};
+-
+-WebFolderAccessManager.prototype.fetchAccess = function (folderPath) {
+-    var queryIndex, folderPathWildcard;
+-
+-    if (!this._pathCollection.hasOwnProperty(folderPath)) {
+-        // If there isn't an exact match and folderPath contains query string,
+-        // check if the path collection contains an access with the same folderPath
+-        // but with wildcard query
+-        if ((queryIndex = folderPath.indexOf("?")) > -1) {
+-            folderPathWildcard = folderPath.slice(0, queryIndex + 1) + "*";
+-
+-            if (this._pathCollection.hasOwnProperty(folderPathWildcard)) {
+-                return this._pathCollection[folderPathWildcard];
+-            }
+-        }
+-
+-        return null;
+-    } else {
+-        return this._pathCollection[folderPath];
+-    }
+-};
+-
+-WebFolderAccessManager.prototype.getAccessRecursively = function (folderPath, pathLength) {
+-    var fetchedAccess,
+-        newPathLength,
+-        newPath;
+-
+-    if (!folderPath) {
+-        return null;
+-    }
+-
+-    folderPath = folderPath.toLowerCase();
+-
+-    if (!!(fetchedAccess = this.fetchAccess(folderPath))) {
+-        return fetchedAccess;
+-    } else {
+-        // Truncate the end portion of the path and try again
+-        newPathLength = Math.min(this._maxPathLength, pathLength - 1);
+-        newPath = _getPath(folderPath, newPathLength);
+-
+-        return this.getAccessRecursively(newPath, newPathLength);
+-    }
+-};
+-
+-function WebFolderAccess() {
+-    this._mgr = new WebFolderAccessManager();
+-}
+-
+-// folderPath - folder path must not include the scheme or the host
+-WebFolderAccess.prototype.addAccess = function (folderPath, access) {
+-    this._mgr.addAccess(folderPath, access);
+-};
+-
+-// folderPath - folder path must not include the scheme or the host
+-WebFolderAccess.prototype.getAccess = function (folderPath) {
+-    return this._mgr.getAccess(folderPath);
+-};
+-
+-exports.WebFolderAccess = WebFolderAccess;
+diff --git a/test/lib/policy/webkitOriginAccess.js b/test/lib/policy/webkitOriginAccess.js
+deleted file mode 100644
+index 84adb49..0000000
+--- a/test/lib/policy/webkitOriginAccess.js
++++ /dev/null
+@@ -1,123 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var config = require('./../config'),
+-    utils = require('./../utils'),
+-    Whitelist = require('./whitelist').Whitelist,
+-    LOCAL_URI = "local://",
+-    FILE_URI = "file://",
+-    WW_URI = utils.getURIPrefix(),
+-    _domains = [
+-        {
+-            url: LOCAL_URI,
+-            allowSubDomains: true
+-        }
+-    ],
+-    _webviews = [],
+-    _isInitialized = false,
+-    _whitelist = new Whitelist();
+-
+-function addOriginAccessWhitelistEntry(webview, source, destination, allowSubDomains) {
+-    webview.addOriginAccessWhitelistEntry(source, destination, !!allowSubDomains);
+-}
+-
+-function addDomain(url, allowSubDomains) {
+-    var parsedUri = utils.parseUri(url);
+-
+-    allowSubDomains = !!allowSubDomains;
+-
+-    if (utils.isLocalURI(parsedUri)) {
+-        url = LOCAL_URI;
+-    } else if (utils.isFileURI(parsedUri)) {
+-        url = FILE_URI;
+-    } else {
+-        url = parsedUri.source;
+-    }
+-
+-    if (_whitelist.isAccessAllowed(url) && !_domains.some(function (domain) {
+-        return domain.url === url;
+-    })) {
+-        _webviews.forEach(function (webview) {
+-            addOriginAccessWhitelistEntry(webview, url, WW_URI, true);
+-
+-            _domains.forEach(function (domain) {
+-                addOriginAccessWhitelistEntry(webview, domain.url, url, allowSubDomains);
+-                addOriginAccessWhitelistEntry(webview, url, domain.url, domain.allowSubDomains);
+-            });
+-
+-        });
+-
+-        _domains.push({
+-            url: url,
+-            allowSubDomains: allowSubDomains
+-        });
+-    }
+-}
+-
+-function initializeDomains() {
+-    var accessElements = config.accessList;
+-
+-    accessElements.forEach(function (element, index, array) {
+-        var uri = (element.uri === 'WIDGET_LOCAL' ? LOCAL_URI : element.uri);
+-        addDomain(uri, !!element.allowSubDomain);
+-    });
+-}
+-
+-function initializaWebview(webview) {
+-    //Always allow file access from local and let the OS deal with permissions
+-    addOriginAccessWhitelistEntry(webview, LOCAL_URI, FILE_URI, true);
+-    addOriginAccessWhitelistEntry(webview, FILE_URI, LOCAL_URI, true);
+-    //Always allow LOCAL access to URIs
+-    addOriginAccessWhitelistEntry(webview, LOCAL_URI, WW_URI, true);
+-
+-    _domains.forEach(function (domain, domainIndex, domainArray) {
+-        var i,
+-            nextDomain;
+-
+-        if (domain.uri !== LOCAL_URI) {
+-            addOriginAccessWhitelistEntry(webview, domain.url, WW_URI, true);
+-        }
+-
+-        for (i = domainIndex + 1; i < domainArray.length; i++) {
+-            nextDomain = domainArray[i];
+-            addOriginAccessWhitelistEntry(webview, domain.url, nextDomain.url, nextDomain.allowSubDomains);
+-            addOriginAccessWhitelistEntry(webview, nextDomain.url, domain.url, domain.allowSubDomains);
+-        }
+-    });
+-
+-}
+-
+-module.exports = {
+-
+-    addWebView: function (webview) {
+-        if (_webviews.indexOf(webview) === -1) {
+-            _webviews.push(webview);
+-            initializaWebview(webview);
+-            if (!_isInitialized) {
+-                initializeDomains();
+-                _isInitialized = true;
+-            }
+-        }
+-    },
+-
+-    addOriginAccess: function (origin, allowSubDomains) {
+-        if (!_isInitialized) {
+-            initializeDomains();
+-            _isInitialized = true;
+-        }
+-        addDomain(origin, allowSubDomains);
+-    }
+-};
+diff --git a/test/lib/policy/whitelist.js b/test/lib/policy/whitelist.js
+deleted file mode 100644
+index dcfbc3c..0000000
+--- a/test/lib/policy/whitelist.js
++++ /dev/null
+@@ -1,317 +0,0 @@
+-/*
+- * Copyright 2010-2011 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var WebFolderAccess = require("./folderAccess").WebFolderAccess,
+-    util = require("../utils");
+-
+-function _isLocalAccess(access) {
+-    return access && access.uri === "WIDGET_LOCAL";
+-}
+-
+-function _isMatch(access, requestURI) {
+-    // Look for local first
+-    if (_isLocalAccess(access)) {
+-        // Local access always allowed
+-        //THIS USED TO RETURN TRUE FOR FILE ACCESS
+-        //I HAVE TURNED IT OFF BECAUSE IT MAKES NO SENSE THAT LOCAL ACCESS ALWAYS MATCHES FILE ACCESS
+-        return (util.isLocalURI(requestURI));
+-    } else if (util.isDataURI(requestURI)) {
+-        // Check for data url
+-        // data urls are allowed
+-        return true;
+-    }
+-
+-    // Based on widgets 1.0 (access control)
+-    // http://www.w3.org/TR/2009/WD-widgets-access-20090618/#rfc3987
+-    var refURI = util.parseUri(access.uri),
+-        allowSub = access.allowSubDomain;
+-
+-    if (!requestURI.path) {
+-        requestURI.path = "/";
+-    }
+-
+-    // Start comparison based on widget spec.
+-    // 1. Compare scheme
+-    if (refURI.scheme.toLowerCase() !== requestURI.scheme.toLowerCase()) {
+-        return false;
+-    }
+-
+-    // 2. Compare host - if subdoman is false, host must match exactly
+-    // (referenceURI MUST HAVE host specified - not null.)
+-    // Special Case: Ignore this condition if we are dealing with file://
+-    if (!requestURI.authority && !util.isFileURI(requestURI)) {
+-        return false;
+-    }
+-
+-    if (!allowSub && refURI.host.toLowerCase() !== requestURI.host.toLowerCase()) {
+-        return false;
+-    }
+-
+-    // 3. Compare host - if subdomain is true, check for subdomain or match
+-    if (allowSub && !util.endsWith(requestURI.host.toLowerCase(), "." + refURI.host.toLowerCase()) &&
+-        requestURI.host.toLowerCase() !== refURI.host.toLowerCase()) {
+-        return false;
+-    }
+-
+-    // 4. Compare port
+-    if (refURI.port && refURI.port !== requestURI.port) {
+-        return false;
+-    }
+-
+-    // 5.  Compare path+query
+-    if (!util.startsWith(requestURI.path.toLowerCase(), refURI.path.toLowerCase()) && refURI.query !== "*") {
+-        return false;
+-    }
+-
+-    return true;
+-}
+-
+-function _getAccessForPathAndQuery(folderAccess, path, query) {
+-    if (folderAccess) {
+-        if (!query) {
+-            return folderAccess.getAccess(path);
+-        } else {
+-            return folderAccess.getAccess(path + "?" + query);
+-        }
+-    }
+-
+-    return null;
+-}
+-
+-function AccessManager(config) {
+-    config = config || require("../config");
+-
+-    this._accessList = config.accessList;
+-    this._hasGlobalAccess = config.hasMultiAccess;
+-    this._authorityCollection = null;
+-    this._localAccess = null;
+-}
+-
+-AccessManager.prototype.getFolderAccess = function (scheme, authority) {
+-    var key = scheme + "://" + authority;
+-    key = key.toLowerCase();
+-
+-    if (this._authorityCollection.hasOwnProperty(key)) {
+-        return this._authorityCollection[key];
+-    }
+-
+-    return null;
+-};
+-
+-AccessManager.prototype.putFolderAccess = function (scheme, authority, folderAccess) {
+-    var key = scheme + "://" + authority;
+-    key = key.toLowerCase();
+-    this._authorityCollection[key] = folderAccess;
+-};
+-
+-AccessManager.prototype.initializeAuthCollection = function () {
+-    var folderAccess, currentURI, that = this;
+-
+-    if (!this._authorityCollection) {
+-        this._authorityCollection = {};
+-
+-        if (this._accessList) {
+-            this._accessList.forEach(function (access) {
+-                if (_isLocalAccess(access)) {
+-                    that._localAccess = access;
+-                } else {
+-                    currentURI = util.parseUri(access.uri);
+-
+-                    // Check the authority collection to see if the authority item
+-                    // we want already exists
+-                    folderAccess = that.getFolderAccess(currentURI.scheme, currentURI.authority) || new WebFolderAccess();
+-
+-                    // Add folder path access to the authority item
+-                    if (!currentURI.query) {
+-                        folderAccess.addAccess(currentURI.path, access);
+-                    } else {
+-                        folderAccess.addAccess(currentURI.path + "?" + currentURI.query, access);
+-                    }
+-
+-                    that.putFolderAccess(currentURI.scheme, currentURI.authority, folderAccess);
+-                }
+-            });
+-        }
+-    }
+-};
+-
+-AccessManager.prototype.authorityCheck = function (port, scheme, authority) {
+-    var originalAuthority = authority;
+-
+-    if (port) {
+-        // If authority has a specific port, and the collection does not have an access matches
+-        // the exact authority, strip port from authority to see if there is a match
+-        if (!this.getFolderAccess(scheme, authority)) {
+-            authority = authority.slice(0, authority.lastIndexOf(":"));
+-            authority = this.authorityCheck("", scheme, authority);
+-        }
+-
+-        //If no successful match was found without the port, reset the authority and try with it
+-        if (!this.getFolderAccess(scheme, authority)) {
+-            authority = originalAuthority;
+-        }
+-    }
+-
+-    if (authority.indexOf(".") === -1) {
+-        // If authority is computer name, must have exact match in collection
+-        if (!this.getFolderAccess(scheme, authority)) {
+-            return "";
+-        }
+-
+-        return authority;
+-    }
+-
+-    while (authority && !this.getFolderAccess(scheme, authority)) {
+-        if (authority.indexOf(".") === -1) {
+-            return "";
+-        }
+-        authority = authority.substring(authority.indexOf(".") + 1);
+-    }
+-
+-    return authority;
+-};
+-
+-AccessManager.prototype.getFromFolderAccess = function (folderAccess, requestURI) {
+-    var fetchedAccess = null,
+-        scheme = requestURI.scheme,
+-        authority = requestURI.authority,
+-        path = requestURI.path,
+-        query = requestURI.query,
+-        prevAuthority;
+-
+-    if (!path) {
+-        fetchedAccess = folderAccess.getAccess("/");
+-    } else {
+-        fetchedAccess = _getAccessForPathAndQuery(folderAccess, path, query);
+-    }
+-
+-    // Make sure we've got the right one
+-    while (!fetchedAccess || !_isMatch(fetchedAccess, requestURI)) {
+-        // There was an auth url that matched, but didnt match the folder structure
+-        // Try the next level up
+-        prevAuthority = authority;
+-        authority = authority.substring(authority.indexOf(".") + 1);
+-        //If authority hasn't changed, then this loop will continue endlessly because nothing else has changed
+-        //This will happen when an element has the same authority but no folder access.
+-        if (prevAuthority === authority) {
+-            return null;
+-        }
+-
+-        // Check for an authority string that has an existing key
+-        authority = this.authorityCheck(requestURI.port, scheme, authority);
+-        if (!authority) {
+-            return null;
+-        }
+-
+-        // Retrieve access set for the specified authority
+-        folderAccess = this.getFolderAccess(scheme, authority);
+-
+-        // Special case: no access element was found for a file protocol request.
+-        // This is added since file protocol was allowed through the above check
+-        if (scheme === "file" && !folderAccess) {
+-            return null;
+-        }
+-
+-        fetchedAccess = _getAccessForPathAndQuery(folderAccess, path, query);
+-    }
+-
+-    return fetchedAccess;
+-};
+-
+-AccessManager.prototype.getAccessByUrl = function (url) {
+-    var requestURI = util.parseUri(url),
+-        authority = requestURI.authority,
+-        scheme = requestURI.scheme,
+-        folderAccess,
+-        fetchedAccess;
+-
+-    if (util.isAbsoluteURI(requestURI)) {
+-        // Initialize authority collection if it does not yet exist
+-        this.initializeAuthCollection();
+-
+-        // Start with the full authority path and check if an access exists for that path
+-        // If it does not exist, remove the first section of the authority path and try again
+-
+-        // Check for an authority string that has an existing key
+-        // Special case: Allow file, and local protocol to proceed without an authority
+-        authority = this.authorityCheck(requestURI.port, scheme, authority);
+-        if (!authority && !(scheme === "file" || scheme === "local" || scheme === "data")) {
+-            return null;
+-        }
+-        // Retrieve access set for the specified authority
+-        folderAccess = this.getFolderAccess(scheme, authority);
+-
+-        // Special case: no access was found for a file protocol request
+-        // This is added since file protocol was allowed through the above check
+-        if (scheme === "file" && !folderAccess) {
+-            return null;
+-        } else if (scheme === "local" && !folderAccess) {
+-            // If no access element is found with local URI, use local access for this request
+-            return this._localAccess;
+-        } else if (scheme === "data") {
+-            // Always allow data-uris
+-            return true;
+-        }
+-
+-        fetchedAccess = this.getFromFolderAccess(folderAccess, requestURI);
+-
+-        if (fetchedAccess) {
+-            return fetchedAccess;
+-        } else if (this._localAccess && _isMatch(this._localAccess, requestURI)) {
+-            // If we cannot find a more specific access for this local URI, use local access
+-            return this._localAccess;
+-        } else if (folderAccess && _isMatch(folderAccess, requestURI)) {
+-            return folderAccess;
+-        }
+-    }
+-
+-    return null;
+-};
+-
+-AccessManager.prototype.hasGlobalAccess = function () {
+-    return this._hasGlobalAccess;
+-};
+-
+-function Whitelist(config) {
+-    this._mgr = new AccessManager(config);
+-}
+-
+-Whitelist.prototype.getFeaturesForUrl = function (url) {
+-    var access = this._mgr.getAccessByUrl(url),
+-        featureIds = [];
+-
+-    if (access && access.features) {
+-        access.features.forEach(function (elem) {
+-            featureIds.push(elem.id);
+-        });
+-    }
+-
+-    return featureIds;
+-};
+-
+-Whitelist.prototype.isFeatureAllowed = function (url, feature) {
+-    var features = this.getFeaturesForUrl(url);
+-
+-    return !!features && features.reduce(function (found, current) {
+-        return found || current === feature;
+-    }, false);
+-};
+-
+-Whitelist.prototype.isAccessAllowed = function (url, isXHR) {
+-    return (this._mgr.hasGlobalAccess() && !isXHR) || !!this._mgr.getAccessByUrl(url);
+-};
+-
+-exports.Whitelist = Whitelist;
+diff --git a/test/lib/utils.js b/test/lib/utils.js
+deleted file mode 100644
+index 73cc6dc..0000000
+--- a/test/lib/utils.js
++++ /dev/null
+@@ -1,551 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var self,
+-    exception = require('./exception');
+-
+-function S4() {
+-    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+-}
+-
+-self = module.exports = {
+-    validateNumberOfArguments: function (lowerBound, upperBound, numberOfArguments, customExceptionType, customExceptionMessage, customExceptionObject) {
+-
+-        customExceptionMessage = customExceptionMessage || "";
+-
+-        if (arguments.length < 3 || arguments.length > 6) {
+-            exception.raise(exception.types.Argument, "Wrong number of arguments when calling: validateNumberOfArguments()");
+-        }
+-
+-        if (isNaN(lowerBound) && isNaN(upperBound) && isNaN(numberOfArguments)) {
+-            exception.raise(exception.types.ArgumentType, "(validateNumberOfArguments) Arguments are not numbers");
+-        }
+-
+-        lowerBound = parseInt(lowerBound, 10);
+-        upperBound = parseInt(upperBound, 10);
+-        numberOfArguments = parseInt(numberOfArguments, 10);
+-
+-        if (numberOfArguments < lowerBound || numberOfArguments > upperBound) {
+-            exception.raise((customExceptionType || exception.types.ArgumentLength), (customExceptionMessage + "\n\nWrong number of arguments"), customExceptionObject);
+-        }
+-
+-    },
+-
+-    validateArgumentType: function (arg, argType, customExceptionType, customExceptionMessage, customExceptionObject) {
+-        var invalidArg = false,
+-            msg;
+-
+-        switch (argType) {
+-        case "array":
+-            if (!arg instanceof Array) {
+-                invalidArg = true;
+-            }
+-            break;
+-        case "date":
+-            if (!arg instanceof Date) {
+-                invalidArg = true;
+-            }
+-            break;
+-        case "integer":
+-            if (typeof arg === "number") {
+-                if (arg !== Math.floor(arg)) {
+-                    invalidArg = true;
+-                }
+-            }
+-            else {
+-                invalidArg = true;
+-            }
+-            break;
+-        default:
+-            if (typeof arg !== argType) {
+-                invalidArg = true;
+-            }
+-            break;
+-        }
+-
+-        if (invalidArg) {
+-            msg = customExceptionMessage +  ("\n\nInvalid Argument type. argument: " + arg + " ==> was expected to be of type: " + argType);
+-            exception.raise((customExceptionType || exception.types.ArgumentType), msg, customExceptionObject);
+-        }
+-    },
+-
+-    validateMultipleArgumentTypes: function (argArray, argTypeArray, customExceptionType, customExceptionMessage, customExceptionObject) {
+-        for (var i = 0; i < argArray.length; i++) {
+-            this.validateArgumentType(argArray[i], argTypeArray[i], customExceptionType, customExceptionMessage, customExceptionObject);
+-        }
+-    },
+-
+-    arrayContains: function (array, obj) {
+-        var i = array.length;
+-        while (i--) {
+-            if (array[i] === obj) {
+-                return true;
+-            }
+-        }
+-        return false;
+-    },
+-
+-    some: function (obj, predicate, scope) {
+-        if (obj instanceof Array) {
+-            return obj.some(predicate, scope);
+-        }
+-        else {
+-            var values = self.map(obj, predicate, scope);
+-
+-            return self.reduce(values, function (some, value) {
+-                return value ? value : some;
+-            }, false);
+-        }
+-    },
+-
+-    count: function (obj) {
+-        return self.sum(obj, function (total) {
+-            return 1;
+-        });
+-    },
+-
+-    sum: function (obj, selector, scope) {
+-        var values = self.map(obj, selector, scope);
+-        return self.reduce(values, function (total, value) {
+-            return total + value;
+-        });
+-    },
+-
+-    max: function (obj, selector, scope) {
+-        var values = self.map(obj, selector, scope);
+-        return self.reduce(values, function (max, value) {
+-            return max < value ? value : max;
+-        }, Number.MIN_VALUE);
+-    },
+-
+-    min: function (obj, selector, scope) {
+-        var values = self.map(obj, selector, scope);
+-        return self.reduce(values, function (min, value) {
+-            return min > value ? value : min;
+-        }, Number.MAX_VALUE);
+-    },
+-
+-    forEach: function (obj, action, scope) {
+-        if (obj instanceof Array) {
+-            return obj.forEach(action, scope);
+-        }
+-        else {
+-            self.map(obj, action, scope);
+-        }
+-    },
+-
+-    filter: function (obj, predicate, scope) {
+-        if (obj instanceof Array) {
+-            return obj.filter(predicate, scope);
+-        }
+-        else {
+-            var result = [];
+-            self.forEach(obj, function (value, index) {
+-                if (predicate.apply(scope, [value, index])) {
+-                    result.push(value);
+-                }
+-
+-            }, scope);
+-
+-            return result;
+-        }
+-    },
+-
+-    reduce: function (obj, func, init, scope) {
+-        var i,
+-            initial = init === undefined ? 0 : init,
+-            result = initial;
+-
+-
+-        if (obj instanceof Array) {
+-            return obj.reduce(func, initial);
+-        }
+-        else if (obj instanceof NamedNodeMap) {
+-            for (i = 0; i < obj.length; i++) {
+-                result = func.apply(scope, [result, obj[i], i]);
+-            }
+-        }
+-        else {
+-            for (i in obj) {
+-                if (obj.hasOwnProperty(i)) {
+-                    result = func.apply(scope, [result, obj[i], i]);
+-                }
+-            }
+-        }
+-
+-        return result;
+-
+-    },
+-
+-    map: function (obj, func, scope) {
+-        var i,
+-            returnVal = null,
+-            result = [];
+-
+-        if (obj instanceof Array) {
+-            return obj.map(func, scope);
+-        }
+-        else if (obj instanceof NamedNodeMap) {
+-            for (i = 0; i < obj.length; i++) {
+-                returnVal = func.apply(scope, [obj[i], i]);
+-                result.push(returnVal);
+-            }
+-        }
+-        else {
+-            for (i in obj) {
+-                if (obj.hasOwnProperty(i)) {
+-                    returnVal = func.apply(scope, [obj[i], i]);
+-                    result.push(returnVal);
+-                }
+-            }
+-        }
+-
+-        return result;
+-    },
+-
+-    series: function (tasks, callback) {
+-
+-        var execute = function () {
+-            var args = [],
+-                task;
+-
+-            if (tasks.length) {
+-                task = tasks.shift();
+-                args = args.concat(task.args).concat(execute);
+-                task.func.apply(this, args);
+-            }
+-            else {
+-                callback.func.apply(this, callback.args);
+-            }
+-        };
+-
+-        execute();
+-    },
+-
+-    regexSanitize: function (regexString) {
+-        return regexString.replace("^", "\\^")
+-                    .replace("$", "\\$")
+-                    .replace("(", "\\(")
+-                    .replace(")", "\\)")
+-                    .replace("<", "\\<")
+-                    .replace("[", "\\[")
+-                    .replace("{", "\\{")
+-                    .replace(/\\/, "\\\\")
+-                    .replace("|", "\\|")
+-                    .replace(">", "\\>")
+-                    .replace(".", "\\.")
+-                    .replace("*", "\\*")
+-                    .replace("+", "\\+")
+-                    .replace("?", "\\?");
+-    },
+-
+-    find: function (comparison, collection, startInx, endInx, callback) {
+-        var results = [],
+-            compare = function (s, pattern) {
+-
+-                if (typeof(s) !== "string" || pattern === null) {
+-                    return s === pattern;
+-                }
+-
+-                var regex = pattern.replace(/\./g, "\\.")
+-                                   .replace(/\^/g, "\\^")
+-                                   .replace(/\*/g, ".*")
+-                                   .replace(/\\\.\*/g, "\\*");
+-
+-                regex = "^".concat(regex, "$");
+-
+-                return !!s.match(new RegExp(regex, "i"));
+-            };
+-
+-        self.forEach(collection, function (c) {
+-            var match,
+-                fail = false;
+-
+-            self.forEach(comparison, function (value, key) {
+-                if (!fail && value !== undefined) {
+-
+-                    if (compare(c[key], value)) {
+-                        match = c;
+-                    }
+-                    else {
+-                        fail = true;
+-                        match = null;
+-                    }
+-                }
+-            });
+-
+-            if (match) {
+-                results.push(match);
+-            }
+-        });
+-
+-        if (callback) {
+-            if (startInx === undefined) {
+-                startInx = 0;
+-            }
+-            if (endInx === undefined) {
+-                endInx = results.length;
+-            }
+-            if (startInx === endInx) {
+-                endInx = startInx + 1;
+-            }
+-
+-            callback.apply(null, [results.slice(startInx, endInx)]);
+-        }
+-    },
+-
+-    mixin: function (mixin, to) {
+-        Object.getOwnPropertyNames(mixin).forEach(function (prop) {
+-            if (Object.hasOwnProperty.call(mixin, prop)) {
+-                Object.defineProperty(to, prop, Object.getOwnPropertyDescriptor(mixin, prop));
+-            }
+-        });
+-        return to;
+-    },
+-
+-    copy: function (obj) {
+-        var i,
+-            newObj = (obj === null ? false : global.toString.call(obj) === "[object Array]") ? [] : {};
+-
+-        if (typeof obj === 'number' ||
+-            typeof obj === 'string' ||
+-            typeof obj === 'boolean' ||
+-            obj === null ||
+-            obj === undefined) {
+-            return obj;
+-        }
+-
+-        if (obj instanceof Date) {
+-            return new Date(obj);
+-        }
+-
+-        if (obj instanceof RegExp) {
+-            return new RegExp(obj);
+-        }
+-
+-        for (i in obj) {
+-            if (obj.hasOwnProperty(i)) {
+-                if (obj[i] && typeof obj[i] === "object") {
+-                    if (obj[i] instanceof Date) {
+-                        newObj[i] = obj[i];
+-                    }
+-                    else {
+-                        newObj[i] = self.copy(obj[i]);
+-                    }
+-                }
+-                else {
+-                    newObj[i] = obj[i];
+-                }
+-            }
+-        }
+-
+-        return newObj;
+-    },
+-
+-    startsWith : function (str, substr) {
+-        return str.indexOf(substr) === 0;
+-    },
+-
+-    endsWith : function (str, substr) {
+-        return str.indexOf(substr, str.length - substr.length) !== -1;
+-    },
+-
+-    parseUri : function (str) {
+-        var i, uri = {},
+-            key = [ "source", "scheme", "authority", "userInfo", "user", "password", "host", "port", "relative", "path", "directory", "file", "query", "anchor" ],
+-            matcher = /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/.exec(str);
+-
+-        for (i = key.length - 1; i >= 0; i--) {
+-            uri[key[i]] = matcher[i] || "";
+-        }
+-
+-        return uri;
+-    },
+-
+-    // uri - output from parseUri
+-    isAbsoluteURI : function (uri) {
+-        if (uri && uri.source) {
+-            return uri.relative !== uri.source;
+-        }
+-
+-        return false;
+-    },
+-
+-    fileNameToImageMIME : function (fileName) {
+-
+-        var extensionsToMIME = {},
+-            ext;
+-
+-        extensionsToMIME.png = 'image/png';
+-        extensionsToMIME.jpg = 'image/jpeg';
+-        extensionsToMIME.jpe = 'image/jpeg';
+-        extensionsToMIME.jpeg = 'image/jpeg';
+-        extensionsToMIME.gif = 'image/gif';
+-        extensionsToMIME.bmp = 'image/bmp';
+-        extensionsToMIME.bm = 'image/bmp';
+-        extensionsToMIME.svg = 'image/svg+xml';
+-        extensionsToMIME.tif = 'image/tiff';
+-        extensionsToMIME.tiff = 'image/tiff';
+-
+-        ext = fileName.split('.').pop();
+-        return extensionsToMIME[ext];
+-    },
+-
+-    isLocalURI : function (uri) {
+-        return uri && uri.scheme && "local:///".indexOf(uri.scheme.toLowerCase()) !== -1;
+-    },
+-
+-    isFileURI : function (uri) {
+-        return uri && uri.scheme && "file://".indexOf(uri.scheme.toLowerCase()) !== -1;
+-    },
+-
+-    isHttpURI : function (uri) {
+-        return uri && uri.scheme && "http://".indexOf(uri.scheme.toLowerCase()) !== -1;
+-    },
+-
+-    isHttpsURI : function (uri) {
+-        return uri && uri.scheme && "https://".indexOf(uri.scheme.toLowerCase()) !== -1;
+-    },
+-
+-    // Checks if the specified uri starts with 'data:'
+-    isDataURI : function (uri) {
+-        return uri && uri.scheme && "data:".indexOf(uri.scheme.toLowerCase()) !== -1;
+-    },
+-
+-    performExec : function (featureId, property, args) {
+-        var result;
+-
+-        window.webworks.exec(function (data, response) {
+-            result = data;
+-        }, function (data, response) {
+-            throw data;
+-        }, featureId, property, args, true);
+-
+-        return result;
+-    },
+-
+-    inNode : function () {
+-        return !!require.resolve;
+-    },
+-
+-    requireWebview : function () {
+-        return require("./webview");
+-    },
+-    convertDataToBinary : function (data, dataEncoding) {
+-        var rawData,
+-            uint8Array,
+-            i;
+-
+-        if (data) {
+-            if (dataEncoding.toLowerCase() === "base64") {
+-                rawData = window.atob(data);
+-            }
+-            else {
+-                rawData = data;
+-            }
+-
+-            uint8Array = new Uint8Array(new ArrayBuffer(rawData.length));
+-
+-            for (i = 0; i < uint8Array.length; i++) {
+-                uint8Array[i] = rawData.charCodeAt(i);
+-            }
+-
+-            return uint8Array.buffer;
+-        }
+-    },
+-    getBlobWithArrayBufferAsData : function (data, dataEncoding) {
+-        var rawData,
+-            blobBuilderObj = new window.WebKitBlobBuilder();
+-        rawData = this.convertDataToBinary(data, dataEncoding);
+-        blobBuilderObj.append(rawData);
+-
+-        return blobBuilderObj.getBlob("arraybuffer");
+-    },
+-    loadModule: function (module) {
+-        return require(module);
+-    },
+-    loadExtensionModule: function (extBasename, path) {
+-        var ext = require("./manifest")[extBasename];
+-
+-        if (ext) {
+-            return require("../ext/" + ext.namespace + "/" + path);
+-        } else {
+-            return null;
+-        }
+-    },
+-    hasPermission: function (config, permission) {
+-        if (config && config.permissions && config.permissions.length) {
+-            return config.permissions.indexOf(permission) >= 0;
+-        }
+-
+-        return false;
+-    },
+-    guid: function () {
+-        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+-    },
+-    getURIPrefix: function () {
+-        return "http://localhost:8472/";
+-    },
+-    translatePath: function (path) {
+-        if (path.indexOf("local:///") === 0) {
+-            var sourceDir = window.qnx.webplatform.getApplication().getEnv("HOME"); //leading slashes need to be removed
+-            path = "file:///" + sourceDir.replace(/^\/*/, '') + "/../app/native/" + path.replace(/local:\/\/\//, '');
+-        }
+-        return path;
+-    },
+-    invokeInBrowser: function (url) {
+-        var request = {
+-            uri: url,
+-            target: "sys.browser"
+-        };
+-        window.qnx.webplatform.getApplication().invocation.invoke(request);
+-    },
+-    isPersonal: function () {
+-        return window.qnx.webplatform.getApplication().getEnv("PERIMETER") === "personal";
+-    },
+-    deepclone: function (obj) {
+-        var newObj = obj instanceof Array ? [] : {},
+-            key;
+-
+-        if (typeof obj === 'number' ||
+-                typeof obj === 'string' ||
+-                typeof obj === 'boolean' ||
+-                obj === null ||
+-                obj === undefined) {
+-            return obj;
+-        }
+-
+-        if (obj instanceof Date) {
+-            return new Date(obj);
+-        }
+-
+-        if (obj instanceof RegExp) {
+-            return new RegExp(obj);
+-        }
+-
+-        for (key in obj) {
+-            if (obj.hasOwnProperty(key)) {
+-                if (obj[key] && typeof obj[key] === "object") {
+-                    newObj[key] = self.deepclone(obj[key]);
+-                } else {
+-                    newObj[key] = obj[key];
+-                }
+-            }
+-        }
+-
+-        return newObj;
+-    }
+-};
+diff --git a/test/lib/webkitHandlers/networkResourceRequested.js b/test/lib/webkitHandlers/networkResourceRequested.js
+deleted file mode 100644
+index 759c8bd..0000000
+--- a/test/lib/webkitHandlers/networkResourceRequested.js
++++ /dev/null
+@@ -1,126 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-var Whitelist = require('../policy/whitelist').Whitelist,
+-    ACCEPT_RESPONSE = {setAction: "ACCEPT"},
+-    DENY_RESPONSE = {setAction: "DENY"},
+-    SUBSTITUTE_RESPONSE = {setAction: "SUBSTITUTE"},
+-    utils = require('../utils');
+-
+-function _formMessage(url, origin, sid, body, securityOrigin, webview) {
+-    var tokens = url.split(utils.getURIPrefix())[1].split("/"),
+-        //Handle the case where the method is multi-level
+-        finalToken = (tokens[3] && tokens.length > 4) ? tokens.slice(3).join('/') : tokens[3];
+-
+-    return {
+-        request : {
+-            params : {
+-                service : tokens[0],
+-                action : tokens[1],
+-                ext : tokens[2],
+-                method : (finalToken && finalToken.indexOf("?") >= 0) ? finalToken.split("?")[0] : finalToken,
+-                args : (finalToken && finalToken.indexOf("?") >= 0) ? finalToken.split("?")[1] : null
+-            },
+-            body : body,
+-            origin : origin,
+-            securityOrigin: securityOrigin
+-
+-        },
+-        response : {
+-            send : function (code, data) {
+-                var responseText;
+-                if (typeof(data) === 'string') {
+-                    responseText = data;
+-                } else {
+-                    responseText =  JSON.stringify(data);
+-                }
+-
+-                webview.notifyOpen(sid, code, "OK");
+-                webview.notifyHeaderReceived(sid, "Access-Control-Allow-Origin", "*");
+-                webview.notifyHeaderReceived(sid, "Access-Control-Allow-Origin", securityOrigin);
+-                webview.notifyHeaderReceived(sid, "Access-Control-Allow-Headers", "Content-Type");
+-                webview.notifyDataReceived(sid, responseText, responseText.length);
+-                webview.notifyDone(sid);
+-            }
+-        }
+-    };
+-}
+-
+-function networkResourceRequestedHandler(value) {
+-    var config = require("./../config"),
+-        obj = JSON.parse(value),
+-        response,
+-        url = obj.url,
+-        body = obj.body,
+-        whitelist = new Whitelist(),
+-        server,
+-        message,
+-        sid = obj.streamId,
+-        origin = obj.referrer,
+-        securityOrigin = obj.securityOrigin,
+-        isXHR = obj.targetType === "TargetIsXMLHTTPRequest",
+-        //Assumes its a navigation request if the target is the main frame
+-        isNav = obj.targetType === "TargetIsMainFrame",
+-        hasAccess = whitelist.isAccessAllowed(url, isXHR),
+-        deniedMsg;
+-
+-    //If the URL starts with the prefix then its a request from an API
+-    //In this case we will hijack and give our own response
+-    //Otherwise follow whitelisting rules
+-    if (url.match("^" + utils.getURIPrefix())) {
+-        server = require("../server");
+-        message = _formMessage(url, origin, sid, body, securityOrigin, this.webview, config);
+-        response = SUBSTITUTE_RESPONSE;
+-        server.handle(message.request, message.response, this.webview);
+-    } else {
+-        //Whitelisting will not prevent navigation, ONLY we will
+-        //Except when they've disabled web security
+-        if (hasAccess || !config.enableWebSecurity) {
+-            response = ACCEPT_RESPONSE;
+-        } else {
+-            response = DENY_RESPONSE;
+-            url = utils.parseUri(url);
+-            deniedMsg = "Access to \"" + url.source + "\" not allowed";
+-
+-            console.warn(deniedMsg);
+-
+-            //Denied navigation requests are sent to the inApp browser rather than an alert
+-            if (isNav) {
+-                if (config.enableChildWebView) {
+-                    this.webview.uiWebView.childwebviewcontrols.open(url.source);
+-                } else {
+-                    utils.invokeInBrowser(url.source);
+-                }
+-            } else {
+-                this.webview.executeJavaScript("alert('" + deniedMsg + "')");
+-            }
+-        }
+-    }
+-
+-    if (response) {
+-        return JSON.stringify(response);
+-    }
+-}
+-
+-function NetworkResourceRequestHandler(webview) {
+-    this.webview = webview;
+-    this.networkResourceRequestedHandler = networkResourceRequestedHandler.bind(this);
+-}
+-
+-module.exports = {
+-    createHandler: function (webview) {
+-        return new NetworkResourceRequestHandler(webview);
+-    }
+-};
+diff --git a/test/lib/webview.js b/test/lib/webview.js
+deleted file mode 100644
+index 690fd1c..0000000
+--- a/test/lib/webview.js
++++ /dev/null
+@@ -1,264 +0,0 @@
+-/*
+- *  Copyright 2012 Research In Motion Limited.
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-var networkResourceRequested = require('./webkitHandlers/networkResourceRequested'),
+-    utils = require('./utils'),
+-    config = require('./config'),
+-    webkitOriginAccess = require("./policy/webkitOriginAccess"),
+-    CHROME_HEIGHT = 0,
+-    OUT_OF_PROCESS = 1,
+-    webview,
+-    _webviewObj;
+-
+-webview =
+-    {
+-    create: function (ready) {
+-        _webviewObj = window.qnx.webplatform.createWebView({processId: OUT_OF_PROCESS, defaultSendEventHandlers: ['onChooseFile', 'onOpenWindow'], defaultWebEventHandlers: ['InvokeRequestEvent']}, function () {
+-            //Create webkit event handlers
+-            var requestObj =  networkResourceRequested.createHandler(_webviewObj);
+-
+-            //Bind networkResourceRequested event so that everything works
+-            _webviewObj.onNetworkResourceRequested = requestObj.networkResourceRequestedHandler;
+-
+-            webkitOriginAccess.addWebView(_webviewObj);
+-
+-            _webviewObj.visible = true;
+-            _webviewObj.active = true;
+-            _webviewObj.zOrder = 0;
+-            _webviewObj.setGeometry(0, CHROME_HEIGHT, screen.width, screen.height - CHROME_HEIGHT);
+-
+-            if (typeof config.backgroundColor !== 'undefined') {
+-                _webviewObj.backgroundColor = config.backgroundColor;
+-            }
+-
+-            if (typeof config.customHeaders !== 'undefined') {
+-                _webviewObj.extraHttpHeaders = config.customHeaders;
+-            }
+-
+-            if (typeof config.userAgent !== 'undefined') {
+-                _webviewObj.userAgent = config.userAgent;
+-            }
+-
+-            _webviewObj.autoDeferNetworkingAndJavaScript = config.autoDeferNetworkingAndJavaScript;
+-
+-            /* Catch and trigger our custom HTML dialog */
+-            _webviewObj.allowWebEvent("DialogRequested");
+-
+-            _webviewObj.addEventListener("DocumentLoadFinished", function () {
+-                window.qnx.webplatform.getApplication().windowVisible = true;
+-            });
+-
+-
+-            if (ready && typeof ready === 'function') {
+-                ready();
+-            }
+-
+-            window.qnx.webplatform.getController().dispatchEvent("webview.initialized", [_webviewObj]);
+-
+-            // If content is not loaded, too bad open the visibility up.
+-            setTimeout(function () {
+-                window.qnx.webplatform.getApplication().windowVisible = true;
+-            }, 2500);
+-        });
+-
+-    },
+-
+-    destroy: function () {
+-        _webviewObj.destroy();
+-    },
+-
+-    setURL: function (url) {
+-        _webviewObj.url = url;
+-    },
+-
+-    reload: function () {
+-        _webviewObj.reload();
+-    },
+-
+-    executeJavascript: function (js) {
+-        _webviewObj.executeJavaScript(js);
+-    },
+-
+-    addEventListener: function (eventName, callback) {
+-        _webviewObj.addEventListener(eventName, callback);
+-    },
+-
+-    removeEventListener: function (eventName, callback) {
+-        _webviewObj.removeEventListener(eventName, callback);
+-    },
+-
+-    windowGroup: function () {
+-        return _webviewObj.windowGroup;
+-    },
+-
+-    getGeometry: function () {
+-        return this.geometry;
+-    },
+-
+-    setGeometry: function (x, y, width, height) {
+-        this.geometry = {x: x, y: y, w: width, h: height};
+-        _webviewObj.setGeometry(x, y, width, height);
+-    },
+-
+-    setApplicationOrientation: function (angle) {
+-        _webviewObj.setApplicationOrientation(angle);
+-    },
+-
+-    setExtraPluginDirectory: function (directory) {
+-        _webviewObj.setExtraPluginDirectory(directory);
+-    },
+-
+-    setEnablePlugins: function (enablePlugins) {
+-        _webviewObj.pluginsEnabled = enablePlugins;
+-    },
+-
+-    getEnablePlugins: function () {
+-        return _webviewObj.pluginsEnabled;
+-    },
+-
+-    notifyApplicationOrientationDone: function () {
+-        _webviewObj.notifyApplicationOrientationDone();
+-    },
+-
+-    setSandbox: function (sandbox) {
+-        _webviewObj.setFileSystemSandbox = sandbox;
+-    },
+-
+-    getSandbox: function () {
+-        return _webviewObj.setFileSystemSandbox;
+-    },
+-
+-    downloadURL: function (url) {
+-        _webviewObj.downloadURL(url);
+-    },
+-
+-    handleContextMenuResponse: function (action) {
+-        _webviewObj.handleContextMenuResponse(action);
+-    },
+-
+-    allowGeolocation : function (url) {
+-        _webviewObj.allowGeolocation(url);
+-    },
+-
+-    disallowGeolocation : function (url) {
+-        _webviewObj.disallowGeolocation(url);
+-
+-    },
+-
+-    addKnownSSLCertificate: function (url, certificateInfo) {
+-        _webviewObj.addKnownSSLCertificate(url, certificateInfo);
+-    },
+-
+-    continueSSLHandshaking: function (streamId, SSLAction) {
+-        _webviewObj.continueSSLHandshaking(streamId, SSLAction);
+-    },
+-
+-    getSensitivity: function () {
+-        return _webviewObj.getSensitivity();
+-    },
+-
+-    setSensitivity: function (sensitivity) {
+-        return _webviewObj.setSensitivity(sensitivity);
+-    },
+-
+-    getBackgroundColor: function () {
+-        return _webviewObj.getBackgroundColor();
+-    },
+-
+-    setBackgroundColor: function (backgroundColor) {
+-        return _webviewObj.setBackgroundColor(backgroundColor);
+-    },
+-
+-    getWebViewObj: function (webview) {
+-        return _webviewObj;
+-    },
+-
+-    setUIWebViewObj: function (webviewObj) {
+-        _webviewObj.uiWebView = webviewObj;
+-    },
+-
+-    allowUserMedia: function (evtId, cameraName) {
+-        _webviewObj.allowUserMedia(evtId, cameraName);
+-    },
+-
+-    disallowUserMedia: function (evtId) {
+-        _webviewObj.disallowUserMedia(evtId);
+-    }
+-};
+-
+-webview.__defineGetter__('id', function () {
+-    if (_webviewObj) {
+-        return _webviewObj.id;
+-    }
+-});
+-
+-webview.__defineGetter__('enableCrossSiteXHR', function () {
+-    return _webviewObj.enableCrossSiteXHR;
+-});
+-
+-webview.__defineSetter__('enableCrossSiteXHR', function (shouldEnable) {
+-    _webviewObj.enableCrossSiteXHR = !!shouldEnable;
+-});
+-
+-webview.__defineGetter__('processId', function () {
+-    return _webviewObj.processId;
+-});
+-
+-webview.__defineSetter__('onOpenWindow', function (input) {
+-    _webviewObj.onOpenWindow = input;
+-});
+-
+-webview.__defineSetter__('onCloseWindow', function (input) {
+-    _webviewObj.onCloseWindow = input;
+-});
+-
+-webview.__defineSetter__('onDestroyWindow', function (input) {
+-    _webviewObj.onDestroyWindow = input;
+-});
+-
+-webview.__defineSetter__('onDialogRequested', function (input) {
+-    _webviewObj.onDialogRequested = input;
+-});
+-
+-webview.__defineSetter__('onGeolocationPermissionRequest', function (input) {
+-    _webviewObj.onGeolocationPermissionRequest = input;
+-});
+-
+-webview.__defineSetter__('onSSLHandshakingFailed', function (input) {
+-    _webviewObj.onSSLHandshakingFailed = input;
+-});
+-
+-webview.__defineSetter__('onPropertyCurrentContextEvent', function (input) {
+-    _webviewObj.onPropertyCurrentContextEvent = input;
+-});
+-
+-webview.__defineSetter__('onContextMenuRequestEvent', function (input) {
+-    _webviewObj.onContextMenuRequestEvent = input;
+-});
+-
+-webview.__defineSetter__('onContextMenuCancelEvent', function (input) {
+-    _webviewObj.onContextMenuCancelEvent = input;
+-});
+-
+-webview.__defineSetter__('onUserMediaRequest', function (input) {
+-    _webviewObj.onUserMediaRequest = input;
+-});
+-
+-webview.__defineSetter__('onChildWindowOpen', function (input) {
+-    _webviewObj.onChildWindowOpen = input;
+-});
+-
+-module.exports = webview;
+diff --git a/test/unit/com.blackberry.identity/client.js b/test/unit/com.blackberry.identity/client.js
+index 2eac3e3..3d6e3f8 100644
+--- a/test/unit/com.blackberry.identity/client.js
++++ b/test/unit/com.blackberry.identity/client.js
+@@ -58,7 +58,6 @@ describe("identity client", function () {
+         });
+ 
+         it("uuid should call exec and value should be defined", function () {
+-            var anyFunc = jasmine.any(Function);
+             expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
+             expect(cordova.exec).not.toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "uuid", null);
+             expect(client.uuid).toEqual("0x12345678");
+@@ -76,7 +75,6 @@ describe("identity client", function () {
+     });
+ 
+     describe("when user hasn't specified correct permission", function () {
+-
+         beforeEach(function () {
+             GLOBAL.cordova = {
+                 exec: jasmine.createSpy().andThrow("Cannot read PPS object"),
+@@ -93,9 +91,9 @@ describe("identity client", function () {
+         });
+ 
+         it("uuid should call exec and catch error and return null", function () {
+-            cordova.exec.andThrow("Cannot read PPS object");
++            var uuid = client.uuid;
++            expect(uuid).toEqual(null);
+             expect(cordova.exec).toHaveBeenCalledWith(anyFunc, anyFunc, _ID, "getFields", null);
+-            expect(client.uuid).toEqual(null);
+         });
+     });
+ });
+-- 
+1.7.10.msysgit.1
+

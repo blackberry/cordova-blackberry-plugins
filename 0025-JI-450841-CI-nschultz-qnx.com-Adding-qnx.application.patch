@@ -1,0 +1,262 @@
+From b434571bdd5a4c3dc56c9d0ac61144707a09892f Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Tue, 3 Sep 2013 10:47:24 -0400
+Subject: [PATCH 25/61] JI:450841 CI:nschultz@qnx.com Adding qnx.application
+ extension for start() method only. (Deprecated, not
+ for use in new applications)
+
+---
+ plugin/com.qnx.application/plugin.xml              |   33 ++++++++++
+ .../src/blackberry10/application.js                |   49 ++++++++++++++
+ .../com.qnx.application/src/blackberry10/index.js  |   68 ++++++++++++++++++++
+ plugin/com.qnx.application/www/client.js           |   64 ++++++++++++++++++
+ 4 files changed, 214 insertions(+)
+ create mode 100644 plugin/com.qnx.application/plugin.xml
+ create mode 100644 plugin/com.qnx.application/src/blackberry10/application.js
+ create mode 100644 plugin/com.qnx.application/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.application/www/client.js
+
+diff --git a/plugin/com.qnx.application/plugin.xml b/plugin/com.qnx.application/plugin.xml
+new file mode 100644
+index 0000000..fc68048
+--- /dev/null
++++ b/plugin/com.qnx.application/plugin.xml
+@@ -0,0 +1,33 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.application"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="qnx.application" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/application.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.application" value="com.qnx.application" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.application/src/blackberry10/application.js b/plugin/com.qnx.application/src/blackberry10/application.js
+new file mode 100644
+index 0000000..5169bd5
+--- /dev/null
++++ b/plugin/com.qnx.application/src/blackberry10/application.js
+@@ -0,0 +1,49 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for qnx application functionality
++ */
++
++var _pps = qnx.webplatform.pps,
++	_writerPPS; 
++
++/*
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Initializes the extension 
++	 */
++		init: function () {
++		//writer
++		_writerPPS = _pps.createObject("/pps/services/app-launcher", _pps.PPSMode.DELTA);
++		_writerPPS.open(_pps.FileMode.WRONLY);
++	},
++
++	/**
++	* Creates a request to start an application
++	* @param id {String} The id of the application to start
++	* @param data {Object} The startup data for the application
++	*/
++	start: function(id,data){
++		var obj = {id:id, cmd:"launch app",app:id,dat:data};
++		_writerPPS.write({req:obj});
++	}
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.application/src/blackberry10/index.js b/plugin/com.qnx.application/src/blackberry10/index.js
+new file mode 100644
+index 0000000..4164848
+--- /dev/null
++++ b/plugin/com.qnx.application/src/blackberry10/index.js
+@@ -0,0 +1,68 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Returns list of installed applications, requests to launch an application
++ * Listens for installed/uninstalled/started/stopped applications
++ */
++
++var _wwfix = require("../../lib/wwfix"),
++	_utils = require("./../../lib/utils"),
++	_application = require("./application");
++
++/**
++ * Initializes the extension
++ * Note: _application.init can't be called here.  
++ * There may be a jscreen init issue.
++ */
++function init() {
++	try {
++		_application.init();
++	} catch (ex) {
++		console.error('Error in webworks ext: application/index.js:init():', ex);
++	}
++}
++init();
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Creates a request to start an application
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: 
++	 *	{
++	 *		id: {String},
++	 *	}
++	 * @param env {Object} Environment variables
++	 */
++
++	start: function (success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			var data = _application.start(fixedArgs.id, fixedArgs.data);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.application/www/client.js b/plugin/com.qnx.application/www/client.js
+new file mode 100644
+index 0000000..b6bb38f
+--- /dev/null
++++ b/plugin/com.qnx.application/www/client.js
+@@ -0,0 +1,64 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * @module qnx.application
++ * @description This plugin exists as a temporary stop gap measure until full cordova migration. 
++ * 				DO NOT USE THIS PLUGIN IN ANY NEW APPLICATIONS.
++ *
++ * @deprecated
++ * @private
++ */
++
++var _ID = "com.qnx.application";
++
++/*
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Create a request to start an application
++	 * @param {String} id The ID of the application to start
++	 * @param {Object} data The startup data for the application
++	 */
++	start: function (id, data) {
++		if (!data || data === undefined) {
++			data = "";
++		}
++
++		try {
++			var value = null,
++				args = {
++					id: id,
++					data: data
++				},
++				success = function (data, response) {
++					value = true;
++				},
++				fail = function (data, response) {
++					value = false;
++				};
++
++			window.cordova.exec(success, fail, _ID, 'start', args);
++		} catch (e) {
++			console.error(e);
++		}
++		return value;
++	},
++};
+\ No newline at end of file
+-- 
+1.7.10.msysgit.1
+

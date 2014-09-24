@@ -1,0 +1,897 @@
+From 61e194e74d09073a0a7f2dfadb30b6996bab35c7 Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Tue, 23 Jul 2013 16:24:20 -0400
+Subject: [PATCH 11/61] JI:450841 CI:dkerr@qnx.com Adding car.hvac extension
+ as well as a few fixes for car.audiomixer
+
+---
+ plugin/com.qnx.car.audiomixer/plugin.xml           |    1 +
+ .../src/blackberry10/index.js                      |   26 +-
+ .../www/AudioMixerSetting.js                       |   47 ++++
+ plugin/com.qnx.car.audiomixer/www/client.js        |   14 +-
+ .../www/enum/AudioMixerSetting.js                  |   47 ----
+ plugin/com.qnx.car.hvac/plugin.xml                 |   35 +++
+ plugin/com.qnx.car.hvac/src/blackberry10/hvac.js   |  125 ++++++++++
+ plugin/com.qnx.car.hvac/src/blackberry10/index.js  |  129 ++++++++++
+ plugin/com.qnx.car.hvac/www/HvacFanDirection.js    |   30 +++
+ plugin/com.qnx.car.hvac/www/HvacSetting.js         |   37 +++
+ plugin/com.qnx.car.hvac/www/client.js              |  248 ++++++++++++++++++++
+ 11 files changed, 676 insertions(+), 63 deletions(-)
+ create mode 100644 plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+ delete mode 100644 plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js
+ create mode 100644 plugin/com.qnx.car.hvac/plugin.xml
+ create mode 100644 plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+ create mode 100644 plugin/com.qnx.car.hvac/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+ create mode 100644 plugin/com.qnx.car.hvac/www/HvacSetting.js
+ create mode 100644 plugin/com.qnx.car.hvac/www/client.js
+
+diff --git a/plugin/com.qnx.car.audiomixer/plugin.xml b/plugin/com.qnx.car.audiomixer/plugin.xml
+index a9ebce8..74b3994 100755
+--- a/plugin/com.qnx.car.audiomixer/plugin.xml
++++ b/plugin/com.qnx.car.audiomixer/plugin.xml
+@@ -22,6 +22,7 @@ for other information.
+ 	<js-module src="www/client.js">
+ 		<clobbers target="car.audiomixer" />
+ 	</js-module>
++    <js-module src="www/AudioMixerSetting.js" />
+ 
+ 	<platform name="blackberry10">
+ 		<source-file src="src/blackberry10/index.js" />
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+index 960019b..d7de04c 100644
+--- a/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
++++ b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+@@ -26,7 +26,7 @@
+ 
+ var _audiomixer = require('./audiomixer'),
+ 	_wwfix = require("../../lib/wwfix"),
+-	_callback;
++	_eventResult;
+ 
+ /**
+  * Initializes the extension 
+@@ -53,15 +53,14 @@ module.exports = {
+ 	 * @param env {Object} Environment variables
+ 	 */
+ 	startEvents: function(success, fail, args, env) {
+-		var result = new PluginResult(args, env)
++		_eventResult = new PluginResult(args, env)
+ 		try {
+-			_callback = function (data) {
+-				result.callbackOk(data, true);
+-			};
+-			_audiomixer.setTriggerUpdate(_callback);
+-			result.noResult(true);
++			_audiomixer.setTriggerUpdate(function (data) {
++				_eventResult.callbackOk(data, true);
++			});
++			_eventResult.noResult(true);
+ 		} catch (e) {
+-			result.error("error in startEvents: " + JSON.stringify(e), false);
++			_eventResult.error("error in startEvents: " + JSON.stringify(e), false);
+ 		}
+ 	},
+ 
+@@ -75,8 +74,13 @@ module.exports = {
+ 	stopEvents: function(success, fail, args, env) {
+ 		var result = new PluginResult(args, env);
+ 		try {
++			//disable the event trigger
+ 			_audiomixer.setTriggerUpdate(null);
+ 			result.ok(undefined, false);
++
++			//cleanup
++			_eventResult.noResult(false);
++			delete _eventResult;
+ 		} catch (e) {
+ 			result.error("error in stopEvents: " + JSON.stringify(e), false);
+ 		}
+@@ -96,7 +100,7 @@ module.exports = {
+ 			var data = _audiomixer.get(args.zone);
+ 			result.ok(data, false);
+ 		} catch (e) {
+-			result.error("Unable to get audiomixer settings", false)
++			result.error(JSON.stringify(e), false)
+ 		}
+ 	},
+ 	
+@@ -108,13 +112,13 @@ module.exports = {
+ 	 * @param env {Object} Environment variables
+ 	 */
+ 	set: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
+ 		try {
+ 			args = _wwfix.parseArgs(args);
+ 			_audiomixer.set(args.setting, args.zone, args.value);
+-			var result = new PluginResult(args, env)
+ 			result.ok(undefined, false);
+ 		} catch (e) {
+-			fail(-1, e);
++			result.error(JSON.stringify(e), false)
+ 		}
+ 	}
+ };
+diff --git a/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+new file mode 100644
+index 0000000..d94136c
+--- /dev/null
++++ b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+@@ -0,0 +1,47 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++ /**
++ * @name car.audiomixer.AudioMixerSetting
++ * @static
++ *
++ * Audio mixer settings enumeration.
++ *
++ * @author mlapierre
++ * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++ */
++
++module.exports = {},
++
++/**  @property VOLUME Represents the volume setting */
++/**  @property BASS Represents the bass setting */
++/**  @property MID Represents the mid setting */
++/**  @property TREBLE Represents the treble setting */
++/**  @property BALANCE Represents the balance setting */
++/**  @property FADE Represents the fade setting */
++
++Object.defineProperties(module.exports,
++{
++	'VOLUME':		{ value: 'volume',		enumerable: true, writable: false },
++	'BASS':			{ value: 'bass',		enumerable: true, writable: false },
++	'MID':			{ value: 'mid',			enumerable: true, writable: false },
++	'TREBLE':		{ value: 'treble',		enumerable: true, writable: false },
++	'BALANCE':		{ value: 'balance',		enumerable: true, writable: false },
++	'FADE':			{ value: 'fade',		enumerable: true, writable: false },
++});
+diff --git a/plugin/com.qnx.car.audiomixer/www/client.js b/plugin/com.qnx.car.audiomixer/www/client.js
+index 000e1b2..23ab921 100644
+--- a/plugin/com.qnx.car.audiomixer/www/client.js
++++ b/plugin/com.qnx.car.audiomixer/www/client.js
+@@ -32,10 +32,8 @@
+ 
+ var _self = {},
+ 	_ID = 'com.qnx.car.audiomixer',
+-    _utils = cordova.require('cordova/utils'),
+-    _watches = {};
+-	// _callback = require('./../../lib/callback'),
+-	// Event = require('./enum/Event');
++	_utils = cordova.require('cordova/utils'),
++	_watches = {};
+ 
+ 
+ /** 
+@@ -44,8 +42,14 @@ var _self = {},
+  * //to refer to the volume setting
+  * car.audiomixer.AudioMixerSetting.VOLUME  //returns 'volume'
+  */
+-//_self.AudioMixerSetting = require('./enum/AudioMixerSetting');
++_self.AudioMixerSetting = require('./AudioMixerSetting');
+ 
++
++/**
++ * Handles update events for this extension
++ * @param data {Array} The updated data provided by the event 
++ * @private
++ */
+ function onUpdate(data) {
+ 	var keys = Object.keys(_watches);
+ 	for (var i=0; i<keys.length; i++) {
+diff --git a/plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js b/plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js
+deleted file mode 100644
+index d94136c..0000000
+--- a/plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/*
+- * Copyright 2013  QNX Software Systems Limited
+- * 
+- * Licensed under the Apache License, Version 2.0 (the "License"). You
+- * may not reproduce, modify or distribute this software except in
+- * compliance with the License. You may obtain a copy of the License
+- * at: http://www.apache.org/licenses/LICENSE-2.0.
+- * 
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" basis,
+- * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
+- * This file may contain contributions from others, either as
+- * contributors under the License or as licensors under other terms.
+- * Please review this entire file for other proprietary rights or license
+- * notices, as well as the applicable QNX License Guide at
+- * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
+- * for other information.
+- */
+-
+- /**
+- * @name car.audiomixer.AudioMixerSetting
+- * @static
+- *
+- * Audio mixer settings enumeration.
+- *
+- * @author mlapierre
+- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
+- */
+-
+-module.exports = {},
+-
+-/**  @property VOLUME Represents the volume setting */
+-/**  @property BASS Represents the bass setting */
+-/**  @property MID Represents the mid setting */
+-/**  @property TREBLE Represents the treble setting */
+-/**  @property BALANCE Represents the balance setting */
+-/**  @property FADE Represents the fade setting */
+-
+-Object.defineProperties(module.exports,
+-{
+-	'VOLUME':		{ value: 'volume',		enumerable: true, writable: false },
+-	'BASS':			{ value: 'bass',		enumerable: true, writable: false },
+-	'MID':			{ value: 'mid',			enumerable: true, writable: false },
+-	'TREBLE':		{ value: 'treble',		enumerable: true, writable: false },
+-	'BALANCE':		{ value: 'balance',		enumerable: true, writable: false },
+-	'FADE':			{ value: 'fade',		enumerable: true, writable: false },
+-});
+diff --git a/plugin/com.qnx.car.hvac/plugin.xml b/plugin/com.qnx.car.hvac/plugin.xml
+new file mode 100644
+index 0000000..8cf20fd
+--- /dev/null
++++ b/plugin/com.qnx.car.hvac/plugin.xml
+@@ -0,0 +1,35 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.car.hvac"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="car.hvac" />
++	</js-module>
++    <js-module src="www/HvacFanDirection.js" />
++    <js-module src="www/HvacSetting.js" />
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/hvac.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.car.hvac" value="com.qnx.car.hvac" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js b/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+new file mode 100644
+index 0000000..42a7884
+--- /dev/null
++++ b/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+@@ -0,0 +1,125 @@
++/**
++ * The abstraction layer for hvac functionality
++ *
++ * @author mlapierre
++ * $Id: hvac.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
++ */
++
++var	_pps = qnx.webplatform.pps,
++	_readerPPS,
++	_writerPPS,
++	_triggerUpdate;
++
++
++/**
++ * Takes in PPS data and formats it for the extension callbacks
++ * @param {Object} data The PPS data
++ * @return {Array} An array of data formatted as per the extension documentation 
++ */
++function dataFormat(data) {
++	if (typeof data != 'object') {
++		return null;
++	}
++
++	var keys = Object.keys(data);
++	var out = [];
++	for (var i=0; i<keys.length; i++) {
++		var splitKey = keys[i].split('_');
++		out.push({ setting: splitKey[0], zone: splitKey[1], value: data[keys[i]] });
++	}
++	return out;
++}
++	
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Initializes the extension 
++	 */
++	init: function() {
++		//readerPPS
++		_readerPPS = _pps.createObject("/pps/qnxcar/hvac", _pps.PPSMode.DELTA);
++		_readerPPS.onNewData = function(event) {
++			if (_triggerUpdate && event && event.data) {
++				_triggerUpdate(dataFormat(event.data));
++			}
++		};
++		_readerPPS.open(_pps.FileMode.RDONLY);
++
++		//writerPPS
++		_writerPPS = _pps.createObject("/pps/qnxcar/hvac", _pps.PPSMode.DELTA);
++		_writerPPS.open(_pps.FileMode.WRONLY);
++	},
++	
++	/**
++	 * Sets the trigger function to call when an event is fired
++	 * @param trigger {Function} The trigger function to call when an event is fired
++	 */
++	setTriggerUpdate: function(trigger) {
++		_triggerUpdate = trigger;
++	},
++	
++	/**
++	 * Returns HVAC settings
++	 * @param settings {Array} A list of car.hvac.HvacSetting values to filter by [optional]
++	 * @param zones {Array} A list of car.zones.Zone values to filter by [optional]
++	 * @returns {Object} The requested setting values
++	 */
++	get: function(settings, zones) {
++		var doSettingFilter = (settings && settings.length > 0);
++		var doZoneFilter = (zones && zones.length > 0);
++
++		//check if we need to filter
++		if (doSettingFilter || doZoneFilter) {
++
++			//we need to filter, retrieve all values from PPS
++			var out = {};
++			var keys = Object.keys(_readerPPS.data.hvac);
++
++			//iterate through the values in PPS
++			for (var i = 0; i < keys.length; i++) {
++
++				//separate the setting from the zone
++				var splitKey = keys[i].split('_');	// 0 = setting, 1 = zone
++				
++				//apply the setting filter
++				if (doSettingFilter && settings.indexOf(splitKey[0]) < 0) {
++					continue;
++				}
++
++				//apply the zone filter
++				if (doZoneFilter && zones.indexOf(splitKey[1]) < 0) {
++					continue;
++				}
++
++				//if we get here, the value passed both filters
++				out[keys[i]] = _readerPPS.data.hvac[keys[i]]
++
++			}
++			//return all filtered values
++			return dataFormat(out);
++		} else {
++			//no filter applied, return all values
++			return dataFormat(_readerPPS.data.hvac);
++		}
++	},
++	
++	/**
++	 * Sets an HVAC setting
++	 * @param setting {String} The car.hvac.HvacSetting value
++	 * @param zone {String} The car.zones.Zone value
++	 * @param value {Mixed} The value for the specified setting in the specified zone
++	 */
++	set: function(setting, zone, value) {
++		if (typeof setting 	== 'string' &&
++			typeof zone 	== 'string' &&
++			typeof value 	!= 'undefined') 
++		{
++			//write data to pps
++			var data = {};
++			data[setting + '_' + zone] = value;
++			_writerPPS.write(data);
++		}
++	}
++};
+diff --git a/plugin/com.qnx.car.hvac/src/blackberry10/index.js b/plugin/com.qnx.car.hvac/src/blackberry10/index.js
+new file mode 100644
+index 0000000..bccce05
+--- /dev/null
++++ b/plugin/com.qnx.car.hvac/src/blackberry10/index.js
+@@ -0,0 +1,129 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Allows control of HVAC systems 
++ *
++ * @author mlapierre
++ * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
++ */
++
++var _hvac = require("./hvac"),
++	_wwfix = require("../../lib/wwfix"),
++	_eventResult;
++
++/**
++ * Initializes the extension 
++ */
++function init() {
++	try {
++		_hvac.init();
++	} catch (ex) {
++		console.error('Error in webworks ext: hvac/index.js:init():', ex);
++	}
++}
++init();
++
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Returns the current audio parameters
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	startEvents: function(success, fail, args, env) {
++		_eventResult = new PluginResult(args, env)
++		try {
++			_hvac.setTriggerUpdate(function (data) {
++				_eventResult.callbackOk(data, true);
++			});
++			_eventResult.noResult(true);
++		} catch (e) {
++			_eventResult.error("error in startEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current audio parameters
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	stopEvents: function(success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			//disable the event trigger
++			_hvac.setTriggerUpdate(null);
++			result.ok(undefined, false);
++
++			//cleanup
++			_eventResult.noResult(false);
++			delete _eventResult;
++		} catch (e) {
++			result.error("error in stopEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns HVAC settings
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	get: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++
++			var settings = (fixedArgs.settings) ? fixedArgs.settings.split(',') : null;
++			var zones = (fixedArgs.zones) ? fixedArgs.zones.split(',') : null;
++			var data = _hvac.get(settings, zones);
++
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false)
++		}
++	},
++	
++	/**
++	 * Sets one or more HVAC settings
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	set: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_hvac.set(fixedArgs.setting, fixedArgs.zone, fixedArgs.value);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false)
++		}
++	}
++};
++
+diff --git a/plugin/com.qnx.car.hvac/www/HvacFanDirection.js b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+new file mode 100644
+index 0000000..248d945
+--- /dev/null
++++ b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+@@ -0,0 +1,30 @@
++/**
++ * @name car.hvac.HvacFanDirection
++ *
++ * @author mlapierre
++ * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++ */
++
++module.exports = {};
++/**
++ * @static
++ * @memberOf module:car_xyz_hvac
++ * @name HvacFanDirection
++ *
++ * @description Fan direction enumeration
++ *
++ * @property DEFROST The fan is set to defrost the front window.
++ * @property DEFROST_AND_FEET The fan is directed to the front window and the feet.
++ * @property FACE The fan is directed to the face.
++ * @property FACE_AND_FEET The fan is directed to the face and feet.
++ * @property FEET The fan is directed to the feet.
++ */
++
++Object.defineProperties(module.exports,
++{
++	'DEFROST':			{ value: 'defrost',			enumerable: true, writable: false },
++	'DEFROST_AND_FEET':	{ value: 'defrostAndFeet',	enumerable: true, writable: false },
++	'FACE':				{ value: 'face',			enumerable: true, writable: false },
++	'FACE_AND_FEET':	{ value: 'faceAndFeet',		enumerable: true, writable: false },
++	'FEET':				{ value: 'feet',			enumerable: true, writable: false },
++});
+\ No newline at end of file
+diff --git a/plugin/com.qnx.car.hvac/www/HvacSetting.js b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+new file mode 100644
+index 0000000..c7abf8d
+--- /dev/null
++++ b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+@@ -0,0 +1,37 @@
++/**
++ * @author mlapierre
++ * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++ */
++
++module.exports = {},
++/**
++ * @static
++ * @memberOf module:car_xyz_hvac
++ * @name HvacSetting
++ *
++ * @description  HVAC settings enumeration
++ *
++ *
++ * @property {Number}  FAN_SPEED The fan speed (0 to 6; 0 for off).
++ * @property {String}  FAN_DIRECTION The fan direction. Use the values from
++ *					   <b>car.hvac.HvacFanDirection</b>.
++ * @property {Boolean} AIR_CONDITIONING The air conditioning (true for on).
++ * @property {Boolean} AIR_RECIRCULATION The air recirculation (true for on).
++ * @property {Boolean} ZONE_LINK Zone Link. When on, both left and right zones are controlled by
++ *					   the left settings (true for on).
++ * @property {Number}  TEMPERATURE The temperature (15 to 26 degrees Celsius).
++ * @property {Number}  HEATED_SEAT Seat heating level (0 to 3; 0 for off).
++ * @property {Boolean} DEFROST Window defrost (true for on).
++ */
++
++Object.defineProperties(module.exports,
++{
++	'FAN_SPEED':			{ value: 'fanSpeed',			enumerable: true, writable: false },
++	'FAN_DIRECTION':		{ value: 'fanDirection',		enumerable: true, writable: false },
++	'AIR_CONDITIONING':		{ value: 'airConditioning',		enumerable: true, writable: false },
++	'AIR_RECIRCULATION':	{ value: 'airRecirculation',	enumerable: true, writable: false },
++	'ZONE_LINK':			{ value: 'zoneLink',			enumerable: true, writable: false },
++	'TEMPERATURE':			{ value: 'temperature',			enumerable: true, writable: false },
++	'HEATED_SEAT':			{ value: 'heatedSeat',			enumerable: true, writable: false },
++	'DEFROST':				{ value: 'defrost',				enumerable: true, writable: false }
++});
+diff --git a/plugin/com.qnx.car.hvac/www/client.js b/plugin/com.qnx.car.hvac/www/client.js
+new file mode 100644
+index 0000000..270ca4b
+--- /dev/null
++++ b/plugin/com.qnx.car.hvac/www/client.js
+@@ -0,0 +1,248 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++ 
++
++ /**
++ * @module car_xyz_hvac
++ * @static
++ *
++ * @description Controls the HVAC system 
++ * 
++ */
++ 
++/* 
++ * @author mlapierre
++ * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
++ */
++
++var _self = {},
++	_ID = 'com.qnx.car.hvac',
++	_utils = cordova.require('cordova/utils'),
++	_watches = {};
++
++
++//to refer to the temperature setting
++_self.HvacSetting = require('./HvacSetting');
++
++//to refer to the defrost direction
++_self.HvacFanDirection = require('./HvacFanDirection');
++
++/**
++ * Handles update events for this extension
++ * @param data {Array} The updated data provided by the event 
++ * @private
++ */
++function onUpdate(data) {
++	var keys = Object.keys(_watches);
++	for (var i=0; i<keys.length; i++) {
++		setTimeout(_watches[keys[i]](data), 0);
++	}
++}
++
++/**
++ * Watch for HVAC changes
++ * @param {Function} callback The function to call when a change is detected.
++ * @return {Number} An ID for the added watch.
++ * @memberOf module:car_xyz_hvac
++ * @method watchHvac
++ * @example
++ * 
++ * //define a callback function
++ * function myCallback(hvacItems) {
++ *		//iterate through the changed items
++ *		for (var i=0; i&lt;hvacItems.length; i++) {
++ *			console.log("hvac item setting = " + hvacItems[i].setting + '\n' +	//a car.hvac.HvacSetting value
++ *						"hvac item zone = " + hvacItems[i].zone + '\n' +		//a car.Zone value
++ *						"hvac item value = " + hvacItems[i].value + '\n\n');	//a mixed value type, depending on the setting
++ *		}
++ * }
++ * 
++ * var watchId = car.hvac.watchHvac(myCallback);
++ */
++_self.watchHvac = function (callback) {
++	var watchId = _utils.createUUID();
++	
++	_watches[watchId] = callback;
++	if (Object.keys(_watches).length === 1) {
++		window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
++	}
++
++	return watchId;
++}
++
++/**
++ * Stop watching HVAC items
++ * @param {Number} watchId The watch ID returned by <i>car.hvac.watchHvac()</i>.
++ * @memberOf module:car_xyz_hvac
++ * @method cancelWatch
++ * @example
++ * 
++ * car.hvac.cancelWatch(watchId);
++ */
++_self.cancelWatch = function (watchId) {
++	if (_watches[watchId]) {
++		delete _watches[watchId];
++		if (Object.keys(_watches).length === 0) {
++			window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
++		}
++	}
++}
++
++
++/**
++ * @desc <p>Return HVAC settings for the specified filter
++ * <p>If successful, <i>car.hvac.get()</i> calls the <i>successCallback</i> function with an array of setting objects.
++ * containing the setting (<b>car.hvac.HvacSetting</b>), the zone (<b>car.Zone</b>) and the value (number/string/boolean).
++ * @param {Function} successCallback The function to call with the result.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Array} [settings] An array of <b>car.hvac.HvacSetting</b> values to whitelist.
++ * @param {Array} [zones] An array of <b>car.Zone</b> values to whitelist. 
++ * @memberOf module:car_xyz_hvac
++ * @method get
++ * @see car.hvac.HvacSetting  
++ * @see car.Zone
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(hvacItems) {
++ *		//iterate through all the hvac items
++ *		for (var i=0; i&lt;hvacItems.length; i++) {
++ *			console.log("hvac item setting = " + hvacItems[i].setting + '\n' +	//a car.hvac.HvacSetting value
++ *						"hvac item zone = " + hvacItems[i].zone + '\n' +		//a car.Zone value
++ *						"hvac item value = " + hvacItems[i].value + '\n\n');	//a mixed value type, depending on the setting
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ *
++ * //call the method
++ * car.hvac.get(successCallback, errorCallback);
++ *
++ *
++ * @example REST - without any filters
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/hvac/get
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{ setting: 'temperature', zone: 'frontLeft', value: 20 },
++ *			{ setting: 'temperature', zone: 'frontRight', value: 22 },
++ *			{ setting: 'temperature', zone: 'rear', value: 22 },
++ *			{ setting: 'airConditioning', zone: 'everywhere', value: true },
++ *			...
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ *
++ *
++ * @example REST - with settings and zone filters
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/hvac/get?settings=temperature,heatedSeats&zones=frontLeft,frontRight
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{ setting: 'temperature', zone: 'frontLeft', value: 20 },
++ *			{ setting: 'temperature', zone: 'frontRight', value: 22 },
++ *			{ setting: 'heatedSeat', zone: 'frontLeft', value: 5 },
++ *			{ setting: 'heatedSeat', zone: 'frontRight', value: 0 }
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.get = function(successCallback, errorCallback, settings, zones) {
++	var args = {};
++
++	if (typeof settings == 'object' && settings.length > 0) {
++		args.settings = settings.join(',');
++	}
++
++	if (typeof zones == 'object' && zones.length > 0) {
++		args.zones = zones.join(',');
++	}
++
++	window.cordova.exec(successCallback, errorCallback, _ID, 'get', args, false);
++};
++
++/**
++ * Save an HVAC setting
++ * @param {String} setting A <b>car.hvac.HvacSetting</b> value.
++ * @param {String} zone A <b>car.Zone</b> value.
++ * @param {Mixed} value The value to save.
++ * @param {Function} [successCallback] The function to call with the result.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car_xyz_hvac 
++ * @method set
++ * @see car.hvac.HvacSetting
++ * @see car.Zone  
++ * @example
++ *
++ * //set the temperature in the entire car to 50
++ * car.hvac.set(car.hvac.HvacSetting.TEMPERATURE, car.Zone.EVERYWHERE, 50);
++ * //NOTE: this is equivalent to doing: car.hvac.set('temperature', 'everywhere', 50);
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/hvac/set?setting=temperature&zone=frontLeft&value=25
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.set = function(setting, zone, value, successCallback, errorCallback) {
++	var args = { 
++		setting: setting, 
++		zone: zone, 
++		value: value 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'set', args, false);
++};
++
++
++// Export
++module.exports = _self;
++
++
+-- 
+1.7.10.msysgit.1
+

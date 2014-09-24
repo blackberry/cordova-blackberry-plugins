@@ -22,6 +22,7 @@
  * @module qnx.browser
  * @description Enables the creation of a basic browser application.
  *              Tabs for the browser are represented by WebViews.
+ * @static
  * 
  */
 
@@ -57,7 +58,7 @@ module.exports = {
 	 *              </ul></p>
 	 * @param {Function} callback The function to call when a change is detected.
 	 * @return {String} The identifier for the callback that was added.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method watchTab
 	 * @example
 	 *
@@ -86,7 +87,7 @@ module.exports = {
 	 * @description Stop monitoring the tab for changes.
 	 *              A tab represents a WebView.
 	 * @param {Number} watchId The watch ID returned by <code>car.browser.watchTab()</code>.
-	 * @memberOf module:car.browser
+	 * @memberOf module:qnx.browser
 	 * @method cancelWatch
 	 * @example
 	 * 
@@ -106,7 +107,7 @@ module.exports = {
 	 * @param {String} chromeUrl The URL of the WebView that handles all the user interface and application logic.
 	 * @param {Number} uiHeight The height you want your WebView to be when the overlay is hidden.
 	 * @param {Number} overlayHeight The height you want for your WebView to be when the overlay is visible.
-	 * @memberOf module:car.browser
+	 * @memberOf module:qnx.browser
 	 * @method init
 	 * @example
 	 * 
@@ -152,7 +153,7 @@ module.exports = {
 	 * @param {Number} x The x-axis location for the top-left corner of the WebView.
 	 * @param {Number} y The y-axis location for the top-left corner of the WebView.
 	 * @param {String} url The default URL to load.
-	 * @memberOf module:car.browser
+	 * @memberOf module:qnx.browser
 	 * @method setDefaultTabParameters
 	 * @example
 	 * 
@@ -196,7 +197,7 @@ module.exports = {
 	 * @description Hide the overlay.
 	 * @param {Function} success The function to call when the overlay is hidden.
 	 * @param {Function} failure The function to call if there's an error hiding the overlay.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method hideOverlay
 	 * @example
 	 *
@@ -222,7 +223,7 @@ module.exports = {
 	 * @description Show the overlay. The the overlay is shown, it's made visible to the user.
 	 * @param {Function} success The function to call when the overlay is shown.
 	 * @param {Function} failure The function to call if there is an error showing the overlay.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method showOverlay
 	 * @example
 	 *
@@ -250,7 +251,7 @@ module.exports = {
 	 * @param {Function} failure The function to call when there is a error creating a tab.
 	 * @param {Object} [options] The settings used to configure a WebView. 
 	 * @return {String} The identifier for the new WebView.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method addTab
 	 * @example
 	 *
@@ -294,7 +295,7 @@ module.exports = {
 	 * @param {Function} success The function to call the tab is successfully removed.
 	 * @param {Function} failure The function to call when there's an error removing a tab.
 	 * @return {String} tabId The identifier of the tab that was removed.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method removeTab
 	 * @example
 	 *
@@ -329,7 +330,7 @@ module.exports = {
 	 * @param {Function} success The function to call with the identifier of the active WebView.
 	 * @param {Function} failure The function to call when there is a error getting the identifier of the active WebView.
 	 * @return {String} The identifier of the active WebView.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser
 	 * @method getActiveTab
 	 * @example
 	 *
@@ -355,7 +356,7 @@ module.exports = {
 	 * @param {Function} success The function to call with the active WebView identifier.
 	 * @param {Function} failure The function to call when there is a error setting the WebView identifier.
 	 * @return {String} tabId The identifier of the active WebView.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method setActiveTab
 	 * @example
 	 *
@@ -388,7 +389,7 @@ module.exports = {
 	 * @param {Function} success The function to call with the updated URL.
 	 * @param {Function} failure The function to call when there is a error setting the URL.
 	 * @return {String} url The new URL for the active WebView.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method updateUrl
 	 * @example
 	 *
@@ -422,7 +423,7 @@ module.exports = {
 	 * @description Reload the active tab. The active tab represents the active WebView.
 	 * @param {Function} success The function to call when reload succeeds.
 	 * @param {Function} failure The function to call when there is a error reloading the WebView.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method reload
 	 * @example
 	 *
@@ -448,7 +449,7 @@ module.exports = {
 	 * @description Stop the active tab from loading. The active tab represents the active WebView.
 	 * @param {Function} success The function to call when the stop command succeeds.
 	 * @param {Function} failure The function to call when there is a error stopping the WebView.
-	 * @memberOf module:car.browser 
+	 * @memberOf module:qnx.browser 
 	 * @method stop
 	 * @example
 	 *

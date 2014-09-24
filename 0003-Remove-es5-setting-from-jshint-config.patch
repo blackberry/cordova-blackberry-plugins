@@ -1,0 +1,26 @@
+From 55c087dab6685ebe65cc173f2b7328888f97b474 Mon Sep 17 00:00:00 2001
+From: Hasan Ahmad <haahmad@blackberry.com>
+Date: Fri, 24 May 2013 15:55:46 -0400
+Subject: [PATCH 03/61] Remove es5 setting from jshint config
+
+Reviewed by Danyi Lin <danylin@blackberry.com>
+Tested by Danyi Lin <danylin@blackberry.com>
+---
+ .jshintrc |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/.jshintrc b/.jshintrc
+index 2eefe82..e261c9c 100644
+--- a/.jshintrc
++++ b/.jshintrc
+@@ -49,7 +49,6 @@
+     ],
+ 
+     "node" : false,
+-    "es5" : true,
+     "browser" : true,
+     "unused": false,
+     "boss" : false,
+-- 
+1.7.10.msysgit.1
+

@@ -1,0 +1,2035 @@
+From ae17b168c88e6c84a9a7151fd7786997827b254f Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Wed, 9 Oct 2013 14:33:25 -0400
+Subject: [PATCH 36/61] Fixing permissions
+
+---
+ test/test-app/src/audio/test.mp3                                       |  Bin 22790 -> 22790 bytes
+ test/test-app/src/img/blackberry10.jpg                                 |  Bin 15353 -> 15353 bytes
+ test/test-app/src/img/windowcover.png                                  |  Bin 13127 -> 13127 bytes
+ test/test-app/src/manual/ContextMenu/icon.png                          |  Bin 6428 -> 6428 bytes
+ test/test-app/src/manual/InvocationTest/test.docx                      |  Bin 5422 -> 5422 bytes
+ test/test-app/src/manual/InvocationTest/test.pdf                       |  Bin 32217 -> 32217 bytes
+ test/test-app/src/manual/InvocationTest/test_image.png                 |  Bin 6428 -> 6428 bytes
+ test/test-app/src/manual/html5/1.jpg                                   |  Bin 2058 -> 2058 bytes
+ test/test-app/src/manual/html5/2.jpg                                   |  Bin 2070 -> 2070 bytes
+ test/test-app/src/manual/html5/sub1/1.jpg                              |  Bin 2612 -> 2612 bytes
+ test/test-app/src/manual/html5/sub1/3.jpg                              |  Bin 2727 -> 2727 bytes
+ test/test-app/src/manual/html5/sub1/sub11/1.jpg                        |  Bin 3046 -> 3046 bytes
+ test/test-app/src/manual/html5/sub1/sub11/4.jpg                        |  Bin 3337 -> 3337 bytes
+ test/test-app/src/video/VideoRecord1.mp4                               |  Bin 2224813 -> 2224813 bytes
+ .../test-suite/Apps/DisableWebSecurity/res/icon/blackberry/icon-80.png |  Bin 7287 -> 7287 bytes
+ .../Apps/SubfolderStartupPage/res/icon/blackberry/icon-80.png          |  Bin 7287 -> 7287 bytes
+ 16 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 Jakefile
+ mode change 100644 => 100755 LICENSE
+ mode change 100644 => 100755 Makefile
+ mode change 100644 => 100755 README.md
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/AUTHORS
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/LICENSE
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/NEWS.txt
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/README.txt
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/SConstruct
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/amalgamate.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/__init__.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/antglob.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/fixeol.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/licenseupdater.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/tarball.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/doxyfile.in
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/footer.html
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/header.html
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/jsoncpp.dox
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/readme.txt
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/roadmap.dox
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doxybuild.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/autolink.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/config.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/features.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/forwards.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/json.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/jsoncpp_features.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/reader.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/value.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/writer.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/jsoncpp.sln
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/jsontest.vcproj
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/lib_json.vcproj
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/test_lib_json.vcproj
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makerelease.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/globtool.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/srcdist.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/substinfile.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/targz.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/jsontestrunner/main.cpp
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/jsontestrunner/sconscript
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_batchallocator.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_internalarray.inl
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_internalmap.inl
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_reader.cpp
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_tool.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_value.cpp
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_valueiterator.inl
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_writer.cpp
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/sconscript
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/jsontest.cpp
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/jsontest.h
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/main.cpp
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/sconscript
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/cleantests.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/fail_test_array_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_04.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_04.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_05.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_05.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_06.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_06.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_04.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_04.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_05.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_05.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_06.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_06.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_07.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_07.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_08.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_08.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_09.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_09.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_comment_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_comment_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_complex_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_complex_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_04.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_04.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_05.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_05.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_06_64bits.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_06_64bits.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_07_64bits.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_07_64bits.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_08_64bits.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_08_64bits.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_large_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_large_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_04.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_04.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_preserve_comment_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_preserve_comment_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_04.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_04.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_05.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_05.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_06.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_06.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_07.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_07.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_01.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_01.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_02.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_02.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_03.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_03.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_04.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_04.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_05.expected
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_05.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/generate_expected.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail1.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail10.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail11.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail12.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail13.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail14.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail15.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail16.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail17.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail18.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail19.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail2.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail20.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail21.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail22.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail23.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail24.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail25.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail26.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail27.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail28.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail29.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail3.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail30.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail31.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail32.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail33.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail4.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail5.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail6.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail7.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail8.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail9.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass1.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass2.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass3.json
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/readme.txt
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/pyjsontestrunner.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/runjsontests.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/rununittests.py
+ mode change 100644 => 100755 dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/version
+ mode change 100644 => 100755 dependencies/cpplint/cpplint.py
+ mode change 100644 => 100755 dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.cpp
+ mode change 100644 => 100755 dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.h
+ mode change 100644 => 100755 dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/tokenizer.cpp
+ mode change 100644 => 100755 dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/tokenizer.h
+ mode change 100644 => 100755 package.json
+ mode change 100644 => 100755 plugin/Makefile
+ mode change 100644 => 100755 plugin/com.qnx.application.event/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.application.event/src/blackberry10/application.js
+ mode change 100644 => 100755 plugin/com.qnx.application.event/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.application.event/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.application.event/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.application/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.application/src/blackberry10/application.js
+ mode change 100644 => 100755 plugin/com.qnx.application/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.application/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/src/blackberry10/pbap.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/src/blackberry10/servicestate.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/src/blackberry10/servicestatus.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth.pbap/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth/src/blackberry10/bluetooth.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.bluetooth/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+ mode change 100644 => 100755 plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+ mode change 100644 => 100755 plugin/com.qnx.car.audiomixer/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.hvac/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+ mode change 100644 => 100755 plugin/com.qnx.car.hvac/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+ mode change 100644 => 100755 plugin/com.qnx.car.hvac/www/HvacSetting.js
+ mode change 100644 => 100755 plugin/com.qnx.car.hvac/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/Event.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/RepeatMode.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js
+ mode change 100644 => 100755 plugin/com.qnx.car.mediaplayer/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.navigation/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.navigation/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js
+ mode change 100644 => 100755 plugin/com.qnx.car.navigation/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.profile/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.profile/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.profile/src/blackberry10/profile.js
+ mode change 100644 => 100755 plugin/com.qnx.car.profile/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.radio/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.radio/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.car.radio/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.radio/src/blackberry10/radio.js
+ mode change 100644 => 100755 plugin/com.qnx.car.radio/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.sensors/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.sensors/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.sensors/src/blackberry10/sensors.js
+ mode change 100644 => 100755 plugin/com.qnx.car.sensors/www/Sensor.js
+ mode change 100644 => 100755 plugin/com.qnx.car.sensors/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.theme/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.theme/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.theme/src/blackberry10/theme.js
+ mode change 100644 => 100755 plugin/com.qnx.car.theme/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.car.zone/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.car.zone/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.car.zone/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.message/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.message/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.message/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.message/src/blackberry10/message.js
+ mode change 100644 => 100755 plugin/com.qnx.message/src/blackberry10/servicenotification.js
+ mode change 100644 => 100755 plugin/com.qnx.message/src/blackberry10/servicestate.js
+ mode change 100644 => 100755 plugin/com.qnx.message/src/blackberry10/servicestatus.js
+ mode change 100644 => 100755 plugin/com.qnx.message/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.phone/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.phone/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.phone/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.phone/src/blackberry10/phone.js
+ mode change 100644 => 100755 plugin/com.qnx.phone/www/client.js
+ mode change 100644 => 100755 plugin/com.qnx.settings/plugin.xml
+ mode change 100644 => 100755 plugin/com.qnx.settings/src/blackberry10/context.js
+ mode change 100644 => 100755 plugin/com.qnx.settings/src/blackberry10/index.js
+ mode change 100644 => 100755 plugin/com.qnx.settings/src/blackberry10/settings.js
+ mode change 100644 => 100755 plugin/com.qnx.settings/www/client.js
+ mode change 100644 => 100755 plugin/meta.mk
+ mode change 100644 => 100755 scripts/autorun-mobile-spec.js
+ mode change 100644 => 100755 scripts/build.js
+ mode change 100644 => 100755 scripts/conf.js
+ mode change 100644 => 100755 scripts/lint.js
+ mode change 100644 => 100755 scripts/mobile-spec.js
+ mode change 100644 => 100755 scripts/project-utils.js
+ mode change 100644 => 100755 scripts/reporter.js
+ mode change 100644 => 100755 scripts/test-app.js
+ mode change 100644 => 100755 scripts/test-suite.js
+ mode change 100644 => 100755 scripts/test.js
+ mode change 100644 => 100755 scripts/utils.js
+ mode change 100644 => 100755 test/autorun-mobile-spec/src/updater/jasmine-jsreporter.js
+ mode change 100644 => 100755 test/autorun-mobile-spec/src/updater/mobile_spec.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.app.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.bbm.platform.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.connection.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.identity.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.invoke.card.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.invoke.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.invoked.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.io.filetransfer.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.io.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.notification.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.pim.calendar.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.pim.contacts.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.push.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.sensors.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.system.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.ui.contextmenu.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.ui.cover.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.ui.dialog.js
+ mode change 100644 => 100755 test/integration/automatic/blackberry.ui.toast.js
+ mode change 100644 => 100755 test/integration/automatic/crossOrigin.js
+ mode change 100644 => 100755 test/integration/automatic/customHeader.js
+ mode change 100644 => 100755 test/integration/automatic/enableFlash.js
+ mode change 100644 => 100755 test/integration/automatic/invokeRequestEvent.js
+ mode change 100644 => 100755 test/integration/automatic/navigator.geolocation.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.bbm.platform.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.invoke.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.invoked.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.io.filetransfer.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.notification.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.pim.calendar.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.pim.contacts.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.push.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.system.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.ui.cover.js
+ mode change 100644 => 100755 test/integration/manual/blackberry.ui.dialog.js
+ mode change 100644 => 100755 test/integration/manual/ui/dialog/index.js
+ mode change 100644 => 100755 test/test-app/src/README.md
+ mode change 100644 => 100755 test/test-app/src/audio/test.mp3
+ mode change 100644 => 100755 test/test-app/src/automatic/SpecRunner.htm
+ mode change 100644 => 100755 test/test-app/src/automatic/invokeRequestEvent.js
+ mode change 100644 => 100755 test/test-app/src/config.xml
+ mode change 100644 => 100755 test/test-app/src/css/input_type.css
+ mode change 100644 => 100755 test/test-app/src/css/jasmine.css
+ mode change 100644 => 100755 test/test-app/src/css/jquery.mobile-1.1.1.min.css
+ mode change 100644 => 100755 test/test-app/src/experimental/index.htm
+ mode change 100644 => 100755 test/test-app/src/experimental/webviews/child.htm
+ mode change 100644 => 100755 test/test-app/src/experimental/webviews/index.htm
+ mode change 100644 => 100755 test/test-app/src/img/blackberry10.jpg
+ mode change 100644 => 100755 test/test-app/src/img/windowcover.png
+ mode change 100644 => 100755 test/test-app/src/index.html
+ mode change 100644 => 100755 test/test-app/src/js/input_type.js
+ mode change 100644 => 100755 test/test-app/src/js/jasmine-html.js
+ mode change 100644 => 100755 test/test-app/src/js/jasmine.js
+ mode change 100644 => 100755 test/test-app/src/js/jquery-1.7.2.min.js
+ mode change 100644 => 100755 test/test-app/src/js/jquery.mobile-1.1.1.min.js
+ mode change 100644 => 100755 test/test-app/src/js/load_autotest.js
+ mode change 100644 => 100755 test/test-app/src/manual/ContextMenu/icon.png
+ mode change 100644 => 100755 test/test-app/src/manual/InvocationTest/index.htm
+ mode change 100644 => 100755 test/test-app/src/manual/InvocationTest/js/app.js
+ mode change 100644 => 100755 test/test-app/src/manual/InvocationTest/test.docx
+ mode change 100644 => 100755 test/test-app/src/manual/InvocationTest/test.pdf
+ mode change 100644 => 100755 test/test-app/src/manual/InvocationTest/test_image.png
+ mode change 100644 => 100755 test/test-app/src/manual/childWebView/alt.html
+ mode change 100644 => 100755 test/test-app/src/manual/childWebView/child.html
+ mode change 100644 => 100755 test/test-app/src/manual/childWebView/main.html
+ mode change 100644 => 100755 test/test-app/src/manual/disableWebSecurity/main.html
+ mode change 100644 => 100755 test/test-app/src/manual/formcontrol/main.html
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/calendarComposer.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/calendarPicker.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/cameraCard.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/emailComposer.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/filePickerCard.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/icsViewerCard.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/main.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/mediaplayer.htm
+ mode change 100644 => 100755 test/test-app/src/manual/framework-split/test.ics
+ mode change 100644 => 100755 test/test-app/src/manual/framework/SpecRunner.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/1.jpg
+ mode change 100644 => 100755 test/test-app/src/manual/html5/2.jpg
+ mode change 100644 => 100755 test/test-app/src/manual/html5/ajaxUtility.js
+ mode change 100644 => 100755 test/test-app/src/manual/html5/feature_access_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/geolocation_testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/getUserMediaTest.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/html5db.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/iframeManifestCache.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/input.html
+ mode change 100644 => 100755 test/test-app/src/manual/html5/input_types.html
+ mode change 100644 => 100755 test/test-app/src/manual/html5/localCSS.css
+ mode change 100644 => 100755 test/test-app/src/manual/html5/localJSFile.js
+ mode change 100644 => 100755 test/test-app/src/manual/html5/localStorage.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/local_Ajax_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/local_CSS_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/local_Image_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/local_JSFile_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/local_ajax.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/main.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/onload_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/sub1/1.jpg
+ mode change 100644 => 100755 test/test-app/src/manual/html5/sub1/3.jpg
+ mode change 100644 => 100755 test/test-app/src/manual/html5/sub1/sub11/1.jpg
+ mode change 100644 => 100755 test/test-app/src/manual/html5/sub1/sub11/4.jpg
+ mode change 100644 => 100755 test/test-app/src/manual/html5/sub1/sub11/local_sub1.html
+ mode change 100644 => 100755 test/test-app/src/manual/html5/webinspector.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/webworker_Testing.htm
+ mode change 100644 => 100755 test/test-app/src/manual/html5/worker1.js
+ mode change 100644 => 100755 test/test-app/src/manual/index.htm
+ mode change 100644 => 100755 test/test-app/src/video/VideoRecord1.mp4
+ mode change 100644 => 100755 test/test-reporter/ReportGenerator.js
+ mode change 100644 => 100755 test/test-reporter/server.js
+ mode change 100644 => 100755 test/test-reporter/template/brief-report_templ.html
+ mode change 100644 => 100755 test/test-reporter/template/css/styles.css
+ mode change 100644 => 100755 test/test-reporter/template/js/report.js
+ mode change 100644 => 100755 test/test-reporter/template/test-report_templ.html
+ mode change 100644 => 100755 test/test-suite/Apps/Calendar/config.xml
+ mode change 100644 => 100755 test/test-suite/Apps/Calendar/index.html
+ mode change 100644 => 100755 test/test-suite/Apps/Calendar/textarea.css
+ mode change 100644 => 100755 test/test-suite/Apps/Calendar/textarea.js
+ mode change 100644 => 100755 test/test-suite/Apps/CreateContact/textarea.css
+ mode change 100644 => 100755 test/test-suite/Apps/CreateContact/textarea.js
+ mode change 100644 => 100755 test/test-suite/Apps/DisableChildWebView/alt.html
+ mode change 100644 => 100755 test/test-suite/Apps/DisableChildWebView/child.html
+ mode change 100644 => 100755 test/test-suite/Apps/DisableChildWebView/main.html
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/config.xml
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/css/jasmine.css
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/index.html
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/js/jasmine-html.js
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/js/jasmine.js
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/res/icon/blackberry/icon-80.png
+ mode change 100644 => 100755 test/test-suite/Apps/DisableWebSecurity/spec/disableWebSecurityTests.js
+ mode change 100644 => 100755 test/test-suite/Apps/ExternalStartup/config.xml
+ mode change 100644 => 100755 test/test-suite/Apps/ExternalStartup/index.html
+ mode change 100644 => 100755 test/test-suite/Apps/NoAccess/config.xml
+ mode change 100644 => 100755 test/test-suite/Apps/NoAccess/css/jasmine.css
+ mode change 100644 => 100755 test/test-suite/Apps/NoAccess/index.html
+ mode change 100644 => 100755 test/test-suite/Apps/NoAccess/js/jasmine-html.js
+ mode change 100644 => 100755 test/test-suite/Apps/NoAccess/js/jasmine.js
+ mode change 100644 => 100755 test/test-suite/Apps/NoAccess/spec/noAccessTests.js
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/a/index.html
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/config.xml
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/css/jasmine.css
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/js/jasmine-html.js
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/js/jasmine.js
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/res/icon/blackberry/icon-80.png
+ mode change 100644 => 100755 test/test-suite/Apps/SubfolderStartupPage/spec/whitelistSubfolder.js
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardDomain/config.xml
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardDomain/css/jasmine.css
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardDomain/index.html
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardDomain/js/jasmine-html.js
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardDomain/js/jasmine.js
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardDomain/spec/crossOriginWildcard.js
+ mode change 100644 => 100755 test/test-suite/Apps/WildcardExternalStartupPage/config.xml
+ mode change 100644 => 100755 test/test-suite/test/DeployTest.js
+ mode change 100644 => 100755 test/test-suite/test/server.js
+ mode change 100644 => 100755 test/test-suite/test/whitelist-suite-runner.js
+ mode change 100644 => 100755 test/unit/com.blackberry.app/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.app/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.bbm.platform/BBMEvents.js
+ mode change 100644 => 100755 test/unit/com.blackberry.bbm.platform/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.bbm.platform/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.connection/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.connection/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.identity/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.identity/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoke.card/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoke.card/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoke/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoke/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoke/invocationEvents.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoked/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoked/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.invoked/invocationEvents.js
+ mode change 100644 => 100755 test/unit/com.blackberry.io.filetransfer/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.io.filetransfer/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.io/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.io/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.notification/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.notification/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.payment/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.payment/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.calendar/CalendarEvent.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.calendar/calendarUtils.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.calendar/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.calendar/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.contacts/Contact.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.contacts/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.contacts/contactUtils.js
+ mode change 100644 => 100755 test/unit/com.blackberry.pim.contacts/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.push/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.push/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.sensors/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.sensors/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.sensors/sensorEvents.js
+ mode change 100644 => 100755 test/unit/com.blackberry.system/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.system/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.contextmenu/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.contextmenu/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.cover/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.cover/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.dialog/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.dialog/index.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.toast/client.js
+ mode change 100644 => 100755 test/unit/com.blackberry.ui.toast/index.js
+
+diff --git a/Jakefile b/Jakefile
+old mode 100644
+new mode 100755
+diff --git a/LICENSE b/LICENSE
+old mode 100644
+new mode 100755
+diff --git a/Makefile b/Makefile
+old mode 100644
+new mode 100755
+diff --git a/README.md b/README.md
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/AUTHORS b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/AUTHORS
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/LICENSE b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/LICENSE
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/NEWS.txt b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/NEWS.txt
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/README.txt b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/README.txt
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/SConstruct b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/SConstruct
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/amalgamate.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/amalgamate.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/__init__.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/__init__.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/antglob.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/antglob.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/fixeol.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/fixeol.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/licenseupdater.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/licenseupdater.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/tarball.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/devtools/tarball.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/doxyfile.in b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/doxyfile.in
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/footer.html b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/footer.html
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/header.html b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/header.html
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/jsoncpp.dox b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/jsoncpp.dox
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/readme.txt b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/readme.txt
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/roadmap.dox b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doc/roadmap.dox
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doxybuild.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/doxybuild.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/autolink.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/autolink.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/config.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/config.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/features.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/features.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/forwards.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/forwards.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/json.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/json.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/jsoncpp_features.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/jsoncpp_features.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/reader.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/reader.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/value.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/value.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/writer.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/include/json/writer.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/jsoncpp.sln b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/jsoncpp.sln
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/jsontest.vcproj b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/jsontest.vcproj
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/lib_json.vcproj b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/lib_json.vcproj
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/test_lib_json.vcproj b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makefiles/vs71/test_lib_json.vcproj
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makerelease.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/makerelease.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/globtool.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/globtool.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/srcdist.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/srcdist.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/substinfile.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/substinfile.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/targz.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/scons-tools/targz.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/jsontestrunner/main.cpp b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/jsontestrunner/main.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/jsontestrunner/sconscript b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/jsontestrunner/sconscript
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_batchallocator.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_batchallocator.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_internalarray.inl b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_internalarray.inl
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_internalmap.inl b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_internalmap.inl
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_reader.cpp b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_reader.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_tool.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_tool.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_value.cpp b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_value.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_valueiterator.inl b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_valueiterator.inl
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_writer.cpp b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/json_writer.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/sconscript b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/lib_json/sconscript
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/jsontest.cpp b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/jsontest.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/jsontest.h b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/jsontest.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/main.cpp b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/main.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/sconscript b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/src/test_lib_json/sconscript
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/cleantests.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/cleantests.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/fail_test_array_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/fail_test_array_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_04.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_04.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_04.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_04.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_05.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_05.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_05.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_05.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_06.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_06.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_06.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_array_06.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_04.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_04.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_04.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_04.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_05.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_05.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_05.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_05.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_06.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_06.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_06.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_06.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_07.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_07.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_07.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_07.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_08.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_08.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_08.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_08.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_09.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_09.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_09.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_basic_09.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_comment_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_comment_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_comment_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_comment_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_complex_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_complex_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_complex_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_complex_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_04.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_04.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_04.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_04.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_05.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_05.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_05.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_05.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_06_64bits.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_06_64bits.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_06_64bits.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_06_64bits.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_07_64bits.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_07_64bits.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_07_64bits.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_07_64bits.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_08_64bits.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_08_64bits.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_08_64bits.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_integer_08_64bits.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_large_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_large_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_large_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_large_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_04.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_04.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_04.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_object_04.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_preserve_comment_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_preserve_comment_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_preserve_comment_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_preserve_comment_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_04.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_04.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_04.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_04.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_05.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_05.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_05.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_05.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_06.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_06.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_06.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_06.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_07.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_07.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_07.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_real_07.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_01.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_01.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_01.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_01.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_02.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_02.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_02.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_02.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_03.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_03.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_03.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_03.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_04.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_04.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_04.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_04.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_05.expected b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_05.expected
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_05.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/data/test_string_unicode_05.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/generate_expected.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/generate_expected.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail1.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail1.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail10.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail10.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail11.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail11.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail12.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail12.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail13.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail13.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail14.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail14.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail15.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail15.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail16.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail16.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail17.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail17.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail18.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail18.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail19.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail19.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail2.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail2.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail20.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail20.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail21.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail21.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail22.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail22.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail23.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail23.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail24.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail24.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail25.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail25.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail26.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail26.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail27.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail27.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail28.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail28.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail29.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail29.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail3.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail3.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail30.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail30.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail31.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail31.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail32.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail32.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail33.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail33.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail4.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail4.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail5.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail5.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail6.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail6.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail7.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail7.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail8.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail8.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail9.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/fail9.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass1.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass1.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass2.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass2.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass3.json b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/pass3.json
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/readme.txt b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/jsonchecker/readme.txt
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/pyjsontestrunner.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/pyjsontestrunner.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/runjsontests.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/runjsontests.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/rununittests.py b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/test/rununittests.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/version b/dependencies/JsonCpp/jsoncpp-src-0.6.0-rc2/version
+old mode 100644
+new mode 100755
+diff --git a/dependencies/cpplint/cpplint.py b/dependencies/cpplint/cpplint.py
+old mode 100644
+new mode 100755
+diff --git a/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.cpp b/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.h b/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/plugin.h
+old mode 100644
+new mode 100755
+diff --git a/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/tokenizer.cpp b/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/tokenizer.cpp
+old mode 100644
+new mode 100755
+diff --git a/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/tokenizer.h b/dependencies/jnext_1_0_8_3/jncore/jnext-extensions/common/tokenizer.h
+old mode 100644
+new mode 100755
+diff --git a/package.json b/package.json
+old mode 100644
+new mode 100755
+diff --git a/plugin/Makefile b/plugin/Makefile
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application.event/plugin.xml b/plugin/com.qnx.application.event/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application.event/src/blackberry10/application.js b/plugin/com.qnx.application.event/src/blackberry10/application.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application.event/src/blackberry10/context.js b/plugin/com.qnx.application.event/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application.event/src/blackberry10/index.js b/plugin/com.qnx.application.event/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application.event/www/client.js b/plugin/com.qnx.application.event/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application/plugin.xml b/plugin/com.qnx.application/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application/src/blackberry10/application.js b/plugin/com.qnx.application/src/blackberry10/application.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application/src/blackberry10/index.js b/plugin/com.qnx.application/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.application/www/client.js b/plugin/com.qnx.application/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/plugin.xml b/plugin/com.qnx.bluetooth.pbap/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/src/blackberry10/context.js b/plugin/com.qnx.bluetooth.pbap/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/src/blackberry10/index.js b/plugin/com.qnx.bluetooth.pbap/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/src/blackberry10/pbap.js b/plugin/com.qnx.bluetooth.pbap/src/blackberry10/pbap.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/src/blackberry10/servicestate.js b/plugin/com.qnx.bluetooth.pbap/src/blackberry10/servicestate.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/src/blackberry10/servicestatus.js b/plugin/com.qnx.bluetooth.pbap/src/blackberry10/servicestatus.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth.pbap/www/client.js b/plugin/com.qnx.bluetooth.pbap/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth/plugin.xml b/plugin/com.qnx.bluetooth/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth/src/blackberry10/bluetooth.js b/plugin/com.qnx.bluetooth/src/blackberry10/bluetooth.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth/src/blackberry10/context.js b/plugin/com.qnx.bluetooth/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth/src/blackberry10/index.js b/plugin/com.qnx.bluetooth/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.bluetooth/www/client.js b/plugin/com.qnx.bluetooth/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.audiomixer/www/client.js b/plugin/com.qnx.car.audiomixer/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.hvac/plugin.xml b/plugin/com.qnx.car.hvac/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js b/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.hvac/src/blackberry10/index.js b/plugin/com.qnx.car.hvac/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.hvac/www/HvacFanDirection.js b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.hvac/www/HvacSetting.js b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.hvac/www/client.js b/plugin/com.qnx.car.hvac/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/plugin.xml b/plugin/com.qnx.car.mediaplayer/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/src/blackberry10/context.js b/plugin/com.qnx.car.mediaplayer/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js b/plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js b/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/Event.js b/plugin/com.qnx.car.mediaplayer/www/Event.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js b/plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js b/plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js b/plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js b/plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/RepeatMode.js b/plugin/com.qnx.car.mediaplayer/www/RepeatMode.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js b/plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js b/plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.mediaplayer/www/client.js b/plugin/com.qnx.car.mediaplayer/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.navigation/plugin.xml b/plugin/com.qnx.car.navigation/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.navigation/src/blackberry10/index.js b/plugin/com.qnx.car.navigation/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js b/plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.navigation/www/client.js b/plugin/com.qnx.car.navigation/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.profile/plugin.xml b/plugin/com.qnx.car.profile/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.profile/src/blackberry10/index.js b/plugin/com.qnx.car.profile/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.profile/src/blackberry10/profile.js b/plugin/com.qnx.car.profile/src/blackberry10/profile.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.profile/www/client.js b/plugin/com.qnx.car.profile/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.radio/plugin.xml b/plugin/com.qnx.car.radio/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.radio/src/blackberry10/context.js b/plugin/com.qnx.car.radio/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.radio/src/blackberry10/index.js b/plugin/com.qnx.car.radio/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.radio/src/blackberry10/radio.js b/plugin/com.qnx.car.radio/src/blackberry10/radio.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.radio/www/client.js b/plugin/com.qnx.car.radio/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.sensors/plugin.xml b/plugin/com.qnx.car.sensors/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.sensors/src/blackberry10/index.js b/plugin/com.qnx.car.sensors/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.sensors/src/blackberry10/sensors.js b/plugin/com.qnx.car.sensors/src/blackberry10/sensors.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.sensors/www/Sensor.js b/plugin/com.qnx.car.sensors/www/Sensor.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.sensors/www/client.js b/plugin/com.qnx.car.sensors/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.theme/plugin.xml b/plugin/com.qnx.car.theme/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.theme/src/blackberry10/index.js b/plugin/com.qnx.car.theme/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.theme/src/blackberry10/theme.js b/plugin/com.qnx.car.theme/src/blackberry10/theme.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.theme/www/client.js b/plugin/com.qnx.car.theme/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.zone/plugin.xml b/plugin/com.qnx.car.zone/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.zone/src/blackberry10/index.js b/plugin/com.qnx.car.zone/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.car.zone/www/client.js b/plugin/com.qnx.car.zone/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/plugin.xml b/plugin/com.qnx.message/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/src/blackberry10/context.js b/plugin/com.qnx.message/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/src/blackberry10/index.js b/plugin/com.qnx.message/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/src/blackberry10/message.js b/plugin/com.qnx.message/src/blackberry10/message.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/src/blackberry10/servicenotification.js b/plugin/com.qnx.message/src/blackberry10/servicenotification.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/src/blackberry10/servicestate.js b/plugin/com.qnx.message/src/blackberry10/servicestate.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/src/blackberry10/servicestatus.js b/plugin/com.qnx.message/src/blackberry10/servicestatus.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.message/www/client.js b/plugin/com.qnx.message/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.phone/plugin.xml b/plugin/com.qnx.phone/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.phone/src/blackberry10/context.js b/plugin/com.qnx.phone/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.phone/src/blackberry10/index.js b/plugin/com.qnx.phone/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.phone/src/blackberry10/phone.js b/plugin/com.qnx.phone/src/blackberry10/phone.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.phone/www/client.js b/plugin/com.qnx.phone/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.settings/plugin.xml b/plugin/com.qnx.settings/plugin.xml
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.settings/src/blackberry10/context.js b/plugin/com.qnx.settings/src/blackberry10/context.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.settings/src/blackberry10/index.js b/plugin/com.qnx.settings/src/blackberry10/index.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.settings/src/blackberry10/settings.js b/plugin/com.qnx.settings/src/blackberry10/settings.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/com.qnx.settings/www/client.js b/plugin/com.qnx.settings/www/client.js
+old mode 100644
+new mode 100755
+diff --git a/plugin/meta.mk b/plugin/meta.mk
+old mode 100644
+new mode 100755
+diff --git a/scripts/autorun-mobile-spec.js b/scripts/autorun-mobile-spec.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/build.js b/scripts/build.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/conf.js b/scripts/conf.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/lint.js b/scripts/lint.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/mobile-spec.js b/scripts/mobile-spec.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/project-utils.js b/scripts/project-utils.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/reporter.js b/scripts/reporter.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/test-app.js b/scripts/test-app.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/test-suite.js b/scripts/test-suite.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/test.js b/scripts/test.js
+old mode 100644
+new mode 100755
+diff --git a/scripts/utils.js b/scripts/utils.js
+old mode 100644
+new mode 100755
+diff --git a/test/autorun-mobile-spec/src/updater/jasmine-jsreporter.js b/test/autorun-mobile-spec/src/updater/jasmine-jsreporter.js
+old mode 100644
+new mode 100755
+diff --git a/test/autorun-mobile-spec/src/updater/mobile_spec.js b/test/autorun-mobile-spec/src/updater/mobile_spec.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.app.js b/test/integration/automatic/blackberry.app.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.bbm.platform.js b/test/integration/automatic/blackberry.bbm.platform.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.connection.js b/test/integration/automatic/blackberry.connection.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.identity.js b/test/integration/automatic/blackberry.identity.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.invoke.card.js b/test/integration/automatic/blackberry.invoke.card.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.invoke.js b/test/integration/automatic/blackberry.invoke.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.invoked.js b/test/integration/automatic/blackberry.invoked.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.io.filetransfer.js b/test/integration/automatic/blackberry.io.filetransfer.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.io.js b/test/integration/automatic/blackberry.io.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.js b/test/integration/automatic/blackberry.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.notification.js b/test/integration/automatic/blackberry.notification.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.pim.calendar.js b/test/integration/automatic/blackberry.pim.calendar.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.pim.contacts.js b/test/integration/automatic/blackberry.pim.contacts.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.push.js b/test/integration/automatic/blackberry.push.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.sensors.js b/test/integration/automatic/blackberry.sensors.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.system.js b/test/integration/automatic/blackberry.system.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.ui.contextmenu.js b/test/integration/automatic/blackberry.ui.contextmenu.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.ui.cover.js b/test/integration/automatic/blackberry.ui.cover.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.ui.dialog.js b/test/integration/automatic/blackberry.ui.dialog.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/blackberry.ui.toast.js b/test/integration/automatic/blackberry.ui.toast.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/crossOrigin.js b/test/integration/automatic/crossOrigin.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/customHeader.js b/test/integration/automatic/customHeader.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/enableFlash.js b/test/integration/automatic/enableFlash.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/invokeRequestEvent.js b/test/integration/automatic/invokeRequestEvent.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/automatic/navigator.geolocation.js b/test/integration/automatic/navigator.geolocation.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.bbm.platform.js b/test/integration/manual/blackberry.bbm.platform.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.invoke.js b/test/integration/manual/blackberry.invoke.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.invoked.js b/test/integration/manual/blackberry.invoked.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.io.filetransfer.js b/test/integration/manual/blackberry.io.filetransfer.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.notification.js b/test/integration/manual/blackberry.notification.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.pim.calendar.js b/test/integration/manual/blackberry.pim.calendar.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.pim.contacts.js b/test/integration/manual/blackberry.pim.contacts.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.push.js b/test/integration/manual/blackberry.push.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.system.js b/test/integration/manual/blackberry.system.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.ui.cover.js b/test/integration/manual/blackberry.ui.cover.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/blackberry.ui.dialog.js b/test/integration/manual/blackberry.ui.dialog.js
+old mode 100644
+new mode 100755
+diff --git a/test/integration/manual/ui/dialog/index.js b/test/integration/manual/ui/dialog/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/README.md b/test/test-app/src/README.md
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/audio/test.mp3 b/test/test-app/src/audio/test.mp3
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/automatic/SpecRunner.htm b/test/test-app/src/automatic/SpecRunner.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/automatic/invokeRequestEvent.js b/test/test-app/src/automatic/invokeRequestEvent.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/config.xml b/test/test-app/src/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/css/input_type.css b/test/test-app/src/css/input_type.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/css/jasmine.css b/test/test-app/src/css/jasmine.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/css/jquery.mobile-1.1.1.min.css b/test/test-app/src/css/jquery.mobile-1.1.1.min.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/experimental/index.htm b/test/test-app/src/experimental/index.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/experimental/webviews/child.htm b/test/test-app/src/experimental/webviews/child.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/experimental/webviews/index.htm b/test/test-app/src/experimental/webviews/index.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/img/blackberry10.jpg b/test/test-app/src/img/blackberry10.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/img/windowcover.png b/test/test-app/src/img/windowcover.png
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/index.html b/test/test-app/src/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/js/input_type.js b/test/test-app/src/js/input_type.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/js/jasmine-html.js b/test/test-app/src/js/jasmine-html.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/js/jasmine.js b/test/test-app/src/js/jasmine.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/js/jquery-1.7.2.min.js b/test/test-app/src/js/jquery-1.7.2.min.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/js/jquery.mobile-1.1.1.min.js b/test/test-app/src/js/jquery.mobile-1.1.1.min.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/js/load_autotest.js b/test/test-app/src/js/load_autotest.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/ContextMenu/icon.png b/test/test-app/src/manual/ContextMenu/icon.png
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/InvocationTest/index.htm b/test/test-app/src/manual/InvocationTest/index.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/InvocationTest/js/app.js b/test/test-app/src/manual/InvocationTest/js/app.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/InvocationTest/test.docx b/test/test-app/src/manual/InvocationTest/test.docx
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/InvocationTest/test.pdf b/test/test-app/src/manual/InvocationTest/test.pdf
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/InvocationTest/test_image.png b/test/test-app/src/manual/InvocationTest/test_image.png
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/childWebView/alt.html b/test/test-app/src/manual/childWebView/alt.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/childWebView/child.html b/test/test-app/src/manual/childWebView/child.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/childWebView/main.html b/test/test-app/src/manual/childWebView/main.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/disableWebSecurity/main.html b/test/test-app/src/manual/disableWebSecurity/main.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/formcontrol/main.html b/test/test-app/src/manual/formcontrol/main.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/calendarComposer.htm b/test/test-app/src/manual/framework-split/calendarComposer.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/calendarPicker.htm b/test/test-app/src/manual/framework-split/calendarPicker.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/cameraCard.htm b/test/test-app/src/manual/framework-split/cameraCard.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/emailComposer.htm b/test/test-app/src/manual/framework-split/emailComposer.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/filePickerCard.htm b/test/test-app/src/manual/framework-split/filePickerCard.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/icsViewerCard.htm b/test/test-app/src/manual/framework-split/icsViewerCard.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/main.htm b/test/test-app/src/manual/framework-split/main.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/mediaplayer.htm b/test/test-app/src/manual/framework-split/mediaplayer.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework-split/test.ics b/test/test-app/src/manual/framework-split/test.ics
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/framework/SpecRunner.htm b/test/test-app/src/manual/framework/SpecRunner.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/1.jpg b/test/test-app/src/manual/html5/1.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/2.jpg b/test/test-app/src/manual/html5/2.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/ajaxUtility.js b/test/test-app/src/manual/html5/ajaxUtility.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/feature_access_Testing.htm b/test/test-app/src/manual/html5/feature_access_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/geolocation_testing.htm b/test/test-app/src/manual/html5/geolocation_testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/getUserMediaTest.htm b/test/test-app/src/manual/html5/getUserMediaTest.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/html5db.htm b/test/test-app/src/manual/html5/html5db.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/iframeManifestCache.htm b/test/test-app/src/manual/html5/iframeManifestCache.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/input.html b/test/test-app/src/manual/html5/input.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/input_types.html b/test/test-app/src/manual/html5/input_types.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/localCSS.css b/test/test-app/src/manual/html5/localCSS.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/localJSFile.js b/test/test-app/src/manual/html5/localJSFile.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/localStorage.htm b/test/test-app/src/manual/html5/localStorage.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/local_Ajax_Testing.htm b/test/test-app/src/manual/html5/local_Ajax_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/local_CSS_Testing.htm b/test/test-app/src/manual/html5/local_CSS_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/local_Image_Testing.htm b/test/test-app/src/manual/html5/local_Image_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/local_JSFile_Testing.htm b/test/test-app/src/manual/html5/local_JSFile_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/local_ajax.htm b/test/test-app/src/manual/html5/local_ajax.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/main.htm b/test/test-app/src/manual/html5/main.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/onload_Testing.htm b/test/test-app/src/manual/html5/onload_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/sub1/1.jpg b/test/test-app/src/manual/html5/sub1/1.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/sub1/3.jpg b/test/test-app/src/manual/html5/sub1/3.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/sub1/sub11/1.jpg b/test/test-app/src/manual/html5/sub1/sub11/1.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/sub1/sub11/4.jpg b/test/test-app/src/manual/html5/sub1/sub11/4.jpg
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/sub1/sub11/local_sub1.html b/test/test-app/src/manual/html5/sub1/sub11/local_sub1.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/webinspector.htm b/test/test-app/src/manual/html5/webinspector.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/webworker_Testing.htm b/test/test-app/src/manual/html5/webworker_Testing.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/html5/worker1.js b/test/test-app/src/manual/html5/worker1.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/manual/index.htm b/test/test-app/src/manual/index.htm
+old mode 100644
+new mode 100755
+diff --git a/test/test-app/src/video/VideoRecord1.mp4 b/test/test-app/src/video/VideoRecord1.mp4
+old mode 100644
+new mode 100755
+diff --git a/test/test-reporter/ReportGenerator.js b/test/test-reporter/ReportGenerator.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-reporter/server.js b/test/test-reporter/server.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-reporter/template/brief-report_templ.html b/test/test-reporter/template/brief-report_templ.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-reporter/template/css/styles.css b/test/test-reporter/template/css/styles.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-reporter/template/js/report.js b/test/test-reporter/template/js/report.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-reporter/template/test-report_templ.html b/test/test-reporter/template/test-report_templ.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/Calendar/config.xml b/test/test-suite/Apps/Calendar/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/Calendar/index.html b/test/test-suite/Apps/Calendar/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/Calendar/textarea.css b/test/test-suite/Apps/Calendar/textarea.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/Calendar/textarea.js b/test/test-suite/Apps/Calendar/textarea.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/CreateContact/textarea.css b/test/test-suite/Apps/CreateContact/textarea.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/CreateContact/textarea.js b/test/test-suite/Apps/CreateContact/textarea.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableChildWebView/alt.html b/test/test-suite/Apps/DisableChildWebView/alt.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableChildWebView/child.html b/test/test-suite/Apps/DisableChildWebView/child.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableChildWebView/main.html b/test/test-suite/Apps/DisableChildWebView/main.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/config.xml b/test/test-suite/Apps/DisableWebSecurity/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/css/jasmine.css b/test/test-suite/Apps/DisableWebSecurity/css/jasmine.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/index.html b/test/test-suite/Apps/DisableWebSecurity/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/js/jasmine-html.js b/test/test-suite/Apps/DisableWebSecurity/js/jasmine-html.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/js/jasmine.js b/test/test-suite/Apps/DisableWebSecurity/js/jasmine.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/res/icon/blackberry/icon-80.png b/test/test-suite/Apps/DisableWebSecurity/res/icon/blackberry/icon-80.png
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/DisableWebSecurity/spec/disableWebSecurityTests.js b/test/test-suite/Apps/DisableWebSecurity/spec/disableWebSecurityTests.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/ExternalStartup/config.xml b/test/test-suite/Apps/ExternalStartup/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/ExternalStartup/index.html b/test/test-suite/Apps/ExternalStartup/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/NoAccess/config.xml b/test/test-suite/Apps/NoAccess/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/NoAccess/css/jasmine.css b/test/test-suite/Apps/NoAccess/css/jasmine.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/NoAccess/index.html b/test/test-suite/Apps/NoAccess/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/NoAccess/js/jasmine-html.js b/test/test-suite/Apps/NoAccess/js/jasmine-html.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/NoAccess/js/jasmine.js b/test/test-suite/Apps/NoAccess/js/jasmine.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/NoAccess/spec/noAccessTests.js b/test/test-suite/Apps/NoAccess/spec/noAccessTests.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/a/index.html b/test/test-suite/Apps/SubfolderStartupPage/a/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/config.xml b/test/test-suite/Apps/SubfolderStartupPage/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/css/jasmine.css b/test/test-suite/Apps/SubfolderStartupPage/css/jasmine.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/js/jasmine-html.js b/test/test-suite/Apps/SubfolderStartupPage/js/jasmine-html.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/js/jasmine.js b/test/test-suite/Apps/SubfolderStartupPage/js/jasmine.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/res/icon/blackberry/icon-80.png b/test/test-suite/Apps/SubfolderStartupPage/res/icon/blackberry/icon-80.png
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/SubfolderStartupPage/spec/whitelistSubfolder.js b/test/test-suite/Apps/SubfolderStartupPage/spec/whitelistSubfolder.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardDomain/config.xml b/test/test-suite/Apps/WildcardDomain/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardDomain/css/jasmine.css b/test/test-suite/Apps/WildcardDomain/css/jasmine.css
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardDomain/index.html b/test/test-suite/Apps/WildcardDomain/index.html
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardDomain/js/jasmine-html.js b/test/test-suite/Apps/WildcardDomain/js/jasmine-html.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardDomain/js/jasmine.js b/test/test-suite/Apps/WildcardDomain/js/jasmine.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardDomain/spec/crossOriginWildcard.js b/test/test-suite/Apps/WildcardDomain/spec/crossOriginWildcard.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/Apps/WildcardExternalStartupPage/config.xml b/test/test-suite/Apps/WildcardExternalStartupPage/config.xml
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/test/DeployTest.js b/test/test-suite/test/DeployTest.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/test/server.js b/test/test-suite/test/server.js
+old mode 100644
+new mode 100755
+diff --git a/test/test-suite/test/whitelist-suite-runner.js b/test/test-suite/test/whitelist-suite-runner.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.app/client.js b/test/unit/com.blackberry.app/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.app/index.js b/test/unit/com.blackberry.app/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.bbm.platform/BBMEvents.js b/test/unit/com.blackberry.bbm.platform/BBMEvents.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.bbm.platform/client.js b/test/unit/com.blackberry.bbm.platform/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.bbm.platform/index.js b/test/unit/com.blackberry.bbm.platform/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.connection/client.js b/test/unit/com.blackberry.connection/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.connection/index.js b/test/unit/com.blackberry.connection/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.identity/client.js b/test/unit/com.blackberry.identity/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.identity/index.js b/test/unit/com.blackberry.identity/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoke.card/client.js b/test/unit/com.blackberry.invoke.card/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoke.card/index.js b/test/unit/com.blackberry.invoke.card/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoke/client.js b/test/unit/com.blackberry.invoke/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoke/index.js b/test/unit/com.blackberry.invoke/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoke/invocationEvents.js b/test/unit/com.blackberry.invoke/invocationEvents.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoked/client.js b/test/unit/com.blackberry.invoked/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoked/index.js b/test/unit/com.blackberry.invoked/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.invoked/invocationEvents.js b/test/unit/com.blackberry.invoked/invocationEvents.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.io.filetransfer/client.js b/test/unit/com.blackberry.io.filetransfer/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.io.filetransfer/index.js b/test/unit/com.blackberry.io.filetransfer/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.io/client.js b/test/unit/com.blackberry.io/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.io/index.js b/test/unit/com.blackberry.io/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.notification/client.js b/test/unit/com.blackberry.notification/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.notification/index.js b/test/unit/com.blackberry.notification/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.payment/client.js b/test/unit/com.blackberry.payment/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.payment/index.js b/test/unit/com.blackberry.payment/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.calendar/CalendarEvent.js b/test/unit/com.blackberry.pim.calendar/CalendarEvent.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.calendar/calendarUtils.js b/test/unit/com.blackberry.pim.calendar/calendarUtils.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.calendar/client.js b/test/unit/com.blackberry.pim.calendar/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.calendar/index.js b/test/unit/com.blackberry.pim.calendar/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.contacts/Contact.js b/test/unit/com.blackberry.pim.contacts/Contact.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.contacts/client.js b/test/unit/com.blackberry.pim.contacts/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.contacts/contactUtils.js b/test/unit/com.blackberry.pim.contacts/contactUtils.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.pim.contacts/index.js b/test/unit/com.blackberry.pim.contacts/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.push/client.js b/test/unit/com.blackberry.push/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.push/index.js b/test/unit/com.blackberry.push/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.sensors/client.js b/test/unit/com.blackberry.sensors/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.sensors/index.js b/test/unit/com.blackberry.sensors/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.sensors/sensorEvents.js b/test/unit/com.blackberry.sensors/sensorEvents.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.system/client.js b/test/unit/com.blackberry.system/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.system/index.js b/test/unit/com.blackberry.system/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.contextmenu/client.js b/test/unit/com.blackberry.ui.contextmenu/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.contextmenu/index.js b/test/unit/com.blackberry.ui.contextmenu/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.cover/client.js b/test/unit/com.blackberry.ui.cover/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.cover/index.js b/test/unit/com.blackberry.ui.cover/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.dialog/client.js b/test/unit/com.blackberry.ui.dialog/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.dialog/index.js b/test/unit/com.blackberry.ui.dialog/index.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.toast/client.js b/test/unit/com.blackberry.ui.toast/client.js
+old mode 100644
+new mode 100755
+diff --git a/test/unit/com.blackberry.ui.toast/index.js b/test/unit/com.blackberry.ui.toast/index.js
+old mode 100644
+new mode 100755
+-- 
+1.7.10.msysgit.1
+

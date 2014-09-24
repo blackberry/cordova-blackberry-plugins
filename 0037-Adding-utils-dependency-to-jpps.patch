@@ -1,0 +1,24 @@
+From 2eef968dcc49cb38a1e4508dc05e36b7edbd8e71 Mon Sep 17 00:00:00 2001
+From: Jeffrey Heifetz <jheifetz@blackberry.com>
+Date: Tue, 8 Oct 2013 22:25:53 -0400
+Subject: [PATCH 37/61] Adding utils dependency to jpps
+
+Reviewed by Bryan Higgins <bhiggins@blackberry.com>
+---
+ plugin/com.blackberry.jpps/plugin.xml |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugin/com.blackberry.jpps/plugin.xml b/plugin/com.blackberry.jpps/plugin.xml
+index 0eec7c6..dc713cf 100644
+--- a/plugin/com.blackberry.jpps/plugin.xml
++++ b/plugin/com.blackberry.jpps/plugin.xml
+@@ -26,5 +26,6 @@
+         <config-file target="www/config.xml" parent="/widget">
+             <feature name="com.blackberry.jpps"/>
+         </config-file>
++        <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
+     </platform>
+ </plugin>
+-- 
+1.7.10.msysgit.1
+

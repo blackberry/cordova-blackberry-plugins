@@ -1,0 +1,27 @@
+From 70deef8728cdcd57ae0bd8eae773737bed78e0b9 Mon Sep 17 00:00:00 2001
+From: Kristoffer Flores <kflores@blackberry.com>
+Date: Mon, 29 Jul 2013 16:33:10 -0400
+Subject: [PATCH 15/61] Modified testapp sensor test to support future
+ hardware
+
+Reviewed by Bryan Higgins <bhiggins@blackberry.com>
+---
+ test/integration/automatic/blackberry.sensors.js |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/integration/automatic/blackberry.sensors.js b/test/integration/automatic/blackberry.sensors.js
+index 1222704..360c59c 100644
+--- a/test/integration/automatic/blackberry.sensors.js
++++ b/test/integration/automatic/blackberry.sensors.js
+@@ -25,7 +25,7 @@ describe("blackberry.sensors", function () {
+ 
+         it('should be able to get a list of supported sensors', function () {
+             runs(function () {
+-                expect(blackberry.sensors.supportedSensors).toContain("devicecompass");
++                expect(blackberry.sensors.supportedSensors).toEqual(jasmine.any(String));
+             });
+         });
+ 
+-- 
+1.7.10.msysgit.1
+

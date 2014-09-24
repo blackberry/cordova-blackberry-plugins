@@ -1,0 +1,31 @@
+From dfa8f83ab729595b760374a83430fa89cafd683d Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <mlapierre@qnx.com>
+Date: Wed, 5 Feb 2014 16:07:20 -0500
+Subject: [PATCH 49/61] JI:602711 CI:mlytvynyuk@qnx.com Removing lines from
+ jpps plugin's plugin.xml as they are causing errors
+ in plugman install when trying to install from an
+ exported location
+
+---
+ plugin/com.blackberry.jpps/plugin.xml |    2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/plugin/com.blackberry.jpps/plugin.xml b/plugin/com.blackberry.jpps/plugin.xml
+index 1d5632d..287da0a 100644
+--- a/plugin/com.blackberry.jpps/plugin.xml
++++ b/plugin/com.blackberry.jpps/plugin.xml
+@@ -27,9 +27,11 @@
+     <platform name="blackberry10">
+         <lib-file src="src/blackberry10/native/device/libjpps.so" arch="device"/>
+         <lib-file src="src/blackberry10/native/simulator/libjpps.so" arch="simulator"/>
++        <!-- Temporarily commented out due to QCARTWO-5876
+         <config-file target="www/config.xml" parent="/widget">
+             <feature name="com.blackberry.jpps"/>
+         </config-file>
+         <dependency id="com.blackberry.utils" url="." subdir="/plugin/com.blackberry.utils/"/>
++        -->
+     </platform>
+ </plugin>
+-- 
+1.7.10.msysgit.1
+

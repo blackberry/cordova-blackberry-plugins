@@ -1,0 +1,2358 @@
+From ae59f137d892f7c0f47fac9c48a12ea2f7038465 Mon Sep 17 00:00:00 2001
+From: efeener <efeener@rim.com>
+Date: Fri, 26 Apr 2013 16:02:43 -0400
+Subject: [PATCH 29/61] Initial checkin of user.identity plugin
+
+- Updating existing extension to a plug in that works with Cordova
+- Addition of profile service calls, challenge, and registerNotifier
+- Updating list of error codes
+- Updating based on feedback from pull request
+- Removing dependency on lib/event
+- Adding constants for BlackBerryId and BlackBerryProfile
+- Addng challengeType to challenge call
+- Fixing jake hint errors
+- Lint cleanup
+---
+ plugin/com.blackberry.user.identity/Makefile       |    8 +
+ plugin/com.blackberry.user.identity/plugin.xml     |   35 +
+ plugin/com.blackberry.user.identity/src/Makefile   |    8 +
+ .../src/blackberry10/IDSJNEXT.js                   |  574 ++++++++++++++
+ .../src/blackberry10/Makefile                      |    8 +
+ .../src/blackberry10/index.js                      |   79 ++
+ .../src/blackberry10/native/Makefile               |    8 +
+ .../src/blackberry10/native/arm/Makefile           |    8 +
+ .../src/blackberry10/native/arm/so.le-v7/Makefile  |    1 +
+ .../src/blackberry10/native/common.mk              |   17 +
+ .../src/blackberry10/native/ids_js.cpp             |  831 ++++++++++++++++++++
+ .../src/blackberry10/native/ids_js.hpp             |   90 +++
+ .../src/blackberry10/native/x86/Makefile           |    8 +
+ .../src/blackberry10/native/x86/so/Makefile        |    1 +
+ .../www/BlackBerryId.js                            |  107 +++
+ .../www/BlackBerryProfile.js                       |  210 +++++
+ plugin/com.blackberry.user.identity/www/client.js  |  207 +++++
+ 17 files changed, 2200 insertions(+)
+ create mode 100644 plugin/com.blackberry.user.identity/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/plugin.xml
+ create mode 100644 plugin/com.blackberry.user.identity/src/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/IDSJNEXT.js
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/index.js
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/arm/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/arm/so.le-v7/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/common.mk
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.cpp
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.hpp
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/x86/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/src/blackberry10/native/x86/so/Makefile
+ create mode 100644 plugin/com.blackberry.user.identity/www/BlackBerryId.js
+ create mode 100644 plugin/com.blackberry.user.identity/www/BlackBerryProfile.js
+ create mode 100644 plugin/com.blackberry.user.identity/www/client.js
+
+diff --git a/plugin/com.blackberry.user.identity/Makefile b/plugin/com.blackberry.user.identity/Makefile
+new file mode 100644
+index 0000000..0e22650
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/Makefile
+@@ -0,0 +1,8 @@
++LIST=VARIANT
++ifndef QRECURSE
++QRECURSE=recurse.mk
++ifdef QCONFIG
++QRDIR=$(dir $(QCONFIG))
++endif
++endif
++include $(QRDIR)$(QRECURSE)
+diff --git a/plugin/com.blackberry.user.identity/plugin.xml b/plugin/com.blackberry.user.identity/plugin.xml
+new file mode 100644
+index 0000000..d51d1c4
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/plugin.xml
+@@ -0,0 +1,35 @@
++<!--
++ Licensed to the Apache Software Foundation (ASF) under one
++ or more contributor license agreements.  See the NOTICE file
++ distributed with this work for additional information
++ regarding copyright ownership.  The ASF licenses this file
++ to you under the Apache License, Version 2.0 (the
++ "License"); you may not use this file except in compliance
++ with the License.  You may obtain a copy of the License at
++ 
++     http://www.apache.org/licenses/LICENSE-2.0
++ 
++ Unless required by applicable law or agreed to in writing,
++ software distributed under the License is distributed on an
++ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ KIND, either express or implied.  See the License for the
++ specific language governing permissions and limitations
++ under the License.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++    id="com.blackberry.user.identity"
++    version="1.0.0">
++    <js-module src="www/client.js"> 
++        <clobbers target="blackberry.user.identity" />
++    </js-module>
++    
++    <platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/IDSJNEXT.js" />
++		<lib-file src="src/blackberry10/native/device/libidsext.so" arch="device"/>
++		<lib-file src="src/blackberry10/native/simulator/libidsext.so" arch="simulator"/>
++        <config-file target="www/config.xml" parent="/widget">
++            <feature name="com.blackberry.user.identity" value="com.blackberry.user.identity" />
++        </config-file>
++    </platform>
++</plugin>
+diff --git a/plugin/com.blackberry.user.identity/src/Makefile b/plugin/com.blackberry.user.identity/src/Makefile
+new file mode 100644
+index 0000000..0e22650
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/Makefile
+@@ -0,0 +1,8 @@
++LIST=VARIANT
++ifndef QRECURSE
++QRECURSE=recurse.mk
++ifdef QCONFIG
++QRDIR=$(dir $(QCONFIG))
++endif
++endif
++include $(QRDIR)$(QRECURSE)
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/IDSJNEXT.js b/plugin/com.blackberry.user.identity/src/blackberry10/IDSJNEXT.js
+new file mode 100644
+index 0000000..cd5b5ee
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/IDSJNEXT.js
+@@ -0,0 +1,574 @@
++/*
++* Copyright 2012 Research In Motion Limited.
++*
++* Licensed under the Apache License, Version 2.0 (the "License");
++* you may not use this file except in compliance with the License.
++* You may obtain a copy of the License at
++*
++* http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing, software
++* distributed under the License is distributed on an "AS IS" BASIS,
++* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++* See the License for the specific language governing permissions and
++* limitations under the License.
++*/
++
++
++var ids;
++
++///////////////////////////////////////////////////////////////////
++// JavaScript wrapper for JNEXT plugin
++///////////////////////////////////////////////////////////////////
++
++JNEXT.IDS = function ()
++{
++    var self = this,
++    hasInstance = false;
++
++    self.idsGetVersion = function (trigger) {
++        return JNEXT.invoke(self.m_id, "getVersion");
++    };
++
++	self.idsRegisterProvider = function (args) {
++		return JNEXT.invoke(self.m_id, "registerProvider " + args);
++	};
++
++	self.idsSetOption = function (args) {
++        var setOptionsOpts = { "option" : JSON.parse(decodeURIComponent(args.option)),
++                            "value" : JSON.parse(decodeURIComponent(args.value)) };
++
++        // Make sure option is an int to pass to C
++		if (typeof(setOptionsOpts.option) === "string") {
++			setOptionsOpts.option = parseInt(setOptionsOpts.option, 10);
++			if (isNaN(setOptionsOpts.option)) {
++				setOptionsOpts.option = -1;
++			}
++		} else if (typeof(setOptionsOpts.option) !== "number") {
++			setOptionsOpts.option = -1;
++		}
++
++        // Make sure value is a string/number/boolean to pass to C as a string
++		if ((typeof(setOptionsOpts.value) !== "string") &&
++				(typeof(setOptionsOpts.value) !== "number") &&
++				(typeof(setOptionsOpts.value) !== "boolean")) {
++			setOptionsOpts.value = "";
++		}
++		return JNEXT.invoke(self.m_id, "setOption " + JSON.stringify(setOptionsOpts));
++	};
++
++	self.idsResponseHandler = function (args, pluginResult) {
++		var resultJSON = JSON.parse(args);
++
++		if (resultJSON.result) {
++			pluginResult.error(resultJSON, true);
++		} else {
++			pluginResult.ok(resultJSON, true);
++		}
++	};
++
++	self.idsGetToken = function (args, pluginResult, onSuccess, onFail) {
++		var getTokenArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++							"provider" : JSON.parse(decodeURIComponent(args.provider)),
++							"tokenType" : JSON.parse(decodeURIComponent(args.tokenType)),
++							"appliesTo" : JSON.parse(decodeURIComponent(args.appliesTo)) };
++
++		self.eventHandlers[getTokenArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "getToken",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++		// Make sure provider is a string to pass to C
++		if (typeof(getTokenArgs.provider) !== "string") {
++			getTokenArgs.provider = "";
++		}
++        // Make sure token type is a string to pass to C
++		if (typeof(getTokenArgs.tokenType) !== "string") {
++			getTokenArgs.tokenType = "";
++		}
++        // Make sure applies to is a string to pass to C
++		if (typeof(getTokenArgs.appliesTo) !== "string") {
++			getTokenArgs.appliesTo = "";
++		}
++		JNEXT.invoke(self.m_id, "getToken " + JSON.stringify(getTokenArgs));
++		return "";
++	};
++
++
++	self.idsClearToken = function (args, pluginResult, onSuccess, onFail) {
++        var clearTokenArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++							"provider" : JSON.parse(decodeURIComponent(args.provider)),
++							"tokenType" : JSON.parse(decodeURIComponent(args.tokenType)),
++							"appliesTo" : JSON.parse(decodeURIComponent(args.appliesTo)) };
++
++		self.eventHandlers[clearTokenArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "clearToken",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        
++        // Make sure provider is a string to pass to C
++		if (typeof(clearTokenArgs.provider) !== "string") {
++			clearTokenArgs.provider = "";
++		}
++        // Make sure token type is a string to pass to C
++		if (typeof(clearTokenArgs.tokenType) !== "string") {
++			clearTokenArgs.tokenType = "";
++		}
++        // Make sure applies to is a string to pass to C
++		if (typeof(clearTokenArgs.appliesTo) !== "string") {
++			clearTokenArgs.appliesTo = "";
++		}
++
++		JNEXT.invoke(self.m_id, "clearToken " + JSON.stringify(clearTokenArgs));
++		return "";
++	};
++
++	
++	self.idsGetProperties = function (args, pluginResult, onSuccess, onFail) {
++        var getPropertiesArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"propertyType" : JSON.parse(decodeURIComponent(args.propertyType)),
++								"numProps" : 0,
++								"userProperties" : JSON.parse(decodeURIComponent(args.userProperties)) },
++			properties = getPropertiesArgs.userProperties;
++
++		self.eventHandlers[getPropertiesArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "getProperties",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++        
++        // Make sure provider is a string to pass to C
++		if (typeof(getPropertiesArgs.provider) !== "string") {
++			getPropertiesArgs.provider = "";
++		}
++
++        // Make sure property type is an int to pass to C
++		if (typeof(getPropertiesArgs.propertyType) === "string") {
++			getPropertiesArgs.propertyType = parseInt(getPropertiesArgs.propertyType, 10);
++			if (isNaN(getPropertiesArgs.propertyType)) {
++				getPropertiesArgs.propertyType = -1;
++			}
++		} else if (typeof(getPropertiesArgs.propertyType) !== "number") {
++			getPropertiesArgs.propertyType = -1;
++		}
++
++		if (typeof(properties) === "string") {
++			properties = properties.split(",");
++			getPropertiesArgs.numProps = properties.length;
++		} else {
++			properties = "";
++			getPropertiesArgs.userProperties = "";
++			getPropertiesArgs.numProps = 0;
++		}
++		JNEXT.invoke(self.m_id, "getProperties " + JSON.stringify(getPropertiesArgs));
++		return "";
++	};
++
++	self.idsGetData = function (args, pluginResult, onSuccess, onFail) {
++        var getDataArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"dataType" : JSON.parse(decodeURIComponent(args.dataType)),
++								"dataFlags" : JSON.parse(decodeURIComponent(args.dataFlags)),
++								"dataName" : JSON.parse(decodeURIComponent(args.dataName)) };
++
++		self.eventHandlers[getDataArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "getData",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(getDataArgs.provider) !== "string") {
++			getDataArgs.provider = "";
++		}
++
++		// Make sure type is an int to pass to C
++        if (typeof(getDataArgs.dataType) === "string") {
++			getDataArgs.dataType = parseInt(getDataArgs.dataType, 10);
++			if (isNaN(getDataArgs.dataType)) {
++				getDataArgs.dataType = -1;
++			}
++        } else if (typeof(getDataArgs.dataType) !== "number") {
++			getDataArgs.dataType = -1;
++		}
++
++        // Make sure flags is an int to pass to C
++        if (typeof(getDataArgs.dataFlags) === "string") {
++			getDataArgs.dataFlags = parseInt(getDataArgs.dataFlags, 10);
++			if (isNaN(getDataArgs.dataFlags)) {
++				getDataArgs.dataFlags = -1;
++			}
++        } else if (typeof(getDataArgs.dataFlags) !== "number") {
++			getDataArgs.dataFlags = -1;
++		}
++
++        // Make sure data name is a string to pass to C
++        if (typeof(getDataArgs.dataName) !== "string") {
++			getDataArgs.dataName = "";
++		}
++
++		JNEXT.invoke(self.m_id, "getData " + JSON.stringify(getDataArgs));
++		return "";
++	};
++
++	self.idsCreateData = function (args, pluginResult, onSuccess, onFail) {
++        var createDataArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"dataType" : JSON.parse(decodeURIComponent(args.dataType)),
++								"dataFlags" : JSON.parse(decodeURIComponent(args.dataFlags)),
++								"dataName" : JSON.parse(decodeURIComponent(args.dataName)),
++								"dataValue" : JSON.parse(decodeURIComponent(args.dataValue)) };
++
++		self.eventHandlers[createDataArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "createData",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(createDataArgs.provider) !== "string") {
++			createDataArgs.provider = "";
++		}
++
++        // Make sure type is an int to pass to C
++        if (typeof(createDataArgs.dataType) === "string") {
++			createDataArgs.dataType = parseInt(createDataArgs.dataType, 10);
++			if (isNaN(createDataArgs.dataType)) {
++				createDataArgs.dataType = -1;
++			}
++        } else if (typeof(createDataArgs.dataType) !== "number") {
++			createDataArgs.dataType = -1;
++		}
++
++        // Make sure flags is an int to pass to C
++        if (typeof(createDataArgs.dataFlags) === "string") {
++			createDataArgs.dataFlags = parseInt(createDataArgs.dataFlags, 10);
++			if (isNaN(createDataArgs.dataFlags)) {
++				createDataArgs.dataFlags = -1;
++			}
++        } else if (typeof(createDataArgs.dataFlags) !== "number") {
++			createDataArgs.dataFlags = -1;
++		}
++
++        // Make sure name is a string to pass to C
++		if (typeof(createDataArgs.dataName) !== "string") {
++			createDataArgs.dataName = "";
++		}
++
++        // Make sure value is a string to pass to C
++		if (typeof(createDataArgs.dataValue) !== "string") {
++			createDataArgs.dataValue = "";
++		}
++
++		JNEXT.invoke(self.m_id, "createData " + JSON.stringify(createDataArgs));
++		return "";
++	};
++
++	self.idsDeleteData = function (args, pluginResult, onSuccess, onFail) {
++        var deleteDataArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"dataType" : JSON.parse(decodeURIComponent(args.dataType)),
++								"dataFlags" : JSON.parse(decodeURIComponent(args.dataFlags)),
++								"dataName" : JSON.parse(decodeURIComponent(args.dataName)) };
++
++		self.eventHandlers[deleteDataArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "deleteData",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(deleteDataArgs.provider) !== "string") {
++			deleteDataArgs.provider = "";
++		}
++
++        // Make sure type is an int to pass to C
++        if (typeof(deleteDataArgs.dataType) === "string") {
++			deleteDataArgs.dataType = parseInt(deleteDataArgs.dataType, 10);
++			if (isNaN(deleteDataArgs.dataType)) {
++				deleteDataArgs.dataType = -1;
++			}
++        } else if (typeof(deleteDataArgs.dataType) !== "number") {
++			deleteDataArgs.dataType = -1;
++		}
++
++        // Make sure flags is an int to pass to C
++        if (typeof(deleteDataArgs.dataFlags) === "string") {
++			deleteDataArgs.dataFlags = parseInt(deleteDataArgs.dataFlags, 10);
++			if (isNaN(deleteDataArgs.dataFlags)) {
++				deleteDataArgs.dataFlags = -1;
++			}
++        } else if (typeof(deleteDataArgs.dataFlags) !== "number") {
++			deleteDataArgs.dataFlags = -1;
++		}
++
++        // Make sure name is a string to pass to C
++		if (typeof(deleteDataArgs.dataName) !== "string") {
++			deleteDataArgs.dataName = "";
++		}
++
++		JNEXT.invoke(self.m_id, "deleteData " + JSON.stringify(deleteDataArgs));
++		return "";
++	};
++
++	self.idsSetData = function (args, pluginResult, onSuccess, onFail) {
++        var setDataArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"dataType" : JSON.parse(decodeURIComponent(args.dataType)),
++								"dataFlags" : JSON.parse(decodeURIComponent(args.dataFlags)),
++								"dataName" : JSON.parse(decodeURIComponent(args.dataName)),
++								"dataValue" : JSON.parse(decodeURIComponent(args.dataValue)) };
++
++		self.eventHandlers[setDataArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "setData",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(setDataArgs.provider) !== "string") {
++			setDataArgs.provider = "";
++		}
++
++        // Make sure type is an int to pass to C
++        if (typeof(setDataArgs.dataType) === "string") {
++			setDataArgs.dataType = parseInt(setDataArgs.dataType, 10);
++			if (isNaN(setDataArgs.dataType)) {
++				setDataArgs.dataType = -1;
++			}
++        } else if (typeof(setDataArgs.dataType) !== "number") {
++			setDataArgs.dataType = -1;
++		}
++
++        // Make sure flags is an int to pass to C
++        if (typeof(setDataArgs.dataFlags) === "string") {
++			setDataArgs.dataFlags = parseInt(setDataArgs.dataFlags, 10);
++			if (isNaN(setDataArgs.dataFlags)) {
++				setDataArgs.dataFlags = -1;
++			}
++        } else if (typeof(setDataArgs.dataFlags) !== "number") {
++			setDataArgs.dataFlags = -1;
++		}
++
++        // Make sure name is a string to pass to C
++		if (typeof(setDataArgs.dataName) !== "string") {
++			setDataArgs.dataName = "";
++		}
++
++        // Make sure value is a string to pass to C
++		if (typeof(setDataArgs.dataValue) !== "string") {
++			setDataArgs.dataValue = "";
++		}
++
++		JNEXT.invoke(self.m_id, "setData " + JSON.stringify(setDataArgs));
++		return "";
++	};
++
++	self.idsListData = function (args, pluginResult, onSuccess, onFail) {
++        var listDataArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"dataType" : JSON.parse(decodeURIComponent(args.dataType)),
++								"dataFlags" : JSON.parse(decodeURIComponent(args.dataFlags)) };
++
++		self.eventHandlers[listDataArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "listData",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(listDataArgs.provider) !== "string") {
++			listDataArgs.provider = "";
++		}
++
++		// Make sure type is an int to pass to C
++        if (typeof(listDataArgs.dataType) === "string") {
++			listDataArgs.dataType = parseInt(listDataArgs.dataType, 10);
++			if (isNaN(listDataArgs.dataType)) {
++				listDataArgs.dataType = -1;
++			}
++        } else if (typeof(listDataArgs.dataType) !== "number") {
++			listDataArgs.dataType = -1;
++		}
++
++		// Make sure flags is an int to pass to C
++        if (typeof(listDataArgs.dataFlags) === "string") {
++			listDataArgs.dataFlags = parseInt(listDataArgs.dataFlags, 10);
++			if (isNaN(listDataArgs.dataFlags)) {
++				listDataArgs.dataFlags = -1;
++			}
++        } else if (typeof(listDataArgs.dataFlags) !== "number") {
++			listDataArgs.dataFlags = -1;
++		}
++
++		JNEXT.invoke(self.m_id, "listData " + JSON.stringify(listDataArgs));
++		return "";
++	};
++
++	self.idsChallenge = function (args, pluginResult, onSuccess, onFail) {
++        var challengeArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"challengeType" : JSON.parse(decodeURIComponent(args.challengeType)),
++								"challengeFlags" : JSON.parse(decodeURIComponent(args.challengeFlags)) };
++
++		self.eventHandlers[challengeArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "challenge",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(challengeArgs.provider) !== "string") {
++			challengeArgs.provider = "";
++		}
++
++		// Make sure type is an int to pass to C
++        if (typeof(challengeArgs.challengeType) === "string") {
++			challengeArgs.challengeType = parseInt(challengeArgs.challengeType, 10);
++			if (isNaN(challengeArgs.challengeType)) {
++				challengeArgs.challengeType = -1;
++			}
++        } else if (typeof(challengeArgs.challengeType) !== "number") {
++			challengeArgs.challengeType = -1;
++		}
++
++		// Make sure flags is an int to pass to C
++        if (typeof(challengeArgs.challengeFlags) === "string") {
++			challengeArgs.challengeFlags = parseInt(challengeArgs.challengeFlags, 10);
++			if (isNaN(challengeArgs.challengeFlags)) {
++				challengeArgs.challengeFlags = -1;
++			}
++        } else if (typeof(challengeArgs.challengeFlags) !== "number") {
++			challengeArgs.challengeFlags = -1;
++		}
++
++		JNEXT.invoke(self.m_id, "challenge " + JSON.stringify(challengeArgs));
++		return "";
++	};
++
++	self.idsRegisterNotifier = function (args, pluginResult, onSuccess, onFail) {
++        var notifierArgs = { "_eventId" : JSON.parse(decodeURIComponent(args.callbackId)),
++								"provider" : JSON.parse(decodeURIComponent(args.provider)),
++								"notifierType" : JSON.parse(decodeURIComponent(args.notifierType)),
++								"notifierFlags" : JSON.parse(decodeURIComponent(args.notifierFlags)),
++								"notifierName" : JSON.parse(decodeURIComponent(args.notifierName)) };
++
++		self.eventHandlers[notifierArgs._eventId] = {
++                "result" : pluginResult,
++                "action" : "registerNotifier",
++                "handler" : self.idsResponseHandler,
++                "success" : onSuccess,
++                "failure" : onFail,
++                "error" : true
++            };
++
++        // Make sure provider is a string to pass to C
++		if (typeof(notifierArgs.provider) !== "string") {
++			notifierArgs.provider = "";
++		}
++
++		// Make sure type is an int to pass to C
++        if (typeof(notifierArgs.notifierType) === "string") {
++			notifierArgs.notifierType = parseInt(notifierArgs.notifierType, 10);
++			if (isNaN(notifierArgs.notifierType)) {
++				notifierArgs.notifierType = -1;
++			}
++        } else if (typeof(notifierArgs.notifierType) !== "number") {
++			notifierArgs.notifierType = -1;
++		}
++
++		// Make sure flags is an int to pass to C
++        if (typeof(notifierArgs.notifierFlags) === "string") {
++			notifierArgs.notifierFlags = parseInt(notifierArgs.notifierFlags, 10);
++			if (isNaN(notifierArgs.notifierFlags)) {
++				notifierArgs.notifierFlags = -1;
++			}
++        } else if (typeof(notifierArgs.notifierFlags) !== "number") {
++			notifierArgs.notifierFlags = -1;
++		}
++
++        // Make sure name is a string to pass to C
++		if (typeof(notifierArgs.notifierName) !== "string") {
++			notifierArgs.notifierName = "";
++		}
++
++		JNEXT.invoke(self.m_id, "registerNotifier " + JSON.stringify(notifierArgs));
++		return "";
++	};
++
++    self.getId = function () {
++        return self.m_id;
++    };
++    
++	self.onEvent = function (strData) {
++		var delim = strData.indexOf(" "),
++			strEventDesc = strData.substring(0, delim),
++			strEventData = strData.substring(delim + 1, strData.length),
++			resultJSON;
++		strEventDesc = strEventDesc.replace(/["']{1}/gi, "");
++
++		resultJSON = JSON.parse(strEventData);
++		self.eventHandlers[strEventDesc].handler(strEventData, self.eventHandlers[strEventDesc].result);
++	};
++	
++	self.init = function () {
++        if (!JNEXT.require("libidsext")) {
++            return false;
++        }
++
++        self.m_id = JNEXT.createObject("libidsext.IDSEXT");
++
++        if (self.m_id === "") {
++			return false;
++        }
++
++        JNEXT.registerEvents(self);
++    };
++	
++    self.m_id = "";
++    self.eventHandlers = {};
++
++    self.getInstance = function () {
++        if (!hasInstance) {
++            self.init();
++            hasInstance = true;
++        }
++        return self;
++    };
++};
++
++ids = new JNEXT.IDS();
++
++module.exports = {
++	ids: ids
++};
+\ No newline at end of file
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/Makefile b/plugin/com.blackberry.user.identity/src/blackberry10/Makefile
+new file mode 100644
+index 0000000..0e22650
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/Makefile
+@@ -0,0 +1,8 @@
++LIST=VARIANT
++ifndef QRECURSE
++QRECURSE=recurse.mk
++ifdef QCONFIG
++QRDIR=$(dir $(QCONFIG))
++endif
++endif
++include $(QRDIR)$(QRECURSE)
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/index.js b/plugin/com.blackberry.user.identity/src/blackberry10/index.js
+new file mode 100644
+index 0000000..bdca7d7
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/index.js
+@@ -0,0 +1,79 @@
++/*
++ * Copyright 2012 Research In Motion Limited.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++var ids = require("./IDSJNEXT").ids;
++
++module.exports = {
++    getVersion: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		result.ok(ids.getInstance().idsGetVersion(), true);
++	},
++
++    registerProvider: function (success, fail, args, env) {
++		var key,
++		result = new PluginResult(args, env);
++        for (key in args) {
++			if (key === "provider") {
++				result.ok(ids.getInstance().idsRegisterProvider(JSON.parse(decodeURIComponent(args[key]))), true);
++			}
++        }
++    },
++    
++    setOption: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		result.ok(ids.getInstance().idsSetOption(args));
++    },
++	getToken: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsGetToken(args, result, success, fail);
++	},
++	clearToken: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsClearToken(args, result, success, fail);
++	},
++	getProperties: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsGetProperties(args, result, success, fail);
++	},
++	getData: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsGetData(args, result, success, fail);
++	},
++	createData: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsCreateData(args, result, success, fail);
++	},
++	deleteData: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsDeleteData(args, result, success, fail);
++	},
++	setData: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsSetData(args, result, success, fail);
++	},
++	listData: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsListData(args, result, success, fail);
++	},
++	challenge: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsChallenge(args, result, success, fail);
++	},
++	registerNotifier: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		ids.getInstance().idsRegisterNotifier(args, result, success, fail);
++	}
++};
+\ No newline at end of file
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/Makefile b/plugin/com.blackberry.user.identity/src/blackberry10/native/Makefile
+new file mode 100644
+index 0000000..0cc5eae
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/Makefile
+@@ -0,0 +1,8 @@
++LIST=CPU
++ifndef QRECURSE
++QRECURSE=recurse.mk
++ifdef QCONFIG
++QRDIR=$(dir $(QCONFIG))
++endif
++endif
++include $(QRDIR)$(QRECURSE)
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/arm/Makefile b/plugin/com.blackberry.user.identity/src/blackberry10/native/arm/Makefile
+new file mode 100644
+index 0000000..0e22650
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/arm/Makefile
+@@ -0,0 +1,8 @@
++LIST=VARIANT
++ifndef QRECURSE
++QRECURSE=recurse.mk
++ifdef QCONFIG
++QRDIR=$(dir $(QCONFIG))
++endif
++endif
++include $(QRDIR)$(QRECURSE)
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/arm/so.le-v7/Makefile b/plugin/com.blackberry.user.identity/src/blackberry10/native/arm/so.le-v7/Makefile
+new file mode 100644
+index 0000000..2c76089
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/arm/so.le-v7/Makefile
+@@ -0,0 +1 @@
++include ../../common.mk
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/common.mk b/plugin/com.blackberry.user.identity/src/blackberry10/native/common.mk
+new file mode 100644
+index 0000000..26c9337
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/common.mk
+@@ -0,0 +1,17 @@
++ifndef QCONFIG
++QCONFIG=qconfig.mk
++endif
++include $(QCONFIG)
++
++NAME=idsext
++PLUGIN=yes
++UTILS=yes
++
++include ../../../../../../meta.mk
++
++SRCS+=ids_js.cpp
++      
++
++include $(MKFILES_ROOT)/qtargets.mk
++
++LIBS+=ids
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.cpp b/plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.cpp
+new file mode 100644
+index 0000000..0341588
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.cpp
+@@ -0,0 +1,831 @@
++/*
++ * Copyright 2012 Research In Motion Limited.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#include <errno.h>
++#include <sys/pps.h>
++#include <sys/netmgr.h>
++#include <sys/iomsg.h>
++#include <bps/bps.h>
++#include <json/reader.h>
++#include <json/writer.h>
++#include <string>
++#include <sstream>
++
++#include "ids_js.hpp"
++
++volatile int eventCHID = 0;
++
++extern "C" {
++    void getTokenSuccessCB(ids_request_id_t requestId, const char *token, int paramCount, const ids_token_param_t *params, void *cbData) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["token"] = token;
++
++            resultJSON["paramCount"] = paramCount;
++            Json::Value tokenParams;
++            int i;
++            for (i = 0; i < paramCount; i++) {
++                tokenParams[i]["name"] = params[i].name;
++                tokenParams[i]["value"] = params[i].value;
++            }
++            resultJSON["tokenParams"] = Json::Value(tokenParams);
++
++            std::string resultStr = writer.write(resultJSON);
++            request->NotifyEvent(request->getEventId(), writer.write(resultJSON));
++        }
++    }
++
++    void clearTokenSuccessCB(ids_request_id_t requestId, bool clear, void* cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["clear"] = clear;
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void getPropertiesSuccessCB(ids_request_id_t requestId, int propertyCount, const ids_property_t* properties, void* cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["propertyCount"] = propertyCount;
++            Json::Value userProperties;
++
++            int i;
++            for (i = 0; i < propertyCount; i++) {
++                userProperties[i]["uri"] = properties[i].name;
++                userProperties[i]["value"] = properties[i].value;
++            }
++
++            resultJSON["userProperties"] = Json::Value(userProperties);
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void getDataSuccessCB(ids_request_id_t requestId, const ids_data_t* data, void* cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["dataName"] = data->name;
++            resultJSON["dataLength"] = data->length;
++
++            // Cordova apps are required to store their data as strings
++            char *strValue = reinterpret_cast<char *>(calloc(1, data->length + 1));
++            if ( strValue ) {
++                strncpy(strValue, reinterpret_cast<char *>(data->value), data->length);
++                resultJSON["dataValue"] = strValue;
++            } else {
++                resultJSON["dataValue"] = "";
++            }
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void createDataSuccessCB(ids_request_id_t requestId, void* cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void deleteDataSuccessCB(ids_request_id_t requestId, void* cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void setDataSuccessCB(ids_request_id_t requestId, void* cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void listDataSuccessCB(ids_request_id_t requestId, int listCount, const char **list, void *cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["listCount"] = listCount;
++            Json::Value dataList;
++
++            int i;
++            for (i = 0; i < listCount; i++) {
++                dataList[i] = list[i];
++            }
++
++            resultJSON["dataList"] = Json::Value(dataList);
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void challengeSuccessCB(ids_request_id_t requestId, int level, void *cbData ) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["level"] = level;
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++    void notifierCB(int type, const char *name, int notification, void *cbData) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["type"] = type;
++            resultJSON["name"] = name;
++            resultJSON["notification"] = notification;
++
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++
++
++    void failureCB(ids_request_id_t requestId, ids_result_t result, const char *failureInfo, void *cbData) {
++        if ( cbData ) {
++            IDSEXT *request = reinterpret_cast<IDSEXT *>(cbData);
++
++            Json::FastWriter writer;
++            Json::Value resultJSON;
++
++            resultJSON["requestId"] = requestId;
++            resultJSON["result"] = result;
++            resultJSON["failureInfo"] = (failureInfo ? failureInfo : "");
++            std::string resultStr = writer.write(resultJSON);
++
++            request->NotifyEvent(request->getEventId(), resultStr.c_str());
++        }
++    }
++}
++
++
++IDSEXT::IDSEXT(const std::string& id) : m_id(id)
++{
++    if ( ids_initialize() != IDS_SUCCESS ) {
++        fprintf(stderr, "Unable to initialize IDS library\n");
++    }
++    providers = NULL;
++
++    connected = true;
++    pthread_create(&m_thread, NULL, idsEventThread, this);
++}
++
++std::string IDSEXT::getEventId()
++{
++    return event_id;
++}
++
++ids_provider_mapping* IDSEXT::getProviders()
++{
++    return providers;
++}
++
++char* onGetObjList()
++{
++    // Return list of classes in the object
++    static char name[] = "IDSEXT";
++    return name;
++}
++
++JSExt* onCreateObject(const std::string& className, const std::string& id)
++{
++    // Make sure we are creating the right class
++    if (className != "IDSEXT") {
++        return 0;
++    }
++
++    return new IDSEXT(id);
++}
++
++ids_provider_mapping* IDSEXT::getProvider(const std::string& provider)
++{
++    ids_provider_mapping *current = providers;
++
++    while ( current != NULL ) {
++        if ( provider == current->providerName ) {
++            return current;
++        } else {
++            current = providers->next;
++        }
++    }
++
++    return NULL;
++}
++
++void IDSEXT::clearProviders(void)
++{
++    ids_provider_mapping *current = providers;
++    while ( current != NULL ) {
++        providers = current->next;
++        if ( current->providerName ) free(const_cast<char *>(current->providerName));
++        if ( current->next ) free(reinterpret_cast<void *>(current->next));
++        current = providers;
++    }
++}
++
++void IDSEXT::removeProvider(int providerFd )
++{
++    ids_provider_mapping *current = providers;
++    ids_provider_mapping *previous = NULL;
++
++    while ( current != NULL ) {
++        if ( current->providerFd == providerFd ) {
++            if ( previous == NULL ) {
++                providers = current->next;
++            } else {
++                previous->next = current->next;
++            }
++            if ( current->providerName ) free(const_cast<char *>(current->providerName));
++            if ( current->next ) free(reinterpret_cast<void *>(current->next));
++        }
++    }
++}
++
++IDSEXT::~IDSEXT()
++{
++    connected = false;
++    ChannelDestroy(eventCHID);
++    ids_shutdown();
++    clearProviders();
++}
++
++std::string IDSEXT::InvokeMethod(const std::string& command)
++{
++    int index = command.find_first_of(" ");
++
++    string strCommand = command.substr(0, index);
++    string strParam = command.substr(index + 1, command.length());
++
++    Json::Reader reader;
++    Json::Value obj;
++    if (strCommand == "getVersion") {
++        return GetVersion();
++    } else if (strCommand == "registerProvider") {
++        return RegisterProvider(strParam);
++    } else if (strCommand == "setOption") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++
++        if (!parse) {
++            //fprintf(stderr, "%s\n", "error parsing\n");
++            return "unable to parse options";
++        }
++        int option = obj["option"].asInt();
++        const std::string value = obj["value"].asString();
++        return( SetOption(option, value) );
++    } else if (strCommand == "getToken") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        std::string tokenType = obj["tokenType"].asString();
++        const std::string appliesTo = obj["appliesTo"].asString();
++
++        GetToken(provider, tokenType, appliesTo);
++    } else if (strCommand == "clearToken") {
++            // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        std::string tokenType = obj["tokenType"].asString();
++        const std::string appliesTo = obj["appliesTo"].asString();
++
++        ClearToken(provider, tokenType, appliesTo);
++    } else if (strCommand == "getProperties") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int propertyType = obj["propertyType"].asInt();
++        int numProps = obj["numProps"].asInt();
++        const std::string userProps = obj["userProperties"].asString();
++        GetProperties(provider, propertyType, numProps, userProps);
++    } else if (strCommand == "getData") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int dataType = obj["dataType"].asInt();
++        int dataFlags = obj["dataFlags"].asInt();
++        const std::string dataName = obj["dataName"].asString();
++        GetData(provider, dataType, dataFlags, dataName);
++    } else if (strCommand == "createData") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int dataType = obj["dataType"].asInt();
++        int dataFlags = obj["dataFlags"].asInt();
++        const std::string dataName = obj["dataName"].asString();
++        const std::string dataValue = obj["dataValue"].asString();
++        CreateData(provider, dataType, dataFlags, dataName, dataValue);
++    } else if (strCommand == "deleteData") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int dataType = obj["dataType"].asInt();
++        int dataFlags = obj["dataFlags"].asInt();
++        const std::string dataName = obj["dataName"].asString();
++        DeleteData(provider, dataType, dataFlags, dataName);
++    } else if (strCommand == "setData") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int dataType = obj["dataType"].asInt();
++        int dataFlags = obj["dataFlags"].asInt();
++        const std::string dataName = obj["dataName"].asString();
++        const std::string dataValue = obj["dataValue"].asString();
++        SetData(provider, dataType, dataFlags, dataName, dataValue);
++    } else if (strCommand == "listData") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int dataType = obj["dataType"].asInt();
++        int dataFlags = obj["dataFlags"].asInt();
++        ListData(provider, dataType, dataFlags);
++    } else if (strCommand == "challenge") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int challengeType = obj["challengeType"].asInt();
++        int challengeFlags = obj["challengeFlags"].asInt();
++        Challenge(provider, challengeType, challengeFlags);
++    } else if (strCommand == "registerNotifier") {
++        // parse the JSON
++        bool parse = reader.parse(strParam, obj);
++        if (!parse) {
++            //fprintf(stderr, "%s", "error parsing\n");
++            return "unable to parse options";
++        }
++        event_id = obj["_eventId"].asString();
++        std::string provider = obj["provider"].asString();
++        int notifierType = obj["notifierType"].asInt();
++        int notifierFlags = obj["notifierFlags"].asInt();
++        std::string notifierName = obj["notifierName"].asString();
++        RegisterNotifier(provider, notifierType, notifierFlags, notifierName);
++    }
++
++    return "";
++}
++
++bool IDSEXT::CanDelete()
++{
++    return true;
++}
++
++// Notifies JavaScript of an event
++void IDSEXT::NotifyEvent(const std::string& eventId, const std::string& event)
++{
++    std::string eventString = m_id + " ";
++    eventString.append(eventId);
++    eventString.append(" ");
++    eventString.append(event);
++    SendPluginEvent(eventString.c_str(), m_pContext);
++}
++
++std::string IDSEXT::GetVersion()
++{
++    ostringstream ver;
++    ver << ids_get_version();
++    return( ver.str() );
++}
++
++std::string IDSEXT::RegisterProvider(const std::string& providerName)
++{
++    Json::FastWriter writer;
++    Json::Value resultJSON;
++
++    ids_provider_mapping *registeredItem = reinterpret_cast<ids_provider_mapping *>(malloc(sizeof(ids_provider_mapping)));
++    if (!registeredItem) {
++        fprintf(stderr, "Unable to register IDS provider - malloc error\n");
++        return "";
++    }
++
++    registeredItem->providerName = strdup(providerName.c_str());
++    resultJSON["result"] = ids_register_provider(registeredItem->providerName, &registeredItem->provider, &registeredItem->providerFd);
++    if ( (ids_result_t) resultJSON["result"].asInt() == IDS_SUCCESS ) {
++        registeredItem->next = providers;
++        providers = registeredItem;
++
++        registeredItem->sigEvent = new sigevent;
++        registeredItem->sigEvent->sigev_notify = SIGEV_PULSE;
++        registeredItem->sigEvent->sigev_coid = ConnectAttach(ND_LOCAL_NODE, 0, eventCHID, _NTO_SIDE_CHANNEL, 0);
++        registeredItem->sigEvent->sigev_priority = getprio(0);
++        registeredItem->sigEvent->sigev_code = registeredItem->providerFd;
++        registeredItem->sigEvent->sigev_value.sival_int = registeredItem->providerFd;
++
++        if (ionotify(registeredItem->providerFd, _NOTIFY_ACTION_POLLARM, _NOTIFY_COND_INPUT, registeredItem->sigEvent) & _NOTIFY_COND_INPUT) {
++            MsgDeliverEvent(0, registeredItem->sigEvent);
++        }
++    } else {
++        resultJSON["errno"] = strerror(errno);
++    }
++
++    std::string resultStr = writer.write(resultJSON);
++    return( resultStr.c_str() );
++}
++
++std::string IDSEXT::SetOption(int option, const std::string& value)
++{
++    Json::FastWriter writer;
++    Json::Value resultJSON;
++
++    resultJSON["result"] = ids_set_option((ids_option_t) option, value.c_str());
++    if ( (ids_result_t) resultJSON["result"].asInt() != IDS_SUCCESS ) {
++        resultJSON["errno"] = strerror(errno);
++    }
++
++    std::string resultStr = writer.write(resultJSON);
++
++    return ( resultStr.c_str());
++}
++
++void* IDSEXT::idsEventThread(void *args)
++{
++    IDSEXT *idsExt = reinterpret_cast<IDSEXT *>(args);
++
++    struct _pulse msg;
++
++    eventCHID = ChannelCreate(_NTO_CHF_COID_DISCONNECT);
++
++    while ( idsExt->connected ) {
++        if (MsgReceive(eventCHID, &msg, sizeof(msg), NULL) == 0) {
++            // Find provider - process msg
++            ids_provider_mapping* current = idsExt->providers;
++
++            while ( current != NULL ) {
++                if ( msg.code == current->providerFd ) {
++                    // Re-arm ionotify
++                    if (ids_process_msg(current->providerFd) != IDS_SUCCESS) {
++                        fprintf(stderr, "Failed to process IDS message\n");
++                        idsExt->removeProvider(current->providerFd);
++                    } else {
++                        if (ionotify(current->providerFd, _NOTIFY_ACTION_POLLARM, _NOTIFY_COND_INPUT, current->sigEvent) & _NOTIFY_COND_INPUT) {
++                            MsgDeliverEvent(0, current->sigEvent);
++                        }
++                    }
++                }
++                current = current->next;
++            }
++        }
++    }
++
++    pthread_detach(pthread_self());
++    return NULL;
++}
++
++std::string IDSEXT::GetToken(const std::string& provider, const std::string& tokenType, const std::string& appliesTo)
++{
++    ids_request_id_t *getTokenRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++
++    ids_result_t getTokenResult;
++    getTokenResult = ids_get_token((requestProvider ? requestProvider->provider : NULL),
++                                    tokenType.c_str(),
++                                    appliesTo.c_str(),
++                                    getTokenSuccessCB,
++                                    failureCB,
++                                    this,
++                                    getTokenRequestId);
++
++    if ( getTokenResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++
++std::string IDSEXT::GetProperties(const std::string& provider, int propertyType, int numProps, const std::string& properties)
++{
++    const char *propList[numProps];
++    char *delimited = strdup(properties.c_str());
++    char *token;
++
++    int i = 0;
++    while ((token = strsep(&delimited, ","))) {
++         propList[i] = strdup(token);
++         i++;
++    }
++    ids_request_id_t *getPropertiesRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t getPropertiesResult;
++
++    getPropertiesResult = ids_get_properties((requestProvider ? requestProvider->provider : NULL),
++                                                propertyType,
++                                                numProps,
++                                                propList,
++                                                getPropertiesSuccessCB,
++                                                failureCB,
++                                                this,
++                                                getPropertiesRequestId);
++
++    if ( getPropertiesResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++
++std::string IDSEXT::ClearToken(const std::string& provider, const std::string& tokenType, const std::string& appliesTo)
++{
++    ids_request_id_t *clearTokenRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++
++    ids_result_t clearTokenResult;
++    clearTokenResult = ids_clear_token((requestProvider ? requestProvider->provider : NULL),
++                                        tokenType.c_str(),
++                                        appliesTo.c_str(),
++                                        clearTokenSuccessCB,
++                                        failureCB,
++                                        this,
++                                        clearTokenRequestId);
++
++    if ( clearTokenResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::GetData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName)
++{
++    ids_request_id_t *getDataRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t getDataResult;
++
++    getDataResult = ids_get_data((requestProvider ? requestProvider->provider : NULL),
++                                    dataType,
++                                    dataFlags,
++                                    dataName.c_str(),
++                                    getDataSuccessCB,
++                                    failureCB,
++                                    this,
++                                    getDataRequestId);
++
++    if ( getDataResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::CreateData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName, const std::string& dataValue)
++{
++    ids_request_id_t *createDataRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t createDataResult;
++    ids_data_t userData;
++    userData.name = strdup(dataName.c_str());
++    userData.value = strdup(dataValue.c_str());
++    userData.length = dataValue.length();
++
++    createDataResult = ids_create_data((requestProvider ? requestProvider->provider : NULL),
++                                            dataType,
++                                            dataFlags,
++                                            &userData,
++                                            createDataSuccessCB,
++                                            failureCB,
++                                            this,
++                                            createDataRequestId);
++
++    if ( createDataResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::DeleteData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName)
++{
++    ids_request_id_t *deleteDataRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t deleteDataResult;
++
++    deleteDataResult = ids_delete_data((requestProvider ? requestProvider->provider : NULL),
++                                            dataType,
++                                            dataFlags,
++                                            dataName.c_str(),
++                                            deleteDataSuccessCB,
++                                            failureCB,
++                                            this,
++                                            deleteDataRequestId);
++
++    if ( deleteDataResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::SetData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName, const std::string& dataValue)
++{
++    ids_request_id_t *setDataRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t setDataResult;
++    ids_data_t userData;
++    userData.name = strdup(dataName.c_str());
++    userData.value = strdup(dataValue.c_str());
++    userData.length = dataValue.length();
++
++    setDataResult = ids_set_data((requestProvider ? requestProvider->provider : NULL),
++                                    dataType,
++                                    dataFlags,
++                                    &userData,
++                                    setDataSuccessCB,
++                                    failureCB,
++                                    this,
++                                    setDataRequestId);
++
++    if ( setDataResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::ListData(const std::string& provider, int dataType, int dataFlags)
++{
++    ids_request_id_t *listDataRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t listDataResult;
++
++    listDataResult = ids_list_data((requestProvider ? requestProvider->provider : NULL),
++                                        dataType,
++                                        dataFlags,
++                                        listDataSuccessCB,
++                                        failureCB,
++                                        this,
++                                        listDataRequestId);
++
++    if ( listDataResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::Challenge(const std::string& provider, int challengeType, int challengeFlags)
++{
++    ids_request_id_t *challengeRequestId = NULL;
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t challengeResult;
++
++    challengeResult = ids_challenge((requestProvider ? requestProvider->provider : NULL),
++                                        challengeType,
++                                        challengeFlags,
++                                        challengeSuccessCB,
++                                        failureCB,
++                                        this,
++                                        challengeRequestId);
++
++    if ( challengeResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
++
++std::string IDSEXT::RegisterNotifier(const std::string& provider, int notifierType, int notifierFlags, const std::string& notifierName)
++{
++    ids_provider_mapping *requestProvider = getProvider(provider);
++    ids_result_t registerNotifierResult;
++
++    registerNotifierResult = ids_register_notifier((requestProvider ? requestProvider->provider : NULL),
++                                                        notifierType,
++                                                        notifierFlags,
++                                                        notifierName.c_str(),
++                                                        notifierCB,
++                                                        this);
++
++    if ( registerNotifierResult != IDS_SUCCESS ) {
++        failureCB((ids_request_id_t)0, IDS_FAILURE, strerror(errno), this);
++    }
++
++    return "";
++}
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.hpp b/plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.hpp
+new file mode 100644
+index 0000000..907beb7
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/ids_js.hpp
+@@ -0,0 +1,90 @@
++/*
++ * Copyright 2012 Research In Motion Limited.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++#ifndef IDS_JS_HPP_
++#define IDS_JS_HPP_
++
++#include <pthread.h>
++#include <sys/neutrino.h>
++#include <ids.h>
++#include <string>
++
++#include "../common/plugin.h"
++
++extern "C" {
++    typedef struct ids_provider_map_t {
++        const char *providerName;
++        int providerFd;
++        ids_provider_t *provider;
++        struct sigevent *sigEvent;
++        ids_provider_map_t *next;
++    } ids_provider_mapping;
++
++    void getTokenSuccessCB(ids_request_id_t requestId, const char *token, int paramCount, const ids_token_param_t *params, void *cbData);
++    void getPropertiesSuccessCB(ids_request_id_t requestId, int propertyCount, const ids_property_t* properties, void* cb_data);
++    void clearTokenSuccessCB(ids_request_id_t requestId, bool clear, void* cb_data);
++    void getDataSuccessCB(ids_request_id_t requestId, const ids_data_t *data, void* cb_data);
++    void createDataSuccessCB(ids_request_id_t requestId, void* cb_data);
++    void deleteDataSuccessCB(ids_request_id_t requestId, void* cb_data);
++    void setDataSuccessCB(ids_request_id_t requestId, void* cb_data);
++    void listDataSuccessCB(ids_request_id_t requestId, int listCount, const char **list, void *cbData);
++    void challengeSuccessCB(ids_request_id_t requestId, int level, void *cbData);
++    void notifierCB(int type, const char *name, int notification, void *cbData);
++    void failureCB(ids_request_id_t requestId, ids_result_t result, const char *failureInfo, void *cbData);
++}
++
++class IDSEXT : public JSExt
++{
++public:
++    explicit IDSEXT(const std::string& id);
++    virtual ~IDSEXT();
++    virtual std::string InvokeMethod(const std::string& command);
++    virtual bool CanDelete();
++    void NotifyEvent(const std::string& eventId, const std::string& event);
++
++    static void* idsEventThread(void *args);
++    std::string GetVersion();
++    std::string RegisterProvider(const std::string& providerName);
++    std::string SetOption(int option, const std::string& value);
++
++    std::string GetToken(const std::string& provider, const std::string& tokenType, const std::string& appliesTo);
++    std::string ClearToken(const std::string& provider, const std::string& tokenType, const std::string& appliesTo);
++    std::string GetProperties(const std::string& provider, int propertyType, int numProps, const std::string& properties);
++    std::string GetData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName);
++    std::string CreateData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName, const std::string& dataValue);
++    std::string DeleteData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName);
++    std::string SetData(const std::string& provider, int dataType, int dataFlags, const std::string& dataName, const std::string& dataValue);
++    std::string ListData(const std::string& provider, int dataType, int dataFlags);
++    std::string Challenge(const std::string& provider, int challengeType, int challengeFlags);
++    std::string RegisterNotifier(const std::string& provider, int notifierType, int notifierFlags, const std::string& notifierName);
++
++    // Needed for callbacks which are not included in IDSEXT class
++    std::string getEventId();
++    ids_provider_mapping *getProviders();
++    void removeProvider(int providerFd);
++private:
++    pthread_t m_thread;
++    bool connected;
++
++    ids_provider_mapping *providers;
++    std::string m_id;
++    std::string event_id;
++
++    ids_provider_mapping* getProvider(const std::string& provider);
++    void clearProviders(void);
++};
++
++#endif // IDS_JS_HPP_
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/x86/Makefile b/plugin/com.blackberry.user.identity/src/blackberry10/native/x86/Makefile
+new file mode 100644
+index 0000000..0e22650
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/x86/Makefile
+@@ -0,0 +1,8 @@
++LIST=VARIANT
++ifndef QRECURSE
++QRECURSE=recurse.mk
++ifdef QCONFIG
++QRDIR=$(dir $(QCONFIG))
++endif
++endif
++include $(QRDIR)$(QRECURSE)
+diff --git a/plugin/com.blackberry.user.identity/src/blackberry10/native/x86/so/Makefile b/plugin/com.blackberry.user.identity/src/blackberry10/native/x86/so/Makefile
+new file mode 100644
+index 0000000..2c76089
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/src/blackberry10/native/x86/so/Makefile
+@@ -0,0 +1 @@
++include ../../common.mk
+diff --git a/plugin/com.blackberry.user.identity/www/BlackBerryId.js b/plugin/com.blackberry.user.identity/www/BlackBerryId.js
+new file mode 100644
+index 0000000..21399e4
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/www/BlackBerryId.js
+@@ -0,0 +1,107 @@
++/*
++ * Copyright 2012 Research In Motion Limited.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++ 
++var _self = {},
++    _ID = "com.blackberry.user.identity.blackberryid";
++
++function defineReadOnlyField(obj, field, value) {
++    Object.defineProperty(obj, field, {
++        "value": value,
++        "writable": false
++    });
++}
++
++
++/*
++ * Define constants for type constants.
++ */
++
++/*
++ * The identity provider name for BlackBerry ID.
++ */
++defineReadOnlyField(_self, "BBID_PROVIDER_NAME", "ids:rim:bbid");
++/*
++ * BlackBerry ID core property - Username.
++ */
++defineReadOnlyField(_self, "USERNAME_KEY", "urn:bbid:username");
++
++/*
++ * BlackBerry ID core property - Screen name.
++ */
++defineReadOnlyField(_self, "SCREENNAME_KEY", "urn:bbid:screenname");
++
++/*
++ * BlackBerry ID core property - First name.
++ */
++defineReadOnlyField(_self, "FIRSTNAME_KEY", "urn:bbid:firstname");
++
++/*
++ * BlackBerry ID core property - Last name.
++ */
++defineReadOnlyField(_self, "LASTNAME_KEY", "urn:bbid:lastname");
++
++/*
++ * BlackBerry ID core property - Unique ID.
++ */
++defineReadOnlyField(_self, "UID_KEY", "urn:bbid:uid");
++
++/*
++ * BlackBerry ID core property type.
++ */
++defineReadOnlyField(_self, "CORE_PROPERTY_TYPE", "0");
++
++/*
++ * BlackBerry ID level of assurance when authentication was performed offline.
++ */
++defineReadOnlyField(_self, "ASSURANCE_OFFLINE_AUTHENTICATED", "0");
++
++/*
++ * BlackBerry ID level of assurance when authentication was performed online.
++ */
++defineReadOnlyField(_self, "ASSURANCE_ONLINE_AUTHENTICATED", "1");
++
++/*
++ * Authentication challenge type.
++ */
++defineReadOnlyField(_self, "BBID_AUTHENTICATE", "0");
++
++/*
++ * Default challenge flag.
++ */
++defineReadOnlyField(_self, "BBID_CHALLENGE_DEFAULT", "0");
++
++/*
++ * The request to receive notifications was successful. Change notifications 
++ * will now be sent.
++ */
++defineReadOnlyField(_self, "NOTIFY_STARTED", "0");
++
++/*
++ * The request to stop receiving notifications was successful, or
++ * the request to start receiving has failed. Change notifications will
++ * NOT be sent.
++ */
++defineReadOnlyField(_self, "NOTIFY_STOPPED", "1");
++
++/*
++ * The provider has detected that the entry has changed and is
++ * notifying the application. A change can include the entry being created,
++ * deleted, or modified.
++ */
++defineReadOnlyField(_self, "NOTIFY_CHANGED", "2");
++
++module.exports = _self;
++
+diff --git a/plugin/com.blackberry.user.identity/www/BlackBerryProfile.js b/plugin/com.blackberry.user.identity/www/BlackBerryProfile.js
+new file mode 100644
+index 0000000..958dd30
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/www/BlackBerryProfile.js
+@@ -0,0 +1,210 @@
++/*
++ * Copyright 2012 Research In Motion Limited.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++ 
++var _self = {},
++    _ID = "com.blackberry.user.identity.blackberry.profile";
++
++function defineReadOnlyField(obj, field, value) {
++    Object.defineProperty(obj, field, {
++        "value": value,
++        "writable": false
++    });
++}
++
++
++/*
++ * Define constants for type constants
++ */
++
++/*
++ * The identity provider name for BlackBerry Profile.
++ */
++defineReadOnlyField(_self, "BBPROFILE_PROVIDER_NAME", "ids:rim:profile");
++
++/*
++ * Application-scoped profile data
++ * Entries stored with this type are access protected to allow
++ * only the creating application access to the data. No other application
++ * is able to retrieve, modify, delete or list the values. If the
++ * same application is installed on another device with the same user, it
++ * will have access to the data. This creates a private-store of data for 
++ * the application that is accessible only from the specific application 
++ * on any device with the same BlackBerry ID user logged in.
++ */
++defineReadOnlyField(_self, "PROFILE_TYPE_APP", "1");
++
++/*
++ * Vendor-scoped profile data.
++ * Entries stored with this type are access protected to allow
++ * all applications developed by the same vendor access to the data. No
++ * other vendor's applications will be able to retrieve, modify, delete or
++ * list the values. If there are several applications installed on a device
++ * from the same vendor, they will all have access to these values. If 
++ * apps from the same vendor are installed on another device, and the same 
++ * BlackBerry ID user is logged in to that device, all apps from that 
++ * vendor will have access to the data. This creates a vendor 
++ * private-store of data that is accessible only from the specific 
++ * vendor's applications on any device with the same BlackBerry ID user 
++ * logged in.
++ */
++defineReadOnlyField(_self, "PROFILE_TYPE_VENDOR", "2");
++
++/*
++ * Default creation flags
++ * No options specified, and the creation will follow the default
++ * behavior where no caching and no extra encryption will be performed for
++ * the new entry.
++ */
++defineReadOnlyField(_self, "CREATE_DATA_DEFAULT", "0");
++
++/*
++ * Device-To-Device encryption, dynamic keys, no user involvement
++ * To have additional encryption performed on the data prior to
++ * being stored remotely. Data is encrypted with dynamically generated keys
++ * shared between devices using the same BlackBerry ID user. Only devices
++ * with the same user will have the keys to decrypt this data.  The keys
++ * are shared between devices and not included in backups or transferred as
++ * part of device swap, so if a user only has one device, and it is lost,
++ * the keys are not recoverable, and any remote data stored with this
++ * encryption will be non-recoverable. Performing a "Security Wipe" will
++ * retain the keys and the stored data is recoverable if the same user
++ * logs back into the device. If the user has multiple devices,
++ * and are data enabled, the devices with the same BlackBerry ID user will
++ * exchange the keys securely so that all of them can store and retrieve
++ * the data stored with this encryption. Operations will return
++ * @c IDS_NOT_READY while the encryption keys are exchanged; the app can
++ * repeat the request after a short wait to avoid failures during this one
++ * time key exchange window.
++ * 
++ */
++defineReadOnlyField(_self, "CREATE_DATA_ENCRYPT_D2D", "1");
++
++/*
++ * Enable local caching of the entry
++ * Override the default behavior to enable local data caching for
++ * this entry. 
++ * In cases where the application may need data stored locally for quick or
++ * repeated access, the value can be cached securely on the device and 
++ * retrieved on demand, even when not connected to the remote storage copy.
++ * The cache is synchronized with the remote copy so that the cache is 
++ * always up to date while the device has appropriate data coverage.
++ */
++defineReadOnlyField(_self, "CREATE_DATA_CACHED", "10");
++
++/*
++ * Use the default flags for get requests
++ * If options are not specified, the get request will follow the
++ * default behavior where the entry is not cached.  If the entry is already
++ * being cached, this flag will not disable caching.
++ */
++defineReadOnlyField(_self, "GET_DATA_DEFAULT", "0");
++
++/*
++ * Enable local caching of the entry
++ * Override the default behavior to enable local data caching for
++ * this entry. 
++ * In cases where the application may need data stored locally for quick or
++ * repeated access, the value can be cached securely on the device and 
++ * retrieved on demand, even when not connected to the remote storage copy.
++ * The cache is synchronized with the remote copy so that the cache is 
++ * always up to date while the device has appropriate data coverage.
++ */
++defineReadOnlyField(_self, "GET_DATA_CACHED", "1");
++
++/*
++ * Use the default flags for set requests
++ * If options are not specified, the update process will follow
++ * the default behavior where the entry is not cached.  If the entry is
++ * already being cached, this flag will not disable caching.
++ */
++defineReadOnlyField(_self, "SET_DATA_DEFAULT", "0");
++
++/*
++ * Enable local caching of the entry
++ * Override the default behavior to enable local data caching for
++ * this entry. 
++ * In cases where the application may need data stored locally for quick or
++ * repeated access, the value can be cached securely on the device and 
++ * retrieved on demand, even when not connected to the remote storage copy.
++ * The cache is synchronized with the remote copy so that the cache is 
++ * always up to date while the device has appropriate data coverage.
++ */
++defineReadOnlyField(_self, "SET_DATA_CACHED", "1");
++
++/*
++ * Use the default flags for delete requests
++ * If options are not specified, the deletion will follow the
++ * default behavior where the specified remote entry is deleted as
++ * well as the cached copy if is was cached.
++ */
++defineReadOnlyField(_self, "DELETE_DATA_DEFAULT", "0");
++
++/*
++ * Remove local cached copy of the entry
++ * Override the default behavior to remove only the cached copy,
++ * but leave the remote copy unchanged. 
++ * In cases where the application may need data stored locally for quick 
++ * or repeated access, the value can be cached securely on the device and 
++ * retrieved on demand, even when not connected to the remote storage copy.
++ * The cache is synchronized with the remote copy so that the cache is 
++ * always up to date while the device has appropriate data coverage.
++ */
++defineReadOnlyField(_self, "DELETE_DATA_CACHE_ONLY", "1");
++
++/*
++ * Delete all entries under profile type
++ * Removes all the entries for the given type. The name 
++ * specified must be empty when using this flag. To avoid accidental 
++ * removal of shared entries, use type PROFILE_TYPE_VENDOR, which does
++ * not allow this flag.
++ */
++defineReadOnlyField(_self, "DELETE_DATA_CACHE_ALL", "2");
++
++/*
++ * Default list flags
++ * If options are not specified, the list process will follow the
++ * default behavior of listing the remotely available entries.
++ */
++defineReadOnlyField(_self, "LIST_DATA_DEFAULT", "0");
++
++
++/*
++ * Notifications will now be sent for this entry
++ * The request to receive notifications was successful. Change
++ * notifications will now be sent.
++ */
++defineReadOnlyField(_self, "NOTIFY_STARTED", "0");
++
++/*
++ * Notifications will no longer be sent for this entry
++ * The request to stop receiving notifications was successful, or
++ * the request to start receiving has failed. Change notifications will
++ * NOT be sent.
++ */
++defineReadOnlyField(_self, "NOTIFY_STOPPED", "1");
++
++/*
++ * The entry has changed
++ * The provider has detected that the entry has changed and is
++ * notifying the application. A change can include the entry being created,
++ * deleted, or modified.
++ */
++defineReadOnlyField(_self, "NOTIFY_CHANGED", "2");
++
++
++
++module.exports = _self;
++
+diff --git a/plugin/com.blackberry.user.identity/www/client.js b/plugin/com.blackberry.user.identity/www/client.js
+new file mode 100644
+index 0000000..7b07068
+--- /dev/null
++++ b/plugin/com.blackberry.user.identity/www/client.js
+@@ -0,0 +1,207 @@
++/*
++ * Copyright 2012 Research In Motion Limited.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++ 
++var _self = {},
++    _ID = "com.blackberry.user.identity",
++    noop = function () {},
++    exec = cordova.require("cordova/exec"),
++    IDS_FAILURE = -1,  /*!< Indicates that the IDS API call function did not complete
++							successfully.  Often the application can get
++							additional information by checking the value of
++							@c errno. */
++    IDS_SUCCESS = 0,   /*!< Indicates that the IDS API call completed successfully.
++							In asynchronous calls, the request has been sent
++							and either the success or failure callback will be
++							called when the response arrives. */
++
++    IDS_DEFAULT_ERROR = 49999, /*!< 49999 Default error.  Internal error occurred
++								while processing the request. */
++
++	IDS_NAME_TOO_LONG = 50002,   /*!< 50002 */
++	IDS_ACCOUNT_LOCALLY_LOCKED_OUT = 50003,   /*!< 50003 */
++	IDS_USER_COULD_NOT_BE_AUTHENTICATED = 50004, /*!< 50004 */
++	IDS_TOO_MANY_NAMES_PASSED = 50005, /*!< 50005 */
++	IDS_INVALID_REQUEST = 50006, /*!< 50006  */
++	IDS_DOES_NOT_EXIST = 50007,  /*!< 50007 */
++	IDS_UNKNOWN_TOKEN_TYPE = 50008, /*!< 50008 */
++	IDS_UNKNOWN_APPLIES_TO = 50009,  /*!< 50009 */
++	IDS_NOT_ENOUGH_RESOURCES = 50010, /*!< 50010 */
++	IDS_CANNOT_GET_TOKEN_WHILE_OFFLINE = 50011,  /*!< 50011 */
++	IDS_ERROR_WHILE_CONTACTING_SERVICE = 50012,  /*!< 50012 Error while contacting
++													identity service.  This
++													could include network
++													issues. */
++	IDS_NULL_OR_UNKNOWN_PARAMETERS = 50015, /*!< 50015 */
++	IDS_NOT_ALLOWED = 50017,  /*!< 50017 */
++	IDS_VALUE_TOO_LARGE = 50107,   /*!< 50107 */
++	IDS_ALREADY_EXISTS = 50159, /*!< 50159 */
++
++	// Deprecated Return Codes no longer used
++	IDS_PROPERTY_DOES_NOT_EXIST = 50007,  /*!< Deprecated. Use @c IDS_DOES_NOT_EXIST. */
++	IDS_PROPERTY_NOT_AUTHORIZED = 50017,  /*!< Deprecated. Use @c IDS_NOT_ALLOWED. */
++	IDS_CLEAR_TOKEN_FAIL = 50016, /*!< Deprecated. Use @c IDS_DEFAULT_ERROR */
++	IDS_NAME_MUST_BE_SET = 50107;  /*!< Deprecated. Use @c IDS_NULL_OR_UNKNOWN_PARAMETERS */
++
++_self.self = {};
++
++_self.getVersion = function () {
++	var version = -1,
++		response = function (data) { version = data; };
++	
++	exec(response, noop, _ID, "getVersion");
++	return version;
++};
++
++_self.registerProvider = function (provider) {
++    var args = {
++            "provider": provider || {}
++        },
++        obj,
++        response = function (data) { obj = JSON.parse(data); };
++        
++	exec(response, noop, _ID, "registerProvider", args);
++	return obj;
++};
++
++_self.setOption = function (option, value) {
++	var args = {
++			"option": option,
++			"value": value || {}
++		},
++		obj,
++		response = function (data) { obj = JSON.parse(data); };
++		
++	exec(response, noop, _ID, "setOption", args);
++	return obj;
++};
++
++
++function createEventHandler(_eventId, callback) {
++    if (!window.webworks.event.isOn(_eventId)) {
++		window.webworks.event.once(_ID, _eventId, callback);
++	}
++}
++
++_self.getToken = function (idsProvider, tokenType, appliesTo, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"tokenType": tokenType,
++		"appliesTo": appliesTo || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "getToken", args);
++};
++
++
++_self.clearToken = function (idsProvider, tokenType, appliesTo, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"tokenType": tokenType,
++		"appliesTo": appliesTo || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "clearToken", args);
++};
++
++_self.getProperties = function (idsProvider, propertyType, userProperties, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"propertyType": propertyType,
++		"userProperties": userProperties || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "getProperties", args);
++};
++
++_self.getData = function (idsProvider, dataType, dataFlags, dataName, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"dataType": dataType,
++		"dataFlags": dataFlags,
++		"dataName": dataName || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "getData", args);
++};
++
++_self.createData = function (idsProvider, dataType, dataFlags, dataName, dataValue, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"dataType": dataType,
++		"dataFlags": dataFlags,
++		"dataName": dataName,
++		"dataValue": dataValue || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "createData", args);
++};
++
++_self.deleteData = function (idsProvider, dataType, dataFlags, dataName, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"dataType": dataType,
++		"dataFlags": dataFlags,
++		"dataName": dataName || {}
++    };
++	exec(successCallback, failureCallback, _ID, "deleteData", args);
++};
++
++_self.setData = function (idsProvider, dataType, dataFlags, dataName, dataValue, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"dataType": dataType,
++		"dataFlags": dataFlags,
++		"dataName": dataName,
++		"dataValue": dataValue || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "setData", args);
++};
++
++_self.listData = function (idsProvider, dataType, dataFlags, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"dataType": dataType,
++		"dataFlags": dataFlags || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "listData", args);
++};
++
++_self.challenge = function (idsProvider, challengeType, challengeFlags, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"challengeType": challengeType,
++		"challengeFlags": challengeFlags || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "challenge", args);
++};
++
++_self.registerNotifier = function (idsProvider, notifierType, notifierFlags, notifierName, successCallback, failureCallback) {
++	var args = {
++		"provider": idsProvider,
++		"notifierType": notifierType,
++		"notifierFlags": notifierFlags,
++		"notifierName": notifierName || {}
++    };
++
++	exec(successCallback, failureCallback, _ID, "registerNotifier", args);
++};
++
++
++module.exports = _self;
++
+-- 
+1.7.10.msysgit.1
+

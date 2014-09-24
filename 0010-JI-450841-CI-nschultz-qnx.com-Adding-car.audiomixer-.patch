@@ -1,0 +1,617 @@
+From 3ad5dc0d8c80d7c8aa9d3b1b0bde69f5534d788b Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Tue, 23 Jul 2013 12:08:25 -0400
+Subject: [PATCH 10/61] JI:450841 CI:nschultz@qnx.com Adding car.audiomixer
+ plugin
+
+---
+ plugin/com.qnx.car.audiomixer/plugin.xml           |   33 +++
+ .../src/blackberry10/audiomixer.js                 |  140 ++++++++++++
+ .../src/blackberry10/index.js                      |  121 +++++++++++
+ plugin/com.qnx.car.audiomixer/www/client.js        |  223 ++++++++++++++++++++
+ .../www/enum/AudioMixerSetting.js                  |   47 +++++
+ 5 files changed, 564 insertions(+)
+ create mode 100755 plugin/com.qnx.car.audiomixer/plugin.xml
+ create mode 100644 plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+ create mode 100644 plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.car.audiomixer/www/client.js
+ create mode 100644 plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js
+
+diff --git a/plugin/com.qnx.car.audiomixer/plugin.xml b/plugin/com.qnx.car.audiomixer/plugin.xml
+new file mode 100755
+index 0000000..a9ebce8
+--- /dev/null
++++ b/plugin/com.qnx.car.audiomixer/plugin.xml
+@@ -0,0 +1,33 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.car.audiomixer"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="car.audiomixer" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/audiomixer.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.car.audiomixer" value="com.qnx.car.audiomixer" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+new file mode 100644
+index 0000000..bfd3b13
+--- /dev/null
++++ b/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+@@ -0,0 +1,140 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for mixer functionality
++ *
++ * @author mlapierre
++ * $Id: audiomixer.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
++ */
++
++var	_pps = qnx.webplatform.pps,
++	_mixerReaderPPS,
++	_mixerWriterPPS,
++	_volumeReaderPPS,
++	_volumeWriterPPS,
++	_triggerUpdate;
++	
++/**
++ * Takes in PPS data and formats it for the extension callbacks
++ * @param {Object} data The PPS data
++ * @return {Array} An array of data formatted as per the extension documentation 
++ */
++function dataFormat(data) {
++	if (typeof data != 'object') {
++		return null;
++	}
++
++	var keys = Object.keys(data);
++	var out = [];
++	for (var i=0; i<keys.length; i++) {
++		out.push({ setting: keys[i], zone: 'all', value: data[keys[i]] });
++	}
++	return out;
++}
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Initializes the extension 
++	 */
++	init: function() {
++		//audio mixer reader
++		_mixerReaderPPS = _pps.createObject("/pps/services/audio/mixer", _pps.PPSMode.DELTA);
++		_mixerReaderPPS.onNewData = function(event) {
++			if (_triggerUpdate && event && event.data)  {
++				_triggerUpdate(dataFormat(event.data));
++			}
++		};
++		_mixerReaderPPS.open(_pps.FileMode.RDONLY);
++
++		//audio mixer writer
++		_mixerWriterPPS = _pps.createObject("/pps/services/audio/mixer", _pps.PPSMode.DELTA);
++		_mixerWriterPPS.open(_pps.FileMode.WRONLY);
++
++		//volume reader
++		_volumeReaderPPS = _pps.createObject("/pps/services/audio/status", _pps.PPSMode.DELTA);
++		_volumeReaderPPS.onNewData = function(event) {
++			if (_triggerUpdate && event && event.data && !isNaN(event.data["output.speaker.volume"])) {
++				_triggerUpdate(dataFormat({ volume: event.data["output.speaker.volume"] }));
++			}
++			console.log('volume event', event)
++		};
++		_volumeReaderPPS.open(_pps.FileMode.RDONLY);
++
++		//volume writer
++		_volumeWriterPPS = _pps.createObject("/pps/services/audio/control", _pps.PPSMode.DELTA);
++		_volumeWriterPPS.open(_pps.FileMode.WRONLY);
++
++	},
++	
++	/**
++	 * Sets the trigger function to call when a mixer event is fired
++	 * @param trigger {Function} The trigger function to call when the event is fired
++	 */
++	setTriggerUpdate: function(trigger) {
++		_triggerUpdate = trigger;
++	},
++	
++	/**
++	 * Return the audio mixer settings for a specific zone
++	 * @param {String} zone (Optional) The Zone to filter the results by
++	 * @returns {Object} The requested settings
++	 */
++	get: function(zone) {
++
++		//aggregate mixer and volume
++		var out = _mixerReaderPPS.data.mixer;
++		out.volume = _volumeReaderPPS.data.status["output.speaker.volume"];
++
++		return dataFormat(out);
++	},	
++	/**
++	 * Sets one or more audio parameters
++	 * @param {String} setting A car.audiomixer.AudioMixerSetting value   
++	 * @param {String} zone A car.Zone value   
++	 * @param {Number} value The value to save
++	 */
++	set: function(setting, zone, value) {
++		if (typeof setting == 'string' &&
++			typeof zone == 'string' && 
++			typeof value == 'number') {
++
++			if (setting == 'volume') {
++				if (!isNaN(value) && value >= 0 && value <= 100) {
++					_volumeWriterPPS.write({
++						id: 4,
++						msg: "set_output_level", 
++						dat: { 
++							ctxt: 0, 
++							output_id: 0, 
++							level: value 
++						}
++					});
++				}
++			} else {
++				var data = {};
++				data[setting] = value;
++				_mixerWriterPPS.write(data);
++			}
++		}
++	},
++};
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+new file mode 100644
+index 0000000..960019b
+--- /dev/null
++++ b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+@@ -0,0 +1,121 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++ /**
++ * Allows control of volume and other audio parameters
++ *
++ * @author mlapierre
++ * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
++ */
++
++var _audiomixer = require('./audiomixer'),
++	_wwfix = require("../../lib/wwfix"),
++	_callback;
++
++/**
++ * Initializes the extension 
++ */
++function init() {
++	try {
++		_audiomixer.init();
++	} catch (ex) {
++		console.error('Error in webworks ext: audiomixer/index.js:init():', ex);
++	}
++}
++init();
++
++
++/*
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Returns the current audio parameters
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	startEvents: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			_callback = function (data) {
++				result.callbackOk(data, true);
++			};
++			_audiomixer.setTriggerUpdate(_callback);
++			result.noResult(true);
++		} catch (e) {
++			result.error("error in startEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current audio parameters
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	stopEvents: function(success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			_audiomixer.setTriggerUpdate(null);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error("error in stopEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current audio parameters
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	get: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			args = _wwfix.parseArgs(args);
++			var data = _audiomixer.get(args.zone);
++			result.ok(data, false);
++		} catch (e) {
++			result.error("Unable to get audiomixer settings", false)
++		}
++	},
++	
++	/**
++	 * Sets one or more audio parameters
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	set: function(success, fail, args, env) {
++		try {
++			args = _wwfix.parseArgs(args);
++			_audiomixer.set(args.setting, args.zone, args.value);
++			var result = new PluginResult(args, env)
++			result.ok(undefined, false);
++		} catch (e) {
++			fail(-1, e);
++		}
++	}
++};
++
+diff --git a/plugin/com.qnx.car.audiomixer/www/client.js b/plugin/com.qnx.car.audiomixer/www/client.js
+new file mode 100644
+index 0000000..000e1b2
+--- /dev/null
++++ b/plugin/com.qnx.car.audiomixer/www/client.js
+@@ -0,0 +1,223 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++ 
++/**
++ * @name car.audiomixer
++ * @static
++ *
++ * Controls the audio mixer 
++ */
++ 
++ /*
++  * @author mlapierre
++  * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
++  */
++
++
++var _self = {},
++	_ID = 'com.qnx.car.audiomixer',
++    _utils = cordova.require('cordova/utils'),
++    _watches = {};
++	// _callback = require('./../../lib/callback'),
++	// Event = require('./enum/Event');
++
++
++/** 
++ * @property AudioMixerSetting An enumeration of audio mixer settings 
++ * @example
++ * //to refer to the volume setting
++ * car.audiomixer.AudioMixerSetting.VOLUME  //returns 'volume'
++ */
++//_self.AudioMixerSetting = require('./enum/AudioMixerSetting');
++
++function onUpdate(data) {
++	var keys = Object.keys(_watches);
++	for (var i=0; i<keys.length; i++) {
++		setTimeout(_watches[keys[i]](data), 0);
++	}
++}
++
++/**
++ * Watch for audio mixer changes
++ * @param {Function} callback The function to be called when a change is detected
++ * @return {Number} An id for the added watch
++ * @example
++ * 
++ * //define a callback function
++ * function myCallback(audioMixerItems) {
++ *	  //iterate through the changed items
++ *	  for (var i=0; i<audioMixerItems.length; i++) {
++ *		  console.log("audio mixer item setting = " + audioMixerItems[i].setting + '\n' + //a car.audiomixer.AudioMixerSetting value
++ *					  "audio mixer item zone = " + audioMixerItems[i].zone + '\n' +	   //a car.Zone value
++ *					  "audio mixer item value = " + audioMixerItems[i].value + '\n\n');   //a numeric value
++ *	  }
++ * }
++ * 
++ * var watchId = car.audiomixer.watchAudioMixer(myCallback);
++ */
++_self.watchAudioMixer = function (callback) {
++	var watchId = _utils.createUUID();
++	
++	_watches[watchId] = callback;
++	if (Object.keys(_watches).length === 1) {
++		window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
++	}
++
++	return watchId;
++}
++
++
++/**	
++ * Stop watching audio mixer changes
++ * @param {Number} watchId The watch id returned by car.audiomixer.watchAudioMixer
++ * @example
++ * 
++ * car.audiomixer.cancelWatch(watchId);
++ */
++_self.cancelWatch = function (watchId) {
++	if (_watches[watchId]) {
++		delete _watches[watchId];
++		if (Object.keys(_watches).length === 0) {
++			window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
++		}
++	}
++}
++
++
++/**
++ * Return the audio mixer settings for a specific zone
++ * If successful, it calls the successCallback with a Zone object for the specific zone.
++ * @param {Function} successCallback The callback that is called with the result on success
++ * @param {Function} errorCallback (Optional) The callback that is called if there is an error
++ * @param {String} zone (Optional) The Zone to filter the results by
++ * @see car.Zone
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(audioMixerItems) {
++ *	  //iterate through all the audio mixer items
++ *	  for (var i=0; i<audioMixerItems.length; i++) {
++ *		  console.log("audio mixer item setting = " + audioMixerItems[i].setting + '\n' + //a car.audiomixer.AudioMixerSetting value
++ *					  "audio mixer item zone = " + audioMixerItems[i].zone + '\n' +	   //a car.Zone value
++ *					  "audio mixer item value = " + audioMixerItems[i].value);			//a numeric value
++ *	  }
++ * }
++ *
++ * function errorCallback(error) {
++ *	  console.log(error.code, error.msg);
++ * }
++ *
++ * //optional: provide a car.Zone filter to retrieve only values for that zone.
++ * //if omitted, settings for all zones will be returned
++ * var zone = car.Zone.FRONT;
++ *
++ * //call the method
++ * car.audiomixer.get(successCallback, errorCallback, zone);
++ *
++ * NOTE: considerations and being made for allowing an array of zones to be accepted
++ *
++ *
++ * @example REST - single zone
++ *
++ * Request:
++ * http://<car-ip>/car/audiomixer/get?zone=all
++ *
++ * Response:
++ * {
++ *	  code: 1,
++ *	  data: [
++ *		  { setting: 'volume', zone: 'all', value: 50 }
++ *	  ]
++ * }
++ *
++ *
++ * @example REST - multi zone
++ *
++ * Request:
++ * http://<car-ip>/car/audiomixer/get
++ *
++ * Success Response:
++ * {
++ *	  code: 1,
++ *	  data: [
++ *		  { setting: 'volume', zone: 'all', value: 50 },
++ *		  { setting: 'bass', zone: 'all', value: 6 },
++ *	  ]
++ * }
++ *
++ * Error Response:
++ * {
++ *	  code: -1,
++ *	  msg: "An error has occurred"
++ * }
++ */
++_self.get = function(successCallback, errorCallback, zone) {
++	var args = {};
++	if (zone) {
++		args.zone = (typeof zone == 'string' && zone.length > 0) ? zone : null;
++	}
++	window.cordova.exec(successCallback, errorCallback, _ID, 'get', args, false);
++};
++
++
++/**
++ * Saves an audio mixer setting
++ * @param {String} setting A car.audiomixer.AudioMixerSetting value   
++ * @param {String} zone A car.Zone value   
++ * @param {Number} value The value to save
++ * @param {Function} successCallback (Optional) The callback that is called on success
++ * @param {Function} errorCallback (Optional) The callback that is called if there is an error
++ * @see car.audiomixer.AudioMixerSetting
++ * @see car.Zone  
++ *
++ * //option 1: set the volume in the entire car to 50 using constants
++ * car.audiomixer.set(car.audiomixer.AudioMixerSetting.VOLUME, car.Zone.ALL, 50);
++ *
++ * //option 2: set the volume in the entire car to 50 without using constants
++ * car.audiomixer.set('volume', 'all', 50);
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://<car-ip>/car/audiomixer/set?setting=volume&zone=all&value=50
++ *
++ * Success Response:
++ * {
++ *	  code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *	  code: -1,
++ *	  msg: "An error has occurred"
++ * }
++ */
++_self.set = function(setting, zone, value, successCallback, errorCallback) {
++	var args = { 
++		setting: setting, 
++		zone: zone, 
++		value: value 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'set', args, false);
++};
++
++
++//Export
++module.exports = _self;
+\ No newline at end of file
+diff --git a/plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js b/plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js
+new file mode 100644
+index 0000000..d94136c
+--- /dev/null
++++ b/plugin/com.qnx.car.audiomixer/www/enum/AudioMixerSetting.js
+@@ -0,0 +1,47 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++ /**
++ * @name car.audiomixer.AudioMixerSetting
++ * @static
++ *
++ * Audio mixer settings enumeration.
++ *
++ * @author mlapierre
++ * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++ */
++
++module.exports = {},
++
++/**  @property VOLUME Represents the volume setting */
++/**  @property BASS Represents the bass setting */
++/**  @property MID Represents the mid setting */
++/**  @property TREBLE Represents the treble setting */
++/**  @property BALANCE Represents the balance setting */
++/**  @property FADE Represents the fade setting */
++
++Object.defineProperties(module.exports,
++{
++	'VOLUME':		{ value: 'volume',		enumerable: true, writable: false },
++	'BASS':			{ value: 'bass',		enumerable: true, writable: false },
++	'MID':			{ value: 'mid',			enumerable: true, writable: false },
++	'TREBLE':		{ value: 'treble',		enumerable: true, writable: false },
++	'BALANCE':		{ value: 'balance',		enumerable: true, writable: false },
++	'FADE':			{ value: 'fade',		enumerable: true, writable: false },
++});
+-- 
+1.7.10.msysgit.1
+

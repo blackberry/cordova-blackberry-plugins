@@ -1,0 +1,484 @@
+From aa98549fa25770a3dea636dee38c886ae479c62a Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Thu, 15 Aug 2013 09:48:53 -0400
+Subject: [PATCH 22/61] JI:450841 CI:mlytvynyuk Adding qnx.settings extension
+
+---
+ plugin/com.qnx.settings/plugin.xml                 |   34 +++++
+ .../com.qnx.settings/src/blackberry10/context.js   |   58 ++++++++
+ plugin/com.qnx.settings/src/blackberry10/index.js  |  152 ++++++++++++++++++++
+ .../com.qnx.settings/src/blackberry10/settings.js  |  100 +++++++++++++
+ plugin/com.qnx.settings/www/client.js              |   89 ++++++++++++
+ 5 files changed, 433 insertions(+)
+ create mode 100644 plugin/com.qnx.settings/plugin.xml
+ create mode 100644 plugin/com.qnx.settings/src/blackberry10/context.js
+ create mode 100644 plugin/com.qnx.settings/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.settings/src/blackberry10/settings.js
+ create mode 100644 plugin/com.qnx.settings/www/client.js
+
+diff --git a/plugin/com.qnx.settings/plugin.xml b/plugin/com.qnx.settings/plugin.xml
+new file mode 100644
+index 0000000..6dac6ca
+--- /dev/null
++++ b/plugin/com.qnx.settings/plugin.xml
+@@ -0,0 +1,34 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.settings"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="qnx.settings" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/context.js" />
++		<source-file src="src/blackberry10/settings.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.settings" value="com.qnx.settings" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.settings/src/blackberry10/context.js b/plugin/com.qnx.settings/src/blackberry10/context.js
+new file mode 100644
+index 0000000..0416c26
+--- /dev/null
++++ b/plugin/com.qnx.settings/src/blackberry10/context.js
+@@ -0,0 +1,58 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The event context for setting events
++ */
++
++var _settings = require("./settings");
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Method called when the first listener is added for an event
++	 * @param event {String} The event name
++	 * @param trigger {Function} The trigger function to call when the event is fired
++	 */
++	addEventListener: function (event, trigger) {
++		if (event && trigger) {
++			switch (event) {
++				case "settingsupdate":
++					_settings.setTriggerUpdate(trigger);
++					break;
++			}
++		}
++	},
++
++	/**
++	 * Method called when the last listener is removed for an event
++	 * @param event {String} The event name
++	 */
++	removeEventListener: function (event) {
++		if (event) {
++			switch (event) {
++				case "settingsupdate":
++					_settings.setTriggerUpdate(null);
++					break;
++			}
++		}
++	}
++};
+diff --git a/plugin/com.qnx.settings/src/blackberry10/index.js b/plugin/com.qnx.settings/src/blackberry10/index.js
+new file mode 100644
+index 0000000..512fc9c
+--- /dev/null
++++ b/plugin/com.qnx.settings/src/blackberry10/index.js
+@@ -0,0 +1,152 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++var _wwfix = require("../../lib/wwfix"),
++	_settings = require("./settings"),
++	_appEvents = require("./../../lib/events/applicationEvents"),
++	_actionMap = {
++		settingsupdate: {
++			event: "settingsupdate",
++			triggerEvent: "settingsupdate",
++			context: require("./context"),
++			trigger: function (pluginResult, data) {
++				pluginResult.callbackOk(data, true);
++			} 
++		}
++	},
++	_listeners = {};
++
++/*
++ * Initializes the extension 
++ */
++function init() {
++	try {
++		_settings.init();
++	} catch (ex) {
++		console.error('Error in webworks ext: settings/index.js:init():', ex);
++	}
++}
++init();
++
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Turn on event dispatching for a specific event name
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	startEvent: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			 	eventName = fixedArgs.eventName,
++				context = _actionMap[eventName].context,
++				systemEvent = _actionMap[eventName].event,
++				listener = _actionMap[eventName].trigger.bind(null, result);
++
++			if (!_listeners[eventName]) {
++				_listeners[eventName] = {};
++			}
++
++			if (_listeners[eventName][env.webview.id]) {
++				//TODO: Stop all listeners on plugin reset and renable this error
++				//result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
++				context.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
++			}
++
++			context.addEventListener(systemEvent, listener);
++			_listeners[eventName][env.webview.id] = listener;
++			result.noResult(true);
++ 		} catch (e) {
++			_eventResult.error("error in startEvent: " + JSON.stringify(e), false);
++		}
++   },
++
++	/**
++	 * Turn off event dispatching for a specific event name
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stopEvent: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			 	eventName = fixedArgs.eventName,
++				context = _actionMap[eventName].context,
++				systemEvent = _actionMap[eventName].event,
++				listener;
++
++		if (!_listeners || !_listeners[eventName] || !_listeners[eventName][env.webview.id]) {
++			result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
++		} else {
++			listener = _listeners[eventName][env.webview.id];
++			context.removeEventListener(systemEvent, listener);
++			delete _listeners[eventName][env.webview.id];
++			result.noResult(false);
++		}
++		} catch (e) {
++			_eventResult.error("error in stopEvent: " + JSON.stringify(e), false);
++		}
++	},
++
++
++	/**
++	 * Returns system settings
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	get: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			var data = _settings.get((fixedArgs && fixedArgs.settings) ? fixedArgs.settings : null);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Sets one or more system settings
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	set: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_settings.set(fixedArgs);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	}
++};
++
+diff --git a/plugin/com.qnx.settings/src/blackberry10/settings.js b/plugin/com.qnx.settings/src/blackberry10/settings.js
+new file mode 100644
+index 0000000..969bae5
+--- /dev/null
++++ b/plugin/com.qnx.settings/src/blackberry10/settings.js
+@@ -0,0 +1,100 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for settings functionality
++ */
++
++var	_pps = qnx.webplatform.pps,
++	_readerPPS,
++	_writerPPS,
++	_triggerUpdate;
++
++/**
++ * Initializes the extension 
++ */
++function init() {
++	try {
++		// readerPPS
++		_readerPPS = _pps.createObject("/pps/qnxcar/system/settings", _pps.PPSMode.DELTA);
++		_readerPPS.onNewData = function(event) {
++			if (_triggerUpdate && event && event.data) {
++				_triggerUpdate(event.data);
++			}
++		};
++
++		// writerPPS
++		_writerPPS = _pps.createObject("/pps/qnxcar/system/settings", _pps.PPSMode.DELTA);
++		
++		// Open the PPS objects
++		if(!_readerPPS.open(_pps.FileMode.RDONLY) || !_writerPPS.open(_pps.FileMode.WRONLY)) {
++
++			console.error('qnx.settings settings.js::init() - Error opening "/pps/qnxcar/system/settings".');
++
++			_readerPPS.close();
++			_writerPPS.close();
++		}
++	} catch(ex) {
++		console.error('qnx.settings/settings.js::init() - Error occurred during initialization.', ex);
++	}
++};
++init();
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Sets the trigger function to call when an event is fired
++	 * @param trigger {Function} The trigger function to call when an event is fired
++	 */
++	setTriggerUpdate: function(trigger) {
++		_triggerUpdate = trigger;
++	},
++	
++	/**
++	 * Returns system settings
++	 * @param settings {Array} A list of settings to get [optional]
++	 * @returns {Object} The requested settings
++	 * NOTE: the list of settings is not fixed and depends on your system configuration
++	 */
++	get: function(settings) {
++		if (settings && settings.length > 0) {
++			var out = {};
++			for (var i=0; i<settings.length; i++) {
++				out[settings[i]] = _readerPPS.data.settings[settings[i]];
++			}
++			return out;
++		} else {
++			return _readerPPS.data.settings;
++		}
++	},
++	
++	/**
++	 * Sets one or more system settings
++	 * @param args {Object} The system settings to set
++	 * NOTE: the list of settings is not fixed and depends on your system configuration
++	 */
++	set: function(settings) {
++		if (settings && Object.keys(settings).length > 0) {
++			//write args to pps
++			_writerPPS.write(settings);
++		}
++	},
++};
+diff --git a/plugin/com.qnx.settings/www/client.js b/plugin/com.qnx.settings/www/client.js
+new file mode 100644
+index 0000000..0a998d7
+--- /dev/null
++++ b/plugin/com.qnx.settings/www/client.js
+@@ -0,0 +1,89 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * @module qnx.settings
++ * @static
++ *
++ * @description Provides access to system settings.
++ */
++
++var _self = {},
++	_ID = "com.qnx.settings",
++	_noop = function () {},
++	_events = ["settingsupdate"];
++
++
++_events.map(function (eventName) {
++	var channel = cordova.addDocumentEventHandler(eventName),
++		success = function (data) {
++			channel.fire(data);
++		},
++		fail = function (error) {
++			console.log("Error initializing " + eventName + " listener: ", error);
++		};
++
++	channel.onHasSubscribersChange = function () {
++		if (this.numHandlers === 1) {
++			window.cordova.exec(success, fail, _ID, "startEvent", {eventName: eventName});
++		} else if (this.numHandlers === 0) {
++			window.cordova.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
++		}
++	};
++});
++
++/*
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Return system settings
++	 * @param {Array} settings A list of settings to get [optional]; if omitted, all settings are returned
++	 * @returns {Object} The requested settings.
++	 * NOTE: the list of settings is not fixed and depends on your system configuration
++	 */
++	get: function (settings) {
++   		var value = null,
++   			args = {
++   				settings: settings
++   			},
++			success = function (data, response) {
++				value = data;
++			},
++			fail = function (data, response) {
++				throw data;
++			};
++
++		try {
++			window.cordova.exec(success, fail, _ID, 'get', args);
++		} catch (e) {
++			console.error(e);
++		}
++		return value;
++	},
++	
++	/**
++	 * Set one or more system settings
++	 * @param {Object} args The system settings to set. 
++	 * NOTE: the list of settings is not fixed and depends on your system configuration
++	 */
++	set: function (args) {
++	    window.cordova.exec(null, null, _ID, 'set', args);
++	},	
++};
+-- 
+1.7.10.msysgit.1
+

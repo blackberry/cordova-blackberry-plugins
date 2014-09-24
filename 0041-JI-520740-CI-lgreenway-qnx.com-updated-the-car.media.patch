@@ -1,0 +1,164 @@
+From 96d7cd48ce0ae3267f2b0c6604c935b4e2668590 Mon Sep 17 00:00:00 2001
+From: Nik Schultz <nschultz@qnx.com>
+Date: Tue, 22 Oct 2013 10:37:07 -0400
+Subject: [PATCH 41/61] JI:520740 CI:lgreenway@qnx.com updated the
+ car.mediaplayer extension in accordance with the new
+ api changes
+
+---
+ plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js  |   10 ++++------
+ .../src/blackberry10/mediaplayer.js                       |   12 +++++-------
+ plugin/com.qnx.car.mediaplayer/www/client.js              |   13 +++++--------
+ 3 files changed, 14 insertions(+), 21 deletions(-)
+
+diff --git a/plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js b/plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js
+index 29254f2..631a759 100755
+--- a/plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js
++++ b/plugin/com.qnx.car.mediaplayer/src/blackberry10/index.js
+@@ -247,8 +247,8 @@ module.exports = {
+ 	 * @param args {Object} The arguments supplied. Available arguments for this call are:
+ 	 *	{
+ 	 *		mediaSourceId: {Number},
+-	 *		mediaNodeId: {String},
+ 	 *		searchTerm: {String},
++	 *		filter: {String},
+ 	 *		limit: {Number},
+ 	 *		offset: {Number}
+ 	 *	}
+@@ -264,8 +264,8 @@ module.exports = {
+ 				result.callbackError(data, false);
+ 			},
+ 			fixedArgs.mediaSourceId,
+-			fixedArgs.mediaNodeId,
+ 			fixedArgs.searchTerm,
++			fixedArgs.filter,
+ 			fixedArgs.limit,
+ 			fixedArgs.offset);
+ 
+@@ -290,8 +290,7 @@ module.exports = {
+ 				mediaSourceId: { type: 'number' },
+ 				mediaNodeId: { type: 'string', nullable: true, optional: true, defaultValue: null },
+ 				index: { type: 'number', optional: true, defaultValue: 0 },
+-				limit: { type: 'number', optional: true, defaultValue: -1 },
+-				offset: { type: 'number', optional: true, defaultValue: 0 }
++				limit: { type: 'number', optional: true, defaultValue: -1 }
+ 			})) {
+ 				fail(-1, 'Invalid arguments.');
+ 			} else {
+@@ -303,8 +302,7 @@ module.exports = {
+ 				fixedArgs.mediaSourceId,
+ 				fixedArgs.mediaNodeId,
+ 				fixedArgs.index,
+-				fixedArgs.limit,
+-				fixedArgs.offset);
++				fixedArgs.limit);
+ 			}
+ 			result.noResult(true);
+ 		} catch (e) {
+diff --git a/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js b/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
+index 4cd228c..2ba0870 100755
+--- a/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
++++ b/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
+@@ -364,21 +364,21 @@ module.exports = {
+ 	 * @param {Function} success Function to call if the operation is a success.
+ 	 * @param {Function} fail Function to call if the operation fails.
+ 	 * @param {Number} mediaSourceId The ID of the media source.
+-	 * @param {String} [mediaNodeId=null] The ID of the media node from which to search.
+ 	 * @param {String} searchTerm The term to search for.
++	 * @param {String} [filter=""] The filter to use to search. null, the search starts from the root node.
+ 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
+ 	 * all records will be retrieved.
+ 	 * @param {Number} [offset=0] The offset at which to start retrieving records. If omitted or negative,
+ 	 * offset will be 0.
+ 	 * @returns {Boolean} True if the operation was successful, False if not.
+ 	 */
+-	search: function(success, fail, mediaSourceId, mediaNodeId, searchTerm, limit, offset) {
++	search: function(success, fail, mediaSourceId, searchTerm, filter, limit, offset) {
+ 		console.log('car.mediaplayer/mediaplayer.js::search', arguments);
+ 		return _jPlayerObj ? _jPlayerObj.search(
+ 				registerCallbackFunctions(success, fail),
+ 				mediaSourceId,
+-				typeof mediaNodeId === 'string' && mediaNodeId.trim() !== '' ? mediaNodeId : ROOT_MEDIA_NODE_ID,
+ 				searchTerm,
++				typeof filter === 'string' && filter.trim() !== '' ? filter : '',
+ 				typeof limit === 'number' ? limit : -1,
+ 				typeof offset === 'number' ? offset: 0
+ 			) : false;
+@@ -392,18 +392,16 @@ module.exports = {
+ 	 * @param {?String} mediaNodeId The media node ID on which to base the track session.
+ 	 * @param {Number} index The index of the item within the track session to set as current after creation.
+ 	 * @param {Number} limit The maximum number of media nodes to add to the track session. A limit of -1 indicates no limit.
+-	 * @param {Number} offset The offset within the specified media node at which to start building the track session.
+ 	 * @returns {Boolean} True if the operation was successful, False if not.
+ 	 */
+-	createTrackSession: function(success, fail, mediaSourceId, mediaNodeId, index, limit, offset) {
++	createTrackSession: function(success, fail, mediaSourceId, mediaNodeId, index, limit) {
+ 		console.log('car.mediaplayer/mediaplayer.js::createTrackSession', arguments);
+ 		return _jPlayerObj ? _jPlayerObj.createTrackSession(
+ 				registerCallbackFunctions(success, fail),
+ 				mediaSourceId,
+ 				mediaNodeId === null ? ROOT_MEDIA_NODE_ID : mediaNodeId,
+ 				index,
+-				limit,
+-				offset
++				limit
+ 			) : false;
+ 	},
+ 
+diff --git a/plugin/com.qnx.car.mediaplayer/www/client.js b/plugin/com.qnx.car.mediaplayer/www/client.js
+index 7fc4410..c7198b5 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/client.js
++++ b/plugin/com.qnx.car.mediaplayer/www/client.js
+@@ -407,7 +407,7 @@ var MediaPlayer = function(playerName) {
+ 	 * @param {String} searchTerm The term to search for.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+-	 * @param {String} [mediaNodeId=null] The ID of the media node from which to search. If omitted or
++	 * @param {String} [filter=""] The filter to use to search.
+ 	 * null, the search starts from the root node.
+ 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
+ 	 * all records are retrieved.
+@@ -473,12 +473,12 @@ var MediaPlayer = function(playerName) {
+ 	 *		msg: "An error has occurred"
+ 	 * }
+ 	 */
+-	self.search = function(mediaSourceId, searchTerm, success, error, mediaNodeId, limit, offset) {
++	self.search = function(mediaSourceId, searchTerm, success, error, filter, limit, offset) {
+ 		console.log('car.mediaplayer/client.js::search', arguments);
+ 		var args = {
+ 				mediaSourceId: mediaSourceId,
+ 				searchTerm: searchTerm,
+-				mediaNodeId: typeof mediaNodeId === 'string' && mediaNodeId.trim() !== '' ? mediaNodeId : null,
++				filter: typeof filter === 'string' && filter.trim() !== '' ? filter : "",
+ 				limit: typeof limit === 'number' ? limit : -1,
+ 				offset: typeof offset === 'number' ? offset : 0
+ 		};
+@@ -495,8 +495,6 @@ var MediaPlayer = function(playerName) {
+ 	 * the tracksession.
+ 	 * @param {Number} [limit=-1] The maximum number of media nodes to add to the tracksession. A limit of -1
+ 	 * indicates no limit.
+-	 * @param {Number} [offset=0] The offset within the specified media node at which to start building the track
+-	 * session.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method createTrackSession	 
+ 	 * @example
+@@ -540,14 +538,13 @@ var MediaPlayer = function(playerName) {
+ 	 *		msg: "An error has occurred"
+ 	 * }
+ 	 */
+-	self.createTrackSession = function(mediaSourceId, success, error, mediaNodeId, index, limit, offset) {
++	self.createTrackSession = function(mediaSourceId, success, error, mediaNodeId, index, limit) {
+ 		console.log('car.mediaplayer/client.js::createTrackSession', arguments);
+ 		var args = {
+ 				mediaSourceId: mediaSourceId,
+ 				mediaNodeId: mediaNodeId,
+ 				index: index,
+-				limit: limit,
+-				offset: offset
++				limit: limit
+ 		};
+ 		window.cordova.exec(success, error, _ID, 'createTrackSession', args, false);
+ 	};
+-- 
+1.7.10.msysgit.1
+

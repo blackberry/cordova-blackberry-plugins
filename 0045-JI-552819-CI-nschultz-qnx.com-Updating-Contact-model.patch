@@ -1,0 +1,25 @@
+From d467f052bcbeedcd441074bb7164fb96f42617ce Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <mlapierre@QNXWS8612.local>
+Date: Wed, 8 Jan 2014 10:57:51 -0500
+Subject: [PATCH 45/61] JI:552819 CI:nschultz@qnx.com Updating Contact model
+ in qnx.bluetooth.pbap to include formattedName field
+
+---
+ plugin/com.qnx.bluetooth.pbap/www/client.js |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/plugin/com.qnx.bluetooth.pbap/www/client.js b/plugin/com.qnx.bluetooth.pbap/www/client.js
+index 7d28c6d..4702949 100755
+--- a/plugin/com.qnx.bluetooth.pbap/www/client.js
++++ b/plugin/com.qnx.bluetooth.pbap/www/client.js
+@@ -134,6 +134,7 @@ function Contact(properties) {
+ 	this.email3 = null;
+ 	this.faxPhone = null;
+ 	this.firstName = null;
++	this.formattedName = null;
+ 	this.homeAddress1 = null;
+ 	this.homeAddress2 = null;
+ 	this.homeAddressCity = null;
+-- 
+1.7.10.msysgit.1
+

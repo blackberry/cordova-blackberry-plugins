@@ -1,0 +1,249 @@
+From b0b5ea54929d99d54f97795945aca713d25c3345 Mon Sep 17 00:00:00 2001
+From: Nik Schultz <nschultz@qnx.com>
+Date: Mon, 9 Jun 2014 16:13:19 -0400
+Subject: [PATCH 57/61] JI:644498 CI:mlapierre Updated the system to handle
+ the authentication requests and ssl certificated
+ challenges thorugh the ui webview. Added a url
+ validation method to make sure there is at least an
+ 'http' protocol in every url passed in
+
+---
+ plugin/com.qnx.browser/src/blackberry10/browser.js |   65 ++++++++++++--------
+ plugin/com.qnx.browser/src/blackberry10/index.js   |   22 -------
+ plugin/com.qnx.browser/www/client.js               |   56 -----------------
+ 3 files changed, 38 insertions(+), 105 deletions(-)
+
+diff --git a/plugin/com.qnx.browser/src/blackberry10/browser.js b/plugin/com.qnx.browser/src/blackberry10/browser.js
+index afdd2a1..7c4c1c5 100644
+--- a/plugin/com.qnx.browser/src/blackberry10/browser.js
++++ b/plugin/com.qnx.browser/src/blackberry10/browser.js
+@@ -25,14 +25,15 @@ var _tabList = {},
+ 	_lastActiveZOrder = 2,
+ 	_activeZOrder = 3,
+ 	_chromeZOrder = 4,
+-	_UIWebviewZOrder = 5,
++	_uiWebviewZOrder = 5,
++	_uiWebview,
+ 	_lastActiveTabId = null,
+ 	_activeTabId = null,
+ 	_x = 0,
+ 	_y = 0,
+ 	_width = screen.width,
+ 	_height = screen.height,
+-	_url =  "www.qnx.com",
++	_url =  "http://www.qnx.com",
+ 	_overlay,
+ 	_overlayHeight,
+ 	_chromeHeight,
+@@ -106,7 +107,7 @@ function applyDefaultParams(webview, args) {
+ 		h = args.height;
+ 	}
+ 	if (args.url !== undefined) {
+-		url = args.url;
++		url = checkUrlProtocol(args.url);
+ 	}
+ 
+ 	webview.setGeometry(x, y, w, h);
+@@ -155,17 +156,17 @@ function onWebviewCreated(webview, args) {
+ 			});
+ 		}
+ 	});
++	webview.enableDialogRequestedEvents = true;
++
++	/*
++	 *	This hooks up the dialog authentication responses and
++	 *	ssl handshake dialogs. However in webplatform 10.3 there is
++	 *	a bug where the Authentication dialog is broken, it will appear
++	 *	but won't accept interaction. The bug is tracked by the following
++	 *	Jira ticket https://jira.bbqnx.net/browse/BRWSR-17162
++	 */ 
++	_uiWebview.dialog.subscribeTo(webview);
+ 
+-	//We bind directly because adding an event listener through addEventListener doens't work for 'SSLHandshakingFailed'
+-	webview.onSSLHandshakingFailed = function (e) {
+-		if (_tabTrigger.length > 0 && e) {
+-			triggerUpdate({
+-				certificateInfo: e,
+-				type: "SSLHandshakingFailed",
+-				webview: webview.id
+-			});
+-		}
+-	};
+ 	applyDefaultParams(webview, args);
+ 	_activeTabId = webview.id;
+ 	webview.visible = true;
+@@ -173,6 +174,25 @@ function onWebviewCreated(webview, args) {
+ 
+ }
+ 
++/**
++ *	Private utility method used to check if a url has the
++ *	"http" or "https" protocol specified in the url if it
++ *	is just empty e.g. "qnx.com" we append "http://" to it
++ */
++
++function checkUrlProtocol(url) {
++	var subString,
++		verifiedUrl = url;
++
++	subString = verifiedUrl.substring(0, 4);
++
++	if (subString !== "http") {
++		verifiedUrl = "http://" + verifiedUrl;
++	}
++
++	return verifiedUrl;
++}
++
+ /*
+  * Exports are the publicly accessible functions
+  */
+@@ -199,7 +219,8 @@ module.exports = {
+ 				_chromeWebview.setGeometry(0, 0, _width, _chromeHeight);
+ 			} else if (webviews[wv].dialog) {
+ 				//since this is the UI dialog boost the default zOrder otherwise it will be clipped by the UI webview
+-				webviews[wv].zOrder = _UIWebviewZOrder;
++				webviews[wv].zOrder = _uiWebviewZOrder;
++				_uiWebview = webviews[wv];
+ 			}
+ 		}
+ 	},
+@@ -221,7 +242,7 @@ module.exports = {
+ 			_height = args.height;
+ 		}
+ 		if (args.url !== undefined) {
+-			_url = args.url;
++			_url = checkUrlProtocol(args.url);
+ 		}
+ 	},
+ 
+@@ -335,7 +356,8 @@ module.exports = {
+ 	 */
+ 	updateUrl: function (url) {
+ 		var webview = getWebview(_activeTabId);
+-		webview.url = url;
++
++		webview.url = checkUrlProtocol(url);
+ 		return url;
+ 	},
+ 
+@@ -360,16 +382,5 @@ module.exports = {
+ 		} else {
+ 			console.error("qnx.browser.stop() cannot be called when there are no tabs.");
+ 		}
+-	},
+-
+-	/**
+-	 *	Adds an exception for an SSL certificate that isn't trusted
+-	 *	@param tabId {Number} the id of the webview that triggered the sslHandshakeFailure
+-	 *	@param streamId {Number} the streamId of the sslHandshakeFailure
+-	 *	@param sslAction {String} can be one of the following "SSLActionTrust", "SSLActionReject", "SSLActionNone"
+-	 *	
+-	 */
+-	continueSSLHandshake: function (tabId, streamId, sslAction) {
+-		qnx.callExtensionMethod("webview.continueSSLHandshaking", tabId, streamId, sslAction);
+ 	}
+ };
+\ No newline at end of file
+diff --git a/plugin/com.qnx.browser/src/blackberry10/index.js b/plugin/com.qnx.browser/src/blackberry10/index.js
+index 4a2fea1..9e1d0f8 100644
+--- a/plugin/com.qnx.browser/src/blackberry10/index.js
++++ b/plugin/com.qnx.browser/src/blackberry10/index.js
+@@ -291,26 +291,4 @@ module.exports = {
+ 			result.error(JSON.stringify(e), false);
+ 		}
+ 	},
+-
+-	/**
+-	 * Continues the browser SSL handshake when a certificate isn't trusted
+-	 * @param {Function} success Function to call if the operation is a success
+-	 * @param {Function} fail Function to call if the operation fails
+-	 * @param {Object} args The arguments supplied
+-	 * @param {Object} env Environment variables
+-	 */
+-	continueSSLHandshake: function (success, fail, args, env) {
+-		var result = new PluginResult(args, env),
+-		fixedArgs = null,
+-		data = null;
+-
+-		try {
+-			fixedArgs = _wwfix.parseArgs(args);
+-			data = _browser.continueSSLHandshake(fixedArgs.tabId, fixedArgs.streamId, fixedArgs.sslAction);
+-				
+-			result.ok(data, false);
+-		} catch (e) {
+-			result.error(JSON.stringify(e), false);
+-		}
+-	}
+ };
+\ No newline at end of file
+diff --git a/plugin/com.qnx.browser/www/client.js b/plugin/com.qnx.browser/www/client.js
+index dc9d5f8..38760db 100644
+--- a/plugin/com.qnx.browser/www/client.js
++++ b/plugin/com.qnx.browser/www/client.js
+@@ -460,61 +460,5 @@ module.exports = {
+ 		} catch (e) {
+ 			console.error(e);
+ 		}
+-	},
+-
+-	/**
+-	 *	Adds an exception for a certificate that didn't validate
+-	 *	@param tabId {Number} the id of the webview that triggered the sslHandshakeFailure
+-	 *	@param streamId {Number} the streamId of the sslHandshakeFailure
+-	 *	@param sslAction {String} can be one of the following "SSLActionTrust", "SSLActionReject", "SSLActionNone"
+-	 *	@memberOf module:car.browser 
+-	 *	@method stop
+-	 *	@example
+-	 *
+-	 *	//The values for tabId and streamId will be returned to the callback passed into 'watchTab'
+-	 *	// as an event of type 'SSLHandshakeFailure' 
+-	 *	var tabId = 4,
+-	 *		streamId = 50,
+-	 *		sslAction = "SSLActionTrust";
+-	 *
+-	 *	//define callback functions
+-	 *	function success() {
+-	 *		console.log("SSLHandshake Success");
+-	 *	}
+-	 * 
+-	 *	function failure(e) {
+-	 *		console.error("There was an error continuing the SSLHandshake: ", e);
+-	 *	}
+-	 *	car.browser.continueSSLHandshake(success, failure, tabId, streamId, sslAction);
+-	 */
+-	continueSSLHandshake: function (success, fail, tabId, streamId, sslAction) {
+-
+-		var args = {};
+-		if (tabId === undefined || !tabId || tabId < 0) {
+-			console.error("qnx.browser.continueSSLHandshake requires a valid tabId, please check your input parameter: ", tabId);
+-			return;
+-		} else {
+-			args.tabId = tabId;
+-		}
+-
+-		if (streamId === undefined || !streamId || streamId < 0) {
+-			console.error("qnx.browser.continueSSLHandshake requires a valid streamId, please check your input parameter: ", streamId);
+-			return;
+-		} else {
+-			args.streamId = streamId;
+-		}
+-
+-		if (sslAction !== "SSLActionTrust" && sslAction !== "SSLActionReject" && sslAction !== "SSLActionNone") {
+-			console.error("qnx.browser.continueSSLHandshake requires a valid sslAction, please check your input parameter: ", sslAction);
+-			return;
+-		} else {
+-			args.sslAction = sslAction;
+-		}
+-
+-		try {
+-			window.cordova.exec(success, fail, _ID, 'continueSSLHandshake', args);
+-		} catch (e) {
+-			console.error(e);
+-		}
+ 	}
+ };
+\ No newline at end of file
+-- 
+1.7.10.msysgit.1
+

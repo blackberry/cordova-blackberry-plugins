@@ -1,0 +1,60 @@
+From 81e80419b1e2526ee2324b3f79e429662c6274fb Mon Sep 17 00:00:00 2001
+From: Nik Schultz <nschultz@qnx.com>
+Date: Wed, 23 Oct 2013 11:02:05 -0400
+Subject: [PATCH 42/61] JI:520740 CI:mlapierre@qnx.com Updated the search
+ method call in car.mediaplayer to default to null if
+ the filter parameter is not included. Testing:
+ packaged the application and tested on target, PASS
+
+---
+ plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js |    4 ++--
+ plugin/com.qnx.car.mediaplayer/www/client.js                   |    4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js b/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
+index 2ba0870..f88225d 100755
+--- a/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
++++ b/plugin/com.qnx.car.mediaplayer/src/blackberry10/mediaplayer.js
+@@ -365,7 +365,7 @@ module.exports = {
+ 	 * @param {Function} fail Function to call if the operation fails.
+ 	 * @param {Number} mediaSourceId The ID of the media source.
+ 	 * @param {String} searchTerm The term to search for.
+-	 * @param {String} [filter=""] The filter to use to search. null, the search starts from the root node.
++	 * @param {String} [filter=null] The filter to use to search. null, the search is not filtered.
+ 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
+ 	 * all records will be retrieved.
+ 	 * @param {Number} [offset=0] The offset at which to start retrieving records. If omitted or negative,
+@@ -378,7 +378,7 @@ module.exports = {
+ 				registerCallbackFunctions(success, fail),
+ 				mediaSourceId,
+ 				searchTerm,
+-				typeof filter === 'string' && filter.trim() !== '' ? filter : '',
++				typeof filter === 'string' && filter.trim() !== '' ? filter : null,
+ 				typeof limit === 'number' ? limit : -1,
+ 				typeof offset === 'number' ? offset: 0
+ 			) : false;
+diff --git a/plugin/com.qnx.car.mediaplayer/www/client.js b/plugin/com.qnx.car.mediaplayer/www/client.js
+index c7198b5..b47d98f 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/client.js
++++ b/plugin/com.qnx.car.mediaplayer/www/client.js
+@@ -407,7 +407,7 @@ var MediaPlayer = function(playerName) {
+ 	 * @param {String} searchTerm The term to search for.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+-	 * @param {String} [filter=""] The filter to use to search.
++	 * @param {String} [filter=null] The filter to use to search.
+ 	 * null, the search starts from the root node.
+ 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
+ 	 * all records are retrieved.
+@@ -478,7 +478,7 @@ var MediaPlayer = function(playerName) {
+ 		var args = {
+ 				mediaSourceId: mediaSourceId,
+ 				searchTerm: searchTerm,
+-				filter: typeof filter === 'string' && filter.trim() !== '' ? filter : "",
++				filter: typeof filter === 'string' && filter.trim() !== '' ? filter : null,
+ 				limit: typeof limit === 'number' ? limit : -1,
+ 				offset: typeof offset === 'number' ? offset : 0
+ 		};
+-- 
+1.7.10.msysgit.1
+

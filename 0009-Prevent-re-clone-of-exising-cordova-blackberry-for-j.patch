@@ -1,0 +1,161 @@
+From 137b197153a1a610cab5457d0d2db613dc50f3e2 Mon Sep 17 00:00:00 2001
+From: Danyi Lin <danylin@blackberry.com>
+Date: Fri, 31 May 2013 15:57:04 -0400
+Subject: [PATCH 09/61] Prevent re-clone of exising cordova-blackberry for
+ jake commands
+
+Reviewed by Jeffrey Heifetz <jheifetz@blackberry.com>
+Tested by Tracy Li <tli@blackberry.com>
+---
+ Jakefile                 |   16 ++++++++--------
+ scripts/mobile-spec.js   |   10 ----------
+ scripts/project-utils.js |   40 +++++++++++++++++++++++-----------------
+ scripts/utils.js         |    3 +--
+ 4 files changed, 32 insertions(+), 37 deletions(-)
+
+diff --git a/Jakefile b/Jakefile
+index 313b597..3ccb051 100644
+--- a/Jakefile
++++ b/Jakefile
+@@ -62,21 +62,21 @@ task('test', [], function () {
+ }, true);
+ 
+ desc("deploy and run test app on device/simulator" + DESC_NEW_LINE +
+-    "Usage: jake deploy-test-app['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
+-    "Example: jake deploy-test-app[nextBB10,mybb10,169.254.0.1,device,password]");
++    "Usage: jake deploy-test-app['remote/branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
++    "Example: jake deploy-test-app[origin/master,Z10,169.254.0.1,device,password]");
+ task('deploy-test-app', ['build'], require('./scripts/test-app'), true);
+ 
+ desc("deploy and run test suite on device/simulator" + DESC_NEW_LINE +
+-    "Usage: jake deploy-test-suite['branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
+-    "Example: jake deploy-test-suite[nextBB10,mybb10,169.254.0.1,device,password]");
++    "Usage: jake deploy-test-suite['remote/branch','targetname','ip','targettype','password']" + DESC_NEW_LINE +
++    "Example: jake deploy-test-suite[origin/master,Z10,169.254.0.1,device,password]");
+ task('deploy-test-suite', [], require('./scripts/test-suite'));
+ 
+ desc("deploy and run cordova-mobile-spec on device/simulator" + DESC_NEW_LINE +
+-    "Usage: jake deploy-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch']" + DESC_NEW_LINE +
+-    "Example: jake deploy-mobile-spec[master,z10,169.254.0.1,device,abc123,master]");
++    "Usage: jake deploy-mobile-spec['remote/branch','targetname','ip','targettype','password','remote/branch']" + DESC_NEW_LINE +
++    "Example: jake deploy-mobile-spec[origin/master,z10,169.254.0.1,device,abc123,origin/master]");
+ task('deploy-mobile-spec', [], require('./scripts/mobile-spec'));
+ 
+ desc("run mobile spec auto test on device" + DESC_NEW_LINE +
+-    "Usage: jake autorun-mobile-spec['cordova-blackberry-branch','targetname','ip','targettype','password','mobile-spec-branch','couchdbIP']" + DESC_NEW_LINE +
+-    "Example: jake autorun-mobile-spec[blackberry10,z10,169.254.0.1,device,abc123,master,169.254.0.2]");
++    "Usage: jake autorun-mobile-spec['remote/branch','targetname','ip','targettype','password','remote/branch','couchdbIP']" + DESC_NEW_LINE +
++    "Example: jake autorun-mobile-spec[origin/master,z10,169.254.0.1,device,abc123,origin/master,169.254.0.2]");
+ task('autorun-mobile-spec', [], require('./scripts/autorun-mobile-spec'));
+diff --git a/scripts/mobile-spec.js b/scripts/mobile-spec.js
+index fbeb80f..16ba9fc 100644
+--- a/scripts/mobile-spec.js
++++ b/scripts/mobile-spec.js
+@@ -26,12 +26,6 @@ var jWorkflow = require("jWorkflow"),
+     projectPath = path.join(baseDir, "test", "mobile-spec/app"),
+     projectName = "CordovaMobileSpec";
+ 
+-function updateCordovaJSVersion() {
+-    var version = fs.readFileSync(path.join(projectPath, 'www', 'VERSION'), 'utf-8').replace('\n', ''),
+-        content = fs.readFileSync(path.join(projectPath, 'www', 'cordova-' + version + '.js'), 'utf-8');
+-    fs.writeFileSync(path.join(projectPath, 'www', 'cordova.blackberry10.js'), content, 'utf-8');
+-}
+-
+ module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
+     var tasks = jWorkflow.order(),
+         preservingProject = false,
+@@ -88,10 +82,6 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
+         });
+     })
+     .andThen(function (prev, baton) {
+-        updateCordovaJSVersion();
+-        console.log("Updated cordova version");
+-    })
+-    .andThen(function (prev, baton) {
+         baton.take();
+         prjUtils.buildProject(projectPath, function () {
+             baton.pass();
+diff --git a/scripts/project-utils.js b/scripts/project-utils.js
+index e271872..376a3c0 100644
+--- a/scripts/project-utils.js
++++ b/scripts/project-utils.js
+@@ -33,31 +33,37 @@ var path = require('path'),
+ 
+ module.exports = {
+     setupRepo: function (branch, done) {
+-        var clone = util.format("git clone %s %s", conf.CORDOVA_BB10_REPOS.url, cordovaDir),
+-            checkout = util.format("git checkout %s", branch ? branch : 'master'),
++        var workflow = jWorkflow.order(),
++            clone = util.format("git clone %s %s", conf.CORDOVA_BB10_REPOS.url, cordovaDir),
++            checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
++            fetchAll = "git fetch --all --prune",
+             npmInstall = "npm install";
+-        // Delete existing cordova repos folder
++        // fetch all if cordova repos folder exists
+         if (fs.existsSync(cordovaDir)) {
+-            wrench.rmdirSyncRecursive(cordovaDir);
++            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
++        } else {
++            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
+         }
+-        jWorkflow.order(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}))
+-            .andThen(utils.execCommandWithJWorkflow(checkout, {cwd: cordovaDir}))
+-            .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}))
+-            .start(function () {
+-                done();
+-            });
++        workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: cordovaDir}))
++        .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}))
++        .start(function () {
++            done();
++        });
+     },
+ 
+     setupMobileSpecRepo: function (branch, done) {
+-        var clone = util.format("git clone %s %s", mobileSpecURL, mobileSpecDir),
+-            checkout = util.format("git checkout %s", branch ? branch : 'master');
++        var workflow = jWorkflow.order(),
++            clone = util.format("git clone %s %s", mobileSpecURL, mobileSpecDir),
++            checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
++            fetchAll = "git fetch --all --prune";
+ 
+-        // Delete existing cordova repos folder
++        // fetch all if the repos exists 
+         if (fs.existsSync(mobileSpecDir)) {
+-            wrench.rmdirSyncRecursive(mobileSpecDir);
++            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
++        } else {
++            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
+         }
+-        jWorkflow.order(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}))
+-        .andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
++        workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
+         .start(function () {
+             done();
+         });
+@@ -137,7 +143,7 @@ module.exports = {
+     },
+ 
+     buildProject: function (projectPath, done) {
+-        var cmd = path.join('cordova', 'build');
++        var cmd = path.join('cordova', 'run');
+ 
+         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
+         .start(function () {
+diff --git a/scripts/utils.js b/scripts/utils.js
+index e4b57a0..3c2bf5c 100644
+--- a/scripts/utils.js
++++ b/scripts/utils.js
+@@ -91,8 +91,7 @@ module.exports = {
+         var displayOutput = this.displayOutput;
+         return function (prev, baton) {
+             baton.take();
+-            console.log('------------------------------------');
+-            console.log("EXECUTING " + command);
++            console.log("[EXECUTING] " + command);
+             options = options || {};
+             options.maxBuffer = 1024 * 1024;
+             var c = childProcess.exec(command, options, function (error, stdout, stderr) {
+-- 
+1.7.10.msysgit.1
+

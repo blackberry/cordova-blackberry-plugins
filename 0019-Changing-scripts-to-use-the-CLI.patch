@@ -1,0 +1,486 @@
+From 988256c7edfeeb9d3fa8400c777f87708e0f7837 Mon Sep 17 00:00:00 2001
+From: Jeffrey Heifetz <jheifetz@blackberry.com>
+Date: Fri, 2 Aug 2013 14:05:05 -0400
+Subject: [PATCH 19/61] Changing scripts to use the CLI
+
+Reviewed by Bryan Higgins <bhiggins@blackberry.com>
+Tested by Tracy Li <tli@blackberry.com>
+---
+ package.json                                     |    3 ++
+ scripts/mobile-spec.js                           |   35 +++++-------
+ scripts/project-utils.js                         |   62 ++++++++++++++--------
+ scripts/test-app.js                              |   49 +++--------------
+ scripts/utils.js                                 |   27 ++++++----
+ test/mobile-spec/src/plugin.xml                  |    3 --
+ test/test-app/src/config.xml                     |    1 -
+ test/test-app/src/dependencies-plugin/plugin.xml |   42 +++++++++++++++
+ 8 files changed, 124 insertions(+), 98 deletions(-)
+ create mode 100644 test/test-app/src/dependencies-plugin/plugin.xml
+
+diff --git a/package.json b/package.json
+index 5f40c13..6f53cae 100644
+--- a/package.json
++++ b/package.json
+@@ -22,6 +22,9 @@
+     "elementtree": "0.1.5",
+     "shelljs": "0.1.3"
+   },
++  "dev-dependencies": {
++    "cordova": "*"
++  },
+   "bundledDependencies": [
+     "connect",
+     "argsparser"
+diff --git a/scripts/mobile-spec.js b/scripts/mobile-spec.js
+index 16ba9fc..1f4a85a 100644
+--- a/scripts/mobile-spec.js
++++ b/scripts/mobile-spec.js
+@@ -28,52 +28,41 @@ var jWorkflow = require("jWorkflow"),
+ 
+ module.exports = function (branch, targetName, targetIP, targetType, targetPassword, mobileSpecBranch) {
+     var tasks = jWorkflow.order(),
+-        preservingProject = false,
++        shouldAddTarget = targetName && targetIP && targetPassword,
+         projectFileBackuped = path.join(projectPath, '..', 'project.json'),
+         projectFile = path.join(projectPath, 'project.json');
+ 
+-    if (fs.existsSync(projectPath)) {
++    if (!fs.existsSync(projectPath)) {
+         wrench.mkdirSyncRecursive(projectPath, "0755");
+     }
+ 
+-    if (!targetIP && !targetType && !targetPassword && 
+-        fs.existsSync(projectFile)) {
+-        preservingProject = true;
+-    }
+-
+     tasks.andThen(function (prev, baton) {
+             baton.take();
+-            prjUtils.setupRepo(branch ? branch : 'master', function () {
++            prjUtils.setupRepo(branch ? branch : 'origin/master', function () {
+                 baton.pass();
+             });
+         })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        prjUtils.setupMobileSpecRepo(mobileSpecBranch ? mobileSpecBranch : 'master', function () {
++        prjUtils.setupMobileSpecRepo(mobileSpecBranch ? mobileSpecBranch : 'origin/master', function () {
+             baton.pass();
+         });
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        if (preservingProject) {
+-            utils.copyFile(projectFile, path.join(projectPath, '..'));
+-        }
+         prjUtils.createProject(projectPath, projectName, function () {
+-            if (preservingProject && fs.existsSync(projectFileBackuped)) {
+-                utils.copyFile(projectFileBackuped, projectPath);
+-            }
+             baton.pass();
+         });
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        if (!preservingProject) {
++        if (shouldAddTarget) {
+             prjUtils.configProject(projectPath, targetName, targetIP, targetType, targetPassword, function () {
+                 baton.pass();
+-            });    
++            });
+         } else {
+             baton.pass();
+-        }  
++        }
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+@@ -83,11 +72,15 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        prjUtils.buildProject(projectPath, function () {
++        prjUtils.runProject(projectPath, targetName, function () {
+             baton.pass();
+         });
+     })
+-    .start(function () {
+-        console.log("DONE");
++    .start(function (err) {
++        if (!err) {
++            console.log("Mobile Spec Deployed Successfully!!!");
++        } else {
++            console.log("Everything is bad and you should feel bad");
++        }
+     });
+ };
+diff --git a/scripts/project-utils.js b/scripts/project-utils.js
+index 10df415..7bddb96 100644
+--- a/scripts/project-utils.js
++++ b/scripts/project-utils.js
+@@ -34,20 +34,23 @@ var path = require('path'),
+ 
+ module.exports = {
+     setupRepo: function (branch, done) {
++        branch = branch || "origin/master";
++
+         var workflow = jWorkflow.order(),
+             clone = util.format("git clone %s %s", conf.CORDOVA_BB10_REPOS.url, cordovaDir),
+-            checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
++            checkout = util.format("git checkout %s", branch),
+             fetchAll = "git fetch --all --prune",
+             npmInstall = "npm install";
+         // fetch all if cordova repos folder exists
+         if (fs.existsSync(cordovaDir)) {
+-            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
++            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}, {silent: true}));
+         } else {
+-            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
++            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}, {silent: true}));
+         }
+         workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: cordovaDir}))
+-        .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}))
++        .andThen(utils.execCommandWithJWorkflow(npmInstall, {cwd: path.join(cordovaDir, "blackberry10")}, {silent: true, logSilent: true}))
+         .start(function () {
++            console.log("[STATUS] cordova-blackberry repo setup complete");
+             done();
+         });
+     },
+@@ -58,36 +61,47 @@ module.exports = {
+             checkout = util.format("git checkout %s", branch ? branch : 'origin/master'),
+             fetchAll = "git fetch --all --prune";
+ 
+-        // fetch all if the repos exists 
++        // fetch all if the repos exists
+         if (fs.existsSync(mobileSpecDir)) {
+-            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}));
++            workflow.andThen(utils.execCommandWithJWorkflow(fetchAll, {cwd: cordovaDir}, {silent: true}));
+         } else {
+-            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}));
++            workflow.andThen(utils.execCommandWithJWorkflow(clone, {cwd: baseDir}, {silent: true}));
+         }
+         workflow.andThen(utils.execCommandWithJWorkflow(checkout, {cwd: mobileSpecDir}))
+         .start(function () {
++            console.log("[STATUS] cordova-mobile-spec repo setup complete");
+             done();
+         });
+     },
+ 
+     createProject: function (projectPath, name, done) {
+-        var create = util.format(path.join("bin", "create") + " %s %s %s", projectPath, name, name);
++        var platformDir = path.join(projectPath, "platforms", "blackberry10"),
++            cordovaCreateCmd = util.format(path.join("bin", "create") + " %s %s %s", platformDir, name, name),
++            cliCreateCmd = util.format("cordova create %s %s %s", projectPath, name, name),
++            platformAddCmd = "cordova platform add blackberry10";
+ 
+         // Delete existing project folder
+         if (fs.existsSync(projectPath)) {
+             wrench.rmdirSyncRecursive(projectPath);
+         }
+ 
+-        jWorkflow.order(utils.execCommandWithJWorkflow(create, {cwd: path.join(cordovaDir, "blackberry10")}))
+-        .start(function () {
+-            if (done) {
+-                done();
+-            }
+-        });
++        jWorkflow
++            .order(utils.execCommandWithJWorkflow(cliCreateCmd))
++            .andThen(utils.execCommandWithJWorkflow(platformAddCmd, {cwd: projectPath}))
++            .andThen(function (prev, baton) {
++                wrench.rmdirSyncRecursive(platformDir);
++                baton.pass();
++            })
++            .andThen(utils.execCommandWithJWorkflow(cordovaCreateCmd, {cwd: path.join(cordovaDir, "blackberry10")}, {silent: true}))
++            .start(function () {
++                if (done) {
++                    done();
++                }
++            });
+     },
+ 
+     configProject: function (projectPath, targetName, targetIP, targetType, targetPassword, done) {
+-        var cmd = path.join('cordova', 'target') + " add %s %s %s";
++        var cmd = path.join('platforms', 'blackberry10', 'cordova', 'target') + " add %s %s %s";
+         // No validation for targetName, type, ip, password here, target command will
+         // take care the validation
+         if (targetName && targetType && targetIP) {
+@@ -102,7 +116,7 @@ module.exports = {
+                     }
+                 });
+         } else {
+-            console.log("Invalid parameters, run jake -T to get the usage");
++            console.log("Invalid parameters for adding a target so it will be skipped. Please run jake -T to get the usage.");
+             process.exit(-1);
+         }
+     },
+@@ -113,6 +127,7 @@ module.exports = {
+         })
+         .andThen(function () {
+             wrench.copyDirSyncRecursive(src, path.join(projectPath, "www/"));
++            shell.cp("-f", path.join(src, "config.xml"), path.join(projectPath, "platforms", "blackberry10", "www", "config.xml"));
+         })
+         .start(function () {
+             if (done) {
+@@ -129,8 +144,9 @@ module.exports = {
+             shell.exec("cd " + src + "&& git archive HEAD | tar -x -C " + path.join(projectPath, "www"));
+             shell.cp("-rf", path.join(projectPath, "..", "src", "plugin.xml"), path.join(projectPath, "www", "dependencies-plugin"));
+             shell.cp("-rf", path.join(projectPath, "..", "src", "config.xml"), path.join(projectPath, "www"));
+-            shell.exec("cd " + projectPath + " && " + "cordova/plugin add " + path.join("www", "dependencies-plugin"));
+-            console.log("Copy Mobile Spec Finished");
++            console.log("[STATUS] Mobile Spec Assets Copied Successfully");
++            shell.exec("cd " + projectPath + " && " + "cordova plugin add " + path.join("www", "dependencies-plugin"));
++            console.log("[STATUS] Mobile Spec depenencies added");
+             baton.pass();
+         })
+         .start(function () {
+@@ -140,8 +156,9 @@ module.exports = {
+         });
+     },
+ 
+-    buildProject: function (projectPath, done) {
+-        var cmd = path.join('cordova', 'run');
++    runProject: function (projectPath, target, done) {
++        var cmd = "cordova run %s";
++        cmd = util.format(cmd, target ? target : "--device");
+ 
+         jWorkflow.order(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}))
+         .start(function () {
+@@ -152,12 +169,11 @@ module.exports = {
+     },
+ 
+     addPlugins: function (projectPath, plugins, done) {
+-        var pluginsPath = path.join(baseDir, 'plugin'),
+-            addPlugin = path.join("cordova", "plugin") + " add %s",
++        var addPlugin = "cordova plugin add %s",
+             task = jWorkflow.order();
+ 
+         plugins.forEach(function (plugin) {
+-            var cmd = util.format(addPlugin, path.join(pluginsPath, plugin));
++            var cmd = util.format(addPlugin, plugin);
+             task.andThen(utils.execCommandWithJWorkflow(cmd, {cwd: projectPath}));
+         });
+         task.start(function () {
+diff --git a/scripts/test-app.js b/scripts/test-app.js
+index d96cadd..8ba484e 100644
+--- a/scripts/test-app.js
++++ b/scripts/test-app.js
+@@ -30,43 +30,29 @@ var jWorkflow = require("jWorkflow"),
+ 
+ module.exports = function (branch, targetName, targetIP, targetType, targetPassword) {
+     var deployTest = jWorkflow.order(),
+-        preservingProject = false,
+-        projectFileBackuped = path.join(testAppPrj, '..', 'project.json'),
+-        projectFile = path.join(testAppPrj, 'project.json');
++        shouldAddTarget = targetName && targetIP && targetPassword;
+ 
+-    if (!targetIP && !targetType && !targetPassword && 
+-        fs.existsSync(path.join(testAppPrj, 'project.json'))) {
+-        preservingProject = true;
+-    }
+-
+-    deployTest = jWorkflow.order();
+     deployTest.andThen(function (prev, baton) {
+         baton.take();
+-        prjUtils.setupRepo(branch ? branch : 'master', function () {
++        prjUtils.setupRepo(branch, function () {
+             baton.pass();
+         });
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        if (preservingProject) {
+-            utils.copyFile(projectFile, path.join(testAppPrj, '..'));
+-        }
+         prjUtils.createProject(testAppPrj, testAppPrjName, function () {
+-            if (preservingProject && fs.existsSync(projectFileBackuped)) {
+-                utils.copyFile(projectFileBackuped, testAppPrj);
+-            }
+             baton.pass();
+         });
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        if (!preservingProject) {
++        if (shouldAddTarget) {
+             prjUtils.configProject(testAppPrj, targetName, targetIP, targetType, targetPassword, function () {
+                 baton.pass();
+-            });    
++            });
+         } else {
+             baton.pass();
+-        }  
++        }
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+@@ -82,26 +68,7 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
+     })
+     .andThen(function (prev, baton) {
+         var plugins = [
+-            "com.blackberry.app",
+-            "com.blackberry.bbm.platform",
+-            "com.blackberry.connection",
+-            "com.blackberry.identity",
+-            "com.blackberry.invoke",
+-            "com.blackberry.invoke.card",
+-            "com.blackberry.invoked",
+-            "com.blackberry.io",
+-            "com.blackberry.io.filetransfer",
+-            "com.blackberry.notification",
+-            "com.blackberry.payment",
+-            "com.blackberry.pim.calendar",
+-            "com.blackberry.pim.contacts",
+-            "com.blackberry.push",
+-            "com.blackberry.sensors",
+-            "com.blackberry.system",
+-            "com.blackberry.ui.contextmenu",
+-            "com.blackberry.ui.cover",
+-            "com.blackberry.ui.dialog",
+-            "com.blackberry.ui.toast"
++            path.join("www", "dependencies-plugin")
+         ];
+         baton.take();
+         prjUtils.addPlugins(testAppPrj, plugins, function () {
+@@ -110,12 +77,12 @@ module.exports = function (branch, targetName, targetIP, targetType, targetPassw
+     })
+     .andThen(function (prev, baton) {
+         baton.take();
+-        prjUtils.buildProject(testAppPrj, function () {
++        prjUtils.runProject(testAppPrj, targetName, function () {
+             baton.pass();
+         });
+     })
+     .start(function () {
+         console.log("DONE");
+     });
+-    
++
+ };
+diff --git a/scripts/utils.js b/scripts/utils.js
+index 3c2bf5c..6c90e93 100644
+--- a/scripts/utils.js
++++ b/scripts/utils.js
+@@ -87,28 +87,37 @@ module.exports = {
+         }
+     },
+ 
+-    execCommandWithJWorkflow: function (command, options, neverDrop) {
++    execCommandWithJWorkflow: function (command, options, customOptions) {
+         var displayOutput = this.displayOutput;
++
++        customOptions = customOptions || {};
++
++        if (typeof customOptions === "boolean") {
++            customOptions = { neverDrop: customOptions};
++        }
++
+         return function (prev, baton) {
+             baton.take();
+-            console.log("[EXECUTING] " + command);
++            if (!customOptions.logSilent) console.log("[EXECUTING] " + command);
+             options = options || {};
+             options.maxBuffer = 1024 * 1024;
+             var c = childProcess.exec(command, options, function (error, stdout, stderr) {
+-                if (error && !neverDrop) {
++                if (error && !customOptions.neverDrop) {
+                     baton.drop(error.code);
+                 } else {
+                     baton.pass(error);
+                 }
+             });
+ 
+-            c.stdout.on('data', function (data) {
+-                displayOutput(data);
+-            });
++            if (!customOptions.silent) {
++                c.stdout.on('data', function (data) {
++                    displayOutput(data);
++                });
+ 
+-            c.stderr.on('data', function (data) {
+-                displayOutput(data);
+-            });
++                c.stderr.on('data', function (data) {
++                    displayOutput(data);
++                });
++            }
+         };
+     },
+ 
+diff --git a/test/mobile-spec/src/plugin.xml b/test/mobile-spec/src/plugin.xml
+index 06ebda8..32420f3 100644
+--- a/test/mobile-spec/src/plugin.xml
++++ b/test/mobile-spec/src/plugin.xml
+@@ -18,9 +18,6 @@
+  under the License.
+ -->
+ <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0" id="org.cordova.mobile-spec-dependencies" version="1.0.0">
+-  <engines>
+-    <engine name="cordova" version="&gt;=2.7"/>
+-  </engines>
+   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
+   <dependency id="org.apache.cordova.core.battery-status" url="https://github.com/apache/cordova-plugin-battery-status.git"/>
+   <dependency id="org.apache.cordova.core.camera" url="https://github.com/apache/cordova-plugin-camera"/>
+diff --git a/test/test-app/src/config.xml b/test/test-app/src/config.xml
+index b89b2dd..067c06d 100644
+--- a/test/test-app/src/config.xml
++++ b/test/test-app/src/config.xml
+@@ -1,6 +1,5 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <widget xmlns="http://www.w3.org/ns/widgets" xmlns:rim="http://www.blackberry.com/ns/widgets" version="1.0.0" id="WebWorksTest" rim:header="RIM:WebWorks/App"><name>WebWorks Test Application</name><name xml:lang="fr-FR">WebWorks Test App-fr</name><name xml:lang="en">WebWorks Test App-en</name><description>This application tests a wide range of WebWorks functionalities.</description><description xml:lang="fr-FR">French description</description><description xml:lang="en">English description</description><content src="index.html"/><author rim:copyright="Copyright 1998-2011 My Corp" email="hello.bob@blah.com" href="http://www.blah.com">Research In Motion Ltd.</author><feature id="blackberry.app" required="true" version="1.0.0.0"><param name="backgroundColor" value="0xFFFFEFD5"/></feature><feature id="blackberry.system" required="true" version="1.0.0.0"/><feature id="blackberry.connection" required="true" version="1.0.0.0"/><feature id="blackberry.identity" required="true" version="1.0.0.0"/><feature id="blackberry.event" required="true" version="1.0.0.0"/><feature id="blackberry.ui.dialog" required="true" version="1.0.0.0"/><feature id="blackberry.ui.toast" required="true" version="1.0.0.0"/><feature id="blackberry.ui.contextmenu" required="true" version="1.0.0.0"/><feature id="blackberry.io" required="true" version="1.0.0.0"/><feature id="blackberry.io.filetransfer" required="true" version="1.0.0.0"/><feature id="blackberry.push" required="true" version="1.0.0.0"/><feature id="blackberry.bbm.platform" required="true" version="1.0.0.0"/><feature id="blackberry.pim.calendar" required="true" version="1.0.0.0"/><feature id="blackberry.pim.contacts" required="true" version="1.0.0.0"/><feature id="blackberry.invoke.card" required="true" version="1.0.0.0"/><feature id="blackberry.invoke" required="true" version="1.0.0.0"/><feature id="blackberry.invoked" required="true" version="1.0.0.0"/><feature id="blackberry.notification" required="true" version="1.0.0.0"/><feature id="blackberry.sensors" required="true" version="1.0.0.0"/>
+-    //Experimental
+     <feature id="qnx.webviews" required="true" version="1.0.0.0"/>
+     <feature id="enable-flash"/>
+     <feature id="internal.automation" required="true" version="1.0.0.0"/>
+diff --git a/test/test-app/src/dependencies-plugin/plugin.xml b/test/test-app/src/dependencies-plugin/plugin.xml
+new file mode 100644
+index 0000000..83f4515
+--- /dev/null
++++ b/test/test-app/src/dependencies-plugin/plugin.xml
+@@ -0,0 +1,42 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++ Licensed to the Apache Software Foundation (ASF) under one
++ or more contributor license agreements.  See the NOTICE file
++ distributed with this work for additional information
++ regarding copyright ownership.  The ASF licenses this file
++ to you under the Apache License, Version 2.0 (the
++ "License"); you may not use this file except in compliance
++ with the License.  You may obtain a copy of the License at
++
++   http://www.apache.org/licenses/LICENSE-2.0
++
++ Unless required by applicable law or agreed to in writing,
++ software distributed under the License is distributed on an
++ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ KIND, either express or implied.  See the License for the
++ specific language governing permissions and limitations
++ under the License.
++-->
++<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0" id="com.blackberry.test-app-dependencies" version="1.0.0">
++  <name>Test-App plugin to quickly pull in all cordova plugins</name>
++  <dependency id="com.blackberry.app" url="." subdir="/plugin/com.blackberry.app/"/>
++  <dependency id="com.blackberry.bbm.platform" url="." subdir="/plugin/com.blackberry.bbm.platform/"/>
++  <dependency id="com.blackberry.connection" url="." subdir="/plugin/com.blackberry.connection/"/>
++  <dependency id="com.blackberry.identity" url="." subdir="/plugin/com.blackberry.identity/"/>
++  <dependency id="com.blackberry.invoke" url="." subdir="/plugin/com.blackberry.invoke/"/>
++  <dependency id="com.blackberry.invoke.card" url="." subdir="/plugin/com.blackberry.invoke.card/"/>
++  <dependency id="com.blackberry.invoked" url="." subdir="/plugin/com.blackberry.invoked/"/>
++  <dependency id="com.blackberry.io" url="." subdir="/plugin/com.blackberry.io/"/>
++  <dependency id="com.blackberry.io.filetransfer" url="." subdir="/plugin/com.blackberry.io.filetransfer/"/>
++  <dependency id="com.blackberry.notification" url="." subdir="/plugin/com.blackberry.notification/"/>
++  <dependency id="com.blackberry.payment" url="." subdir="/plugin/com.blackberry.payment/"/>
++  <dependency id="com.blackberry.pim.calendar" url="." subdir="/plugin/com.blackberry.pim.calendar/"/>
++  <dependency id="com.blackberry.pim.contacts" url="." subdir="/plugin/com.blackberry.pim.contacts/"/>
++  <dependency id="com.blackberry.push" url="." subdir="/plugin/com.blackberry.push/"/>
++  <dependency id="com.blackberry.sensors" url="." subdir="/plugin/com.blackberry.sensors/"/>
++  <dependency id="com.blackberry.system" url="." subdir="/plugin/com.blackberry.system/"/>
++  <dependency id="com.blackberry.ui.contextmenu" url="." subdir="/plugin/com.blackberry.ui.contextmenu/"/>
++  <dependency id="com.blackberry.ui.cover" url="." subdir="/plugin/com.blackberry.ui.cover/"/>
++  <dependency id="com.blackberry.ui.dialog" url="." subdir="/plugin/com.blackberry.ui.dialog/"/>
++  <dependency id="com.blackberry.ui.toast" url="." subdir="/plugin/com.blackberry.ui.toast/"/>
++</plugin>
+-- 
+1.7.10.msysgit.1
+

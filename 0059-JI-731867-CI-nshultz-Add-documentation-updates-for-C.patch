@@ -1,0 +1,2898 @@
+From 8bf9d2322fd5405baf628018c0a4758e45f6279b Mon Sep 17 00:00:00 2001
+From: Gilbert Yu <giyu@qnx.com>
+Date: Mon, 21 Jul 2014 16:35:27 -0400
+Subject: [PATCH 59/61] JI:731867 CI: nshultz - Add documentation updates for
+ Cordova plugins
+
+---
+ plugin/com.qnx.application.event/www/client.js     |   22 ++-
+ plugin/com.qnx.application/www/client.js           |   11 +-
+ plugin/com.qnx.bluetooth.pbap/www/client.js        |  199 +++++++++++---------
+ plugin/com.qnx.bluetooth/www/client.js             |   53 +++---
+ plugin/com.qnx.browser/www/client.js               |    5 +-
+ .../www/AudioMixerSetting.js                       |    7 +-
+ plugin/com.qnx.car.audiomixer/www/client.js        |   43 ++---
+ plugin/com.qnx.car.hvac/www/HvacFanDirection.js    |    5 +-
+ plugin/com.qnx.car.hvac/www/HvacSetting.js         |    8 +-
+ plugin/com.qnx.car.hvac/www/client.js              |   30 +--
+ .../com.qnx.car.mediaplayer/www/MediaNodeType.js   |    5 +-
+ .../www/MediaSourceEvent.js                        |   11 +-
+ .../com.qnx.car.mediaplayer/www/MediaSourceType.js |    5 +-
+ plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js |    5 +-
+ plugin/com.qnx.car.mediaplayer/www/RepeatMode.js   |    3 +-
+ plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js  |    5 +-
+ .../www/TrackSessionEvent.js                       |   13 +-
+ plugin/com.qnx.car.mediaplayer/www/client.js       |  118 ++++++------
+ plugin/com.qnx.car.navigation/www/client.js        |   52 ++---
+ plugin/com.qnx.car.profile/www/client.js           |   30 +--
+ plugin/com.qnx.car.radio/www/client.js             |   48 ++---
+ plugin/com.qnx.car.sensors/www/Sensor.js           |   12 +-
+ plugin/com.qnx.car.sensors/www/client.js           |   22 +--
+ plugin/com.qnx.car.theme/www/client.js             |   24 +--
+ plugin/com.qnx.car.zone/www/client.js              |   23 +--
+ plugin/com.qnx.message/www/client.js               |  159 ++++++++--------
+ plugin/com.qnx.phone/www/client.js                 |  136 +++++++------
+ plugin/com.qnx.power/www/client.js                 |   33 ++--
+ plugin/com.qnx.settings/www/client.js              |   17 +-
+ 29 files changed, 571 insertions(+), 533 deletions(-)
+
+diff --git a/plugin/com.qnx.application.event/www/client.js b/plugin/com.qnx.application.event/www/client.js
+index 8ca76e9..7981b3b 100755
+--- a/plugin/com.qnx.application.event/www/client.js
++++ b/plugin/com.qnx.application.event/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013-2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,8 +21,8 @@
+ /**
+  * @module qnx.application.event
+  * @static
+- *
+- * @description Send events to an application, as well as to pause, resume, and reselect events 
++ * @description Send events to an application. The events include pause, resume,
++*               and and reselect events.
+  */
+ 
+ var _ID = "com.qnx.application.event",
+@@ -48,21 +49,21 @@ _events.map(function (eventName) {
+ });
+ 
+ /*
+- * Exports are the publicly accessible functions
++ * Exports are the publicly accessible functions.
+  */
+ module.exports = {
+ 
+ 	/**
+-	 * Register the key (application name) for pause, resume, and reselect events
+-	 * @param {String} key The application key
++	 * @description Register the key (application name) for pause, resume, and reselect events.
++	 * @param {String} key The application key.
+ 	 */
+ 	register: function(key) {
+ 		window.cordova.exec(null, null, _ID, 'register', { key: key });
+ 	},
+ 	
+ 	/**
+-	 * Get the screen window group name for the specified key
+-	 * @param {String} key The application key
++	 * @description Get the screen window group name for the specified key.
++	 * @param {String} key The application key.
+ 	 */
+ 	getWindowGroup: function(key) {
+    		var value = null,
+@@ -85,8 +86,9 @@ module.exports = {
+ 	},
+ 
+ 	/**
+-	 * Get the data passed to the application on startup
+-	 * @return {Mixed} The data passed to the application on startup, or null
++	 * @description Get the data passed to the application on startup.
++	 * @return {Mixed} The data passed to the application on startup, otherwise
++	 *                 <code>null</code> when no data is passed to the application.
+ 	 */
+ 	getData: function() {
+    		var value = null,
+diff --git a/plugin/com.qnx.application/www/client.js b/plugin/com.qnx.application/www/client.js
+index b6bb38f..9c3b5cd 100755
+--- a/plugin/com.qnx.application/www/client.js
++++ b/plugin/com.qnx.application/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013-2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -29,13 +30,13 @@
+ var _ID = "com.qnx.application";
+ 
+ /*
+- * Exports are the publicly accessible functions
++ * Exports are the publicly accessible functions.
+  */
+ module.exports = {
+ 	/**
+-	 * Create a request to start an application
+-	 * @param {String} id The ID of the application to start
+-	 * @param {Object} data The startup data for the application
++	 * Create a request to start an application.
++	 * @param {String} id The ID of the application to start.
++	 * @param {Object} data The startup data for the application.
+ 	 */
+ 	start: function (id, data) {
+ 		if (!data || data === undefined) {
+diff --git a/plugin/com.qnx.bluetooth.pbap/www/client.js b/plugin/com.qnx.bluetooth.pbap/www/client.js
+index 4702949..4260a80 100755
+--- a/plugin/com.qnx.bluetooth.pbap/www/client.js
++++ b/plugin/com.qnx.bluetooth.pbap/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013-2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -19,33 +20,34 @@
+ 
+ 
+ /**
+- * Allows access to address book information over Bluetooth PBAP.
++ * @module qnx.bluetooth_pbap
++ * @static
++ * @deprecated
++ * @description Allow access to address book information over 
++ *              Bluetooth Phone Book Access Profile (PBAP). <br/>
+  *
+- * <h3>Events</h3>
+- * <dl><dt><h4>bluetoothpbapstatechange</h4></dt>
+- * <dd><p>Fired when the state of a service has changed</p>
+- * <h5>Event data</h5>
++ * <br/><h2>Events</h2>
++ * <dl><dt><h3>bluetoothpbapstatechange</h3></dt>
++ * <dd><p>Fired when the state of a service has changed.</p>
++ * <h4>Event data</h4>
+  * <p>{Object}</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  * <pre><code>{
+  *      service: 'SERVICE_BLUETOOTH',
+  *      state: 'STATE_CONNECTED'
+  * }</code></pre></dd></dl>
+  *
+  * <dl><dt><h4>bluetoothpbapstatuschange</h4></dt>
+- * <dd><p>Fired when the status of the contact service has changed,
+- * e.g. the contact store is refreshing or service is ready</p>
+- * <h5>Event data</h5>
++ * <dd><p>Fired when the status of the contact service has changed.
++ * E.g., the contact store is refreshing or service is ready.</p>
++ * <h4>Event data</h4>
+  * <p>{Object}</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  * <pre><code>{
+  *      service: 'SERVICE_BLUETOOTH'
+  *      status: 'REFRESHING'
+  *}</code></pre></dd></dl>
+  * 
+- * @module qnx.bluetooth.pbap
+- * @static
+- * @deprecated
+  */
+  
+ 
+@@ -74,55 +76,56 @@ _events.map(function (eventName) {
+ 
+ /**
+  * @static
+- * The <code>qnx.bluetooth.pbap.Contact</code> constructor function. Contact object instances represent contacts
+- * stored on the device from which the PBAP contacts were synchronized.
+- * @param {Object} [properties] The properties argument can be used to initialize the Contact instance's properties.
++ * The <code>qnx.bluetooth.pbap.Contact</code> constructor function. <code>Contact</code> object instances 
++ * represent contacts stored on the device from which the PBAP contacts were synchronized.
++ * @param {Object} [properties] The properties argument can be used to initialize the <code>Contact</code>
++ *                              instance's properties.
+  * 
+  * @example
+- * // The following code demonstrates how to create a new Contact object with its name
++ * // The following code shows how to create a new <code>Contact</code> object with its name
+  * // defaulted to 'John Doe'
+  * var contact = new qnx.bluetooth.pbap.Contact({ firstName: 'John', lastName: 'Doe'});
+  * 
+- * @property {String} anniversary The anniversary of the Contact in ISO 8601 format.
+- * @property {String} birthday The birthday of the Contact in ISO 8601 format.
+- * @property {String} categories A comma-separated list of categories to which this Contact belongs.
+- * @property {String} company The Contact's company.
+- * @property {String} email1 Primary email address.
+- * @property {String} email2 Secondary email address.
+- * @property {String} email3 Tertiary email address.
+- * @property {String} faxPhone The Contact's fax number.
+- * @property {String} firstName First name.
+- * @property {String} homeAddress1 Primary home address information.
+- * @property {String} homeAddress2 Secondary home address inofrmation.
+- * @property {String} homeAddressCity Home address city.
+- * @property {String} homeAddressCountry Home address country.
+- * @property {String} homeAddressStateProvince Home address state or province.
+- * @property {String} homeAddressZipPostal Home address zip or postal code.
+- * @property {String} homePhone Primary home phone number.
+- * @property {String} homePhone2 Secondary home phone number.
+- * @property {String} jobTitle The Contact's job title.
+- * @property {String} lastName Last name.
+- * @property {String} mobilePhone Mobile phone number.
++ * @property {String} anniversary The anniversary of the contact in ISO 8601 format.
++ * @property {String} birthday The birthday of the contact in ISO 8601 format.
++ * @property {String} categories A comma-separated list of categories to which this <code>Contact</code> belongs.
++ * @property {String} company The contact's company.
++ * @property {String} email1 Primary email address of the contact.
++ * @property {String} email2 Secondary email address of the contact.
++ * @property {String} email3 Tertiary email address of the contact.
++ * @property {String} faxPhone The contact's fax number.
++ * @property {String} firstName The contact's first name.
++ * @property {String} homeAddress1 The contact's primary home address information.
++ * @property {String} homeAddress2 The contact's secondary home address information.
++ * @property {String} homeAddressCity The contact's home address city.
++ * @property {String} homeAddressCountry The contact's home address country.
++ * @property {String} homeAddressStateProvince The contact's home address state or province.
++ * @property {String} homeAddressZipPostal The contact's home address zip or postal code.
++ * @property {String} homePhone The contact's primary home phone number.
++ * @property {String} homePhone2 The contact's secondary home phone number.
++ * @property {String} jobTitle The contact's job title.
++ * @property {String} lastName The contact's last name.
++ * @property {String} mobilePhone The contact's mobile phone number.
+  * @property {String} note Additional contact information.
+- * @property {String} otherPhone Other phone number.
+- * @property {String} pagerPhone Pager number.
+- * @property {String} picture The fully qualified system path to the Contact's photo.
+- * @property {String} pin The Contact's device PIN.
+- * @property {String} title The Contact's title or titles.
+- * @property {String} uid Unique identifier for this Contact.
++ * @property {String} otherPhone The contact's other phone number.
++ * @property {String} pagerPhone The contact's pager number.
++ * @property {String} picture The fully qualified system path to the contact's photo.
++ * @property {String} pin The contact's device PIN.
++ * @property {String} title The contact's title or titles.
++ * @property {String} uid THe unique identifier for this <code>Contact</code>.
+  * @property {String} user1 User-defined field.
+  * @property {String} user2 User-defined field.
+  * @property {String} user3 User-defined field.
+  * @property {String} user4 User-defined field.
+- * @property {String} webpage The Contact's webpage URI.
+- * @property {String} workAddress1 Primary work address information.
+- * @property {String} workAddress2 Secondary work address information.
+- * @property {String} workAddressCity Work address city.
+- * @property {String} workAddressCountry Work address country.
+- * @property {String} workAddressStateProvince Work address state or province.
+- * @property {String} workAddressZipPostal Work address zip or postal code.
+- * @property {String} workPhone Primary work phone number.
+- * @property {String} workPhone2 Secondary work phone number.
++ * @property {String} webpage The contact's webpage URI.
++ * @property {String} workAddress1 The contact's primary work address.
++ * @property {String} workAddress2 The contact's secondary work address.
++ * @property {String} workAddressCity The contact's city of work.
++ * @property {String} workAddressCountry The contact's country of work.
++ * @property {String} workAddressStateProvince The contact's work address state or province.
++ * @property {String} workAddressZipPostal The contact's  work address zip or postal code.
++ * @property {String} workPhone The contact's primary work phone number.
++ * @property {String} workPhone2 The contact's secondary work phone number.
+  */
+ function Contact(properties) {
+ 	this.anniversary = null;
+@@ -175,9 +178,10 @@ function Contact(properties) {
+ 	};
+ 	
+ 	/**
+-	 * qnx.bluetooth.pbap.Contact instance function to create or update the Contact in the device PIM storage.
+-	 * If creating a new contact, the Contact's uid property will be updated to the new unique identifier for the
+-	 * created Contact.
++	 * <code>qnx.bluetooth.pbap.Contact</code> instance function to create or update the 
++	 * <code>Contact</code> in the device PIM storage. If creating a new contact, the 
++	 * <code>Contact.uid</code> property is updated to the new unique identifier for the
++	 * created contact.
+ 	 * @inner
+ 	 * @deprecated Unsupported.
+ 	 */
+@@ -198,7 +202,8 @@ function Contact(properties) {
+ 	};
+ 	
+ 	/**
+-	 * qnx.bluetooth.pbap.Contact instance function to remove this Contact from the device PIM storage.
++	 * <code>qnx.bluetooth.pbap_xyz.Contact</code> instance function to remove this 
++	 * Contact from the device PIM storage.
+ 	 * @inner
+ 	 * @deprecated Unsupported.
+ 	 */
+@@ -209,16 +214,18 @@ function Contact(properties) {
+ 
+ /**
+  * @static
+- * The <code>qnx.bluetooth.pbap.FilterExpression</code> constructor function. <code>FilterExpression</code> objects
+- * can be used to filter the results of the <code>qnx.bluetooth.pbap.find()</code> function.
++ * The <code>qnx.bluetooth.pbap.FilterExpression</code> constructor function. 
++ * <code>FilterExpression</code> objects can be used to filter the results of the
++ * <code>qnx.bluetooth.pbap.find()</code> function.
+  * @param {String|qnx.bluetooth.pbap.FilterExpression} leftField The field name or FilterExpression.
+- * @param {String} operator The filter operator, e.g. '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
+- * @param {String|qnx.bluetooth.pbap.FilterExpression} rightField The field value or additional FilterExpression.
++ * @param {String} operator The filter operator, e.g., '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
++ * @param {String|qnx.bluetooth.pbap.FilterExpression} rightField The field value or additional 
++ *                                                                FilterExpression.
+  * 
+  * @example
+  * // The following code demonstrates how to create a new FilterExpression and get a
+  * // list of contacts filtered by last name = 'Doe'
+- * var filter = new qnx.bluetooth.pbap.FilterExpression(qnx.bluetooth.pbap.FIELD_LAST_NAME, '=', 'Doe'),
++ * var filter = new qnx.bluetooth.pbap.FilterExpression(qnx.bluetooth.pbap.FIELD_LAST_NAME,'=', 'Doe'),
+  *     filteredContacts = qnx.bluetooth.pbap.find(filter);
+  * 
+  * @example
+@@ -232,7 +239,7 @@ function Contact(properties) {
+  *     filteredContacts = qnx.bluetooth.pbap.find(filter);
+  * 
+  * @property {String|qnx.bluetooth.pbap.FilterExpression} leftField The field name or FilterExpression.
+- * @property {String} operator The filter operator, e.g. '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
++ * @property {String} operator The filter operator, e.g., '=', '<', '>', '<>', 'LIKE', 'AND', 'OR'.
+  * @property {String|qnx.bluetooth.pbap.FilterExpression} rightField The field value or additional FilterExpression.
+  */
+ function FilterExpression(leftField, operator, rightField) {
+@@ -246,43 +253,43 @@ function FilterExpression(leftField, operator, rightField) {
+  */
+ module.exports = {
+ 	/* State constants */
+-	/** PBAP service in process of connecting*/
++	/** The Bluetooth PBAP service is in the process of connecting.*/
+ 	STATE_CONNECTING:	'STATE_CONNECTING',
+-	/** PBAP service connected state */
++	/** The Bluetooth PBAP service is in the connected state. */
+ 	STATE_CONNECTED:	'STATE_CONNECTED',
+-	/** PBAP service disconnected state */
++	/** The Bluetooth PBAP service is in the disconnected state. */
+ 	STATE_DISCONNECTED:	'STATE_DISCONNECTED',
+ 	
+ 	/* Status constants */
+-	/** PBAP service ready status */
++	/** The Bluetooth PBAP service is ready. */
+ 	STATUS_READY:		'STATUS_READY',
+-	/** PBAP service refreshing status */
++	/** The Bluetooth PBAP service is refreshing. */
+ 	STATUS_REFRESHING:	'STATUS_REFRESHING',
+-	/** PBAP service error status */
++	/** An error occurred in the Bluetooth PBAP service. */
+ 	STATUS_ERROR:		'STATUS_ERROR',
+ 
+ 	/* Filter constants */
+-	/** <code>homePhone</code> field name for use in FilterExpression */
++	/** <code>homePhone</code> field name for use in FilterExpression. */
+ 	FIELD_HOME_PHONE:'home_phone',
+-	/** <code>homePhone2</code> field name for use in FilterExpression */
++	/** <code>homePhone2</code> field name for use in FilterExpression. */
+ 	FIELD_HOME_PHONE_2:'home_phone_2',
+-	/** <code>workPhone</code> field name for use in FilterExpression */
++	/** <code>workPhone</code> field name for use in FilterExpression. */
+ 	FIELD_WORK_PHONE:'work_phone',
+-	/** <code>workPhone2</code> field name for use in FilterExpression */
++	/** <code>workPhone2</code> field name for use in FilterExpression. */
+ 	FIELD_WORK_PHONE_2:'work_phone_2',
+-	/** <code>mobilePhone</code> field name for use in FilterExpression */
++	/** <code>mobilePhone</code> field name for use in FilterExpression. */
+ 	FIELD_MOBILE_PHONE:'mobile_phone',
+-	/** <code>otherPhone</code> field name for use in FilterExpression */
++	/** <code>otherPhone</code> field name for use in FilterExpression. */
+ 	FIELD_OTHER_PHONE:'other_phone',
+-	/** <code>firstName</code> field name for use in FilterExpression */
++	/** <code>firstName</code> field name for use in FilterExpression. */
+ 	FIELD_FIRST_NAME:'first_name',
+-	/** <code>lastName</code> field name for use in FilterExpression */
++	/** <code>lastName</code> field name for use in FilterExpression. */
+ 	FIELD_LAST_NAME:'last_name',
+-	/** <code>email1</code> field name for use in FilterExpression */
++	/** <code>email1</code> field name for use in FilterExpression. */
+ 	FIELD_EMAIL_1:'email_1',
+-	/** <code>email2</code> field name for use in FilterExpression */
++	/** <code>email2</code> field name for use in FilterExpression. */
+ 	FIELD_EMAIL_2:'email_2',
+-	/** <code>email3</code> field name for use in FilterExpression */
++	/** <code>email3</code> field name for use in FilterExpression. */
+ 	FIELD_EMAIL_3:'email_3',
+ 
+ 	Contact: Contact,
+@@ -290,16 +297,20 @@ module.exports = {
+ 	FilterExpression: FilterExpression,
+ 	
+ 	/**
+-	 * Returns an array of zero or more {@link qnx.bluetooth.pbap.Contact} instances.
++	 * Return an array of zero or more {@link qnx.bluetooth.pbap.Contact} instances.
++	 *
+ 	 * @param {qnx.bluetooth.pbap.FilterExpression} [filter] The
+-	 * <code>qnx.bluetooth.pbap.FilterExpression</code> to apply against the phone book database.
++	 *        <code>qnx.bluetooth.pbap.FilterExpression</code> to apply against the phone book database.
+ 	 * @param {String} [orderBy] The field name to order by. If this parameter is
+-	 * not specified, the results will be sorted first by last name ascending, then first name ascending.
+-	 * @param {Boolean} [isAscending] If an <code>orderBy</code> parameter is supplied, changes the order
+-	 * direction to ascending if true, descending if false. If an <code>orderBy</code> parameter
+-	 * is not specified, <code>isAscending</code> has no effect. Defaults to false.
+-	 * @param {Number} [limit] The maximum number of Contact instances to return. Defaults to -1 (no limit).
+-	 * @param {Number} [offset] Specifies the record offset. Defaults to 0 (no offset).
++	 *        not specified, the results are sorted by last name ascending and then
++	 *        first name ascending.
++	 * @param {Boolean} [isAscending] If an <code>orderBy</code> parameter is supplied,
++	 *        changes the order direction to ascending when <code>true</code>, descending when 
++	 *        <code>false</code>. If an <code>orderBy</code> parameter is not specified, 
++	 *        <code>isAscending</code> has no effect. The default is <code>false</code>.
++	 * @param {Number} [limit] The maximum number of <code>Contact</code> instances to return.
++	 *        Default is -1 (no limit).
++	 * @param {Number} [offset] The record offset to use. Default is 0 (no offset).
+ 	 */
+ 	find: function(filter, orderBy, isAscending, limit, offset) {
+ 		var args = {};
+@@ -332,9 +343,10 @@ module.exports = {
+ 	},
+ 	
+ 	/**
+-	 * Get the current state of the PBAP service
++	 * Get the current state of the PBAP service.
+ 	 * @returns {String} The contact service state. Possible values are
+-	 * qnx.bluetooth.pbap state constants, or null if the service state is not available
++	 * <code>qnx.bluetooth.pbap</code> state constants, or <code>null</code> when the
++	 * service state is not available.
+ 	 */
+ 	getState: function() {
+    		var value = null,
+@@ -355,9 +367,10 @@ module.exports = {
+ 	},
+ 
+ 	/**
+-	 * Get the current status of the PBAP service
++	 * Get the current status of the PBAP service.
+ 	 * @returns {String} The contact service status. Possible values are
+-	 * qnx.bluetooth.pbap status constants, or null if the service status is not available
++	 * <code>qnx.bluetooth.pbap</code> status constants, or <code>null</code> when the
++	 * service status is not available.
+ 	 */
+ 	getStatus: function() {
+    		var value = null,
+@@ -378,7 +391,7 @@ module.exports = {
+ 	},
+ 
+ 	/**
+-	 * Force the PBAP phone book data to be refreshed from the device
++	 * Force the Bluetooth PBAP phone book data to be refreshed from the device.
+ 	 */
+ 	refresh: function() {
+ 		window.cordova.exec(null, null, _ID, 'refresh');
+diff --git a/plugin/com.qnx.bluetooth/www/client.js b/plugin/com.qnx.bluetooth/www/client.js
+index edcbefc..dec7475 100755
+--- a/plugin/com.qnx.bluetooth/www/client.js
++++ b/plugin/com.qnx.bluetooth/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013-2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -18,10 +19,12 @@
+  */
+ 
+ /**
+- * @name qnx.bluetooth
++ * 
++ * @module qnx.bluetooth
++ * @deprecated
+  * @static
++ * @description Manage Bluetooth operations.
+  *
+- * @deprecated
+  */
+ 
+ 
+@@ -49,33 +52,34 @@ _events.map(function (eventName) {
+ 
+ 
+ /*
+- * Exports are the publicly accessible functions
++ * Exports are the publicly accessible functions.
+  */
+ module.exports = {
+-	/* TODO Please make sure that constants below are identical to ones in bluetooth.js*/
+-	/** To exchange legacy PIN (usually hardcoded) */
++	/* Ensure that the constants below are identical to ones in bluetooth.js.*/
++
++	/** To exchange legacy PINs (usually hardcoded). */
+ 	LEGACY_PIN:"LEGACY_PIN",
+-	/** To allow remote device connect. */
++	/** To allow remote device connections. */
+ 	AUTHORIZE:"AUTHORIZE",
+-	/** Request to display dialog to enter authorization passkey */
++	/** Request to display dialog to enter authorization passkey. */
+ 	PASS_KEY:"PASS_KEY",
+-	/** Request to display dialog to confirm displayed  passkey*/
++	/** Request to display dialog to confirm displayed  passkey. */
+ 	ACCEPT_PASS_KEY:"ACCEPT_PASS_KEY",
+-	/** Request to display dialog display passkey*/
++	/** Request to display dialog display passkey. */
+ 	DISPLAY_PASS_KEY:"DISPLAY_PASS_KEY",
+-	/** Defines Handsfree Profile ID */
++	/** Defines the Hands-Free Profile ID. */
+ 	SERVICE_HFP:"0x111E",
+-	/** Defines Message Access Profile ID */
++	/** Defines the Message Access Profile ID. */
+ 	SERVICE_MAP:"0x1134",
+-	/** Defines Serial Port Profile ID */
++	/** Defines the Serial Port Profile ID. */
+ 	SERVICE_SPP:"0x1101",
+-	/** Defines Phonebook Access Profile ID */
++	/** Defines the Phonebook Access Profile ID. */
+ 	SERVICE_PBAP:"0x1130",
+-	/** Defines Personal Area Network ID */
++	/** Defines the Personal Area Network ID. */
+ 	SERVICE_PAN : "0x1115",
+-	/** Defines Advanced Audio Distribution Profile / Audio/Video Remote Control Profile ID */
++	/** Defines the Advanced Audio Distribution Profile, Audio, or Video Remote Control Profile ID. */
+ 	SERVICE_AVRCP : "0x110B",
+-	/** Defines all allowed Profile ID for current device*/
++	/** Defines all the allowed Profile IDs for current device. */
+ 	SERVICE_ALL:"ALL",
+ 
+ 	/** Not discoverable or connectable. */
+@@ -91,17 +95,18 @@ module.exports = {
+ 
+ 
+ 	/**
+-	 * Connect to specified service on device with specified MAC address
+-	 * @param {String} service Service identifier
+-	 * @param {String} mac MAC address of the device
++	 * @description Connect to the specified service on device with the specified MAC address.
++	 * @param {String} service The service identifier.
++	 * @param {String} mac The MAC address of the device.
+ 	 * */
+ 	connectService:function (service, mac) {
+ 		window.cordova.exec(null, null, _ID, 'connectService', { service:service, mac:mac });
+ 	},
+ 
+ 	/**
+-	 * Return a list of paired devices
+-	 * @return {Object} The currently paired device, or null
++	 * @description Get a list of paired devices.
++	 * @return {Object} The currently paired device, otherwise <code>null</code> 
++	 *         if no device is paired.
+ 	 */
+ 	getPaired:function () {
+    		var value = null,
+@@ -121,8 +126,8 @@ module.exports = {
+ 	},
+ 
+ 	/**
+-	 * Get a list of connected devices for Bluetooth services
+-	 * @param {String} service [optional] The Bluetooth service (e.g. SERVICE_HFP)
++	 * @description Get a list of connected devices for Bluetooth services.
++	 * @param {String} [service] The Bluetooth service (e.g., <code>SERVICE_HFP</code>).
+ 	 */
+ 	getConnectedDevices:function (service) {
+    		var value = null,
+diff --git a/plugin/com.qnx.browser/www/client.js b/plugin/com.qnx.browser/www/client.js
+index 38760db..6e7d298 100644
+--- a/plugin/com.qnx.browser/www/client.js
++++ b/plugin/com.qnx.browser/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2014  QNX Software Systems Limited
++ * Copyright 2014.
++*  QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -81,7 +82,7 @@ module.exports = {
+ 
+ 	/**	
+ 	 * Stop watching webview changes
+-	 * @param {Number} watchId The watch ID returned by <i>car.browser.watchTab()</i>.
++	 * @param {Number} watchId The watch ID returned by <code>car.browser.watchTab()</code>.
+ 	 * @memberOf module:car.browser
+ 	 * @method cancelWatch
+ 	 * @example
+diff --git a/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+index a7839a8..0415cbf 100755
+--- a/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
++++ b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -24,8 +25,8 @@ module.exports = {},
+  * @memberOf module:car.audiomixer
+  * @name AudioMixerSetting
+  *
+- * @description <p>Audio mixer settings enumeration
+- * <p>All values indicate a level within a range from 0 to 100%.
++ * @description Audio mixer settings enumeration.
++ * <p>All values indicate a level within a range from 0 to 100%.</p>
+  *
+  * @property {Number} VOLUME The volume setting. 
+  * @property {String} BASS The bass setting.
+diff --git a/plugin/com.qnx.car.audiomixer/www/client.js b/plugin/com.qnx.car.audiomixer/www/client.js
+index da41d78..7d4fec7 100755
+--- a/plugin/com.qnx.car.audiomixer/www/client.js
++++ b/plugin/com.qnx.car.audiomixer/www/client.js
+@@ -18,10 +18,9 @@
+  */
+  
+ /**
+- * @name car.audiomixer
+  * @static
+- *
+- * Controls the audio mixer 
++ * @module car.audiomixer
++ * @description Control the audio mixer.
+  */
+ 
+ var _self = {},
+@@ -35,8 +34,8 @@ _self.AudioMixerSetting = require('./AudioMixerSetting');
+ 
+ 
+ /**
+- * Handles update events for this extension
+- * @param data {Array} The updated data provided by the event 
++ * @description Handle update events for this extension.
++ * @param data {Array} The updated data provided by the event.
+  * @private
+  */
+ function onUpdate(data) {
+@@ -47,13 +46,12 @@ function onUpdate(data) {
+ }
+ 
+ /**
+- * Watch for audio mixer changes
++ * @description Monitor for audio mixer changes.
+  * @param {Function} callback The function to call when a change is detected.
+- * @return {String} An ID for the added watch.
++ * @return {String} The identifier (ID) for the added watch.
+  * @memberOf module:car.audiomixer 
+  * @method watchAudioMixer
+  * @example
+- * 
+  * //define a callback function
+  * function myCallback(audioMixerItems) {
+  *		//iterate through the changed items
+@@ -79,8 +77,8 @@ _self.watchAudioMixer = function (callback) {
+ 
+ 
+ /**	
+- * Stop watching audio mixer changes
+- * @param {Number} watchId The watch ID returned by <i>car.audiomixer.watchAudioMixer()</i>.
++ * @description Stop watching audio mixer changes.
++ * @param {Number} watchId The watch ID returned by <code>car.audiomixer.watchAudioMixer()</code>.
+  * @memberOf module:car.audiomixer
+  * @method cancelWatch
+  * @example
+@@ -98,8 +96,9 @@ _self.cancelWatch = function (watchId) {
+ 
+ 
+ /**
+- * @desc <p>Return the audio mixer settings for a specific zone
+- * <p>If successful, <i>car.audiomixer.get()</i> calls the <i>successCallback</i> function with the <b>car.Zone</b> object for the specific zone.
++ * @description Return the audio mixer settings for a specific zone.
++ * <p>If the call is successful, <code>car.audiomixer.get()</code> calls the <code>successCallback</code>
++ * function with the <code>car.Zone</code> object for the specific zone.</p>
+  * @param {Function} successCallback The function to call with the result on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @param {String} [zone] The zone to filter the results by.
+@@ -107,7 +106,6 @@ _self.cancelWatch = function (watchId) {
+  * @method get
+  * @see car.Zone 
+  * @example 
+- *
+  * //define your callback function(s)
+  * function successCallback(audioMixerItems) {
+  *		//iterate through all the audio mixer items
+@@ -122,7 +120,7 @@ _self.cancelWatch = function (watchId) {
+  *		console.log(error.code, error.msg);
+  * }
+  *
+- * //Optional: provide a car.Zone filter to retrieve values for only that zone.
++ * //Optional: Provide a car.Zone filter to retrieve values for only that zone.
+  * //If omitted, settings for all zones will be returned.
+  * var zone = car.Zone.FRONT;
+  *
+@@ -130,8 +128,7 @@ _self.cancelWatch = function (watchId) {
+  * car.audiomixer.get(successCallback, errorCallback, zone);
+  *
+  *
+- * @example REST - single zone
+- *
++ * @example REST - Single zone.
+  * Request:
+  * http://<car-ip>/car/audiomixer/get?zone=all
+  *
+@@ -144,8 +141,7 @@ _self.cancelWatch = function (watchId) {
+  * }
+  *
+  *
+- * @example REST - multi zone
+- *
++ * @example REST - Multizone.
+  * Request:
+  * http://<car-ip>/car/audiomixer/get
+  *
+@@ -174,12 +170,12 @@ _self.get = function(successCallback, errorCallback, zone) {
+ 
+ 
+ /**
+- * Save an audio mixer setting
+- * @param {String} setting A <b>car.audiomixer.AudioMixerSetting</b> value.  
+- * @param {String} zone A <b>car.Zone</b> value.   
++ * @description Save an audio mixer setting.
++ * @param {String} setting The <code>car.audiomixer.AudioMixerSetting</code> value.  
++ * @param {String} zone A <code>car.Zone</code> value.   
+  * @param {Number} value The value to save.
+- * @param {Function} [successCallback] The function to call on success.
+- * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Function} [successCallback] The function to call when the function call is successful.
++ * @param {Function} [errorCallback] The function to call if there's an error.
+  * @memberOf module:car.audiomixer
+  * @method set
+  * @see car.audiomixer.AudioMixerSetting
+@@ -194,7 +190,6 @@ _self.get = function(successCallback, errorCallback, zone) {
+  *
+  *
+  * @example REST
+- *
+  * Request:
+  * http://<car-ip>/car/audiomixer/set?setting=volume&zone=all&value=50
+  *
+diff --git a/plugin/com.qnx.car.hvac/www/HvacFanDirection.js b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+index 5ad1d78..67ff691 100755
+--- a/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
++++ b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -23,7 +24,7 @@ module.exports = {};
+  * @memberOf module:car.hvac
+  * @name HvacFanDirection
+  *
+- * @description Fan direction enumeration
++ * @description Fan direction enumeration.
+  *
+  * @property DEFROST The fan is set to defrost the front window.
+  * @property DEFROST_AND_FEET The fan is directed to the front window and the feet.
+diff --git a/plugin/com.qnx.car.hvac/www/HvacSetting.js b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+index 8d4777f..9b491e8 100755
+--- a/plugin/com.qnx.car.hvac/www/HvacSetting.js
++++ b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -22,13 +23,12 @@ module.exports = {},
+  * @static
+  * @memberOf module:car.hvac
+  * @name HvacSetting
+- *
+- * @description  HVAC settings enumeration
++ * @description The HVAC settings enumeration.
+  *
+  *
+  * @property {Number}  FAN_SPEED The fan speed (0 to 6; 0 for off).
+  * @property {String}  FAN_DIRECTION The fan direction. Use the values from
+- *					   <b>car.hvac.HvacFanDirection</b>.
++ *					   <code>car.hvac.HvacFanDirection</code>.
+  * @property {Boolean} AIR_CONDITIONING The air conditioning (true for on).
+  * @property {Boolean} AIR_RECIRCULATION The air recirculation (true for on).
+  * @property {Boolean} ZONE_LINK Zone Link. When on, both left and right zones are controlled by
+diff --git a/plugin/com.qnx.car.hvac/www/client.js b/plugin/com.qnx.car.hvac/www/client.js
+index b83c1c5..794067c 100755
+--- a/plugin/com.qnx.car.hvac/www/client.js
++++ b/plugin/com.qnx.car.hvac/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,8 +21,7 @@
+ /**
+  * @module car.hvac
+  * @static
+- *
+- * @description Controls the HVAC system 
++ * @description Control the HVAC system.
+  */
+ 
+ var _self = {},
+@@ -37,7 +37,7 @@ _self.HvacSetting = require('./HvacSetting');
+ _self.HvacFanDirection = require('./HvacFanDirection');
+ 
+ /**
+- * Handles update events for this extension
++ * @description Handle update events for this plugin.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -49,7 +49,7 @@ function onUpdate(data) {
+ }
+ 
+ /**
+- * Watch for HVAC changes
++ * @description Watch for HVAC changes.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {String} An ID for the added watch.
+  * @memberOf module:car.hvac
+@@ -80,8 +80,8 @@ _self.watchHvac = function (callback) {
+ }
+ 
+ /**
+- * Stop watching HVAC items
+- * @param {String} watchId The watch ID returned by <i>car.hvac.watchHvac()</i>.
++ * @description Stop watching HVAC items.
++ * @param {String} watchId The watch ID returned by <code>car.hvac.watchHvac()</code>.
+  * @memberOf module:car.hvac
+  * @method cancelWatch
+  * @example
+@@ -99,13 +99,13 @@ _self.cancelWatch = function (watchId) {
+ 
+ 
+ /**
+- * @desc <p>Return HVAC settings for the specified filter
+- * <p>If successful, <i>car.hvac.get()</i> calls the <i>successCallback</i> function with an array of setting objects
+- * containing the setting (<b>car.hvac.HvacSetting</b>), the zone (<b>car.Zone</b>), and the value (number/string/boolean).
++ *@description Return HVAC settings for the specified filter.
++ * <p>If successful, <code>car.hvac.get()</code> calls the <code>successCallback</code> function with an array of setting objects
++ * containing the setting (<code>car.hvac.HvacSetting</code>), the zone (<code>car.Zone</code>), and the value (number/string/boolean).
+  * @param {Function} successCallback The function to call with the result.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+- * @param {Array} [settings] An array of <b>car.hvac.HvacSetting</b> values to whitelist.
+- * @param {Array} [zones] An array of <b>car.Zone</b> values to whitelist. 
++ * @param {Array} [settings] An array of <code>car.hvac.HvacSetting</code> values to whitelist.
++ * @param {Array} [zones] An array of <code>car.Zone</code> values to whitelist. 
+  * @memberOf module:car.hvac
+  * @method get
+  * @see car.hvac.HvacSetting  
+@@ -192,9 +192,9 @@ _self.get = function(successCallback, errorCallback, settings, zones) {
+ };
+ 
+ /**
+- * Save an HVAC setting
+- * @param {String} setting A <b>car.hvac.HvacSetting</b> value.
+- * @param {String} zone A <b>car.Zone</b> value.
++ * @description Save an HVAC setting.
++ * @param {String} setting A <code>car.hvac.HvacSetting</code> value.
++ * @param {String} zone A <code>car.Zone</code> value.
+  * @param {Mixed} value The value to save.
+  * @param {Function} [successCallback] The function to call with the result.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+diff --git a/plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js b/plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js
+index 899753b..ae51d29 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js
++++ b/plugin/com.qnx.car.mediaplayer/www/MediaNodeType.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -22,7 +23,7 @@ module.exports = {};
+  * @memberOf module:car.mediaplayer
+  * @name MediaNodeType
+  *
+- * @description  Media node type enumeration
++ * @description The media node type enumeration.
+  *
+  *  @property UNKNOWN The media type is unknown.
+  *  @property FOLDER The media type is folder.
+diff --git a/plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js b/plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js
+index a19ba0e..4995526 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js
++++ b/plugin/com.qnx.car.mediaplayer/www/MediaSourceEvent.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -23,11 +24,11 @@ module.exports = {};
+  * @memberOf module:car.mediaplayer
+  * @name MediaSourceEvent
+  *
+- * @description  Media source event enumeration
++ * @description The media source event enumeration.
+  *
+- * @property ADDED The media source is added.
+- * @property REMOVED The media source is removed.
+- * @property UPDATED The media source is updated.
++ * @property ADDED The media source was added.
++ * @property REMOVED The media source was removed.
++ * @property UPDATED The media source was updated.
+  */ 
+ Object.defineProperties(module.exports,
+ {
+diff --git a/plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js b/plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js
+index 3422474..86f1cdb 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js
++++ b/plugin/com.qnx.car.mediaplayer/www/MediaSourceType.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -23,7 +24,7 @@ module.exports = {};
+  * @memberOf module:car.mediaplayer
+  * @name MediaSourceType
+  *
+- * @description  Media source type enumeration
++ * @description The media source type enumeration.
+  *
+  * @property HDD The media source is HDD.
+  * @property USB The media source is USB.
+diff --git a/plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js b/plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js
+index 5f29a8c..f3d250e 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js
++++ b/plugin/com.qnx.car.mediaplayer/www/PlayerStatus.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -24,7 +25,7 @@ module.exports = {};
+  * @memberOf module:car.mediaplayer
+  * @name PlayerStatus
+  *
+- * @description  Media player status enumeration
++ * @description The media player status enumeration.
+  *
+  * @property DESTROYED The media player instance was destroyed.
+  * @property IDLE The media player is idle.
+diff --git a/plugin/com.qnx.car.mediaplayer/www/RepeatMode.js b/plugin/com.qnx.car.mediaplayer/www/RepeatMode.js
+index 843791e..4c060e8 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/RepeatMode.js
++++ b/plugin/com.qnx.car.mediaplayer/www/RepeatMode.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+diff --git a/plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js b/plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js
+index 8a1f0f5..2f25f1e 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js
++++ b/plugin/com.qnx.car.mediaplayer/www/ShuffleMode.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -23,7 +24,7 @@ module.exports = {};
+  * @memberOf module:car.mediaplayer
+  * @name ShuffleMode
+  *
+- * @description  Shuffle mode enumeration
++ * @description The shuffle mode enumeration.
+  *
+  * @property SHUFFLE_OFF Shuffle mode is off.
+  * @property SHUFFLE_ON Shuffle mode is on.
+diff --git a/plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js b/plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js
+index 745c65c..3f80ab2 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js
++++ b/plugin/com.qnx.car.mediaplayer/www/TrackSessionEvent.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -23,11 +24,13 @@ module.exports = {};
+  * @memberOf module:car.mediaplayer
+  * @name TrackSessionEvent
+  *
+- * @description  Tracksession event enumeration
++ * @description  The track session event enumeration. A track session
++ *               represents the session information for a media track and is
++ *               identified by a <code>trackSessionId</code>.
+  *
+- * @property CREATED The tracksession is created.
+- * @property DESTROYED The tracksession is destroyed.
+- * @property APPENDED The tracksession is appended. 
++ * @property CREATED The track session is created.
++ * @property DESTROYED The track session is destroyed.
++ * @property APPENDED The track session is appended. 
+  */  
+ Object.defineProperties(module.exports,
+ {
+diff --git a/plugin/com.qnx.car.mediaplayer/www/client.js b/plugin/com.qnx.car.mediaplayer/www/client.js
+index b47d98f..24cd19a 100755
+--- a/plugin/com.qnx.car.mediaplayer/www/client.js
++++ b/plugin/com.qnx.car.mediaplayer/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -19,7 +20,7 @@
+ 
+ /**
+  * @module car.mediaplayer
+- * @description Provides media playback, browse, and search
++ * @description Provide capabilities to play, browse, and search media.
+  */
+ 
+ var _ID = "com.qnx.car.mediaplayer",
+@@ -39,7 +40,7 @@ var _ID = "com.qnx.car.mediaplayer",
+ 	_watchesTrack = {};
+ 
+ /**
+- * Handles media source events
++ * @description Handle media source events.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -51,7 +52,7 @@ function onMediaSourceChange(data) {
+ }
+ 
+ /**
+- * Handles track session events
++ *  @description Handle track session events.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -63,7 +64,7 @@ function onTrachSessionChange(data) {
+ }
+ 
+ /**
+- * Handles player state events
++ *  @description Handle player state events.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -75,7 +76,7 @@ function onPlayerStateChange(data) {
+ }
+ 
+ /**
+- * Handles track position events
++ *  @description Handle track position events.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -87,7 +88,7 @@ function onTrackPositionChange(data) {
+ }
+ 
+ /**
+- * Handles track events
++ *  @description Handle track events.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -100,18 +101,18 @@ function onTrackChange(data) {
+ 
+ 
+ /**
+- * @description <p>The <b>car.mediaplayer</b> MediaPlayer instance constructor
+- * <p>Open the specified player and return an instance of the MediaPlayer object,
++ * @description The <code>car.mediaplayer</code> <code>Mediaplayer</code> instance constructor.
++ * <p>Open the specified player and return an instance of the <code>Mediaplayer</code> object,
+  * which is used to perform actions on the media player and to receive update events
+  * through watchers.
+  * @name MediaPlayer
+  * @param {String} playerName The name of the player to open. If the player does not exist, it is automatically created.
+- * @returns {MediaPlayer} The <b>car.mediaplayer.MediaPlayer</b> instance.
++ * @returns {MediaPlayer} The <code>car.mediaplayer.MediaPlayer</code> instance.
+  * @memberOf module:car.mediaplayer
+  * @constructor
+  * @example
+  *
+- * // Instantiate a media player object, specifying the player name
++ * // Instantiate a Mediaplayer object, specifying the player name
+  * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
+  *
+  *
+@@ -135,15 +136,15 @@ function onTrackChange(data) {
+  */
+ var MediaPlayer = function(playerName) {
+ 	/**
+-	 * Reference to this object instance.
++	 * @description A reference to this object's instance.
+ 	 * @private
+ 	 */
+ 	var self = this;
+ 	
+ 	/**
+-	 * Opens the specified player name.
++	 * @description Open the specified player name.
+ 	 * @param {String} name The player name to open. If the player does not exist it will automatically be created.
+-	 * @returns {Boolean} True if the player was opened successfully, False if not.
++	 * @returns {Boolean} A value of <code>true</code> if the media player was successfully opened, otherwise <code>false</code>.
+ 	 * @private
+ 	 */
+ 	var open = function(playerName) {
+@@ -168,9 +169,9 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Closes the specified player name.
++	 * @description Close the specified player name.
+ 	 * @param {String} name The player name to close.
+-	 * @returns {Boolean} True if the player was closed successfully, False if not.
++	 * @returns {Boolean} A value of <code>true</code> when the media player was closed successfully, otherwise <code>false</code>.
+ 	 * @private
+ 	 */
+ 	var close = function(playerName) {
+@@ -194,8 +195,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 
+ 	/**
+-	 * Return the list of available media sources connected to the device
+-	 *
++	 * @description Return the list of available media sources connected to the device.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+@@ -299,7 +299,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Browse a media source for media
++	 * @description Browse a media source for media.
+ 	 * @param {Number} mediaSourceId The ID of the media source to be retrieved.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+@@ -402,7 +402,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Search for media in a specific media source
++	 * @description Search for media in a specific media source.
+ 	 * @param {Number} mediaSourceId The ID of the media source.
+ 	 * @param {String} searchTerm The term to search for.
+ 	 * @param {Function} success The function to call on success.
+@@ -486,14 +486,14 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Create a new tracksession
++	 * @description Create a new track session.
+ 	 * @param {Number} mediaSourceId The ID of the media source.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+-	 * @param {?String} [mediaNodeId=null] The media node ID on which to base the tracksession.
+-	 * @param {Number} [index=0] The index of the item within the tracksession to set as current after creating
+-	 * the tracksession.
+-	 * @param {Number} [limit=-1] The maximum number of media nodes to add to the tracksession. A limit of -1
++	 * @param {?String} [mediaNodeId=null] The media node ID on which to base the track session.
++	 * @param {Number} [index=0] The index of the item within the track session to set as current after creating
++	 * the track session.
++	 * @param {Number} [limit=-1] The maximum number of media nodes to add to the track session. A limit of -1
+ 	 * indicates no limit.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method createTrackSession	 
+@@ -503,7 +503,7 @@ var MediaPlayer = function(playerName) {
+ 	 * function successCallback(result) {
+ 	 * 	console.log("tracksession id = " + result.trackSessionId + "\n");
+ 	 * 	
+-	 * 	// Play the new tracksession
++	 * 	// Play the new track session
+ 	 * 	mediaPlayer.play();
+ 	 * }
+ 	 * 
+@@ -514,7 +514,7 @@ var MediaPlayer = function(playerName) {
+ 	 * // Instantiate a media player object, specifying the player name
+ 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
+ 	 * 
+-	 * // Create a tracksession from a folder node ID, setting the third track as first to play
++	 * // Create a track session from a folder node ID, setting the third track as first to play
+ 	 * mediaPlayer.createTrackSession(0, successCallback, errorCallback, '/songs-7', 2);
+ 	 *
+ 	 *
+@@ -550,8 +550,8 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Destroy an existing tracksession
+-	 * @param {Number} trackSessionId The ID of the tracksession to destroy.
++	 * @description Destroy an existing track session.
++	 * @param {Number} trackSessionId The ID of the track session to destroy.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method destroyTrackSession	 
+ 	 * @example
+@@ -559,7 +559,7 @@ var MediaPlayer = function(playerName) {
+ 	 * // Instantiate a media player object, specifying the player name
+ 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
+ 	 * 
+-	 * // Destroy the tracksession by its ID
++	 * // Destroy the track session by its ID
+ 	 * mediaPlayer.destroyTrackSession(10);
+ 	 *
+ 	 *
+@@ -587,7 +587,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Retrieve the current tracksession information
++	 * @description Retrieve the current track session information.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+@@ -607,7 +607,7 @@ var MediaPlayer = function(playerName) {
+ 	 * // Instantiate a media player object, specifying the player name
+ 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
+ 	 * 
+-	 * // Get the current tracksession info
++	 * // Get the current track session information
+ 	 * mediaPlayer.getTrackSessionInfo(successCallback, errorCallback);
+ 	 *
+ 	 *
+@@ -638,7 +638,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Retrieve media from the current tracksession
++	 * @description Retrieve media from the current track session.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+ 	 * @param {Number} [limit=-1] The maximum number of records to retrieve. If omitted or negative,
+@@ -667,7 +667,7 @@ var MediaPlayer = function(playerName) {
+ 	 * // Instantiate a media player object, specifying the player name
+ 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
+ 	 * 
+-	 * // Get the third through fifth tracksession items
++	 * // Get the third through fifth track session items
+ 	 * mediaPlayer.getTrackSessionItems(successCallback, errorCallback, 3, 2);
+ 	 *
+ 	 *
+@@ -721,7 +721,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 
+ 	/**
+-	 * Retrieve information for the currently playing track 
++	 * @description Retrieve information for the currently playing track.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer	 
+@@ -811,7 +811,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Retrieve the current playback position, in milliseconds, of the current track.
++	 * @description Retrieve the current playback position(in milliseconds) of the current track.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+ 	 * @memberOf module:car.mediaplayer.Mediaplayer	 
+@@ -859,7 +859,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 
+ 	/**
+-	 * Retrieve metadata for the specified media
++	 * @description Retrieve metadata for the specified media.
+ 	 * @param {Number} mediaSourceId The ID of the node's media source.
+ 	 * @param {String} mediaNodeId The ID of the media node to retrieve metadata for.
+ 	 * @param {Function} success The function to call on success.
+@@ -931,7 +931,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Retrieve extended metadata properties for the specified media.
++	 * @description Retrieve extended metadata properties for the specified media.
+ 	 * @param {Number} mediaSourceId The ID of the node's media source.
+ 	 * @param {String} mediaNodeId The ID of the media node to retrieve metadata for.
+ 	 * @param {String[]} properties An array of extended metadata property names to retrieve.
+@@ -989,7 +989,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 
+ 	/**
+-	 * Return the state of the media player
++	 * @description Return the state of the media player.
+ 	 * @param {Function} success The function to call on success.
+ 	 * @param {Function} [error] The function to call on error.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer	 
+@@ -1043,7 +1043,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Start or resume playback of the current tracksession
++	 * @description Start or resume playback of the current track session.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method play	 
+ 	 * @example
+@@ -1078,7 +1078,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Pause playback
++	 * @description Pause playback.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method pause	 
+ 	 * @example
+@@ -1113,7 +1113,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 
+ 	/**
+-	 * Stop playback
++	 * @description Stop playback.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method stop	 
+ 	 * @example
+@@ -1148,7 +1148,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Skip to the next track in the active tracksession
++	 * @@description Skip to the next track in the active track session.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method next	 
+ 	 * @example
+@@ -1183,7 +1183,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Skip to the previous track in the active tracksession
++	 * @description Skip to the previous track in the active track session.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method previous	 
+ 	 * @example
+@@ -1218,8 +1218,8 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Jump to the specified index in the current tracksession
+-	 * @param {Number} index The index of the track within the current tracksession.
++	 * @description Jump to the specified index in the current track session.
++	 * @param {Number} index The index of the track within the current track session.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method jump
+ 	 * @example
+@@ -1227,7 +1227,7 @@ var MediaPlayer = function(playerName) {
+ 	 * // Instantiate a media player object, specifying the player name
+ 	 * var mediaPlayer = new car.mediaplayer.MediaPlayer('playerName');
+ 	 * 
+-	 * // Jump to another track in the active tracksession
++	 * // Jump to another track in the active track session
+ 	 * mediaPlayer.jump(4);
+ 	 *
+ 	 *
+@@ -1254,7 +1254,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Seek to a specific position in the current track
++	 * @description Seek to a specific position in the current track.
+ 	 * @param {Number} position The track position (in ms).
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method seek
+@@ -1290,7 +1290,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Set the playback rate of the media player
++	 * @description Set the playback rate of the media player.
+ 	 * @param {Number} playbackRate The playback rate. A rate of 1.0 is regular play speed. Negative numbers result in
+ 	 * reverse playback.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+@@ -1327,8 +1327,8 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Set the shuffle mode for the active tracksession.
+-	 * @param {MediaPlayer.ShuffleMode} shuffleMode The shuffle mode. Use values from the <b>MediaPlayer.ShuffleMode</b> enumeration.
++	 * @description Set the shuffle mode for the active track session.
++	 * @param {MediaPlayer.ShuffleMode} shuffleMode The shuffle mode. Use values from the <code>MediaPlayer.ShuffleMode</code> enumeration.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method shuffle
+ 	 * @example
+@@ -1363,8 +1363,8 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Set the repeat mode for the active tracksession
+-	 * @param {MediaPlayer.RepeatMode} repeatMode The repeat mode. Use values from the <b>MediaPlayer.RepeatMode</b> enumeration.
++	 * @description Set the repeat mode for the active track session.
++	 * @param {MediaPlayer.RepeatMode} repeatMode The repeat mode. Use values from the <code>MediaPlayer.RepeatMode</code> enumeration.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method repeat
+ 	 * @example
+@@ -1399,7 +1399,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 
+ 	/**
+-	 * Watch for changes to media sources
++	 * @description Watch for changes to media sources.
+ 	 * @param {Function} callback The function to call when a change is detected.
+ 	 * @return {Number} The watch ID.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+@@ -1429,7 +1429,7 @@ var MediaPlayer = function(playerName) {
+ 	
+ 
+ 	/**
+-	 * Watch for changes to tracksessions
++	 * @description Watch for changes to track sessions.
+ 	 * @param {Function} callback The function to call when a change is detected.
+ 	 * @return {Number} The watch ID.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+@@ -1458,7 +1458,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Watch for changes to the media player state
++	 * @description Watch for changes to the media player state.
+ 	 * @param {Function} callback The function to call when a change is detected.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method watchPlayerState
+@@ -1487,7 +1487,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Watch for changes to the current track
++	 * @description Watch for changes to the current track.
+ 	 * @param {Function} callback The function to call when a change is detected.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method watchTrack
+@@ -1516,7 +1516,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Watch for changes to the current track's position
++	 * @description Watch for changes to the current track's position.
+ 	 * @param {Function} callback The function to call when a change is detected.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method watchTrackPosition
+@@ -1545,7 +1545,7 @@ var MediaPlayer = function(playerName) {
+ 	};
+ 	
+ 	/**
+-	 * Remove a watch
++	 * @description Remove a watch.
+ 	 * @param {Number} watchId The watch ID.
+ 	 * @memberOf module:car.mediaplayer.MediaPlayer
+ 	 * @method cancelWatch
+diff --git a/plugin/com.qnx.car.navigation/www/client.js b/plugin/com.qnx.car.navigation/www/client.js
+index 572daa2..288b7c3 100755
+--- a/plugin/com.qnx.car.navigation/www/client.js
++++ b/plugin/com.qnx.car.navigation/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,8 +21,7 @@
+  /**
+  * @module car.navigation 
+  * @static
+- *
+- * @description Provides GPS navigation control
++ * @description Provide GPS navigation control.
+  */
+ 
+ var _self = {},
+@@ -30,8 +30,8 @@ var _self = {},
+ 	_watches = {};
+ 
+ /**
+- * Handles update events for this extension
+- * @param data {Array} The updated data provided by the event 
++ * @description Handle update events for this extension.
++ * @param data {Array} The updated data provided by the event.
+  * @private
+  */
+ function onUpdate(data) {
+@@ -42,7 +42,7 @@ function onUpdate(data) {
+ }
+ 
+ /**
+- * Watch for navigation updates
++ * @description Watch for navigation updates.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {String} An ID for the added watch.
+  * @memberOf module:car.navigation
+@@ -67,8 +67,8 @@ _self.watchNavigation = function (callback) {
+ }
+ 
+ /**
+- * Stop watching for navigation updates
+- * @param {String} watchId The watch ID returned by <i>car.navigation.watchNavigation()</i>.
++ * @description Stop watching for navigation updates.
++ * @param {String} watchId The watch ID returned by <code>car.navigation.watchNavigation()</code>.
+  * @memberOf module:car.navigation
+  * @method cancelWatch 
+  * @example
+@@ -85,7 +85,7 @@ _self.cancelWatch = function (watchId) {
+ }
+ 
+ /**
+- * Get the current user's preferred locations
++ * @description Get the current user's preferred locations.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -168,7 +168,7 @@ _self.getFavourites = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Add a location to the current user's preferred locations
++ * @description Add a location to the current user's preferred locations.
+  * @param {Object} location The location to add.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -214,8 +214,8 @@ _self.addFavourite = function(location, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Remove a location from the current user's preferred locations
+- * @param {Number} favouriteId The ID to remove as returned by <i>car.navigation.getFavourites()</i>.
++ * @description Remove a location from the current user's preferred locations.
++ * @param {Number} favouriteId The ID to remove as returned by <code>car.navigation.getFavourites()</code>.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -260,7 +260,7 @@ _self.removeFavourite = function(favouriteId, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Get the current user's navigation history
++ * @description Get the current user's navigation history.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -343,7 +343,7 @@ _self.getHistory = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Clear the current user's navigation history
++ * @description Clear the current user's navigation history.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -385,7 +385,7 @@ _self.clearHistory = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Browse the Point of Interest (POI) database near a location
++ * @description Browse the Point of Interest (POI) database near a location.
+  * @param {Number} [categoryId] A category ID to browse; defaults to 0 for root category
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -476,7 +476,7 @@ _self.browsePOI = function(categoryId, successCallback, errorCallback, location)
+ };
+ 
+ /**
+- * Search the Point of Interest (POI) database near a location
++ * @description Search the Point of Interest (POI) database near a location.
+  * @param {String} name The name of the location.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -567,10 +567,10 @@ _self.searchPOI = function(name, successCallback, errorCallback, location) {
+ };
+ 
+ /**
+- * Show a set of locations on a map
++ * @description Show a set of locations on a map.
+  * @param {Array} locations An array of locations to show on the map as returned by
+- * <i>car.navigation.browsePOI()</i>, <i>car.navigation.search()</i>,
+- * <i>car.navigation.getFavourites()</i>, or <i>car.navigation.getHistory()</i>.
++ * <code>car.navigation.browsePOI()</code>, <code>car.navigation.search()</code>,
++ * <code>car.navigation.getFavourites()</code>, or <code>car.navigation.getHistory()</code>.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -623,7 +623,7 @@ _self.showOnMap = function(locations, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Zoom the current map
++ * @description Zoom the current map.
+  * @param {Number} scale The zoom scale, relative to the current view.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -679,7 +679,7 @@ _self.zoomMap = function(scale, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Pan the current map
++ * @description Pan the current map.
+  * @param {Number} deltaX The number of pixels to move the map on the X axis.
+  * @param {Number} deltaY The number of pixels to move the map on the Y axis.
+  * @param {Function} [successCallback] The function to call on success.
+@@ -728,7 +728,7 @@ _self.panMap = function(deltaX, deltaY, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Find a location based on a partial address
++ * @description Find a location based on a partial address.
+  * @param {Object} location The location to search for.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -807,7 +807,7 @@ _self.searchAddress = function(location, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Navigate to a specific location
++ * @description Navigate to a specific location.
+  * @param {Object} location The location to navigate to.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -860,7 +860,7 @@ _self.navigateTo = function(location, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Cancel the navigation if it is in progress
++ * @description Cancel the navigation if it is in progress.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -905,7 +905,7 @@ _self.cancelNavigation = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Get the current navigation route
++ * @description Get the current navigation route.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+@@ -972,7 +972,7 @@ _self.getRoute = function (successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Get details about the current status of the navigation engine
++ * @description Get details about the current status of the navigation engine.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.navigation
+diff --git a/plugin/com.qnx.car.profile/www/client.js b/plugin/com.qnx.car.profile/www/client.js
+index 78ee066..bf884b8 100755
+--- a/plugin/com.qnx.car.profile/www/client.js
++++ b/plugin/com.qnx.car.profile/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,8 +21,7 @@
+ /**
+  * @module car.profile
+  * @static
+- *
+- * @description Manages the system user information
++ * @description Manage the system's user information.
+  */
+ 
+ var _self = {},
+@@ -31,7 +31,7 @@ var _self = {},
+ 
+ 
+ /**
+- * Handles update events for this extension
++ * @description Handle update events for this extension.
+  * @param data {Array} The updated data provided by the event 
+  * @private
+  */
+@@ -43,7 +43,7 @@ function onUpdate(data) {
+ }
+ 
+ /**
+- * Watch for profile changes
++ * @description Watch for profile changes.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {String} An ID for the added watch.
+  * @memberOf module:car.profile
+@@ -74,8 +74,8 @@ _self.watchProfile = function (callback) {
+ }
+ 
+ /**
+- * Stop watching profile changes
+- * @param {String} watchId The watch ID returned by <i>car.profile.watchProfile()</i>.
++ * @description Stop watching profile changes.
++ * @param {String} watchId The watch ID returned by <code>car.profile.watchProfile()</code>.
+  * @memberOf module:car.profile
+  * @method cancelWatch 
+  * @example
+@@ -92,7 +92,7 @@ _self.cancelWatch = function (watchId) {
+ }
+ 
+ /**
+- * Retrieve the current profile information
++ * @description Retrieve the current profile information.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.profile
+@@ -146,7 +146,7 @@ _self.getActive = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Change the active profile
++ * @description Change the active profile.
+  * @param {Number} profileId The ID of the profile to make active.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -183,7 +183,7 @@ _self.setActive = function(profileId, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Return a list of available profiles
++ * @description Return the list of available profiles.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.profile
+@@ -250,7 +250,7 @@ _self.getList = function(successCallback, errorCallback) {
+ 
+ 
+ /**
+- * Create a new profile
++ * @description Create a new profile.
+  * @param {String} name The name of the profile.
+  * @param {String} [avatar] The avatar for the profile.
+  * @param {String} [theme] The preferred theme for the profile.
+@@ -314,7 +314,7 @@ _self.addProfile = function(name, avatar, theme, bluetoothDeviceId, successCallb
+ 
+ 
+ /**
+- * Update an existing profile
++ * @description Update an existing profile.
+  * @param {Number} profileId The ID of the profile.
+  * @param {String} [name] The name of the profile.
+  * @param {String} [avatar] The avatar for the profile.
+@@ -376,7 +376,7 @@ _self.updateProfile = function(profileId, name, avatar, theme, bluetoothDeviceId
+ };
+ 
+ /**
+- * Delete an existing profile
++ * @description Delete an existing profile.
+  * @param {Number} profileId The ID of the profile.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -419,7 +419,7 @@ _self.deleteProfile = function(profileId, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Retrieve settings for the current profile
++ * @description Retrieve settings for the current profile.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @param {Array} [settings] A list of settings to whitelist.
+@@ -476,7 +476,7 @@ _self.getSettings = function(successCallback, errorCallback, settings) {
+ };
+ 
+ /**
+- * Set the value of a setting for the current profile
++ * @description Set the value of a setting for the current profile.
+  * @param {String} key The key of the setting.
+  * @param {Mixed} value The value of the setting.
+  * @param {Function} [successCallback] The function to call on success.
+diff --git a/plugin/com.qnx.car.radio/www/client.js b/plugin/com.qnx.car.radio/www/client.js
+index f48fe30..c884478 100755
+--- a/plugin/com.qnx.car.radio/www/client.js
++++ b/plugin/com.qnx.car.radio/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,8 +21,7 @@
+ /**
+  * @module car.radio
+  * @static
+- *
+- * @description Manages the radio interface
++ * @description Manage the radio interface.
+  */
+ 
+ var _ID = "com.qnx.car.radio",
+@@ -31,8 +31,8 @@ var _ID = "com.qnx.car.radio",
+ 	_watchesPresets = {};
+ 
+ /**
+- * Handles radio update events
+- * @param data {Array} The updated data provided by the event 
++ * @description Handle radio update events.
++ * @param data {Array} The updated data provided by the event.
+  * @private
+  */
+ function onUpdateRadio(data) {
+@@ -43,8 +43,8 @@ function onUpdateRadio(data) {
+ }
+ 
+ /**
+- * Handles preset update events 
+- * @param data {Array} The updated data provided by the event 
++ * @description Handle preset update events.
++ * @param data {Array} The updated data provided by the event.
+  * @private
+  */
+ function onUpdatePresets(data) {
+@@ -55,7 +55,7 @@ function onUpdatePresets(data) {
+ }
+ 
+ /**
+- * Watch for metadata updates
++ * @description Watch for metadata updates.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {Number} An ID for the added watch.
+  * @memberOf module:car.radio
+@@ -88,7 +88,7 @@ _self.watchRadio = function (callback) {
+ };
+ 
+ /**
+- * Watch for preset updates
++ * @description Watch for preset updates.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {Number} An ID for the added watch.
+  * @memberOf module:car.radio
+@@ -120,8 +120,8 @@ _self.watchPresets = function (callback) {
+ };
+ 
+ /**
+- * Stop watching for metadata updates
+- * @param {Number} watchId The watch ID as returned by <i>car.radio.watchRadio()</i> or <i>car.radio.watchPresets()</i>.
++ * @description Stop watching for metadata updates.
++ * @param {Number} watchId The watch ID as returned by <code>car.radio.watchRadio()</code> or <code>car.radio.watchPresets()</code>.
+  * @memberOf module:car.radio
+  * @method cancelWatch   
+  * @example
+@@ -144,7 +144,7 @@ _self.cancelWatch = function (watchId) {
+ };
+ 
+ /**
+- * Return the list of available tuners
++ * @description Return the list of available tuners.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.radio
+@@ -213,7 +213,7 @@ _self.getTuners = function(successCallback, errorCallback) {
+ };
+ 		
+ /**
+- * Set the active tuner by name
++ * @description Set the active tuner by name.
+  * @param {String} tuner The name of tuner to set as active.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -259,9 +259,9 @@ _self.setTuner = function(tuner, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * @description <p>Tune to a specific station, optionally targeting a specific tuner
+- * <p>If the specified tuner is not the active tuner, then the station will be 
+- * automatically selected the next time that tuner is set as active.
++ * @description Tune to a specific station, optionally, targeting a specific tuner.
++ * <p>If the specified tuner is not the active tuner, then the station is
++ * automatically selected the next time that tuner is set as active. </p>
+  * @param {Number} station The target station.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -311,9 +311,9 @@ _self.setStation = function(station, successCallback, errorCallback, tuner) {
+ };
+ 
+ /**
+- * @description <p>Get the presets for the current tuner
++ * @description Get the presets for the current tuner.
+  * <p>Optionally, a tuner name can be specified, returning
+- * presets for the specified tuner.
++ * presets for the specified tuner. </p>
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @param {String} [tuner] The tuner of the presets. If not specified, the active tuner is used.
+@@ -382,8 +382,8 @@ _self.getPresets = function(successCallback, errorCallback, tuner) {
+ };
+ 
+ /**
+- * @description <p>Set the current station as a preset at the specified index
+- * <p>You can optionally specify a different station and tuner as a preset. 
++ * @description Set the current station as a preset at the specified index
++ * <p>Optionally, you can specify a different station and tuner as a preset. </p>
+  * @param {Number} index The preset index.
+  * @param {String} group The preset group.
+  * @param {Number} [station] The station to set as the preset. If this is not specified, the current station is used.
+@@ -439,7 +439,7 @@ _self.setPreset = function(index, group, station, tuner, successCallback, errorC
+ };
+ 
+ /**
+- * Seek for the next radio station in the specified direction
++ * @description Seek for the next radio station in the specified direction.
+  * @param {String} direction The direction to seek ('up' or 'down').
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -485,7 +485,7 @@ _self.seek = function(direction, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Scan for available radio stations in the specified direction
++ * @description Scan for available radio stations in the specified direction.
+  * @param {String} direction The direction to seek ('up' or 'down').
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+@@ -531,7 +531,7 @@ _self.scan = function(direction, successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Stop station scanning if in progress
++ * @description Stop station scanning if in progress.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.radio
+@@ -573,7 +573,7 @@ _self.scanStop = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Get the current station metadata
++ * @description Get the metadata of the current station.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.radio
+diff --git a/plugin/com.qnx.car.sensors/www/Sensor.js b/plugin/com.qnx.car.sensors/www/Sensor.js
+index c179a79..28b12ec 100755
+--- a/plugin/com.qnx.car.sensors/www/Sensor.js
++++ b/plugin/com.qnx.car.sensors/www/Sensor.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -19,13 +20,14 @@
+ 
+ module.exports = {};
+ /**
++ * @name Sensor
+  * @static
+  * @memberOf module:car.sensors
+- * @name Sensor
+  *
+- * @description <p>Sensor type enumeration.
+- * <p>NOTE: This is provided as an example only. This API is intended to be a custom
+- * implementation for each system to access its specific sensor data.
++ *
++ * @description A sensor type enumeration.
++ * <p><b>Note</b>: This is provided as an example only. This API is intended to be a custom
++ * implementation for each system to access its specific sensor data. </p>
+  *
+  *
+  *  @property {Number}  FUEL_LEVEL Fuel level (0 to 100%).
+diff --git a/plugin/com.qnx.car.sensors/www/client.js b/plugin/com.qnx.car.sensors/www/client.js
+index c6aec0e..17c2db0 100755
+--- a/plugin/com.qnx.car.sensors/www/client.js
++++ b/plugin/com.qnx.car.sensors/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,7 +21,6 @@
+ /**
+  * @module car.sensors
+  * @static
+- *
+  * @description Provides access to custom automotive sensors.
+  */
+ 
+@@ -35,8 +35,8 @@ _self.Sensor = require('./Sensor');
+ 
+ 
+ /**
+- * Handles update events for this extension
+- * @param data {Array} The updated data provided by the event 
++ * @description Handles update events for this plugin.
++ * @param data {Array} The updated data provided by the event.
+  * @private
+  */
+ function onUpdate(data) {
+@@ -48,7 +48,7 @@ function onUpdate(data) {
+ 
+ 
+ /**
+- * Watch for sensor changes
++ * @description Watch for sensor changes.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {String} An ID for the added watch.
+  * @memberOf module:car.sensors
+@@ -79,8 +79,8 @@ _self.watchSensors = function (callback) {
+ 
+ 
+ /**
+- * Stop watching sensor changes
+- * @param {Number} watchId The watch ID as returned by <i>car.sensors.watchSensors()</i>.
++ * @description Stop watching sensor changes.
++ * @param {Number} watchId The watch ID as returned by <code>car.sensors.watchSensors()</code>.
+  * @memberOf module:car.sensors
+  * @method cancelWatch 
+  * @example
+@@ -97,12 +97,12 @@ _self.cancelWatch = function (watchId) {
+ }
+ 
+ /**
+- * @description <p>Return the current vehicle sensors
+- * <p>If successful, the <i>successCallback</i> method is called with an object describing
+- * the available sensors, their location (if applicable), and their values.
++ * @description Return the sensors of the current vehicle.
++ * <p>If successful, the <code>successCallback</code> method is called with an object describing
++ * the available sensors, its location (if applicable), and its values.
+  * @param {Function} successCallback The function to call with the result on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+- * @param {Array} [sensors] A list of <b>car.sensor.Sensor</b> values to whitelist.
++ * @param {Array} [sensors] A list of <code>car.sensor.Sensor</code> values to whitelist.
+  * @memberOf module:car.sensors
+  * @method get 
+  * @example 
+diff --git a/plugin/com.qnx.car.theme/www/client.js b/plugin/com.qnx.car.theme/www/client.js
+index c039ca8..c97df63 100755
+--- a/plugin/com.qnx.car.theme/www/client.js
++++ b/plugin/com.qnx.car.theme/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,8 +21,7 @@
+ /**
+  * @module car.theme
+  * @static
+- *
+- * @description Provides access to HMI theming 
++ * @description Provide access to HMI theming.
+  */
+ 
+ var _self = {},
+@@ -31,7 +31,7 @@ var _self = {},
+ 
+ 
+ /**
+- * Load a theme and inject the stylesheet into the DOM
++ * @description Load a theme and inject the stylesheet into the DOM.
+  * @param {Object} theme The theme to load.
+  * @private
+  */
+@@ -55,8 +55,8 @@ function loadTheme(theme) {
+  }
+ 
+ /**
+- * Handles update events for this extension
+- * @param data {Array} The updated data provided by the event 
++ * @description Handles update events for this extension.
++ * @param data {Array} The updated data provided by the event.
+  * @private
+  */
+ function onUpdate(data) {
+@@ -67,7 +67,7 @@ function onUpdate(data) {
+ }
+ 
+ /**
+- * Watch for theme changes
++ * @description Watch for theme changes.
+  * @param {Function} callback The function to call when a change is detected.
+  * @return {String} An ID for the added watch.
+  * @memberOf module:car.theme
+@@ -94,8 +94,8 @@ _self.watchTheme = function (callback) {
+ 
+ 
+ /**
+- * Stop watching theme changes
+- * @param {String} watchId The watch ID as returned by <i>car.theme.watchTheme()</i>.
++ * @description Stop watching theme changes.
++ * @param {String} watchId The watch ID as returned by <code>car.theme.watchTheme()</code>.
+  * @memberOf module:car.theme
+  * @method cancelWatch
+  * @example
+@@ -112,7 +112,7 @@ _self.cancelWatch = function (watchId) {
+ }
+ 
+ /**
+- * Return a list of available themes
++ * @description Return a list of available themes.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.theme
+@@ -161,7 +161,7 @@ _self.getList = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Return the current theme
++ * @description Get the current theme.
+  * @param {Function} successCallback The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @memberOf module:car.theme
+@@ -204,7 +204,7 @@ _self.getActive = function(successCallback, errorCallback) {
+ };
+ 
+ /**
+- * Change the current theme
++ * @description Change the current theme.
+  * @param {String} themeId The ID of the new theme.
+  * @param {Function} [successCallback] The function to call on success.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+diff --git a/plugin/com.qnx.car.zone/www/client.js b/plugin/com.qnx.car.zone/www/client.js
+index 2c5af10..fc09443 100755
+--- a/plugin/com.qnx.car.zone/www/client.js
++++ b/plugin/com.qnx.car.zone/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++*  QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,25 +21,17 @@
+ 
+ /**
+  * @module car.Zone
+- * @description Provides the zone enumeration
+- *
+- */
+- 
+-/**
+  * @static
+- * @memberOf module:car.Zone
+- * @name Zone
+- *
+- * @description  <p>Zone enumeration
++ * @description The zone enumeration.
+  * <p>This enumeration provides a list of available zones for convenience. It can be used
+  * with the following APIs:
+  * <ul>
+- * <li><b>car.hvac</b>
+- * <li><b>car.audiomixer</b>
++ * <li><code>car.hvac</code>
++ * <li><code>car.audiomixer</code>
+  * </ul>
+- * 
+- * <p>Note that not all zones are present in all vehicles and that
+- * zones can be different for each extension.  
++ * </p>
++ * <p><b>Note</b>: Not all zones are available in vehicles. In addition, zones
++ *                 can be different for each extension.  
+  *
+  * @property ALL  The entire vehicle.
+  * @property ROW1 The first row. 
+diff --git a/plugin/com.qnx.message/www/client.js b/plugin/com.qnx.message/www/client.js
+index 4f9cb3d..70c3d55 100755
+--- a/plugin/com.qnx.message/www/client.js
++++ b/plugin/com.qnx.message/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013 - 2014.
++*  QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -19,9 +20,12 @@
+ 
+ 
+ /**
+- * Allow access to device messages (Email, SMS, MMS)
+- *
+- * <h3>Events</h3>
++ * @module qnx.message
++ * @static
++ * @deprecated
++ * @description Allow access to device messages (Email, SMS, MMS).
++ * 
++ * <br/><h2>Events</h2>
+  *     
+  * <dl><dt><h4>messageservicestatechange</h4></dt>
+  * <dd><p>Fired when a message service state has changed.</p>
+@@ -32,11 +36,11 @@
+  *      'CONNECTED'
+  * }</code></pre></dd></dl>
+  *
+- * <dl><dt><h4>messageservicefindresult</h4></dt>
++ * <dl><dt><h3>messageservicefindresult</h3></dt>
+  * <dd><p>Fired when a <code>qnx.message.find</code> operation has returned data.</p>
+- * <h5>Event data</h5>
++ * <h4>Event data</h4>
+  * <p>{Array} Array of <code>qnx.message.Message</code> objects.</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  * <pre><code>[
+  *{
+  *      handle: 123456,
+@@ -63,16 +67,16 @@
+  *}
+  *]</code></pre></dd></dl>
+  *
+- * <dl><dt><h4>messageservicefindresult</h4></dt>
++ * <dl><dt><h3>messageservicefindresult</h3></dt>
+  * <dd><p>Fired when a <code>qnx.message.find</code> operation has failed.</p>
+  * <h5>Event data</h5>
+  * <p>{String} The error message.</p>
+  *
+- * <h4>messageservicemessageresult</h4>
++ * <h3>messageservicemessageresult</h3>
+  * <p>Fired when a <code>qnx.message.getMessage</code> operation has returned data.</p>
+- * <h5>Event data</h5>
++ * <h4>Event data</h4>
+  * <p>{qnx.message.Message} The <code>qnx.message.Message</code> object.</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  * <pre><code>{
+  *      handle: 123456,
+  *      type: 'EMAIL',
+@@ -86,16 +90,16 @@
+  *      ...
+  *}</code></pre></dd></dl>
+  *
+- * <dl><dt><h4>messageservicemessagefail</h4></dt>
++ * <dl><dt><h3>messageservicemessagefail</h3></dt>
+  * <dd><p>Fired when a <code>qnx.message.getMessage</code> operation has failed.</p>
+- * <h5>Event data</h5>
++ * <h4>Event data</h4>
+  * <p>{String} The error message.</p></dd></dl>
+  *
+- * <dl><dt><h4>messageservicenotification</h4></dt>
++ * <dl><dt><h3>messageservicenotification</h3></dt>
+  * <dd><p>Fired when a message service notification event has occured.</p>
+- * <h5>Event data</h5>
++ * <h4>Event data</h4>
+  * <p>{Object}</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  *<pre><code>{
+  *      type:	'NOTIFICATION_NEW_MESSAGE',
+  *      message:
+@@ -111,9 +115,6 @@
+  *      }
+  *}</code></pre></dd></dl>
+  * 
+- * @module qnx.message
+- * @static
+- * @deprecated
+  */
+ 
+ 
+@@ -142,7 +143,7 @@ _events.map(function (eventName) {
+ 
+ 
+ /**
+- * Message object constructor.
++ * @description The <code>Message</code> object constructor.
+  * @param {Object} properties The properties argument can be used to initialize the Messages's properties.
+  */
+ function Message(properties) {
+@@ -180,7 +181,7 @@ function Message(properties) {
+ 	};
+ 
+ 	/**
+-	 * Save this message to the device MAP storage
++	 * @description Save this message to the device MAP storage.
+ 	 */
+ 	this.save = function () {
+    		var args = {
+@@ -201,14 +202,14 @@ function Message(properties) {
+ 
+ 
+ 	/**
+-	 * Remove this message from the device MAP storage
++	 *  @description Remove this message from the device MAP storage.
+ 	 */
+ 	this.remove = function () {
+ 		window.cordova.exec(null, null, _ID, 'remove', { contact:this });
+ 	};
+ 
+ 	/**
+-	 * Move this message to different folder
++	 * @description Move this message to different folder.
+ 	 * @param {Number} folder The folder ID to which the message will be moved.
+ 	 */
+ 	this.move = function (folder) {
+@@ -216,7 +217,7 @@ function Message(properties) {
+ 	};
+ 
+ 	/**
+-	 * Send this message
++	 *  @description Send this message.
+ 	 */
+ 	this.send = function () {
+ 		window.cordova.exec(null, null, _ID, 'send', { contact:this });
+@@ -225,7 +226,7 @@ function Message(properties) {
+ 
+ function FilterExpression(leftField, operator, rightField) {
+ 	// Filter on:
+-	// - Message types (SMS, Email, etc)
++	// - Message types (SMS, Email, etc.)
+ 	// - Sender email
+ 	// - Subject (partial matching)
+ 	// - Date range?
+@@ -235,86 +236,87 @@ function FilterExpression(leftField, operator, rightField) {
+ };
+ 
+ /*
+- * Exports are the publicly accessible functions
++ * Exports are the publicly accessible functions.
+  */
+ module.exports = {
+ 	/* Service states */
+-	/** Service Connected and ready to accept commands */
++	
++	/** The service is connected and ready to accept commands. */
+ 	STATE_CONNECTED:'STATE_CONNECTED',
+-	/** Service Disconnected*/
++	/** The service is disconnected. */
+ 	STATE_DISCONNECTED:'STATE_DISCONNECTED',
+-	/** Service in process of connecting*/
++	/** The service in process of connecting. */
+ 	STATE_CONNECTING:'STATE_CONNECTING',
+-	/** Service Initializing*/
++	/** The service is in the process of initializing. */
+ 	STATE_INITIALIZING:'STATE_INITIALIZING',
+ 
+ 	/* Message types */
+-	/** Defines message of EMAIL type */
++	/** Message type of email. */
+ 	MESSAGE_TYPE_EMAIL:'EMAIL',
+-	/** Defines message of SMS_GSM type */
++	/** Message type of short message service(SMS) message sent over GSM. */
+ 	MESSAGE_TYPE_SMS_GSM:'SMS_GSM',
+-	/** Defines message of SMS_CDMA type */
++	/** Message type of SMS message sent over CDMA. */
+ 	MESSAGE_TYPE_SMS_CDMA:'SMS_CDMA',
+-	/** Defines message of MMS type */
++	/** Message type of multimedia messaging service(MMS) message. */
+ 	MESSAGE_TYPE_MMS:'MMS',
+ 
+ 	/* Message folders */
+-	/** root INBOX folder*/
++	/** The root <i>inbox</i> folder. */
+ 	FOLDER_INBOX:'inbox/',
+-	/** root DRAFTS folder*/
++	/** The root <i>drafts</i> folder. */
+ 	FOLDER_DRAFTS:'drafts/',
+-	/** root OUTBOX folder*/
++	/** The root <i>outbox</i> folder. */
+ 	FOLDER_OUTBOX:'outbox/',
+-	/** root SENT folder*/
++	/** The root <i>sent</i> folder. */
+ 	FOLDER_SENT:'sent/',
+ 
+ 	/* Notification types */
+-	/** Notification type for new messages */
++	/** Notification type for new messages. */
+ 	NOTIFICATION_NEW_MESSAGE:'NOTIFICATION_NEW_MESSAGE',
+-	/** Notification type for delivery of sent message successful */
++	/** Notification type for delivery of sent message successful. */
+ 	NOTIFICATION_DELIVERY_SUCCESS:'NOTIFICATION_DELIVERY_SUCCESS',
+-	/** Notification type for sending of message successful */
++	/** Notification type for sending of message successful. */
+ 	NOTIFICATION_SENDING_SUCCESS:'NOTIFICATION_SENDING_SUCCESS',
+-	/** Notification type for delivery of sent message failed */
++	/** Notification type for delivery of sent message failed. */
+ 	NOTIFICATION_DELIVERY_FAILURE:'NOTIFICATION_DELIVERY_FAILURE',
+-	/** Notification type for sending of message failed */
++	/** Notification type for sending of message failed. */
+ 	NOTIFICATION_SENDING_FAILURE:'NOTIFICATION_SENDING_FAILURE',
+-	/** Notification type when phone memory is full */
++	/** Notification type when phone memory is full. */
+ 	NOTIFICATION_MEMORY_FULL:'NOTIFICATION_MEMORY_FULL',
+-	/** Notification type when phone memory is available */
++	/** Notification type when phone memory is available. */
+ 	NOTIFICATION_MEMORY_AVAILABLE:'NOTIFICATION_MEMORY_AVAILABLE',
+-	/** Notification type when message is deleted*/
++	/** Notification type when message is deleted. */
+ 	NOTIFICATION_MESSAGE_DELETED:'NOTIFICATION_MESSAGE_DELETED',
+-	/** Notification type when message moved */
++	/** Notification type when message moved. */
+ 	NOTIFICATION_MESSAGE_SHIFT:'NOTIFICATION_MESSAGE_SHIFT',
+ 
+ 	/* Filter constants */
+-	/** Defines constant to identify Message Type field for filtering */
++	/** Constant that identifies the Message Type field for filtering. */
+ 	FIELD_MESSAGE_TYPE:'type',
+-	/** Defines constant to identify Folder Path field for filtering */
++	/** Constant that identifies the Folder Path field for filtering. */
+ 	FIELD_FOLDER_PATH:'folder_path',
+-	/** Defines constant to identify Message Handle field for filtering */
++	/** Constant that identifies Message Handle field for filtering */
+ 	FIELD_HANDLE:'handle',
+-	/** Defines constant to identify Sender's Email field for filtering */
++	/** Constant that identifies Sender's Email field for filtering */
+ 	FIELD_SENDER_EMAIL:'sender_email',
+-	/** Defines constant to identify Sender's Number field for filtering */
++	/** Constant that identifies Sender's Number field for filtering */
+ 	FIELD_SENDER_NUMBER:'sender_number',
+ 
+ 	/**
+-	 * The <code>qnx.messages.FilterExpression</code> constructor function. <code>FilterExpression</code> objects
++	 * @description The <code>qnx.messages.FilterExpression</code> constructor function. <code>FilterExpression</code> objects
+ 	 * can be used to filter the results of the <code>qnx.messages.find()</code> function.
+ 	 * @return {qnx.messages.FilterExpression} The <code>FilterExpression</code> constructor function.
+ 	 */
+ 	FilterExpression:FilterExpression,
+ 
+ 	/**
+-	 * The <code>message.Message</code> constructor function.
++	 * @description The <code>message.Message</code> constructor function.
+ 	 */
+ 	Message:Message,
+ 
+ 	/**
+-	 * Return a list of message accounts
+-	 * @param messageType {String} [optional] Filter returned accounts by supported message type.
++	 * @description Return a list of message accounts.
++	 * @param  {String} [messageType]  Filter returned accounts by supported message type.
+ 	 * @return {Array} The list of message accounts.
+ 	 * @example
+ 	 * [
+@@ -354,17 +356,17 @@ module.exports = {
+ 	},
+ 	
+ 	/**
+-	 * Return an array of zero or more messages
+-	 * @param {qnxcar.phonebook.filterExpression} filter [optional] The
+-	 * {@link qnxcar.phonebook.filterExpression filter expression} to apply against
+-	 * the phone book database.
+-	 * @param {String} orderBy [optional] The field name to order by. The default order is descending,
+-	 * however this can be overridden by specifying the <code>isAscending</code> parameter as 'true'. Defaults to
+-	 * 'last_name'.
+-	 * @param {Boolean} isAscending [optional] If an <code>orderBy</code> parameter is supplied, changes the order
+-	 * direction to ascending if true, descending if false. Defaults to false.
+-	 * @param {Number} limit [optional] The maximum number of Contacts to return. Defaults to -1 (no limit).
+-	 * @param {Number} offset [optional] Specifies the record offset. Defaults to 0 (no offset).
++	 * @description Return an array of zero or more messages.
++	 * @param {qnxcar.phonebook.filterExpression} [filter] The
++	 *        {@link qnxcar.phonebook.filterExpression filter expression} to apply against
++	 *        the phone book database.
++	 * @param {String} [orderBy] The field name to order by. The default order is descending,
++	 *        however this can be overridden by specifying the <code>isAscending</code> parameter as <code>true</code>.
++	 *        Defaults to <code>last_name</code>.
++	 * @param {Boolean} [isAscending] If the <code>orderBy</code> parameter is supplied, this parameter changes the order
++	 *        to ascending when <code>true</code>, descending when <code>false</code>. Defaults to <code>false</code>.
++	 * @param {Number} [limit] The maximum number of Contacts to return. Defaults to -1 (no limit).
++	 * @param {Number} [offset] The record offset. Defaults to 0 (no offset).
+ 	 */
+ 	find:function (filter, orderBy, isAscending, limit, offset) {
+    		var value = null,
+@@ -409,29 +411,32 @@ module.exports = {
+ 	},
+ 
+ 	/**
+-	 * Get a list of folders by type.
++	 * @description Get a list of folders by type.
+ 	 * @param {Number} accountId The message account ID.
+-	 * @param {Number} parentFolderId [optional] The parent folder ID. If not specified, the entire folder tree is returned.
++	 * @param {Number} [parentFolderId] The parent folder ID. If not specified, the entire folder tree is returned.
+ 	 */
+ 	getFolders:function (accountId, parentFolderId) {
+ 		// TODO Implement
+ 	},
+ 
+ 	/**
+-	 * Retrieve message from the database; check first to see if message exists in database and then return it, if not initiated
+-	 * PPS request to fetch message by provided message handle.
+-	 * The message is returned asynchronously, and can be retrieved by listening to the <code>messageservicemessageresult</code>
+-	 * event. Returns a fully populated message, including full subject, contents, recipient list, and attachments.
+-	 * @param {Number} accountId The ID of the account for which the message exists
+-	 * @param {String} handle Unique identifier of the message of certain type
++	 * @description Retrieve message from the database.
++	 *              <p> First, determine if the message exists in database and then return it. If the message
++	 *              doesn't exist, initiate a PPS request to fetch the message using the provided message handle.
++	 *              The message is returned asynchronously, and can be retrieved by listening to the
++	 *              <code>messageservicemessageresult</code> event.
++	 * @param {Number} accountId The ID of the account for which the message exists.
++	 * @param {String} handle Unique identifier of the message of certain type.
++	 * @return  A fully populated message that includes the full subject, contents, recipient list, and attachments.
+ 	 * */
+ 	getMessage:function (accountId, handle) {
+ 		window.cordova.exec(null, null, _ID, 'getMessage', { accountId: accountId, handle:handle });
+ 	},
+ 
+ 	/**
+-	 * Return current state of the MAP
+-	 * @return {String} Value which will indicate current state of the service, <code>STATE_CONNECTED</code>, <code>STATE_DISCONNECTED</code>, <code>STATE_INITIALIZING</code>
++	 * @description Return current state of the MAP.
++	 * @return {String} A value which that indicates the current state of the service, 
++	           <code>STATE_CONNECTED</code>, <code>STATE_DISCONNECTED</code>, <code>STATE_INITIALIZING</code>.
+ 	 */
+ 	getState:function () {
+    		var value = null,
+diff --git a/plugin/com.qnx.phone/www/client.js b/plugin/com.qnx.phone/www/client.js
+index 6a06447..6f292c7 100755
+--- a/plugin/com.qnx.phone/www/client.js
++++ b/plugin/com.qnx.phone/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013-2014. 
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -18,40 +19,41 @@
+  */
+ 
+ /**
+- * Provide the functionality of a phone
+  *
+- * <h3>Events</h3>
+- * <dl><dt><h4>phoneready</h4></dt>
+- * <dd><p>Triggered when phone is idle (no incoming, outgoing, active calls) and ready to accept commands</p>
+- * <h5>callback parameter event</h5>
++ * @module qnx.phone
++ * @static
++ * @description Provide the functionality of a phone.<br/><br/>
++ *
++ * <h2>Events</h2>
++ * <dl><dt><h3>phoneready</h3></dt>
++ * <dd><p>Triggered when the phone is idle (no incoming, outgoing, or active calls) and ready to accept commands.</p>
++ * <h4>Callback parameter event</h4>
+  * <p>{Object}</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  *<pre><code>{
+  *      service: {String}       // identifies the phone service
+  *}</code></pre></dd></dl>
+  *
+- * <h4>phonecallactive</h4>
+- * <p>Triggered when active phone call (recipient accepted the outgoing call or incoming call accepted locally)</p>
+- * <h5>callback parameter event</h5> 
++ * <h3>phonecallactive</h3>
++ * <p>Triggered when an active phone call is made (recipient accepted the outgoing call or locally accepted the incoming call).</p>
++ * <h4>Callback parameter event</h4> 
+  * <p>{Object}</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  *<pre><code>{
+  *      service: {String}		// identifies the phone service
+- *      callId: {String}		// incoming call phone number in case of Handsfree, can be BBID etc
++ *      callId: {String}		// incoming call phone number in case of hands-free call, can be BBID etc.
+  *}</code></pre></dd></dl>
+  * 
+- * <h4>phoneincoming</h4>
+- * <p>Triggered when there is incoming call, phone is ringing</p>
+- * <h5>callback parameter event</h5>
++ * <h3>phoneincoming</h3>
++ * <p>Triggered when there's incoming call (phone is ringing).</p>
++ * <h4>Callback parameter event</h4>
+  * <p>{Object}</p>
+- * <h5>Example</h5>
++ * <h4>Example</h4>
+  * <pre><code>{
+  *      service: {String}	// identifies the phone service
+- *      callId: {String}	// incoming call phone number in case of Handsfree, can be BBID etc
++ *      callId: {String}	// incoming call phone number in the case of hands-free call, can be BBID etc.
+  *}</code></pre></dd></dl>
+  *
+- * @module qnx.phone
+- * @static
+  */
+ 
+ 
+@@ -85,81 +87,90 @@ _events.map(function (eventName) {
+ 
+ 
+ /*
+- * Exports are the publicly accessible functions
++ * Exports are the publicly accessible functions.
+  */
+ module.exports = {	
+ 	/**
+-	 * Defines identifier for HFP service
++	 * Defines the identifier for the Hands-Free Profile(HFP) service.
+ 	 * */
+ 	SERVICE_HFP: "SERVICE_HFP",
+ 
+ 	/**
+ 	 * 
+-	 * Dial a number
+-	 * @param {String} number Number to dial
+-	 * @param {String} service [optional] Identifier of the phone service; 
+-	 * if no parameter specified, function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
++	 * @description Dial a number.
++	 * <p><b>Note</b>: The <code>service</code> parameter is reserved for future use. </p>
++	 * <p>When no parameters are specified, the function call is routed to the default service (Hands-Free service).</p>
++     * @param {String} number The number to dial.
++	 * @param {String} [service] Reserved for future use. Identifier of the phone service.
+ 	 */
+ 	dial: function (number, service) {
+ 		window.cordova.exec(null, null, _ID, 'dial', { number: number });
+ 	},
+ 	/**
+-	 * Accept incoming call
+-	 * @param {String} callId ID to identify a call
+-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
+-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, 
+-	 * function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
++	 * @description Accept an incoming call.
++	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use.</p>
++	 * @param {String} callId Reserved for future use. <p>ID to identify a call.
++	 *        With existing implementations of the Hands-free service, there's only one active call.</p>
++	 * @param {String} [service] Reserved for future use. <p>Identifier of the phone service. 
++	 *        When no parameter is specified, the function call is routed to the default service
++	 *        (currently the Hands-free service).</p>
+ 	 */
+ 	accept: function (callId, service) {
+ 	    window.cordova.exec(null, null, _ID, 'accept');
+ 	},
+ 	/**
+-	 * Hang up current active call
+-	 * @param {String} callId ID to identify a call
+-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
+-	 * @param {String} service [optional]Identifier of the phone service, if no parameter specified, function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
++	 * @description Hang up current active call.
++	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use.</p>
++	 * @param {String} [callId] Reserved for future use. <p>The identifier that identifies a call.
++	 *        With existing implementations of the Hands-free service, there's only one active call.</p>
++	 * @param {String} [service] Reserved for future use. <p>Identifier of the 
++	          phone service, if no parameter specified, function call is routed to the default service (currently the Hands-free service).</p> 
++	 *
+ 	 * */
+ 	hangup: function (callId, service) {
+ 	    window.cordova.exec(null, null, _ID, 'hangup');
+ 	},
+ 	/**
+-	 * Redial last called number
+-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
+-	 * */
++	 * @description Redial last called number.
++	 * <p><b>Note</b>: The <code>callId</code> parameter is reserved for future use. </p>
++	 * @param {String} [service] Reserved for future use. 
++	 *        <p>Identifier of the phone service. If no parameter is specified, the function 
++	 *        is routed to the default service (currently the Hands-free service). </p>
++	 * 
++	 */
+ 	redial: function (service) {
+ 	    window.cordova.exec(null, null, _ID, 'redial');
+ 	},
+ 	/**
+-	 * Put a call on hold
+-	 * @param {String} callId ID to identify a call
+-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
+-	 * @param {Boolean} value True to put current call on hold, false to release current call from hold
+-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
+-	 * */
++	 * @description Put a call on hold or release a call from hold.
++	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use. </p>
++	 * @param {String} callId Reserved for future use. <p>ID to identify a call.
++	 *        With the existing implementation of the Hands-free service, there's only one active call. </p>
++	 * @param {Boolean} value <code>true</code> to put current call on hold, <code>false</code> to release current call from hold.
++	 * @param {String} [service] Reserved for future use. Identifier of the phone service. 
++	 *        When no parameter specified, function call is routed to the default service (currently the Hands-free service).
++	 */
+ 	hold: function (callId, value, service) {
+ 		//TODO Implement this function and add appropriate events
+ 	},
+ 	/**
+-	 * Mute audio input for incoming phone call (mute mic)
+-	 * @param {String} callId ID to identify a call
+-	 * TODO Currently callId is not in use, because with existing implementation of Handsfree we can have only one active call
+-	 * @param {Boolean} value True to mute, false to unmute
+-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
++	 * @description Mute audio input for the incoming phone call (mute microphone).
++	 * <p><b>Note</b>: The <code>callId</code> and <code>service</code> parameters are reserved for future use. </p>
++	 * @param {String} callId Reserved for future use. <p> ID to identify a call.
++	 *        With the existing implementation of the Hands-free service, there's only one active call. </p>
++	 * @param {Boolean} value A value of <code>true</code> to mute, <code>false</code> to unmute.
++	 * @param {String} [service] Reserved for future use. Identifier of the Phone service.
++	 *        When no parameter specified, function call is routed to the default service (currently the Hands-free service).
+ 	 * */
+ 	mute: function (callId, value, service) {
+ 		//TODO Implement this function and add appropriate events
+ 	},
+ 	/**
+-	 * Return the current state of the phone
+-	 * @param {String} service [optional] Identifier of the phone service; if no parameter specified, function call will be routed to default, currently Handsfree, service 
+-	 * TODO Currently service is not in use
+-	 * @returns {String} Current state of the phone
++	 * @description Return the current state of the phone.
++	 * <p><b>Note</b>: The <code>service</code> parameter isn't available for use.
++	 * @param {String} [service] Reserved for future use. <p> Identifier of the phone service.
++	 *        When no parameter specified, function call is routed to the default service (currently the Hands-free service).</p>
++	 * @returns {String} The current state of the phone.
+ 	 * */
+ 	getState: function (service) {
+    		var value = null,
+@@ -178,10 +189,11 @@ module.exports = {
+ 		return value;
+ 	},
+ 	/**
+-	 * Call this method to return the list of active calls
+-	 * @param {String} service Identifier of the phone service, if no parameter specified function call will be routed to default, currently Handsfree, service [optional]
+-	 * TODO Currently service is not in use
+-	 * @return {Object} List of active calls
++	 * @description Call this method to return the list of active calls.</p>
++	 * <p><b>Note</b>: The <code>service</code> parameter isn't available for use.
++	 * @param {String} [service] Reserved for future use. <p>Identifier of the phone service. 
++	 *        When no parameter is specified, the function call is routed to the default service (currently the Hands-free service).</p>
++	 * @return {Object} List of active calls.
+ 	 * */
+ 	getActiveCalls: function (service) {
+ 		//TODO Implement this function
+diff --git a/plugin/com.qnx.power/www/client.js b/plugin/com.qnx.power/www/client.js
+index 80c96d5..52136ca 100644
+--- a/plugin/com.qnx.power/www/client.js
++++ b/plugin/com.qnx.power/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2014  QNX Software Systems Limited
++ * Copyright 2014. 
++ * QNX Software Systems Limited. ALl rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -18,10 +19,9 @@
+  */
+  
+ /**
+- * @name qnx.power
++ * @module qnx.power
+  * @static
+- *
+- * Controls shutdown and reboot for the target 
++ * @description Controls the shutdown and reboot of the target.
+  */
+ 
+ var _self = {},
+@@ -30,15 +30,15 @@ var _self = {},
+ 
+ 
+ /**
+- * @desc Initiate a shutdown request
++ * @description Initiate a shutdown request.
+  * @param {Function} successCallback The function to call when successful.
+- * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Function} [errorCallback] The function to call if there's an error.
+  * @param {String} [reason] The zone to filter the results by.
+- * @param {String} fast 1- fast shutdown without logging 0- slow with logging
+- * @memberOf module:car.power
++ * @param {String} fast Whether to use fast or slow shutdown. Set to "1" for fast shutdown(without
++ *                      logging), otherwise set to "0" for slow showdown (with with logging).
++ * @memberOf module:qnx.power
+  * @method shutdown
+  * @example 
+- *
+  * //define your callback function(s)
+  * function successCallback(audioMixerItems) {
+  * 		console.log("Shutdown Initiated")			
+@@ -50,8 +50,7 @@ var _self = {},
+  *
+  *
+  * //call the method
+- * car.power.shutdown(successCallback, errorCallback, "userRequest","1");
+- *
++ * qnx.power.shutdown(successCallback, errorCallback, "userRequest","1");
+  *
+  */
+ _self.shutdown = function (successCallback, errorCallback, reason, fast) {
+@@ -67,15 +66,15 @@ _self.shutdown = function (successCallback, errorCallback, reason, fast) {
+ 
+ 
+ /**
+- * @desc Initiate a reboot request
++ * @description Initiate a reboot request.
+  * @param {Function} successCallback The function to call when successful.
+  * @param {Function} [errorCallback] The function to call if there is an error.
+  * @param {String} [reason] The zone to filter the results by.
+- * @param {String} fast 1- fast reboot without logging 0- slow with logging
+- * @memberOf module:car.power
++ * @param {String} fast Whether to use fast or slow reboot. Set to "1" for fast reboot (without
++ *                      logging), otherwise set to "0" for slow reboot (with with logging).
++ * @memberOf module:qnx.power
+  * @method reboot
+  * @example 
+- *
+  * //define your callback function(s)
+  * function successCallback(audioMixerItems) {
+  * 		console.log("Shutdown Initiated")			
+@@ -87,9 +86,7 @@ _self.shutdown = function (successCallback, errorCallback, reason, fast) {
+  *
+  *
+  * //call the method
+- * car.power.reboot(successCallback, errorCallback, "userRequest","1");
+- *
+- *
++ * qnx.power.reboot(successCallback, errorCallback, "userRequest","1");
+  */
+ _self.reboot = function (successCallback, errorCallback, reason, fast) {
+ 	var args = {};
+diff --git a/plugin/com.qnx.settings/www/client.js b/plugin/com.qnx.settings/www/client.js
+index 0a998d7..8c2bfaf 100755
+--- a/plugin/com.qnx.settings/www/client.js
++++ b/plugin/com.qnx.settings/www/client.js
+@@ -1,5 +1,6 @@
+ /*
+- * Copyright 2013  QNX Software Systems Limited
++ * Copyright 2013-2014.
++ * QNX Software Systems Limited. All rights reserved.
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License"). You
+  * may not reproduce, modify or distribute this software except in
+@@ -20,7 +21,6 @@
+ /**
+  * @module qnx.settings
+  * @static
+- *
+  * @description Provides access to system settings.
+  */
+ 
+@@ -49,14 +49,15 @@ _events.map(function (eventName) {
+ });
+ 
+ /*
+- * Exports are the publicly accessible functions
++ * Exports are the publicly accessible functions.
+  */
+ module.exports = {
+ 	/**
+-	 * Return system settings
+-	 * @param {Array} settings A list of settings to get [optional]; if omitted, all settings are returned
++	 * @description Return the system settings.
++	 * <p><b>Note</b>: The list of settings isn't fixed and depends on your system configuration.</p>
++	 * @param {Array} [service] A list of settings to retrieve. When this parameter is omitted,
++	 *                         all settings are returned.
+ 	 * @returns {Object} The requested settings.
+-	 * NOTE: the list of settings is not fixed and depends on your system configuration
+ 	 */
+ 	get: function (settings) {
+    		var value = null,
+@@ -79,9 +80,9 @@ module.exports = {
+ 	},
+ 	
+ 	/**
+-	 * Set one or more system settings
++	 * @description Set one or more system settings.
++	 * <p><b>Note</b>: The list of settings isn't fixed and depends on your system configuration.</p>
+ 	 * @param {Object} args The system settings to set. 
+-	 * NOTE: the list of settings is not fixed and depends on your system configuration
+ 	 */
+ 	set: function (args) {
+ 	    window.cordova.exec(null, null, _ID, 'set', args);
+-- 
+1.7.10.msysgit.1
+

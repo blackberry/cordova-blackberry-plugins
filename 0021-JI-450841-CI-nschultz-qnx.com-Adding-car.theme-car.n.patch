@@ -1,0 +1,3152 @@
+From 2e8ac10b6a46a5ec09004d990c3595e3d5f969d2 Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Tue, 13 Aug 2013 10:37:58 -0400
+Subject: [PATCH 21/61] JI:450841 CI:nschultz@qnx.com Adding car.theme,
+ car.navigation, and qnx.application.event extensions
+
+---
+ plugin/com.qnx.application.event/plugin.xml        |   34 +
+ .../src/blackberry10/application.js                |  217 ++++
+ .../src/blackberry10/context.js                    |   76 ++
+ .../src/blackberry10/index.js                      |  184 ++++
+ plugin/com.qnx.application.event/www/client.js     |  108 ++
+ plugin/com.qnx.car.navigation/plugin.xml           |   33 +
+ .../src/blackberry10/index.js                      |  414 ++++++++
+ .../src/blackberry10/providers-elektrobit.js       |  412 ++++++++
+ plugin/com.qnx.car.navigation/www/client.js        | 1035 ++++++++++++++++++++
+ plugin/com.qnx.car.theme/plugin.xml                |   33 +
+ plugin/com.qnx.car.theme/src/blackberry10/index.js |  132 +++
+ plugin/com.qnx.car.theme/src/blackberry10/theme.js |   95 ++
+ plugin/com.qnx.car.theme/www/client.js             |  262 +++++
+ 13 files changed, 3035 insertions(+)
+ create mode 100644 plugin/com.qnx.application.event/plugin.xml
+ create mode 100644 plugin/com.qnx.application.event/src/blackberry10/application.js
+ create mode 100644 plugin/com.qnx.application.event/src/blackberry10/context.js
+ create mode 100644 plugin/com.qnx.application.event/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.application.event/www/client.js
+ create mode 100644 plugin/com.qnx.car.navigation/plugin.xml
+ create mode 100644 plugin/com.qnx.car.navigation/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js
+ create mode 100644 plugin/com.qnx.car.navigation/www/client.js
+ create mode 100644 plugin/com.qnx.car.theme/plugin.xml
+ create mode 100644 plugin/com.qnx.car.theme/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.car.theme/src/blackberry10/theme.js
+ create mode 100644 plugin/com.qnx.car.theme/www/client.js
+
+diff --git a/plugin/com.qnx.application.event/plugin.xml b/plugin/com.qnx.application.event/plugin.xml
+new file mode 100644
+index 0000000..23b4bd2
+--- /dev/null
++++ b/plugin/com.qnx.application.event/plugin.xml
+@@ -0,0 +1,34 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.application.event"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="qnx.application.event" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/context.js" />
++		<source-file src="src/blackberry10/application.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.application.event" value="com.qnx.application.event" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.application.event/src/blackberry10/application.js b/plugin/com.qnx.application.event/src/blackberry10/application.js
+new file mode 100644
+index 0000000..26cd97f
+--- /dev/null
++++ b/plugin/com.qnx.application.event/src/blackberry10/application.js
+@@ -0,0 +1,217 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for qnx application events
++ */
++
++var _pps = qnx.webplatform.pps,
++	_commandReaderPPS,
++	_appdataReaderPPS,
++	_windowGroup,
++	_webview = require("../../lib/webview"),
++	_windowGroupPPS,
++	_pauseTrigger,
++	_resumeTrigger,
++	_reselectTrigger,
++	_appdataTrigger,
++	_handlers = {},
++	_key;
++
++/**
++ * Opens the windowgroup PPS object 
++ */
++function init () {
++	try {
++		_windowGroupPPS = _pps.createObject("/pps/system/navigator/windowgroup", _pps.PPSMode.DELTA);
++		_windowGroupPPS.open(_pps.FileMode.WRONLY);
++	} catch (ex) {
++		console.error('Error in webworks ext: application.event/application.js:init():', ex);
++	}
++}
++init();
++
++/**
++ * Method called when a command event is received
++ * @param event {Object} The PPS event for the command object
++ */
++function onCommand(event) {
++	// filter on the id of the target app
++	var id = Object.keys(event.changed)[0];
++
++	// is the target app local?
++	if (_handlers.hasOwnProperty(id)) {
++		//yes, manually trigger the event in the webview
++		var webview = window.qnx.webplatform.createWebView({WebViewId: _handlers[id].key}),
++			actionEvent = event.data[id].action;
++		
++		webview.executeJavaScript("webworks.event.trigger('" + actionEvent + "', '" + encodeURIComponent(JSON.stringify([event.data[id].args])) + "')");
++	}
++	else {
++		//no, use the trigger to dispatch the event in the webview
++		if (event && event.data && event.data.hasOwnProperty(_key) && typeof event.data[_key].action != "undefined") {
++			switch (event.data[_key].action) {
++				case 'reselect':
++					if (_reselectTrigger) { 
++						_reselectTrigger(event.data[_key].args); 
++					}
++					break;
++				case 'pause':
++					if (_pauseTrigger) { 
++						_pauseTrigger(event.data[_key].args); 
++					}
++					break;
++				case 'resume':
++					if (_resumeTrigger) { 
++						_resumeTrigger(event.data[_key].args); 
++					}
++					break;
++			}
++		}
++	}	
++};
++
++/**
++ * Method called when opened pps object ready
++ * Contains data from opened PPS obect
++ * @param event {Object} content the appdata object
++ */
++function onAppDataReady(event) {
++	if (_appdataTrigger && event && event[_key]) {
++		_appdataTrigger(event[_key]);
++	}
++}
++
++/**
++ * Method called when app data received
++ * @param event {Object} The PPS event for the appdata object
++ */
++function onAppData(event) {
++	if (_appdataTrigger && event && event.data && event.data[_key]) { 
++		_appdataTrigger(event.data[_key]); 
++	}
++}
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Registers the application and sets up the event triggers
++	 * @param key {String} The key.	 This should be the application's key.
++	 */
++	register: function(key) {
++		_key = key;
++		_windowGroup = this.getWindowGroup(key);
++
++		//listen for app commands
++		if (typeof _commandReaderPPS === "undefined") {
++			_commandReaderPPS = _pps.createObject("/pps/system/navigator/command", _pps.PPSMode.DELTA);
++			_commandReaderPPS.onNewData = onCommand;
++			_commandReaderPPS.open(_pps.FileMode.RDONLY);
++		}	
++		//listen for startup arguments
++		if (typeof _appdataReaderPPS === "undefined") {
++			_appdataReaderPPS = _pps.createObject("/pps/system/navigator/appdata?f=" + _key, _pps.PPSMode.DELTA);
++			_appdataReaderPPS.onFirstReadComplete = onAppDataReady;
++			_appdataReaderPPS.onNewData = onAppData;
++			_appdataReaderPPS.open(_pps.FileMode.RDONLY);
++		}
++		
++		// convenience feature to provide apps with their application's window group name.
++		var obj = {};
++		obj['[n]' + _key] = _windowGroup;
++		_windowGroupPPS.write(obj);
++	},
++
++	/**
++	 * Retrieves the screen window group. Specific to this application.
++	 * @param id {String}  [optional] The application's id 
++	 */
++	getWindowGroup: function(id) {
++		if (id) {
++			if (_handlers.hasOwnProperty(id)) {
++				return _handlers[id].windowGroup;
++			} else {
++				return _webview.windowGroup();
++			}
++		} else {
++			return _webview.windowGroup();			
++		}
++	},
++
++	/**
++	 * Adds a local trigger to the app.
++	 * Only occurs if the app is loaded locally by the Navigator
++	 * @param args {Object} The argument obj
++	 * Ex. {
++	 * 		id: {String}, // The application id
++	 *		key: {Number}, // The webview id
++	 *		windowGroup: {String}, // The screen window group string 	
++	 * }
++	 */
++	addLocalTrigger: function(args) {
++		//If there are no registered listeners for this event, create an array to hold them
++		if (!_handlers.hasOwnProperty(args.id)) {
++			_handlers[args.id] = {key:args.key, windowGroup: args.windowGroup};
++		}
++	},
++
++	/**
++	 * Sets the trigger function to call when a pause event is fired
++	 * @param trigger {Function} The trigger function to call when the event is fired
++	 */
++	setPauseTrigger: function(trigger) {
++		_pauseTrigger = trigger;
++	},
++
++	/**
++	 * Sets the trigger function to call when a resume event is fired
++	 * @param trigger {Function} The trigger function to call when the event is fired
++	 */
++	setResumeTrigger: function(trigger) {
++		_resumeTrigger = trigger;
++	},
++
++	/**
++	 * Sets the trigger function to call when a reselect event is fired
++	 * @param trigger {Function} The trigger function to call when the event is fired
++	 */
++	setReselectTrigger: function(trigger) {
++		_reselectTrigger = trigger;
++	},
++	
++	/**
++	 * Sets the trigger function to call when a reselect event is fired
++	 * @param trigger {Function} The trigger function to call when the event is fired
++	 */
++	setAppDataTrigger: function(trigger) {
++		_appdataTrigger = trigger;
++	},
++	
++	/**
++	 * Gets the data passed to the application on startup
++	 * @return {Mixed} The data passed to the application on startup, or null
++	 */
++	getData: function() {
++		return (_appdataReaderPPS.data.appdata && _appdataReaderPPS.data.appdata[_key]) ? _appdataReaderPPS.data.appdata[_key] : null;
++	}
++};
++
++	
+diff --git a/plugin/com.qnx.application.event/src/blackberry10/context.js b/plugin/com.qnx.application.event/src/blackberry10/context.js
+new file mode 100644
+index 0000000..70abc99
+--- /dev/null
++++ b/plugin/com.qnx.application.event/src/blackberry10/context.js
+@@ -0,0 +1,76 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The event context for application events
++ */
++
++var _application = require("./application");
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++    /**
++     * Method called when the first listener is added for an event
++     * @param event {String} The event name
++     * @param trigger {Function} The trigger function to call when the event is fired
++     */
++    addEventListener: function (event, trigger) {
++        if (event && trigger) {
++            switch (event) {
++                case "pause":
++                    _application.setPauseTrigger(trigger);
++                    break;
++                case "resume":
++                    _application.setResumeTrigger(trigger);
++                    break;
++                case "reselect":
++                    _application.setReselectTrigger(trigger);
++                    break;
++                case "appdata":
++                    _application.setAppDataTrigger(trigger);
++                    break;
++            }
++        }
++    },
++
++    /**
++     * Method called when the last listener is removed for an event
++     * @param event {String} The event name
++     */
++    removeEventListener: function (event) {
++        if (event) {
++            switch (event) {
++                case "pause":
++                    _application.setPauseTrigger(null);
++                    break;
++                case "resume":
++                    _application.setResumeTrigger(null);
++                    break;
++                case "reselect":
++                    _application.setReselectTrigger(null);
++                    break;
++                case "appdata":
++                    _application.setAppDataTrigger(null);
++                    break;
++            }
++        }
++    }
++};
+diff --git a/plugin/com.qnx.application.event/src/blackberry10/index.js b/plugin/com.qnx.application.event/src/blackberry10/index.js
+new file mode 100644
+index 0000000..38eaffb
+--- /dev/null
++++ b/plugin/com.qnx.application.event/src/blackberry10/index.js
+@@ -0,0 +1,184 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Sends pause, resume and reselect events to an application
++ */
++
++var _wwfix = require("../../lib/wwfix"),
++	_application = require("./application"),
++	_appEvents = require("./../../lib/events/applicationEvents"),
++	_actionMap = {
++		appdata: {
++			event: "appdata",
++			triggerEvent: "appdata",
++			context: require("./context"),
++			trigger: function (pluginResult, data) {
++				pluginResult.callbackOk(data, true);
++			} 
++		},
++		reselect: {
++			event: "reselect",
++			triggerEvent: "reselect",
++			context: require("./context"),
++			trigger: function (pluginResult, data) {
++				pluginResult.callbackOk(data, true);
++			} 
++		},
++		pause: {
++			event: "pause",
++			triggerEvent: "pause",
++			context: require("./context"),
++			trigger: function (pluginResult, data) {
++				pluginResult.callbackOk(data, true);
++			} 
++		},
++		resume: {
++			event: "resume",
++			triggerEvent: "resume",
++			context: require("./context"),
++			trigger: function (pluginResult, data) {
++				pluginResult.callbackOk(data, true);
++			} 
++		}
++	},
++	_listeners = {};
++
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++
++	/**
++	 * Turn on event dispatching for a specific event name
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	startEvent: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			 	eventName = fixedArgs.eventName,
++				context = _actionMap[eventName].context,
++				systemEvent = _actionMap[eventName].event,
++				listener = _actionMap[eventName].trigger.bind(null, result);
++
++			if (!_listeners[eventName]) {
++				_listeners[eventName] = {};
++			}
++
++			if (_listeners[eventName][env.webview.id]) {
++				//TODO: Stop all listeners on plugin reset and renable this error
++				//result.error("Underlying listener for " + eventName + " already already running for webview " + env.webview.id);
++				context.removeEventListener(systemEvent, _listeners[eventName][env.webview.id]);
++			}
++
++			context.addEventListener(systemEvent, listener);
++			_listeners[eventName][env.webview.id] = listener;
++			result.noResult(true);
++ 		} catch (e) {
++			_eventResult.error("error in startEvent: " + JSON.stringify(e), false);
++		}
++   },
++
++	/**
++	 * Turn off event dispatching for a specific event name
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stopEvent: function (success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			 	eventName = fixedArgs.eventName,
++				context = _actionMap[eventName].context,
++				systemEvent = _actionMap[eventName].event,
++				listener;
++
++		if (!_listeners || !_listeners[eventName] || !_listeners[eventName][env.webview.id]) {
++			result.error("Underlying listener for " + eventName + " never started for webview " + env.webview.id);
++		} else {
++			listener = _listeners[eventName][env.webview.id];
++			context.removeEventListener(systemEvent, listener);
++			delete _listeners[eventName][env.webview.id];
++			result.noResult(false);
++		}
++		} catch (e) {
++			_eventResult.error("error in stopEvent: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Register's the application name for filtering the events.  Also writes the screen window group name.
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: key - the application name
++	 * @param env {Object} Environment variables
++	 */
++	register: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_application.register(fixedArgs.key);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Gets the screen window group.
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: n/a
++	 * @param env {Object} Environment variables
++	 */
++	getWindowGroup: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _application.getWindowGroup();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Gets the data passed to the application on startup
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	getData: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _application.getData();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++};
++
+diff --git a/plugin/com.qnx.application.event/www/client.js b/plugin/com.qnx.application.event/www/client.js
+new file mode 100644
+index 0000000..8ca76e9
+--- /dev/null
++++ b/plugin/com.qnx.application.event/www/client.js
+@@ -0,0 +1,108 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * @module qnx.application.event
++ * @static
++ *
++ * @description Send events to an application, as well as to pause, resume, and reselect events 
++ */
++
++var _ID = "com.qnx.application.event",
++	_noop = function () {},
++	_events = ["pause", "resume", "reselect", "appdata"];
++
++
++_events.map(function (eventName) {
++	var channel = cordova.addDocumentEventHandler(eventName),
++		success = function (data) {
++			channel.fire(data);
++		},
++		fail = function (error) {
++			console.log("Error initializing " + eventName + " listener: ", error);
++		};
++
++	channel.onHasSubscribersChange = function () {
++		if (this.numHandlers === 1) {
++			window.cordova.exec(success, fail, _ID, "startEvent", {eventName: eventName});
++		} else if (this.numHandlers === 0) {
++			window.cordova.exec(_noop, _noop, _ID, "stopEvent", {eventName: eventName});
++		}
++	};
++});
++
++/*
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++
++	/**
++	 * Register the key (application name) for pause, resume, and reselect events
++	 * @param {String} key The application key
++	 */
++	register: function(key) {
++		window.cordova.exec(null, null, _ID, 'register', { key: key });
++	},
++	
++	/**
++	 * Get the screen window group name for the specified key
++	 * @param {String} key The application key
++	 */
++	getWindowGroup: function(key) {
++   		var value = null,
++   			args = {
++   				key: key
++   			},
++			success = function (data, response) {
++				value = data;
++			},
++			fail = function (data, response) {
++				throw data;
++			};
++
++		try {
++			window.cordova.exec(success, fail, _ID, 'getWindowGroup', args);
++			return value;
++		} catch (e) {
++			console.error(e);
++		}
++	},
++
++	/**
++	 * Get the data passed to the application on startup
++	 * @return {Mixed} The data passed to the application on startup, or null
++	 */
++	getData: function() {
++   		var value = null,
++			success = function (data, response) {
++				value = data;
++			},
++			fail = function (data, response) {
++				throw data;
++			};
++
++		try {
++			window.cordova.exec(success, fail, _ID, 'getData', null);
++			return value;
++		} catch (e) {
++			console.error(e);
++		}
++	},
++};
++
+diff --git a/plugin/com.qnx.car.navigation/plugin.xml b/plugin/com.qnx.car.navigation/plugin.xml
+new file mode 100644
+index 0000000..5598b7d
+--- /dev/null
++++ b/plugin/com.qnx.car.navigation/plugin.xml
+@@ -0,0 +1,33 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.car.navigation"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="car.navigation" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/providers-elektrobit.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.car.navigation" value="com.qnx.car.navigation" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.car.navigation/src/blackberry10/index.js b/plugin/com.qnx.car.navigation/src/blackberry10/index.js
+new file mode 100644
+index 0000000..a51c472
+--- /dev/null
++++ b/plugin/com.qnx.car.navigation/src/blackberry10/index.js
+@@ -0,0 +1,414 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Allows control of GPS navigation 
++ */
++
++var _wwfix = require("../../lib/wwfix"),
++	_eventResult,
++
++	_utils = require("./../../lib/utils"),
++	_profile = _utils.loadExtensionModule("com.qnx.car.profile", "index"),
++	_provider = null;
++
++
++/**
++ * Initializes the extension 
++ */
++function init() {
++	try {
++
++		//NOTE: Commenting out navigation provider selection logic because we only
++		//		support electrobit right now.
++
++		//determine the configured navigation provider
++		// var settingsExt = _utils.loadExtensionModule("settings", "settings");
++		// var settings = settingsExt.get(['navigationProvider']);
++
++		//check if the navigation provider exists
++		// if (settings.navigationProvider) {
++		// 	try {
++				_provider = require('./providers-' + 'elektrobit'); // + settings.navigationProvider);
++				_provider.init();
++		// 	} catch(ex) {
++		// 		// If this is an XMLHttpRequestException, then it's likely because the specified provider file simply does not exist
++		// 		// So, if this is another type of exception, we'll rethrow since there may be another problem
++		// 		if (ex instanceof XMLHttpRequestException === false) {
++		// 			throw ex;
++		// 		} else {
++		// 			console.error('qnx.navigation index.js::init() - Unknown or invalid navigationProvider "' + (settings.navigationProvider || '') + '".');
++		// 		}
++		// 	}
++		// } else {
++		// 	console.error('qnx.navigation index.js::init() - navigationProvider not set!');
++		// }
++		
++	} catch (ex) {
++		console.error('car.navigation index.js::init() - Error occurred during initialization.', ex);
++	}
++}
++init();
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Returns the current audio parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	startEvents: function(success, fail, args, env) {
++		_eventResult = new PluginResult(args, env)
++		try {
++			_provider.setTriggerUpdate(function (data) {
++				_eventResult.callbackOk(data, true);
++			});
++			_eventResult.noResult(true);
++		} catch (e) {
++			_eventResult.error("error in startEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current audio parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stopEvents: function(success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			//disable the event trigger
++			_provider.setTriggerUpdate(null);
++			result.ok(undefined, false);
++
++			//cleanup
++			_eventResult.noResult(false);
++			delete _eventResult;
++		} catch (e) {
++			result.error("error in stopEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Gets the current user's favourite locations
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getFavourites: function(success, fail, args, env) {
++		_profile.getNavigationFavourites(success, fail, args, env);
++	},
++	
++	/**
++	 * Adds a location to the current user's favourite locations
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	addFavourite: function(success, fail, args, env) {
++		_profile.addNavigationFavourite(success, fail, args, env);
++	},
++	
++	/**
++	 * Removes a location from the current user's favourite locations
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	removeFavourite: function(success, fail, args, env) {
++		_profile.removeNavigationFavourite(success, fail, args, env);
++	},
++	
++	/**
++	 * Gets the current user's navigation history
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getHistory: function(success, fail, args, env) {
++		_profile.getNavigationHistory(success, fail, args, env);
++	},
++	
++	/**
++	 * Clears the current user's navigation history
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	clearHistory: function(success, fail, args, env) {
++		_profile.clearNavigationHistory(success, fail, args, env);
++	},
++	
++	/**
++	 * Adds a location to the navigation history for a given user
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	addToNavigationHistory: function(success, fail, args, env) {
++		_profile.addToNavigationHistory(success, fail, args, env);
++	},
++	
++	/**
++	 * Browse the POI database to find a destination
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	browsePOI: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			var categoryId = (!isNaN(fixedArgs.categoryId)) ? fixedArgs.categoryId : undefined;
++			//hack: remove callback id because it messes up location search
++			if (typeof fixedArgs.callbackId !== 'undefined') {
++				delete fixedArgs.callbackId
++			}
++			var location = fixedArgs;
++
++			if (location && !isNaN(location.categoryId)) {
++				delete location.categoryId;
++			}
++
++			if (Object.keys(location).length <= 0) {
++				location = null;
++			}
++			
++			var data = _provider.browsePOI(categoryId, location, function(data) {
++				result.callbackOk(data, false);
++			}, function(error) {
++				result.error(error, false);
++			});
++			result.noResult(true);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Search the POI database to find a destination
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	searchPOI: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			var name = (fixedArgs.name) ? fixedArgs.name : null;
++
++			//hack: remove callback id because it messes up location search
++			if (typeof fixedArgs.callbackId !== 'undefined') {
++				delete fixedArgs.callbackId
++			}
++			var location = fixedArgs;
++
++			if (location && location.name) {
++				delete location.name;
++			}
++
++			if (Object.keys(location).length <= 0) {
++				location = null;
++			}
++
++			_provider.searchPOI(name, location, function(data) {
++				result.callbackOk(data, false);
++			}, function(error) {
++				result.error(error, false);
++			});
++			result.noResult(true);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Shows a set of Destinations on a map
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	showOnMap: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_provider.showOnMap(fixedArgs.locations);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Zoom the current map
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	zoomMap: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_provider.zoomMap(fixedArgs.scale);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Pans the current map
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	panMap: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_provider.zoomMap(fixedArgs.deltaX, fixedArgs.deltaY);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Search to find a destination in the POI database or an address
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	searchAddress: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			//hack: remove callback id because it messes up location search
++			if (typeof fixedArgs.callbackId !== 'undefined') {
++				delete fixedArgs.callbackId
++			}
++			var location = fixedArgs;
++			_provider.searchAddress(location, function(data) {
++				result.callbackOk(data, false);
++			}, function(error) {
++				result.error(error, false);
++			});
++			result.noResult(true);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Search to find a destination in the POI database or an address
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	navigateTo: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			//hack: remove callback id because it messes up location search
++			if (typeof fixedArgs.callbackId !== 'undefined') {
++				delete fixedArgs.callbackId
++			}
++			var location = fixedArgs;
++			_provider.navigateTo(location, function(data) {
++				result.callbackOk(data, false);
++			}, function(error) {
++				result.error(error, false);
++			});
++			result.noResult(true);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Cancels the navigation if it is in progress
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	cancelNavigation: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			_provider.cancelNavigation();
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Gets the current navigation route
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getRoute: function (success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _provider.getRoute();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Gets details about the current status of the navigation engine
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getStatus: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _provider.getStatus();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	}
++};
++
+diff --git a/plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js b/plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js
+new file mode 100644
+index 0000000..2c07064
+--- /dev/null
++++ b/plugin/com.qnx.car.navigation/src/blackberry10/providers-elektrobit.js
+@@ -0,0 +1,412 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Implements navigation functionality for Elektrobit
++ */
++
++var	_pps = qnx.webplatform.pps,
++	_qdb = require('../../lib/qdb'),
++	_db,
++	_statusPPS,
++	_controlReaderPPS,
++	_controlWriterPPS,
++	_triggerUpdate,
++	_callbackCounter = 0,
++	_callbackFunctions = {},
++	
++	GET_LOCATIONS = 'SELECT l.*, c.type FROM locations l LEFT JOIN categories c ON l.categoryId = c.id';
++	
++/**
++ * Initialization function
++ */
++function init() {
++	try {
++		_db = _qdb.createObject();
++		if (!_db || !_db.open('/dev/qdb/navigation')) {
++			console.log("car.navigation::init [providers-elektrobit.js] Error opening db; path=/dev/qdb/navigation");
++		}
++	} catch (ex) {
++		console.error('Error in webworks ext: navigation/providers-elektrobit.js:init():', ex);
++	}
++}
++init();
++
++/**
++ * Track callback functions for asynchronous requests
++ * @param {Function} success The function to call on success
++ * @param {Function} fail The function to call on failure
++ * @return {Number} A unique id for the callback
++ */
++function setupCallback(success, fail) {
++	_callbackCounter ++;
++	_callbackFunctions[_callbackCounter] = {
++		success: success,
++		fail: fail
++	};
++	return _callbackCounter;
++}
++
++/**
++ * Method called when the navigation status object changes
++ * @param {Object} event The PPS event
++ */
++function onStatusEvent(event) {
++	if (event && event.changed && _triggerUpdate) {
++		var data = {};
++		if (event.changed.navigating) {
++			data["isNavigating"] = event.data.navigating;
++		}
++		if (event.changed.total_time_remaining) {
++			data["totalTimeRemaining"] = event.data.total_time_remaining;
++		}
++		if (event.changed.total_distance_remaining) {
++			data["totalDistanceRemaining"] = event.data.total_distance_remaining;
++		}
++		if (event.changed.destination) {
++			data["destination"] = event.data.destination;
++		}
++		if (event.changed.maneuvers) {
++			data["maneuvers"] = event.data.maneuvers;
++		}
++		if (Object.keys(data).length > 0) {
++			_triggerUpdate(data);
++		}
++	}
++}
++
++/**
++ * Method called when the navigation control object has a response ready
++ * @param {Object} event The PPS event
++ */
++function onControlEvent(event) {
++	if (event && event.data && event.data.res) {
++		switch (event.data.res) {
++			case 'getPOIs':
++			case 'getPOIsByName':
++			case 'search':
++				handleSearchResults(event.data);
++				break;
++
++			case 'navigateTo': 
++				handleNavigateToComplete(event.data);
++				break;
++		}
++	}
++}
++
++/**
++ * Function called when navigateTo has completed
++ * @param data {Object} The incoming PPS data
++ */
++function handleNavigateToComplete(data) {
++	if (typeof _callbackFunctions[data.id] == 'object') {
++		try {
++			if (typeof data.err == 'number') {
++				if (typeof _callbackFunctions[data.id].error == 'function') {
++					_callbackFunctions[data.id].error({ 
++						code: parseInt(data.err), 
++						message: data.errstr || 'An unknown error has occured'
++					});
++				}
++			} else {
++				if (typeof _callbackFunctions[data.id].success == 'function') {
++					_callbackFunctions[data.id].success();
++				}
++			}
++		} catch (ex) {
++			if (typeof _callbackFunctions[data.id].error == 'function') {
++				_callbackFunctions[data.id].error(-1, ex.message);
++			}
++		} finally {
++			delete _callbackFunctions[data.id];
++		}
++	}
++}
++
++/**
++ * Function called when a search result is available
++ * @param data {Object} The incoming PPS data
++ */
++function handleSearchResults(data) {
++	if (typeof _callbackFunctions[data.id] == 'object') {
++		try {
++			if (data.id && _callbackFunctions[data.id]) {
++				var result = _db.query(GET_LOCATIONS);
++				var locations = _qdb.resultToArray(result);
++				_callbackFunctions[data.id].success(locations);
++			}
++		} catch (ex) {
++			_callbackFunctions[data.id].error(-1, ex.message);
++		} finally {
++			delete _callbackFunctions[data.id];
++		}
++	}
++}
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Initializes the extension 
++	 */
++	init: function() {
++		_statusPPS = _pps.createObject("/pps/qnxcar/navigation/status", _pps.PPSMode.DELTA);
++		_statusPPS.onNewData = onStatusEvent;
++		_statusPPS.open(_pps.FileMode.RDONLY);
++
++		_controlReaderPPS = _pps.createObject("/pps/qnxcar/navigation/control", _pps.PPSMode.DELTA);
++		_controlReaderPPS.onNewData = onControlEvent;
++		_controlReaderPPS.open(_pps.FileMode.RDONLY);
++
++		_controlWriterPPS = _pps.createObject("/pps/qnxcar/navigation/control", _pps.PPSMode.DELTA);
++		_controlWriterPPS.open(_pps.FileMode.WRONLY);
++	},
++
++	/**
++	 * Sets the trigger function to call when a navigation update event is fired
++	 * @param {Function} trigger The trigger function to call when the event is fired
++	 */
++	setTriggerUpdate: function(trigger) {
++		_triggerUpdate = trigger;
++	},
++	
++	/**
++	 * Browse the POI database near a location
++	 * @param {Number} categoryId (Optional) A category id to browse; defaults to 0
++	 * @param {Object} location (Optional) The location around which we want to find a POI; defaults to current location
++	 * @param {Function} success The function to call on success
++	 * @param {Function} fail The function to call on failure
++	 */
++	browsePOI: function(categoryId, location, success, fail) {
++		if (isNaN(categoryId)) {
++			categoryId = 0;
++		}
++		
++		var result = _db.query("SELECT * FROM categories WHERE parentId=" + categoryId);
++		var categories = _qdb.resultToArray(result);
++		if (categories.length == 0) {
++			//we need to do an async search for pois
++			//setup the callback
++			var id = setupCallback(success, fail);
++
++			//make the request
++			var dat = {
++				category: categoryId,
++			};
++			if (typeof location == 'object' && location !== null) {
++				dat['location'] = location;
++			}
++			_controlWriterPPS.write({
++				id: id,
++				msg: 'getPOIs',
++				dat: dat,
++			});
++		} else {
++			//categories are available, we can respond now
++			success(categories);
++		}
++	},
++	
++	/**
++	 * Search the POI database near a location
++	 * @param name {String} The name of the location
++	 * @param {String} id An identifier to return in the result of this query [optional]
++	 * @param location {Object} The location around which we want to find a POI [optional, defaults to current location]
++	 * @param {Function} success The function to call on success
++	 * @param {Function} fail The function to call on failure
++	 */
++	searchPOI: function(name, location, success, fail) {
++		//setup the callback
++		var id = setupCallback(success, fail);
++
++		//make the request
++		var dat = {
++			name: name,
++		};
++		if (typeof location == 'object' && location !== null) {
++			dat['location'] = location;
++		}
++		_controlWriterPPS.write({
++			msg: 'getPOIsByName',
++			id: id,
++			dat: dat,
++		});
++	},
++
++	/**
++	 * Shows a set of locations on a map
++	 * @param locations {Array} An array of locations to show on the map
++	 */
++	showOnMap: function(locations) {
++		_controlWriterPPS.write({
++			msg: 'showOnMap',
++			dat: {
++				locations: locations,
++			}
++		});
++	},
++	
++	/**
++	 * Zoom the current map
++	 * @param scale {Number} The zoom scale
++	 */
++	zoomMap: function(scale) {
++		_controlWriterPPS.write({
++			msg: 'zoomMap',
++			dat: {
++				scale: scale,
++			}
++		});
++	},
++	
++	/**
++	 * Pans the current map
++	 * @param deltaX {Number} The number of pixels to move the map on the X axis
++	 * @param deltaY {Number} The number of pixels to move the map on the Y axis
++	 */
++	panMap: function(deltaX, deltaY) {
++		_controlWriterPPS.write({
++			msg: 'panMap',
++			dat: {
++				deltaX: deltaX,
++				deltaY: deltaY,
++			}
++		});
++	},
++	
++	/**
++	 * Search to find a location based on a partial address
++	 * @param {Object} location The location we want to search for
++	 * @param {Function} success The function to call on success
++	 * @param {Function} fail The function to call on failure
++	 */
++	searchAddress: function(location, success, fail) {
++		if (typeof location == 'object' && location !== null) {
++			//setup the callback
++			var id = setupCallback(success, fail);
++
++			//make the request
++			var dat = {};
++
++			if (typeof location.country == 'string') {
++				dat["country"] = location.country;
++			}
++			if (typeof location.city == 'string') {
++				dat["city"] = location.city;
++			}
++			if (typeof location.street == 'string') {
++				dat["street"] = location.street;
++			}
++			if (typeof location.number == 'string') {
++				dat["number"] = location.number;
++			}
++
++			if (Object.keys(dat).length > 0) {
++				_controlWriterPPS.write({
++					msg: 'search',
++					id: id,
++					dat: dat
++				});
++			}
++		}		
++	},
++	
++	/**
++	 * Navigate to a specific location
++	 * @param location {Object} The location we want to navigate to
++	 * @param {Function} success The function to call on success
++	 * @param {Function} fail The function to call on failure
++	 */
++	navigateTo: function(location, success, fail) {
++		var id = setupCallback(success, fail);
++		_controlWriterPPS.write({
++			msg: 'navigateTo',
++			id: id,
++			dat: {
++				location: location
++			}
++		});
++	},
++	
++	/**
++	 * Cancels the navigation if it is in progress
++	 */
++	cancelNavigation: function() {
++		_controlWriterPPS.write({
++			msg: 'cancelNavigation',
++		});
++	},
++	
++	/**
++	 * Gets the current navigation route
++	 * @returns {Array} An array of navigation route segments, or null if not navigating
++	 * Ex:
++	 *	 [{
++	 *		currentRoad: {String},		//name of the current road
++	 *		command: {String},			//command to execute to transition to the next road
++	 *		distance: {Number},			//distance covered by this segment, in metres
++	 *		time: {Number},				//amount of time required to cover this segment, in minutes
++	 *		latitude: {Number},			//latitude at the end of this segment
++	 *		longitude: {Number},		//longitude at the end of this segment
++	 *	}]
++	 */
++	getRoute: function() {
++		try {
++			return (_statusPPS.data.status.navigating) ? _statusPPS.data.status.route : null;
++		} catch (e) {
++			console.error('navigation/providers-elektrobit::getRoute error', e);
++			return null;
++		}
++	},
++	
++	/**
++	 * Gets details about the current status of the navigation engine
++	 * @return {Object} A navigation status object
++	 * Ex:
++	 *	 {
++	 *		isNavigating: {Boolean},			//true if navigation is in progress, otherwise false
++	 *		segment: {Number},					//the index of the current route segment [present if isNavigating=true]
++	 *		segmentDistanceRemaining: {Number},	//the distance remaining in the current segment, in metres [present if isNavigating=true]
++	 *		totalTimeRemaining: {Number},		//the amount of time remaining in the route, in seconds [present if isNavigating=true]
++	 *		totalDistanceRemaining: {Number},	//the distance remaining in the route, in metres [present if isNavigating=true]
++	 *	};
++	 */
++	getStatus: function() {
++		try {
++			if (typeof _statusPPS.data.status.navigating == 'boolean' && _statusPPS.data.status.navigating === true) {
++				return {
++					isNavigating: 			true,
++					maneuvers: 				_statusPPS.data.status.maneuvers,
++					destination: 			_statusPPS.data.status.destination,
++					totalTimeRemaining: 	_statusPPS.data.status.total_time_remaining,
++					totalDistanceRemaining: _statusPPS.data.status.total_distance_remaining,
++				};
++			} else {
++				return {
++					isNavigating: 			false,
++				};
++			}
++		} catch (e) {
++			console.error('navigation/providers-elektrobit::getStatus error', e);
++			return null;
++		}
++	},	
++};
+diff --git a/plugin/com.qnx.car.navigation/www/client.js b/plugin/com.qnx.car.navigation/www/client.js
+new file mode 100644
+index 0000000..572daa2
+--- /dev/null
++++ b/plugin/com.qnx.car.navigation/www/client.js
+@@ -0,0 +1,1035 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++ /**
++ * @module car.navigation 
++ * @static
++ *
++ * @description Provides GPS navigation control
++ */
++
++var _self = {},
++	_ID = "com.qnx.car.navigation",
++	_utils = cordova.require('cordova/utils'),
++	_watches = {};
++
++/**
++ * Handles update events for this extension
++ * @param data {Array} The updated data provided by the event 
++ * @private
++ */
++function onUpdate(data) {
++	var keys = Object.keys(_watches);
++	for (var i=0; i<keys.length; i++) {
++		setTimeout(_watches[keys[i]](data), 0);
++	}
++}
++
++/**
++ * Watch for navigation updates
++ * @param {Function} callback The function to call when a change is detected.
++ * @return {String} An ID for the added watch.
++ * @memberOf module:car.navigation
++ * @method watchNavigation
++ * @example
++ * 
++ * //define a callback function
++ * function myCallback(navigationStatus) {
++ * }
++ * 
++ * var watchId = car.navigation.watchNavigation(myCallback);
++ */
++_self.watchNavigation = function (callback) {
++	var watchId = _utils.createUUID();
++	
++	_watches[watchId] = callback;
++	if (Object.keys(_watches).length === 1) {
++		window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
++	}
++
++	return watchId;
++}
++
++/**
++ * Stop watching for navigation updates
++ * @param {String} watchId The watch ID returned by <i>car.navigation.watchNavigation()</i>.
++ * @memberOf module:car.navigation
++ * @method cancelWatch 
++ * @example
++ * 
++ * car.navigation.cancelWatch(watchId);
++ */
++_self.cancelWatch = function (watchId) {
++	if (_watches[watchId]) {
++		delete _watches[watchId];
++		if (Object.keys(_watches).length === 0) {
++			window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
++		}
++	}
++}
++
++/**
++ * Get the current user's preferred locations
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method getFavourites 
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(locations) {
++ *		//iterate through all the locations
++ *		for (var i=0; i&lt;locations.length; i++) {
++ *			console.log("location id = " + locations[i].id + "\n" +
++ *						"location name = " + locations[i].name + "\n" +
++ *						"location number = " + locations[i].number
++ *						"location street = " + locations[i].street + "\n" +
++ *						"location city = " + locations[i].city + "\n" +
++ *						"location province = " + locations[i].province + "\n" +
++ *						"location postalCode = " + locations[i].postalCode + "\n" +
++ *						"location country = " + locations[i].country + "\n" +
++ *						"location type = " + locations[i].type + "\n" +
++ *						"location latitude = " + locations[i].latitude + "\n" +
++ *						"location longitude = " + locations[i].longitude
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.navigation.getFavourites(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/getFavourites
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{
++ *				id: 1
++ *				name: "Lester B Pearson Int'l-T1 Departure",
++ *				number: "",
++ *				street: "",
++ *				city: "Mississaugua",
++ *				province: "Ontario",
++ *				postalCode: "L5P ",
++ *				country: "Canada",
++ *				type: "transportation",
++ *				latitude: 43.68169,
++ *				longitude: -79.611198
++ *			}, {
++ *				id: 2
++ *				name: "CBC Museum",
++ *				number: "250",
++ *				street: "Front St W",
++ *				city: "Toronto",
++ *				province: "Ontario",
++ *				postalCode: "M5V",
++ *				country: "Canada",
++ *				type: "museum",
++ *				latitude: 43.644203,
++ *				longitude: -79.387566
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getFavourites = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getFavourites', null, false);
++};
++
++/**
++ * Add a location to the current user's preferred locations
++ * @param {Object} location The location to add.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method addFavourite  
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("favourite has been added");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * var myLocation = { city: "Toronto", country: "Canada", latitude: 43.645256, longitude: -79.389229, name: "Starbucks", number: "224", postalCode: "M5V", province: "Ontario", street: "Wellington St W" };
++ * 
++ * //call the method
++ * car.navigation.addFavourite(myLocation, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/addFavourite?city=Toronto&country=Canada&latitude=43.645256&longitude=-79.389229&name=Starbucks&number=224&postalCode=M5V&province=Ontario&street=Wellington%20St%20W
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.addFavourite = function(location, successCallback, errorCallback) {
++	var args = location;
++	window.cordova.exec(successCallback, errorCallback, _ID, 'addFavourite', args, false);
++};
++
++/**
++ * Remove a location from the current user's preferred locations
++ * @param {Number} favouriteId The ID to remove as returned by <i>car.navigation.getFavourites()</i>.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method removeFavourite  
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("favourite has been removed");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.navigation.removeFavourite(2, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/removeFavourite?favouriteId=2
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.removeFavourite = function(favouriteId, successCallback, errorCallback) {
++	var args = { 
++		favouriteId: favouriteId
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'removeFavourite', args, false);
++};
++
++/**
++ * Get the current user's navigation history
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method getHistory   
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(locations) {
++ *		//iterate through all the locations
++ *		for (var i=0; i&lt;locations.length; i++) {
++ *			console.log("location id = " + locations[i].id + "\n" +
++ *						"location name = " + locations[i].name + "\n" +
++ *						"location number = " + locations[i].number
++ *						"location street = " + locations[i].street + "\n" +
++ *						"location city = " + locations[i].city + "\n" +
++ *						"location province = " + locations[i].province + "\n" +
++ *						"location postalCode = " + locations[i].postalCode + "\n" +
++ *						"location country = " + locations[i].country + "\n" +
++ *						"location type = " + locations[i].type + "\n" +
++ *						"location latitude = " + locations[i].latitude + "\n" +
++ *						"location longitude = " + locations[i].longitude
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.navigation.getHistory(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/getHistory
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{
++ *				id: 1
++ *				name: "Lester B Pearson Int'l-T1 Departure",
++ *				number: "",
++ *				street: "",
++ *				city: "Mississaugua",
++ *				province: "Ontario",
++ *				postalCode: "L5P ",
++ *				country: "Canada",
++ *				type: "transportation",
++ *				latitude: 43.68169,
++ *				longitude: -79.611198
++ *			}, {
++ *				id: 2
++ *				name: "CBC Museum",
++ *				number: "250",
++ *				street: "Front St W",
++ *				city: "Toronto",
++ *				province: "Ontario",
++ *				postalCode: "M5V",
++ *				country: "Canada",
++ *				type: "museum",
++ *				latitude: 43.644203,
++ *				longitude: -79.387566
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getHistory = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getHistory', null, false);
++};
++
++/**
++ * Clear the current user's navigation history
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method clearHistory    
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("history has been cleared");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.navigation.clearHistory(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/clearHistory
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.clearHistory = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'clearHistory', null, false);
++};
++
++/**
++ * Browse the Point of Interest (POI) database near a location
++ * @param {Number} [categoryId] A category ID to browse; defaults to 0 for root category
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Object} [location] Find a POI near this location; defaults to current location.
++ * @memberOf module:car.navigation
++ * @method browsePOI
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(locations) {
++ *		//iterate through all the locations
++ *		for (var i=0; i&lt;locations.length; i++) {
++ *			console.log("location id = " + locations[i].id + "\n" +
++ *						"location name = " + locations[i].name + "\n" +
++ *						"location number = " + locations[i].number
++ *						"location street = " + locations[i].street + "\n" +
++ *						"location city = " + locations[i].city + "\n" +
++ *						"location province = " + locations[i].province + "\n" +
++ *						"location postalCode = " + locations[i].postalCode + "\n" +
++ *						"location country = " + locations[i].country + "\n" +
++ *						"location type = " + locations[i].type + "\n" +
++ *						"location latitude = " + locations[i].latitude + "\n" +
++ *						"location longitude = " + locations[i].longitude
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * var myLocation = { city: "Mississaugua", country: "Canada" };
++ * 
++ * //call the method - location object is optional. 
++ * car.navigation.browsePOI(7, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST - without location filter
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/browsePOI?categoryId=7
++ *
++ * 
++ *
++ * @example REST - with location filter. Any of the location parameters can be used arbitrarily in the query string.
++ * This example would be equivalent to: car.navigation.browsePOI(7, successCallback, errorCallback, { city: "Mississaugua", country: "Canada" });
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/browsePOI?categoryId=7&city=Mississaugua&country=Canada
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{
++ *				id: 1
++ *				name: "Lester B Pearson Int'l-T1 Departure",
++ *				number: "",
++ *				street: "",
++ *				city: "Mississaugua",
++ *				province: "Ontario",
++ *				postalCode: "L5P ",
++ *				country: "Canada",
++ *				type: "transportation",
++ *				latitude: 43.68169,
++ *				longitude: -79.611198
++ *			}, {
++ *				...
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.browsePOI = function(categoryId, successCallback, errorCallback, location) {
++	var args = location || {};
++	if (!isNaN(categoryId)) {
++		args['categoryId'] = categoryId;
++	}
++	window.cordova.exec(successCallback, errorCallback, _ID, 'browsePOI', args, false);
++};
++
++/**
++ * Search the Point of Interest (POI) database near a location
++ * @param {String} name The name of the location.
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Object} [location] Find a POI near this location; defaults to current location.
++ * @memberOf module:car.navigation
++ * @method searchPOI 
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(locations) {
++ *		//iterate through all the locations
++ *		for (var i=0; i&lt;locations.length; i++) {
++ *			console.log("location id = " + locations[i].id + "\n" +
++ *						"location name = " + locations[i].name + "\n" +
++ *						"location number = " + locations[i].number
++ *						"location street = " + locations[i].street + "\n" +
++ *						"location city = " + locations[i].city + "\n" +
++ *						"location province = " + locations[i].province + "\n" +
++ *						"location postalCode = " + locations[i].postalCode + "\n" +
++ *						"location country = " + locations[i].country + "\n" +
++ *						"location type = " + locations[i].type + "\n" +
++ *						"location latitude = " + locations[i].latitude + "\n" +
++ *						"location longitude = " + locations[i].longitude
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * var myLocation = { city: "Toronto", country: "Canada" };
++ *
++ * //call the method
++ * car.navigation.searchPOI("starbucks", successCallback, errorCallback, myLocation);
++ *
++ *
++ *
++ * @example REST - without location filter
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/searchPOI?name=starbucks
++ *
++ * 
++ *
++ * @example REST - with location filter. Any of the location parameters can be used arbitrarily in the query string.
++ * This example would be equivalent to: car.navigation.searchPOI("starbucks", successCallback, errorCallback, { city: "Toronto", country: "Canada" });
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/searchPOI?name=starbucks&city=Toronto&country=Canada
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{
++ *				id: 1
++ *				name: "Starbucks",
++ *				number: "224",
++ *				street: "Wellington St W",
++ *				city: "Toronto",
++ *				province: "Ontario",
++ *				postalCode: "M5V",
++ *				country: "Canada",
++ *				type: "transportation",
++ *				latitude: 43.645256,
++ *				longitude: -79.389229
++ *			}, {
++ *				...
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.searchPOI = function(name, successCallback, errorCallback, location) {
++	var args = location || {};
++	if (name) {
++		args['name'] = name;
++	}
++	window.cordova.exec(successCallback, errorCallback, _ID, 'searchPOI', args, false);
++};
++
++/**
++ * Show a set of locations on a map
++ * @param {Array} locations An array of locations to show on the map as returned by
++ * <i>car.navigation.browsePOI()</i>, <i>car.navigation.search()</i>,
++ * <i>car.navigation.getFavourites()</i>, or <i>car.navigation.getHistory()</i>.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method showOnMap  
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("showOnMap has been completed");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * var myLocations = [
++ *		{ city: "Toronto", country: "Canada", latitude: 43.645256, longitude: -79.389229, name: "Starbucks", number: "224", postalCode: "M5V", province: "Ontario", street: "Wellington St W" },
++ *		{ city: "Toronto", country: "Canada", latitude: 43.639709, longitude: -79.382027, number: "208", postalCode: "M5J", province: "Ontario", street: "Queens Quay W" }
++ * ];
++ * 
++ * //call the method - location object is optional. 
++ * car.navigation.showOnMap(myLocations, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST 
++ *	The locations variable is a URL encoded, serialized JSON array of locations 
++ *	To encode/serialize from JavaScript: encodeURIComponent(JSON.stringify(myLocations));
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/showOnMap?locations=%5B%7B%22id%22%3A1%2C%22name%22%3A%22Starbucks%22%2C%22number%22%3A%22224%22%2C%22street%22%3A%22Wellington%20St%20W%22%2C%22city%22%3A%22Toronto%22%2C%22province%22%3A%22Ontario%22%2C%22postalCode%22%3A%22M5V%22%2C%22country%22%3A%22Canada%22%2C%22type%22%3Anull%2C%22distance%22%3A344%2C%22latitude%22%3A43.645256%2C%22longitude%22%3A-79.389229%7D%2C%7B%22id%22%3A2%2C%22name%22%3A%22Starbucks%22%2C%22number%22%3A%22208%22%2C%22street%22%3A%22Queens%20Quay%20W%22%2C%22city%22%3A%22Toronto%22%2C%22province%22%3A%22Ontario%22%2C%22postalCode%22%3A%22M5J%22%2C%22country%22%3A%22Canada%22%2C%22type%22%3Anull%2C%22distance%22%3A515%2C%22latitude%22%3A43.639709%2C%22longitude%22%3A-79.382027%7D%5D
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.showOnMap = function(locations, successCallback, errorCallback) {
++	var args = { 
++		locations: locations 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'showOnMap', args, false);
++};
++
++/**
++ * Zoom the current map
++ * @param {Number} scale The zoom scale, relative to the current view.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method zoomMap
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("zoomMap has been completed");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method - zoom in
++ * car.navigation.zoomMap(2, successCallback, errorCallback);
++ *
++ * //call the method - zoom out 
++ * car.navigation.zoomMap(0.5, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST - zoom in
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/zoomMap?scale=2
++ *
++ *
++ * @example REST - zoom out
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/zoomMap?scale=0.5
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.zoomMap = function(scale, successCallback, errorCallback) {
++	var args = { 
++		scale: scale 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'zoomMap', args, false);
++};
++
++/**
++ * Pan the current map
++ * @param {Number} deltaX The number of pixels to move the map on the X axis.
++ * @param {Number} deltaY The number of pixels to move the map on the Y axis.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method panMap
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("panMap has been completed");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.navigation.panMap(100, 100, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST - pan the map
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/panMap?deltaX=100&deltaY=100
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.panMap = function(deltaX, deltaY, successCallback, errorCallback) {
++	var args = { 
++		deltaX: deltaX, 
++		deltaY: deltaY 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'panMap', args, false);
++};
++
++/**
++ * Find a location based on a partial address
++ * @param {Object} location The location to search for.
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method searchAddress
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(locations) {
++ *		//iterate through all the locations
++ *		for (var i=0; i&lt;locations.length; i++) {
++ *			console.log("location id = " + locations[i].id + "\n" +
++ *						"location name = " + locations[i].name + "\n" +
++ *						"location number = " + locations[i].number
++ *						"location street = " + locations[i].street + "\n" +
++ *						"location city = " + locations[i].city + "\n" +
++ *						"location province = " + locations[i].province + "\n" +
++ *						"location postalCode = " + locations[i].postalCode + "\n" +
++ *						"location country = " + locations[i].country + "\n" +
++ *						"location type = " + locations[i].type + "\n" +
++ *						"location latitude = " + locations[i].latitude + "\n" +
++ *						"location longitude = " + locations[i].longitude
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * var myLocation = { number: "224", street: "Wellington", city: "Toronto", province: "Ontario" };
++ * 
++ * //call the method - location object is optional. 
++ * car.navigation.searchAddress(myLocation, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/searchAddress?number=224&street=Wellington&city=Toronto&province=Ontario
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{
++ *				id: 1
++ *				name: "Starbucks",
++ *				number: "224",
++ *				street: "Wellington St W",
++ *				city: "Toronto",
++ *				province: "Ontario",
++ *				postalCode: "M5V",
++ *				country: "Canada",
++ *				type: "transportation",
++ *				latitude: 43.645256,
++ *				longitude: -79.389229
++ *			}, {
++ *				...
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.searchAddress = function(location, successCallback, errorCallback) {
++	var args = location;
++	window.cordova.exec(successCallback, errorCallback, _ID, 'searchAddress', args, false);
++};
++
++/**
++ * Navigate to a specific location
++ * @param {Object} location The location to navigate to.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Function} [startedCallback] The function to call when navigation starts.
++ * @param {Function} [updateCallback] The function to call when navigation status is updated.
++ * @param {Function} [stoppedCallback] The function to call when navigation ends.
++ * @memberOf module:car.navigation
++ * @method navigateTo
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("navigation has been started");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * var myLocation = { city: "Toronto", country: "Canada", latitude: 43.645256, longitude: -79.389229, name: "Starbucks", number: "224", postalCode: "M5V", province: "Ontario", street: "Wellington St W" };
++ * 
++ * //call the method
++ * car.navigation.navigateTo(myLocation, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/navigateTo?city=Toronto&country=Canada&latitude=43.645256&longitude=-79.389229&name=Starbucks&number=224&postalCode=M5V&province=Ontario&street=Wellington%20St%20W
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * } 
++ */
++_self.navigateTo = function(location, successCallback, errorCallback) {
++	var args = location;
++
++	window.cordova.exec(successCallback, errorCallback, _ID, 'navigateTo', args, false);
++	window.cordova.exec(null, null, _ID, 'addToNavigationHistory', args, false);
++};
++
++/**
++ * Cancel the navigation if it is in progress
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method cancelNavigation 
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("navigation has been cancelled");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ * 
++ *
++ * //call the method
++ * car.navigation.cancelNavigation(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/cancelNavigation
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * } 
++ */
++_self.cancelNavigation = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'cancelNavigation', null, false);
++};
++
++/**
++ * Get the current navigation route
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method getRoute
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(routeSegments) {
++ *		//iterate through all the route segments
++ *		for (var i=0; i&lt;routeSegments.length; i++) {
++ *			console.log("route segment #" + i + "\n" +
++ *						"currentRoad = " + routeSegments[i].currentRoad + '\n' +	//name of the current road
++ *						"command = " + routeSegments[i].command + '\n' +			//command to execute to transition to the next road
++ *						"distance = " + routeSegments[i].distance + '\n' +			//distance (in meters) covered by this segment
++ *						"time = " + routeSegments[i].time + '\n' +					//amount of time (in minutes) required to cover this segment
++ *						"latitude = " + routeSegments[i].latitude + '\n' +			//latitude at the end of this segment
++ *						"longitude = " + routeSegments[i].longitude					//longitude at the end of this segment
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ * 
++ *
++ * //call the method
++ * car.navigation.getRoute(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/getRoute
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{
++ *				currentRoad: "Wellington St",
++ *				command: "TR-L",
++ *				distance: 5000,
++ *				time: 5,
++ *				latitude: 43.645256,
++ *				longitude: -79.389229,
++ *			}, {
++ *				...
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * } 
++ */
++_self.getRoute = function (successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getRoute', null, false);
++};
++
++/**
++ * Get details about the current status of the navigation engine
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.navigation
++ * @method getStatus 
++ * @example
++ *
++ * //define your callback function(s)
++ * function successCallback(status) {
++ *			console.log("isNavigating = " + status.isNavigating + '\n' +							//true if navigation is in progress; otherwise, false
++ *						"segment = " + status.segment + '\n' +										//the index of the current route segment [present if isNavigating=true]
++ *						"segmentDistanceRemaining = " + status.segmentDistanceRemaining + '\n' +	//the distance (in meters) remaining in the current segment [present if isNavigating=true]
++ *						"totalTimeRemaining = " + status.totalTimeRemaining + '\n' +				//the amount of time (in seconds) remaining in the route [present if isNavigating=true]
++ *						"totalDistanceRemaining = " + status.totalDistanceRemaining					//the distance (in meters) remaining in the route [present if isNavigating=true]
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ * 
++ *
++ * //call the method
++ * car.navigation.getStatus(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car.navigation/getStatus
++ *
++ *
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: {
++ *			isNavigating: true,
++ *			segment: 1,
++ *			segmentDistanceRemaining: 5000,
++ *			totalTimeRemaining: 10,
++ *			totalDistanceRemaining: 12000,
++ *		}
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * } 
++*/
++_self.getStatus = function (successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getStatus', null, false);
++};
++
++
++//Export
++module.exports = _self;
++
+diff --git a/plugin/com.qnx.car.theme/plugin.xml b/plugin/com.qnx.car.theme/plugin.xml
+new file mode 100644
+index 0000000..53ebbff
+--- /dev/null
++++ b/plugin/com.qnx.car.theme/plugin.xml
+@@ -0,0 +1,33 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.car.theme"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="car.theme" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/theme.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.car.theme" value="com.qnx.car.theme" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.car.theme/src/blackberry10/index.js b/plugin/com.qnx.car.theme/src/blackberry10/index.js
+new file mode 100644
+index 0000000..cb865c9
+--- /dev/null
++++ b/plugin/com.qnx.car.theme/src/blackberry10/index.js
+@@ -0,0 +1,132 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++var _wwfix = require("../../lib/wwfix"),
++	_theme = require("./theme"),
++	_eventResult;
++
++/**
++ * Initializes the extension 
++ */
++function init() {
++	try {
++		_theme.init();
++	} catch (ex) {
++		console.error('Error in webworks ext: theme/index.js:init():', ex);
++	}
++}
++init();
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Returns the current audio parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	startEvents: function(success, fail, args, env) {
++		_eventResult = new PluginResult(args, env)
++		try {
++			_theme.setTriggerUpdate(function (data) {
++				_eventResult.callbackOk(data, true);
++			});
++			_eventResult.noResult(true);
++		} catch (e) {
++			_eventResult.error("error in startEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current audio parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stopEvents: function(success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			//disable the event trigger
++			_theme.setTriggerUpdate(null);
++			result.ok(undefined, false);
++
++			//cleanup
++			_eventResult.noResult(false);
++			delete _eventResult;
++		} catch (e) {
++			result.error("error in stopEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns a list of available themes
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getList: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _theme.getList();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current theme
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	getActive: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _theme.getActive();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Sets the current theme
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	setActive: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_theme.setActive(fixedArgs.themeId);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	}
++};
+diff --git a/plugin/com.qnx.car.theme/src/blackberry10/theme.js b/plugin/com.qnx.car.theme/src/blackberry10/theme.js
+new file mode 100644
+index 0000000..ea2aea7
+--- /dev/null
++++ b/plugin/com.qnx.car.theme/src/blackberry10/theme.js
+@@ -0,0 +1,95 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for theme functionality
++ */
++
++var	_pps = qnx.webplatform.pps,
++	_themesReaderPPS,
++	_profileThemeReaderPPS,
++	_profileThemeWriterPPS,
++	_triggerUpdate;
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Initializes the extension 
++	 */
++	init: function() {
++		_themesReaderPPS = _pps.createObject("/pps/qnxcar/themes", _pps.PPSMode.DELTA);
++		_themesReaderPPS.open(_pps.FileMode.RDONLY);
++
++		_profileThemeReaderPPS = _pps.createObject("/pps/qnxcar/profile/theme", _pps.PPSMode.DELTA);
++		_profileThemeReaderPPS.onNewData = function(event) {
++			if (_triggerUpdate && event && event.data) {
++				_triggerUpdate(this.getActive());
++			}
++		}.bind(this);
++		_profileThemeReaderPPS.open(_pps.FileMode.RDONLY);
++
++		_profileThemeWriterPPS = _pps.createObject("/pps/qnxcar/profile/theme", _pps.PPSMode.DELTA);
++		_profileThemeWriterPPS.open(_pps.FileMode.WRONLY);
++	},
++
++	/**
++	 * Sets the trigger function to call when an update event is fired
++	 * @param {Function} trigger The trigger function to call when the event is fired
++	 */
++	setTriggerUpdate: function(trigger) {
++		_triggerUpdate = trigger;
++	},
++
++	/**
++	 * Returns a list of available themes
++	 * @returns {Array} A list of available themes
++	 */
++	getList: function() {
++		var list = [];
++		var keys = Object.keys(_themesReaderPPS.data.themes)
++		for (var i=0; i<keys.length; i++) {
++			list.push({ id: keys[i], name: _themesReaderPPS.data.themes[keys[i]].title });
++		}
++		return list;
++	},
++	
++	/**
++	 * Returns the current theme
++	 * @returns {Object} The current theme
++	 */
++	getActive: function() {
++		var id = _profileThemeReaderPPS.data.theme.theme;
++		var name = _themesReaderPPS.data.themes[id].title;
++		return { id: id, name: name };
++	},
++	
++	/**
++	 * Sets the current theme
++	 * @param {String} themeId The new theme id
++	 */
++	setActive: function(themeId) {
++		if (typeof themeId === "string" && themeId.length > 0) {
++			_profileThemeWriterPPS.write({
++				theme: themeId
++			});
++		}
++	}
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.car.theme/www/client.js b/plugin/com.qnx.car.theme/www/client.js
+new file mode 100644
+index 0000000..c039ca8
+--- /dev/null
++++ b/plugin/com.qnx.car.theme/www/client.js
+@@ -0,0 +1,262 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * @module car.theme
++ * @static
++ *
++ * @description Provides access to HMI theming 
++ */
++
++var _self = {},
++	_ID = "com.qnx.car.theme",
++	_utils = cordova.require('cordova/utils'),
++	_watches = {};
++
++
++/**
++ * Load a theme and inject the stylesheet into the DOM
++ * @param {Object} theme The theme to load.
++ * @private
++ */
++function loadTheme(theme) {
++	if (theme && theme.id) {
++	 	//verify that this application is themeable
++	 	var styleNode = document.getElementById('theme-css');
++	 	if (styleNode) {
++	 		//find the name of the application
++	 		var app = styleNode.getAttribute('app');
++
++	 		//determing the CSS file for the application
++			var themeCSS = 'platform:///apps/common/themes/' + theme.id + '/' + app + '/master.css';
++
++	 		//apply the theme only if it is different than the current theme
++	 		if (styleNode.getAttribute('href') !== themeCSS) {
++		 		styleNode.setAttribute('href', themeCSS);
++	 		}
++	 	}
++	}
++ }
++
++/**
++ * Handles update events for this extension
++ * @param data {Array} The updated data provided by the event 
++ * @private
++ */
++function onUpdate(data) {
++	var keys = Object.keys(_watches);
++	for (var i=0; i<keys.length; i++) {
++		setTimeout(_watches[keys[i]](data), 0);
++	}
++}
++
++/**
++ * Watch for theme changes
++ * @param {Function} callback The function to call when a change is detected.
++ * @return {String} An ID for the added watch.
++ * @memberOf module:car.theme
++ * @method watchTheme
++ * @example
++ * 
++ * //define a callback function
++ * function myCallback(theme) {
++ * 		console.log("theme id = " + theme.id + "; theme name = " + theme.name);
++ * }
++ * 
++ * var watchId = car.theme.watchTheme(myCallback);
++ */
++_self.watchTheme = function (callback) {
++	var watchId = _utils.createUUID();
++	
++	_watches[watchId] = callback;
++	if (Object.keys(_watches).length === 1) {
++		window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
++	}
++
++	return watchId;
++}
++
++
++/**
++ * Stop watching theme changes
++ * @param {String} watchId The watch ID as returned by <i>car.theme.watchTheme()</i>.
++ * @memberOf module:car.theme
++ * @method cancelWatch
++ * @example
++ * 
++ * car.theme.cancelWatch(watchId);
++ */
++_self.cancelWatch = function (watchId) {
++	if (_watches[watchId]) {
++		delete _watches[watchId];
++		if (Object.keys(_watches).length === 0) {
++			window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
++		}
++	}
++}
++
++/**
++ * Return a list of available themes
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.theme
++ * @method getList
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(themes) {
++ *		//iterate through all the themes
++ *		for (var i=0; i&lt;themes.length; i++) {
++ *			console.log("theme id = " + themes[i].id + "; theme name = " + themes[i].name);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.theme.getList(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/theme/getList
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [ 
++ *			{ id: 'default', name: 'Default' }, 
++ *			{ id: 'titanium', name: 'Titanium' } 
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getList = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getList', null, false);
++};
++
++/**
++ * Return the current theme
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.theme
++ * @method getActive
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(theme) {
++ *		console.log("theme id = " + theme.id + "; theme name = " + theme.name);
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.theme.getActive(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/theme/getActive
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: { id: 'default', name: 'Default' }
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getActive = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getActive', null, false);
++};
++
++/**
++ * Change the current theme
++ * @param {String} themeId The ID of the new theme.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.theme
++ * @method setActive 
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("theme has been changed");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.theme.setActive('default', successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/theme/setActive?themeId=default
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.setActive = function(themeId, successCallback, errorCallback) {
++	var args = { 
++		themeId: themeId 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'setActive', args, false);
++};
++
++
++//Export
++module.exports = _self;
++
++
++// Listen for theme changes and react as necessary
++document.addEventListener("deviceready", function() {
++	car.theme.getActive(loadTheme);
++	car.theme.watchTheme(loadTheme);
++}, false);
++
+-- 
+1.7.10.msysgit.1
+

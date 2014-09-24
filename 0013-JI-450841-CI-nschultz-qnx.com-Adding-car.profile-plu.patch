@@ -1,0 +1,1557 @@
+From c3549c010ecf360e5f362a09572d78cfec3907d9 Mon Sep 17 00:00:00 2001
+From: Marc Lapierre <marc@eternallabs.com>
+Date: Wed, 24 Jul 2013 15:26:38 -0400
+Subject: [PATCH 13/61] JI:450841 CI:nschultz@qnx.com Adding car.profile
+ plugin; Updating comments in other plugins
+
+---
+ .../src/blackberry10/audiomixer.js                 |    3 -
+ .../src/blackberry10/index.js                      |    7 +-
+ .../www/AudioMixerSetting.js                       |   28 +-
+ plugin/com.qnx.car.audiomixer/www/client.js        |    6 -
+ plugin/com.qnx.car.hvac/src/blackberry10/hvac.js   |   22 +-
+ plugin/com.qnx.car.hvac/src/blackberry10/index.js  |    3 -
+ plugin/com.qnx.car.hvac/www/HvacFanDirection.js    |   24 +-
+ plugin/com.qnx.car.hvac/www/HvacSetting.js         |   22 +-
+ plugin/com.qnx.car.hvac/www/client.js              |    9 +-
+ plugin/com.qnx.car.profile/plugin.xml              |   33 ++
+ .../com.qnx.car.profile/src/blackberry10/index.js  |  333 ++++++++++++
+ .../src/blackberry10/profile.js                    |  301 +++++++++++
+ plugin/com.qnx.car.profile/www/client.js           |  529 ++++++++++++++++++++
+ .../com.qnx.car.sensors/src/blackberry10/index.js  |    3 -
+ .../src/blackberry10/sensors.js                    |    5 +-
+ plugin/com.qnx.car.sensors/www/Sensor.js           |    9 +-
+ plugin/com.qnx.car.sensors/www/client.js           |    4 -
+ 17 files changed, 1270 insertions(+), 71 deletions(-)
+ create mode 100644 plugin/com.qnx.car.profile/plugin.xml
+ create mode 100644 plugin/com.qnx.car.profile/src/blackberry10/index.js
+ create mode 100644 plugin/com.qnx.car.profile/src/blackberry10/profile.js
+ create mode 100644 plugin/com.qnx.car.profile/www/client.js
+
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+index 23ec6bd..7098797 100644
+--- a/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
++++ b/plugin/com.qnx.car.audiomixer/src/blackberry10/audiomixer.js
+@@ -19,9 +19,6 @@
+ 
+ /**
+  * The abstraction layer for mixer functionality
+- *
+- * @author mlapierre
+- * $Id: audiomixer.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
+  */
+ 
+ var	_pps = qnx.webplatform.pps,
+diff --git a/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+index 39281e8..de449bc 100644
+--- a/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
++++ b/plugin/com.qnx.car.audiomixer/src/blackberry10/index.js
+@@ -18,11 +18,8 @@
+  */
+ 
+  /**
+- * Allows control of volume and other audio parameters
+- *
+- * @author mlapierre
+- * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
+- */
++  * Allows control of volume and other audio parameters
++  */
+ 
+ var _audiomixer = require('./audiomixer'),
+ 	_wwfix = require("../../lib/wwfix"),
+diff --git a/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+index d94136c..a7839a8 100644
+--- a/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
++++ b/plugin/com.qnx.car.audiomixer/www/AudioMixerSetting.js
+@@ -17,25 +17,23 @@
+  * for other information.
+  */
+ 
+- /**
+- * @name car.audiomixer.AudioMixerSetting
++module.exports = {},
++
++/**
+  * @static
++ * @memberOf module:car.audiomixer
++ * @name AudioMixerSetting
+  *
+- * Audio mixer settings enumeration.
++ * @description <p>Audio mixer settings enumeration
++ * <p>All values indicate a level within a range from 0 to 100%.
+  *
+- * @author mlapierre
+- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++ * @property {Number} VOLUME The volume setting. 
++ * @property {String} BASS The bass setting.
++ * @property {String} MID The midrange setting. 
++ * @property {String} TREBLE The treble setting. 
++ * @property {Number} BALANCE The balance setting. 
++ * @property {String} FADE The fade setting. 
+  */
+-
+-module.exports = {},
+-
+-/**  @property VOLUME Represents the volume setting */
+-/**  @property BASS Represents the bass setting */
+-/**  @property MID Represents the mid setting */
+-/**  @property TREBLE Represents the treble setting */
+-/**  @property BALANCE Represents the balance setting */
+-/**  @property FADE Represents the fade setting */
+-
+ Object.defineProperties(module.exports,
+ {
+ 	'VOLUME':		{ value: 'volume',		enumerable: true, writable: false },
+diff --git a/plugin/com.qnx.car.audiomixer/www/client.js b/plugin/com.qnx.car.audiomixer/www/client.js
+index 259436a..da41d78 100644
+--- a/plugin/com.qnx.car.audiomixer/www/client.js
++++ b/plugin/com.qnx.car.audiomixer/www/client.js
+@@ -23,12 +23,6 @@
+  *
+  * Controls the audio mixer 
+  */
+- 
+- /*
+-  * @author mlapierre
+-  * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
+-  */
+-
+ 
+ var _self = {},
+ 	_ID = 'com.qnx.car.audiomixer',
+diff --git a/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js b/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+index 1e850e0..3dae49b 100644
+--- a/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
++++ b/plugin/com.qnx.car.hvac/src/blackberry10/hvac.js
+@@ -1,8 +1,24 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
+ /**
+  * The abstraction layer for hvac functionality
+- *
+- * @author mlapierre
+- * $Id: hvac.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
+  */
+ 
+ var	_pps = qnx.webplatform.pps,
+diff --git a/plugin/com.qnx.car.hvac/src/blackberry10/index.js b/plugin/com.qnx.car.hvac/src/blackberry10/index.js
+index 9bea678..b0d34f1 100644
+--- a/plugin/com.qnx.car.hvac/src/blackberry10/index.js
++++ b/plugin/com.qnx.car.hvac/src/blackberry10/index.js
+@@ -19,9 +19,6 @@
+ 
+ /**
+  * Allows control of HVAC systems 
+- *
+- * @author mlapierre
+- * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
+  */
+ 
+ var _hvac = require("./hvac"),
+diff --git a/plugin/com.qnx.car.hvac/www/HvacFanDirection.js b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+index 248d945..5ad1d78 100644
+--- a/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
++++ b/plugin/com.qnx.car.hvac/www/HvacFanDirection.js
+@@ -1,14 +1,26 @@
+-/**
+- * @name car.hvac.HvacFanDirection
+- *
+- * @author mlapierre
+- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
+  */
+ 
+ module.exports = {};
+ /**
+  * @static
+- * @memberOf module:car_xyz_hvac
++ * @memberOf module:car.hvac
+  * @name HvacFanDirection
+  *
+  * @description Fan direction enumeration
+diff --git a/plugin/com.qnx.car.hvac/www/HvacSetting.js b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+index c7abf8d..8d4777f 100644
+--- a/plugin/com.qnx.car.hvac/www/HvacSetting.js
++++ b/plugin/com.qnx.car.hvac/www/HvacSetting.js
+@@ -1,12 +1,26 @@
+-/**
+- * @author mlapierre
+- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
+  */
+ 
+ module.exports = {},
+ /**
+  * @static
+- * @memberOf module:car_xyz_hvac
++ * @memberOf module:car.hvac
+  * @name HvacSetting
+  *
+  * @description  HVAC settings enumeration
+diff --git a/plugin/com.qnx.car.hvac/www/client.js b/plugin/com.qnx.car.hvac/www/client.js
+index 87394ca..b83c1c5 100644
+--- a/plugin/com.qnx.car.hvac/www/client.js
++++ b/plugin/com.qnx.car.hvac/www/client.js
+@@ -17,18 +17,11 @@
+  * for other information.
+  */
+  
+-
+- /**
++/**
+  * @module car.hvac
+  * @static
+  *
+  * @description Controls the HVAC system 
+- * 
+- */
+- 
+-/* 
+- * @author mlapierre
+- * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
+  */
+ 
+ var _self = {},
+diff --git a/plugin/com.qnx.car.profile/plugin.xml b/plugin/com.qnx.car.profile/plugin.xml
+new file mode 100644
+index 0000000..62419db
+--- /dev/null
++++ b/plugin/com.qnx.car.profile/plugin.xml
+@@ -0,0 +1,33 @@
++<!--
++Copyright 2013  QNX Software Systems Limited
++
++Licensed under the Apache License, Version 2.0 (the "License"). You
++may not reproduce, modify or distribute this software except in
++compliance with the License. You may obtain a copy of the License
++at: http://www.apache.org/licenses/LICENSE-2.0.
++
++Unless required by applicable law or agreed to in writing, software
++distributed under the License is distributed on an "AS IS" basis,
++WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++This file may contain contributions from others, either as
++contributors under the License or as licensors under other terms.
++Please review this entire file for other proprietary rights or license
++notices, as well as the applicable QNX License Guide at
++http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++for other information.
++-->
++<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
++	id="com.qnx.car.profile"
++	version="1.0.0">
++	<js-module src="www/client.js">
++		<clobbers target="car.profile" />
++	</js-module>
++
++	<platform name="blackberry10">
++		<source-file src="src/blackberry10/index.js" />
++		<source-file src="src/blackberry10/profile.js" />
++		<config-file target="www/config.xml" parent="/widget">
++			<feature name="com.qnx.car.profile" value="com.qnx.car.profile" />
++		</config-file>
++	</platform>
++</plugin>
+diff --git a/plugin/com.qnx.car.profile/src/blackberry10/index.js b/plugin/com.qnx.car.profile/src/blackberry10/index.js
+new file mode 100644
+index 0000000..f51651f
+--- /dev/null
++++ b/plugin/com.qnx.car.profile/src/blackberry10/index.js
+@@ -0,0 +1,333 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * Manages the system user information
++ */
++
++var _profile = require("./profile"),
++	_wwfix = require("../../lib/wwfix"),
++	_eventResult;
++
++/**
++ * Initializes the extension 
++ */
++function init() {
++	try {
++		_profile.init();
++	} catch (ex) {
++		console.error('Error in webworks ext: profile/index.js:init():', ex);
++	}
++}
++init();
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Returns the current audio parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	startEvents: function(success, fail, args, env) {
++		_eventResult = new PluginResult(args, env)
++		try {
++			_profile.setTriggerUpdate(function (data) {
++				_eventResult.callbackOk(data, true);
++			});
++			_eventResult.noResult(true);
++		} catch (e) {
++			_eventResult.error("error in startEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Returns the current audio parameters
++	 * @param {Function} success Function to call if the operation is a success
++	 * @param {Function} fail Function to call if the operation fails
++	 * @param {Object} args The arguments supplied
++	 * @param {Object} env Environment variables
++	 */
++	stopEvents: function(success, fail, args, env) {
++		var result = new PluginResult(args, env);
++		try {
++			//disable the event trigger
++			_profile.setTriggerUpdate(null);
++			result.ok(undefined, false);
++
++			//cleanup
++			_eventResult.noResult(false);
++			delete _eventResult;
++		} catch (e) {
++			result.error("error in stopEvents: " + JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Retrieves the current profile information
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	getActive: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _profile.getActive();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Change the active profile
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	setActive: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.setActive(fixedArgs.profileId);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Return a list of available profiles
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	getList: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _profile.getList();
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Adds a profile
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	addProfile: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			var data = _profile.addProfile(fixedArgs.name, fixedArgs.avatar, fixedArgs.theme, fixedArgs.bluetoothDeviceId);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Updates a given profile
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	updateProfile: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.updateProfile(fixedArgs.profileId, fixedArgs.name, fixedArgs.avatar, fixedArgs.theme, fixedArgs.bluetoothDeviceId);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Delete a given profile
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	deleteProfile: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.deleteProfile(fixedArgs.profileId);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++
++	/**
++	 * Gets all the settings save for a given profile
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	getSettings: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			var settings = (fixedArgs.settings) ? fixedArgs.settings.split(',') : null;
++			var data = _profile.getSettings(_profile.getActive().id, settings);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Sets a profile preference setting
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied
++	 * @param env {Object} Environment variables
++	 */
++	setSetting: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.setSetting(_profile.getActive().id, fixedArgs.key, fixedArgs.value);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++
++	/**
++	 * Get the navigation history for a given user
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	getNavigationHistory: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _profile.getNavigationHistory(_profile.getActive().id);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Clears the navigation history for a given user
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	clearNavigationHistory: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			_profile.clearNavigationHistory(_profile.getActive().id);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Adds a location to the navigation history for a given user
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	addToNavigationHistory: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.addToNavigationHistory(_profile.getActive().id, fixedArgs);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Get the navigation favourites for a given user
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	getNavigationFavourites: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var data = _profile.getNavigationFavourites(_profile.getActive().id);
++			result.ok(data, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Adds a navigation location to the user's favourites
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	addNavigationFavourite: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.addNavigationFavourite(_profile.getActive().id, fixedArgs);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},
++	
++	/**
++	 * Removes a navigation location to the user's favourites
++	 * @param success {Function} Function to call if the operation is a success
++	 * @param fail {Function} Function to call if the operation fails
++	 * @param args {Object} The arguments supplied. Available arguments for this call are: N/A
++	 * @param env {Object} Environment variables
++	 */
++	removeNavigationFavourite: function(success, fail, args, env) {
++		var result = new PluginResult(args, env)
++		try {
++			var fixedArgs = _wwfix.parseArgs(args);
++			_profile.removeNavigationFavourite(fixedArgs.favouriteId);
++			result.ok(undefined, false);
++		} catch (e) {
++			result.error(JSON.stringify(e), false);
++		}
++	},	
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.car.profile/src/blackberry10/profile.js b/plugin/com.qnx.car.profile/src/blackberry10/profile.js
+new file mode 100644
+index 0000000..125eb92
+--- /dev/null
++++ b/plugin/com.qnx.car.profile/src/blackberry10/profile.js
+@@ -0,0 +1,301 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * The abstraction layer for profile functionality
++ */
++
++var	_pps = qnx.webplatform.pps,
++	_qdb = require("../../lib/qdb"),
++	_db,
++	_readerPPS,
++	_writerPPS,
++	_triggerUpdate;
++
++const SELECT_PROFILE_QUERY = "SELECT id, full_name AS name, avatar, theme, device_id AS bluetoothDeviceId FROM profiles ";
++
++/**
++ * Returns the full profile for a given profile id
++ * @param {Number} profileId The profile id to find
++ * @return {Object} The full profile object for the given profile id, or null if it doesn't exist
++ */
++function getProfile(profileId) {
++	//validate the profile id
++	if (typeof profileId !== 'number' || profileId <= 0) {
++		return null;
++	}
++
++	var query = SELECT_PROFILE_QUERY + "WHERE id={0}".format(profileId);
++	var results = _qdb.resultToArray(_db.query(query));
++
++	return (results && results.length == 1) ? results[0] : null;
++}
++
++/**
++ * Exports are the publicly accessible functions
++ */
++module.exports = {
++	/**
++	 * Initializes the extension 
++	 */
++	init: function() {
++		//readerPPS
++		_readerPPS = _pps.createObject("/pps/qnxcar/profile/user", _pps.PPSMode.DELTA);
++		_readerPPS.onNewData = function(event) {
++			if (_triggerUpdate && event && event.data) {
++				_triggerUpdate(event.data);
++			}
++		};
++		_readerPPS.open(_pps.FileMode.RDONLY);
++
++		//writerPPS
++		_writerPPS = _pps.createObject("/pps/qnxcar/profile/user", _pps.PPSMode.DELTA);
++		_writerPPS.open(_pps.FileMode.WRONLY);
++
++		_db = _qdb.createObject();
++		if (!_db || !_db.open("/dev/qdb/personalization"))
++		{
++			throw "error opening db; path=/dev/qdb/personalization";
++		}
++	},
++	
++	/**
++	 * Sets the trigger function to call when an event is fired
++	 * @param {Function} trigger The trigger function to call when an event is fired
++	 */
++	setTriggerUpdate: function(trigger) {
++		_triggerUpdate = trigger;
++	},
++	
++	/**
++	 * Retrieves the current profile information
++	 * @returns {Object} The requested user object
++	 */
++	getActive: function() {
++		return getProfile(_readerPPS.data.user.id);
++	},
++	
++	/**
++	 * Change the active profile
++	 * @param {Number} profileId The id of the profile to make active
++	 */
++	setActive: function(profileId) {
++		var profile = getProfile(profileId);
++		_writerPPS.write(profile);
++	},
++
++	/**
++	 * Return a list of available profiles
++	 * @return {Array} An array of profiles
++	 */
++	getList: function() {
++		var results = _qdb.resultToArray(_db.query(SELECT_PROFILE_QUERY));
++		return results;
++	},
++
++	/**
++	 * Create a new profile
++	 * @param {String} name The name of the profile
++	 * @param {String} [avatar] The avatar for the profile
++	 * @param {String} [theme] The preferred theme for the profile
++	 * @param {String} [bluetoothDeviceId] The preferred Bluetooth device for the profile
++	 * @return {Number} ID of the last row entered in the profiles table
++	 */
++	addProfile: function(name, avatar, theme, bluetoothDeviceId) {
++		//insert the user
++		var insertQuery = "INSERT INTO profiles(full_name, theme, avatar, device_id) VALUES ('{0}', '{1}', '{2}', '{3}')";
++		_db.query(insertQuery.format(_qdb.sqlSafe(name), _qdb.sqlSafe(theme), _qdb.sqlSafe(avatar), bluetoothDeviceId || 0));
++
++		//retrieve the user id
++		var selectQuery = "SELECT id FROM profiles ORDER BY ROWID DESC LIMIT 1";
++		return _qdb.resultToArray(_db.query(selectQuery, true))[0].id;
++	},
++
++	/**
++	 * Update an existing profile
++	 * @param {Number} profileId The id of the profile
++	 * @param {String} [name] The name of the profile
++	 * @param {String} [avatar] The avatar for the profile
++	 * @param {String} [theme] The preferred theme for the profile
++	 * @param {String} [bluetoothDeviceId] The preferred Bluetooth device for the profile
++	 */
++	updateProfile: function(profileId, name, avatar, theme, bluetoothDeviceId) {
++		var query = "UPDATE profiles SET {0} WHERE id = {1}";
++		var params = [];
++
++		if (typeof name =='string' && name.length > 0) {
++			params.push("full_name='{0}'".format(name));
++		}
++		if (typeof avatar =='string' && avatar.length > 0) {
++			params.push("avatar='{0}'".format(avatar));
++		}
++		if (typeof theme =='string' && theme.length > 0) {
++			params.push("theme='{0}'".format(theme));
++		}
++		if (typeof bluetoothDeviceId =='string' && bluetoothDeviceId.length > 0) {
++			params.push("device_id='{0}'".format(bluetoothDeviceId));
++		}
++
++		if (params.length > 0) {
++			_db.query(query.format(params.join(','), profileId));
++		}
++	},
++
++	/**
++	 * Delete an existing profile
++	 * @param {String} profileId The id of the profile
++	 */
++	deleteProfile: function(profileId) {
++		var query_profile = "DELETE FROM profiles WHERE id = {0}".format(profileId);
++		var query_settings = "DELETE FROM settings WHERE profile_id = {0}";
++
++		_db.query(query_settings);
++		_db.query(query_profile);
++	},
++
++	/**
++	 * Returns all settings for a given profile
++	 * @param {Number} profileId The ID of the profile to get the settings for [optional; default to current user]
++	 * @param {Array} [settings] A list of settings to whitelist
++	 * @returns {Array} The specified settings for the given profile
++	 */
++	getSettings: function(profileId, settings) {
++		var query = "SELECT * FROM settings WHERE profile_id = {0}".format(profileId);
++
++		if (settings) {
++			query += " AND key IN ('{0}')".format(settings.join("','"));
++		}
++
++		return _qdb.resultToArray(_db.query(query));
++	},
++
++	/**
++	 * Set the value of a setting for a given profile
++	 * @param {Number} profileId The id of the profile
++	 * @param {String} key The key of the setting
++	 * @param {Mixed} value The value of the setting
++	 */
++	setSetting: function(profileId, key, value) {
++		//build the query
++		var query = "REPLACE INTO settings (profile_id, key, value) VALUES ({0}, '{1}', '{2}')".format(profileId, _qdb.sqlSafe(key), _qdb.sqlSafe(String(value)));
++
++		//execute the query
++		_db.query(query);
++	},
++
++	/**
++	 * Get the navigation history for a given user
++	 * @param {Number} profileId The id of the profile
++	 * @returns {Array} An array of navigation locations
++	 */
++	getNavigationHistory: function(profileId) {
++		var result = _db.query("SELECT * FROM nav_history WHERE profile_id={0} ORDER BY timestamp DESC".format(profileId));
++		return _qdb.resultToArray(result);
++	},
++	
++	/**
++	 * Clears the navigation history for a given user
++	 * @param {Number} profileId The id of the profile
++	 */
++	clearNavigationHistory: function(profileId) {
++		_db.query("DELETE FROM nav_history WHERE profile_id={0}".format(profileId));
++	},
++	
++	/**
++	 * Adds a location to the navigation history for a given user
++	 * @param {Number} profileId The id of the profile
++	 * @param {Object} location The location to add to the user's history 
++	 */
++	addToNavigationHistory: function(profileId, location) {
++		var timestamp = Math.floor(new Date().getTime() / 1000);		
++		var query = "SELECT id FROM nav_history WHERE profile_id={0} AND name='{1}' AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
++
++		//see if this destination is already in the history
++		var result = _qdb.resultToArray(_db.query(query));
++		if (result && result.length > 0) {
++			//destination exists in history; update the timestamp
++			_db.query("UPDATE nav_history SET timestamp={0} WHERE id={1}".format(timestamp, result[0].id));
++		} else {
++			//destination does not exist in history, add it
++			_db.query("INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude, timestamp) VALUES ({0}, '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', {9}, {10}, {11})".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.postalCode), _qdb.sqlSafe(location.country), location.type, location.latitude, location.longitude, timestamp));
++		}
++
++		
++		/* TEST DATA
++		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
++		VALUES (1, 'Bridgehead Coffee', '126', 'Guiges Ave', 'Ottawa', 'ON', '', 'Canada', '', 1341949840000, 10.1234, 10.1234);
++		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
++		VALUES (1, 'QNX Software Systems', '1001', 'Farrar Rd', 'Kanata', 'ON', 'K2K 1Y5', 'Canada', '', 1341839740000, 10.1234, 10.1234);
++		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
++		VALUES (1, 'National Gallery of Canada', '380', 'Sussex Drive', 'Ottawa', 'ON', '', 'Canada', '', 1341839740000, 10.1234, 10.1234);
++		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
++		VALUES (1, 'ADDRESS', '404', 'Laurier Ave E', 'Ottawa', 'ON', 'K1N 6R2', 'Canada', '', 1341815840000, 10.1234, 10.1234);
++		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
++		VALUES (1, 'Chez Lucien Restaurant', '137', 'Murray Street', 'Ottawa', 'ON', 'K1N 5M7', 'Canada', '', 1341802840000, 10.1234, 10.1234);
++		*/
++	},
++	
++	/**
++	 * Get the navigation favourites for a given user
++	 * @param {Number} profileId The id of the profile
++	 * @returns {Array} An array of navigation locations
++	 */
++	getNavigationFavourites: function(profileId) {	
++		var result = _db.query("SELECT * FROM nav_favourites WHERE profile_id={0}".format(profileId));		
++		return _qdb.resultToArray(result);
++
++		/* TEST DATA
++		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
++		VALUES (1, 'Bridgehead Coffee', '126', 'Guiges Ave', 'Ottawa', 'ON', '', 'Canada', '', 10.1234, 10.1234);
++		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
++		VALUES (1, 'QNX Software Systems', '1001', 'Farrar Rd', 'Kanata', 'ON', 'K2K 1Y5', 'Canada', '', 10.1234, 10.1234);
++		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
++		VALUES (1, 'National Gallery of Canada', '380', 'Sussex Drive', 'Ottawa', 'ON', '', 'Canada', '', 10.1234, 10.1234);
++		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
++		VALUES (1, 'ADDRESS', '404', 'Laurier Ave E', 'Ottawa', 'ON', 'K1N 6R2', 'Canada', '', 10.1234, 10.1234);
++		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
++		VALUES (1, 'Chez Lucien Restaurant', '137', 'Murray Street', 'Ottawa', 'ON', 'K1N 5M7', 'Canada', '', 10.1234, 10.1234);
++		*/
++	},
++	
++	/**
++	 * Adds a navigation location to the user's favourites
++	 * @param {Number} profileId The id of the profile
++	 * @param {Object} location The location to add to the user's favourites 
++	 */
++	addNavigationFavourite: function(profileId, location) {
++		var timestamp = Math.floor(new Date().getTime() / 1000);		
++		var query = "SELECT id FROM nav_favourites WHERE profile_id={0} AND name='{1}' AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
++
++		//see if this destination is already in the favourites
++		var result = _qdb.resultToArray(_db.query(query));
++		if (result && result.length == 0) {
++			//destination does not exist in favourites, add it
++			_db.query("INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) VALUES ({0}, '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', {9}, {10})".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.postalCode), _qdb.sqlSafe(location.country), location.type, location.latitude, location.longitude));
++		}
++	},
++	
++	/**
++	 * Removes a navigation location to the user's favourites
++	 * @param {Number} favouriteId The id of the favourite location to remove from the user's favourites 
++	 */
++	removeNavigationFavourite: function(favouriteId) {
++		_db.query("DELETE FROM nav_favourites WHERE id={0}".format(favouriteId));
++	},
++};
+\ No newline at end of file
+diff --git a/plugin/com.qnx.car.profile/www/client.js b/plugin/com.qnx.car.profile/www/client.js
+new file mode 100644
+index 0000000..78ee066
+--- /dev/null
++++ b/plugin/com.qnx.car.profile/www/client.js
+@@ -0,0 +1,529 @@
++/*
++ * Copyright 2013  QNX Software Systems Limited
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"). You
++ * may not reproduce, modify or distribute this software except in
++ * compliance with the License. You may obtain a copy of the License
++ * at: http://www.apache.org/licenses/LICENSE-2.0.
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
++ * This file may contain contributions from others, either as
++ * contributors under the License or as licensors under other terms.
++ * Please review this entire file for other proprietary rights or license
++ * notices, as well as the applicable QNX License Guide at
++ * http://www.qnx.com/legal/licensing/document_archive/current_matrix.pdf
++ * for other information.
++ */
++
++/**
++ * @module car.profile
++ * @static
++ *
++ * @description Manages the system user information
++ */
++
++var _self = {},
++	_ID = "com.qnx.car.profile",
++	_utils = cordova.require('cordova/utils'),
++	_watches = {};
++
++
++/**
++ * Handles update events for this extension
++ * @param data {Array} The updated data provided by the event 
++ * @private
++ */
++function onUpdate(data) {
++	var keys = Object.keys(_watches);
++	for (var i=0; i<keys.length; i++) {
++		setTimeout(_watches[keys[i]](data), 0);
++	}
++}
++
++/**
++ * Watch for profile changes
++ * @param {Function} callback The function to call when a change is detected.
++ * @return {String} An ID for the added watch.
++ * @memberOf module:car.profile
++ * @method watchProfile
++ * @example
++ *
++ *
++ * //define a callback function
++ * function myCallback(profile) {
++ *		console.log("profile id = " + profile.id + "\n" +
++ *					"profile name = " + profile.name + "\n" +
++ *					"profile avatar = " + profile.avatar + "\n" +
++ *					"profile theme = " + profile.theme + "\n" +
++ *					"profile bluetooth device id = " + profile.bluetoothDeviceId
++ * }
++ *
++ * var watchId = car.profile.watchProfile(myCallback);
++ */
++_self.watchProfile = function (callback) {
++	var watchId = _utils.createUUID();
++	
++	_watches[watchId] = callback;
++	if (Object.keys(_watches).length === 1) {
++		window.cordova.exec(onUpdate, null, _ID, 'startEvents', null, false);
++	}
++
++	return watchId;
++}
++
++/**
++ * Stop watching profile changes
++ * @param {String} watchId The watch ID returned by <i>car.profile.watchProfile()</i>.
++ * @memberOf module:car.profile
++ * @method cancelWatch 
++ * @example
++ *
++ * car.profile.cancelWatch(watchId);
++ */
++_self.cancelWatch = function (watchId) {
++	if (_watches[watchId]) {
++		delete _watches[watchId];
++		if (Object.keys(_watches).length === 0) {
++			window.cordova.exec(null, null, _ID, 'stopEvents', null, false);
++		}
++	}
++}
++
++/**
++ * Retrieve the current profile information
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method getActive 
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(profile) {
++ *		console.log("profile id = " + profile.id + "\n" +
++ *					"profile name = " + profile.name + "\n" +
++ *					"profile avatar = " + profile.avatar + "\n" +
++ *					"profile theme = " + profile.theme + "\n" +
++ *					"profile bluetooth device id = " + profile.bluetoothDeviceId
++ *		);
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.getActive(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/getActive
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: { 
++ *			id: 1, 
++ *			name: 'John Doe', 
++ *			avatar: 'platform:///path/to/avatar.png', 
++ *			theme: 'default', 
++ *			bluetoothDeviceId: '9D:BA:8E:43:ED:68' 
++ *		}
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getActive = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getActive', null, false);
++};
++
++/**
++ * Change the active profile
++ * @param {Number} profileId The ID of the profile to make active.
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method setActive
++ * @example 
++ *
++ * //call the method
++ * car.profile.setActive(1);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/setActive?profileId=1
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.setActive = function(profileId, successCallback, errorCallback) {
++	var args = { 
++		profileId: profileId 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'setActive', args, false);
++};
++
++/**
++ * Return a list of available profiles
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method getList
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(profiles) {
++ *		//iterate through all the profiles
++ *		for (var i=0; i&lt;profiles.length; i++) {
++ *			console.log("profile id = " + profiles[i].id + "\n" +
++ *						"profile name = " + profiles[i].name + "\n" +
++ *						"profile avatar = " + profiles[i].avatar
++ *						"profile avatar = " + profiles[i].avatar + "\n" +
++ *						"profile theme = " + profiles[i].theme + "\n" +
++ *						"profile bluetooth device id = " + profiles[i].bluetoothDeviceId
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.getList(successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/getList
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [ 
++ * 			{ 
++ *				id: 1, 
++ *				name: 'John Doe', 
++ *				avatar: 'platform:///path/to/avatar.png', 
++ *				theme: 'default', 
++ *				bluetoothDeviceId: '9D:BA:8E:43:ED:68' 
++ *			}, { 
++ *				id: 2, 
++ *				name: 'Joe', 
++ *				avatar: 'platform:///path/to/avatar.png', 
++ *				theme: 'titanium', 
++ *				bluetoothDeviceId: null 
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getList = function(successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getList', null, false);
++};
++
++
++/**
++ * Create a new profile
++ * @param {String} name The name of the profile.
++ * @param {String} [avatar] The avatar for the profile.
++ * @param {String} [theme] The preferred theme for the profile.
++ * @param {String} [bluetoothDeviceId] The preferred Bluetooth device for the profile.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method addProfile
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(profileid) {
++ *		console.log("profile id = " + profileid);
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.addProfile('Joe', 'platform:///path/to/avatar.png', 'default', '9D:BA:8E:43:ED:68', successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/addProfile?name=Joe&avatar=platform%3A%2F%2F%2Fpath%2Fto%2Favatar.png&themeId=default&bluetoothDeviceId=9D:BA:8E:43:ED:68
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [ 
++ * 			{ 
++ *				id: 2
++ *			}
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.addProfile = function(name, avatar, theme, bluetoothDeviceId, successCallback, errorCallback) {
++	var args = { 
++		name: name 
++	};
++	if (avatar) {
++		args.avatar = avatar;
++	}
++	if (theme) {
++		args.theme = theme;
++	}
++	if (bluetoothDeviceId) {
++		args.bluetoothDeviceId = bluetoothDeviceId;
++	}
++	window.cordova.exec(successCallback, errorCallback, _ID, 'addProfile', args, false);
++};
++
++
++/**
++ * Update an existing profile
++ * @param {Number} profileId The ID of the profile.
++ * @param {String} [name] The name of the profile.
++ * @param {String} [avatar] The avatar for the profile.
++ * @param {String} [theme] The preferred theme for the profile.
++ * @param {String} [bluetoothDeviceId] The preferred Bluetooth device for the profile.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method updateProfile
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("profile has been updated");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.updateProfile(2, 'Joe', 'platform:///path/to/avatar.png', 'default', '9D:BA:8E:43:ED:68', successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/updateProfile?profileId=2&name=Joe&avatar=platform%3A%2F%2F%2Fpath%2Fto%2Favatar.png&themeId=default&bluetoothDeviceId=9D:BA:8E:43:ED:68
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.updateProfile = function(profileId, name, avatar, theme, bluetoothDeviceId, successCallback, errorCallback) {
++	var args = { 
++		profileId: profileId 
++	};
++	if (name) {
++		args.name = name;
++	}
++	if (avatar) {
++		args.avatar = avatar;
++	}
++	if (theme) {
++		args.theme = theme;
++	}
++	if (bluetoothDeviceId) {
++		args.bluetoothDeviceId = bluetoothDeviceId;
++	}
++	window.cordova.exec(successCallback, errorCallback, _ID, 'updateProfile', args, false);
++};
++
++/**
++ * Delete an existing profile
++ * @param {Number} profileId The ID of the profile.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method deleteProfile
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("profile has been deleted");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.deleteProfile(2, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/deleteProfile?profileId=2
++ *
++ * Success Response:
++ * {
++ *		code: 1
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.deleteProfile = function(profileId, successCallback, errorCallback) {
++	window.cordova.exec(successCallback, errorCallback, _ID, 'deleteProfile', { profileId: profileId }, false);
++};
++
++/**
++ * Retrieve settings for the current profile
++ * @param {Function} successCallback The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @param {Array} [settings] A list of settings to whitelist.
++ * @memberOf module:car.profile
++ * @method getSettings 
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback(settings) {
++ *		//iterate through all the settings
++ *		for (var i=0; i&lt;settings.length; i++) {
++ *			console.log("setting key = " + settings[i].key + "\n" +
++ *						"setting value = " + settings[i].value
++ *			);
++ *		}
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.getSettings(successCallback, errorCallback, ['hvac_fanSpeed_frontLeft', 'audio_volume_everywhere', 'radio_preset_am']);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/getSettings?settings=hvac_fanSpeed_all,hvac_airConditioning_all,radio_preset_am
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ *		data: [
++ *			{ key: 'hvac_fanSpeed_frontLeft', value: 1 },
++ *			{ key: 'audio_volume_everywhere', value: 10 },
++ *			{ key: 'radio_preset_am', value: [880,910,950,1020,1220,1430] }
++ *		]
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.getSettings = function(successCallback, errorCallback, settings) {
++	var args = {};
++	if (settings && settings.length > 0) {
++		args.settings = settings.join(',');
++	}
++	window.cordova.exec(successCallback, errorCallback, _ID, 'getSettings', args, false);
++};
++
++/**
++ * Set the value of a setting for the current profile
++ * @param {String} key The key of the setting.
++ * @param {Mixed} value The value of the setting.
++ * @param {Function} [successCallback] The function to call on success.
++ * @param {Function} [errorCallback] The function to call if there is an error.
++ * @memberOf module:car.profile
++ * @method setSetting
++ * @example 
++ *
++ * //define your callback function(s)
++ * function successCallback() {
++ *		console.log("setting has been set");
++ * }
++ *
++ * function errorCallback(error) {
++ *		console.log(error.code, error.msg);
++ * }
++ *
++ * //call the method
++ * car.profile.setSettings('hvac_fanSpeed_frontLeft', 1, successCallback, errorCallback);
++ *
++ *
++ *
++ * @example REST
++ *
++ * Request:
++ * http://&lt;car-ip&gt;/car/profile/setSettings?key=hvac_fanSpeed_frontLeft&value=1
++ *
++ * Success Response:
++ * {
++ *		code: 1,
++ * }
++ *
++ * Error Response:
++ * {
++ *		code: -1,
++ *		msg: "An error has occurred"
++ * }
++ */
++_self.setSetting = function(key, value, successCallback, errorCallback) {
++	var args = { 
++		key: key, 
++		value: value 
++	};
++	window.cordova.exec(successCallback, errorCallback, _ID, 'setSetting', args, false);
++};
++
++
++//Export
++module.exports = _self;
++
+diff --git a/plugin/com.qnx.car.sensors/src/blackberry10/index.js b/plugin/com.qnx.car.sensors/src/blackberry10/index.js
+index 8906807..070e0ae 100644
+--- a/plugin/com.qnx.car.sensors/src/blackberry10/index.js
++++ b/plugin/com.qnx.car.sensors/src/blackberry10/index.js
+@@ -19,9 +19,6 @@
+ 
+ /**
+  * Implementation for car.sensors API
+- *
+- * @author mlapierre
+- * $Id: index.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
+  */
+ 
+ var _wwfix = require("../../lib/wwfix"),
+diff --git a/plugin/com.qnx.car.sensors/src/blackberry10/sensors.js b/plugin/com.qnx.car.sensors/src/blackberry10/sensors.js
+index f74fe75..cd995f1 100644
+--- a/plugin/com.qnx.car.sensors/src/blackberry10/sensors.js
++++ b/plugin/com.qnx.car.sensors/src/blackberry10/sensors.js
+@@ -17,11 +17,8 @@
+  * for other information.
+  */
+ 
+- /**
++/**
+  * Implementation for car.sensors API
+- *
+- * @author mlapierre
+- * $Id: sensors.js 4273 2012-09-25 17:51:22Z mlapierre@qnx.com $
+  */
+ 
+ var	_pps = qnx.webplatform.pps,
+diff --git a/plugin/com.qnx.car.sensors/www/Sensor.js b/plugin/com.qnx.car.sensors/www/Sensor.js
+index 27be0f1..c179a79 100644
+--- a/plugin/com.qnx.car.sensors/www/Sensor.js
++++ b/plugin/com.qnx.car.sensors/www/Sensor.js
+@@ -17,15 +17,10 @@
+  * for other information.
+  */
+ 
+- /**
+- * @static
+- * @author mlapierre
+- * $Id: Event.js 5936 2013-03-25 16:15:21Z lgreenway@qnx.com $
+- */
+-
+ module.exports = {};
+ /**
+- * @memberOf module:car_xyz_sensors
++ * @static
++ * @memberOf module:car.sensors
+  * @name Sensor
+  *
+  * @description <p>Sensor type enumeration.
+diff --git a/plugin/com.qnx.car.sensors/www/client.js b/plugin/com.qnx.car.sensors/www/client.js
+index 8244d44..c6aec0e 100644
+--- a/plugin/com.qnx.car.sensors/www/client.js
++++ b/plugin/com.qnx.car.sensors/www/client.js
+@@ -23,10 +23,6 @@
+  *
+  * @description Provides access to custom automotive sensors.
+  */
+- 
+-/* @author mlapierre
+- * $Id: client.js 4326 2012-09-27 17:43:24Z mlapierre@qnx.com $
+- */
+ 
+ var _self = {},
+ 	_ID = "com.qnx.car.sensors",
+-- 
+1.7.10.msysgit.1
+

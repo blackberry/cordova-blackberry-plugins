@@ -1,0 +1,140 @@
+From ff82eaa3aa531a400f968329bddbdbee32066f9b Mon Sep 17 00:00:00 2001
+From: Danyi Lin <danylin@blackberry.com>
+Date: Tue, 23 Jul 2013 11:23:43 -0400
+Subject: [PATCH 14/61] Update deploy-mobile-spec to adapt cordova 3.0
+
+Reviewed by Jeffrey Heifetz <jheifetz@blackberry.com>
+Tested by Tracy Li <tli@blackberry.com>
+---
+ .gitignore                      |    2 +-
+ scripts/project-utils.js        |   18 ++++++++--------
+ test/mobile-spec/src/config.xml |   16 +++++++++++++++
+ test/mobile-spec/src/plugin.xml |   43 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 68 insertions(+), 11 deletions(-)
+ create mode 100644 test/mobile-spec/src/config.xml
+ create mode 100644 test/mobile-spec/src/plugin.xml
+
+diff --git a/.gitignore b/.gitignore
+index f414029..148a957 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -36,7 +36,7 @@ plugin/*/src/blackberry10/native/simulator/*.so
+ test/test-app/app/*
+ test/test-suite/app/*
+ test/autorun-mobile-spec/app/*
+-test/mobile-spec/
++test/mobile-spec/app/*
+ test/test-app/project.json
+ test/test-suite/project.json
+ 
+diff --git a/scripts/project-utils.js b/scripts/project-utils.js
+index 376a3c0..10df415 100644
+--- a/scripts/project-utils.js
++++ b/scripts/project-utils.js
+@@ -24,6 +24,7 @@ var path = require('path'),
+     wrench = require('wrench'),
+     util = require('util'),
+     ncp = require('ncp').ncp,
++    shell = require("shelljs"),
+     utils = require('./utils'),
+     conf = require(path.join(__dirname, "conf")),
+     baseDir = path.join(__dirname, '/../'),
+@@ -123,17 +124,14 @@ module.exports = {
+     copyMobileSpec: function (projectPath, src, done) {
+         jWorkflow.order()
+         .andThen(function (prev, baton) {
+-            var version = fs.readFileSync(path.join(projectPath, "www", "VERSION"));
+             baton.take();
+-            ncp(src, path.join(projectPath, "www"), function (err) {
+-                if (err) {
+-                    console.log(err);
+-                }
+-                //Change back the version
+-                fs.writeFileSync(path.join(projectPath, "www", "VERSION"), version);
+-                console.log("Copy Mobile Spec Finished");
+-                baton.pass();
+-            });
++            shell.mkdir('-p', path.join(projectPath, 'www'));
++            shell.exec("cd " + src + "&& git archive HEAD | tar -x -C " + path.join(projectPath, "www"));
++            shell.cp("-rf", path.join(projectPath, "..", "src", "plugin.xml"), path.join(projectPath, "www", "dependencies-plugin"));
++            shell.cp("-rf", path.join(projectPath, "..", "src", "config.xml"), path.join(projectPath, "www"));
++            shell.exec("cd " + projectPath + " && " + "cordova/plugin add " + path.join("www", "dependencies-plugin"));
++            console.log("Copy Mobile Spec Finished");
++            baton.pass();
+         })
+         .start(function () {
+             if (done) {
+diff --git a/test/mobile-spec/src/config.xml b/test/mobile-spec/src/config.xml
+new file mode 100644
+index 0000000..712ef25
+--- /dev/null
++++ b/test/mobile-spec/src/config.xml
+@@ -0,0 +1,16 @@
++<?xml version='1.0' encoding='utf-8'?>
++<widget id="org.apache.mobilespec" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
++    <name>mobilespec</name>
++    <description>
++        Cordova test suite.
++    </description>
++    <author rim:copyright="Copyright 1998-2013 BlackBerry" email="test@blackberry.com" href="http://www.BlackBerry.com">BlackBerry Limited</author>
++    <content src="index.html"/>
++    <access origin="http://audio.ibeat.org" />
++    <access origin="http://cordova-filetransfer.jitsu.com" />
++    <access origin="http://whatheaders.com" />
++    <access origin="http://apache.org" subdomains="true"/>
++    <access origin="https://apache.org" subdomains="true"/>
++    <access origin="http://www.google.com" />
++    <access origin="httpssss://example.com" />
++</widget>
+diff --git a/test/mobile-spec/src/plugin.xml b/test/mobile-spec/src/plugin.xml
+new file mode 100644
+index 0000000..06ebda8
+--- /dev/null
++++ b/test/mobile-spec/src/plugin.xml
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++ Licensed to the Apache Software Foundation (ASF) under one
++ or more contributor license agreements.  See the NOTICE file
++ distributed with this work for additional information
++ regarding copyright ownership.  The ASF licenses this file
++ to you under the Apache License, Version 2.0 (the
++ "License"); you may not use this file except in compliance
++ with the License.  You may obtain a copy of the License at
++
++   http://www.apache.org/licenses/LICENSE-2.0
++
++ Unless required by applicable law or agreed to in writing,
++ software distributed under the License is distributed on an
++ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ KIND, either express or implied.  See the License for the
++ specific language governing permissions and limitations
++ under the License.
++-->
++<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0" id="org.cordova.mobile-spec-dependencies" version="1.0.0">
++  <engines>
++    <engine name="cordova" version="&gt;=2.7"/>
++  </engines>
++  <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
++  <dependency id="org.apache.cordova.core.battery-status" url="https://github.com/apache/cordova-plugin-battery-status.git"/>
++  <dependency id="org.apache.cordova.core.camera" url="https://github.com/apache/cordova-plugin-camera"/>
++  <dependency id="org.apache.cordova.core.console" url="https://github.com/apache/cordova-plugin-console"/>
++  <dependency id="org.apache.cordova.core.contacts" url="https://github.com/apache/cordova-plugin-contacts"/>
++  <dependency id="org.apache.cordova.core.device" url="https://github.com/apache/cordova-plugin-device"/>
++  <dependency id="org.apache.cordova.core.device-motion" url="https://github.com/apache/cordova-plugin-device-motion"/>
++  <dependency id="org.apache.cordova.core.device-orientation" url="https://github.com/apache/cordova-plugin-device-orientation"/>
++  <dependency id="org.apache.cordova.core.dialogs" url="https://github.com/apache/cordova-plugin-dialogs"/>
++  <dependency id="org.apache.cordova.core.file" url="https://github.com/apache/cordova-plugin-file"/>
++  <dependency id="org.apache.cordova.core.file-transfer" url="https://github.com/apache/cordova-plugin-file-transfer.git"/>
++  <dependency id="org.apache.cordova.core.geolocation" url="https://github.com/apache/cordova-plugin-geolocation"/>
++  <dependency id="org.apache.cordova.core.globalization" url="https://github.com/apache/cordova-plugin-globalization"/>
++  <dependency id="org.apache.cordova.core.inappbrowser" url="https://github.com/apache/cordova-plugin-inappbrowser"/>
++  <dependency id="org.apache.cordova.core.AudioHandler" url="https://github.com/apache/cordova-plugin-media"/>
++  <dependency id="org.apache.cordova.core.media-capture" url="https://github.com/apache/cordova-plugin-media-capture"/>
++  <dependency id="org.apache.cordova.core.network-information" url="https://github.com/apache/cordova-plugin-network-information"/>
++  <dependency id="org.apache.cordova.core.splashscreen" url="https://github.com/apache/cordova-plugin-splashscreen"/>
++  <dependency id="org.apache.cordova.core.vibration" url="https://github.com/apache/cordova-plugin-vibration"/>
++</plugin>
+-- 
+1.7.10.msysgit.1
+
