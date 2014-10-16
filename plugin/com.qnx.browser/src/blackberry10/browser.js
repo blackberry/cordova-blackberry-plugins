@@ -216,6 +216,12 @@ function createWebview(args) {
 
 }
 
+function updateUiWebview() {
+	//since this is the UI dialog boost the default zOrder otherwise it will be clipped by the UI webview
+	_uiWebview.zOrder = _uiWebviewZOrder;
+	_uiWebview.setGeometry(_x, _y, _width, _height);
+}
+
 /*
  * Exports are the publicly accessible functions
  */
@@ -244,9 +250,8 @@ module.exports = {
 				_chromeWebview.setBackgroundColor(0x00ffffff);
 				_chromeWebview.setGeometry(0, 0, _width, _chromeHeight);
 			} else if (webviews[wv].dialog) {
-				//since this is the UI dialog boost the default zOrder otherwise it will be clipped by the UI webview
-				webviews[wv].zOrder = _uiWebviewZOrder;
 				_uiWebview = webviews[wv];
+				updateUiWebview();
 			}
 		}
 
@@ -271,6 +276,8 @@ module.exports = {
 		if (args.url !== undefined) {
 			_url = checkUrlProtocol(args.url);
 		}
+		//make sure the ui webview is in sync with these changes
+		updateUiWebview();
 	},
 
 	/**
