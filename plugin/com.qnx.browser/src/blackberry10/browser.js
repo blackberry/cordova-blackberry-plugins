@@ -21,11 +21,11 @@
  * The abstraction layer for qnx browser functionality
  */
 var _tabList = {},
-	_defaultZOrder = 1,
-	_lastActiveZOrder = 2,
-	_activeZOrder = 3,
-	_chromeZOrder = 4,
-	_uiWebviewZOrder = 5,
+	_defaultZOrder = -2,
+	_lastActiveZOrder = -1,
+	_activeZOrder = 0,
+	_chromeZOrder = 1,
+	_uiWebviewZOrder = 2,
 	_uiWebview,
 	_lastActiveTabId = null,
 	_activeTabId = null,
