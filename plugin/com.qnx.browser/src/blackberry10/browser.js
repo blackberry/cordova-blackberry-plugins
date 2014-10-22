@@ -165,7 +165,9 @@ function onWebviewCreated(webview, args) {
 	//add Handlers for the OpenWindow event
 	webview.on("OpenWindow", function (webviewId, value, eventId, returnValue) {
 		value = JSON.parse(value);
+		if (value.isPopup === false) {
 		createWebview({url: value.url});
+		}
 	});
 
 	/*
@@ -207,7 +209,7 @@ function createWebview(args) {
 
 	var webview;
 
-	webview = qnx.webplatform.createWebView({}, function () {
+	webview = qnx.webplatform.createWebView({defaultSendEventHandlers: ['onChooseFile', 'onOpenWindow']}, function () {
 		onWebviewCreated(webview, args);
 	});
 	_tabList[webview.id] = webview;
