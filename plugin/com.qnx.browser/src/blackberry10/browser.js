@@ -127,6 +127,20 @@ function getWebview(tabId) {
 }
 
 /**
+ *	Private method to retrieve the popup webview 
+ *	Returns the id of the popup webview
+ */
+function getPopUp() {
+	var webviews = qnx.webplatform.getWebViews(),
+		view;
+	for (view in webviews) {
+		if (webviews[view].url === "http://popupwebview/") {
+			return webviews[view].id;
+		}
+	}
+	return -1;
+}
+/**
  *	Private method called when the webview "created" event is 
  *	triggered. Sets the default parameters and attaches the 
  *	event listeners for Location Change and page load progress. 
@@ -167,6 +181,16 @@ function onWebviewCreated(webview, args) {
 		value = JSON.parse(value);
 		if (value.isPopup === false) {
 		createWebview({url: value.url});
+		}
+	});
+	//This is a work around for the popup webview, it appears that it doesn't
+	//clean itself up after its closed by the user so we manually close it in
+	//this case
+	webview.on("CloseWindow", function (parentWebview, args) {
+		var parsedArgs = JSON.parse(args),
+			popId = getPopUp();
+		if (parsedArgs.windowName === "PopupWindow" && popId !== -1) {
+			qnx.callExtensionMethod('webview.destroy', popId);
 		}
 	});
 
