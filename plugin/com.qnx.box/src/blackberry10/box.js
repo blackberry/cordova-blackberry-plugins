@@ -68,7 +68,7 @@ function createOverlay(url) {
  * */
 function networkResourceRequestedHandler(e) {
 	var e_obj = JSON.parse(e);
-	if (e_obj.targetType == 'TargetIsSubframe' && e_obj.url.indexOf(Constants.PROTOCOL) != -1) {
+	if (e_obj.targetType == 'TargetIsMainFrame' && e_obj.url.indexOf(Constants.PROTOCOL) != -1) {
 		overlayWebView.destroy();
 		var params = e_obj.url.split("?")[1].split("&");
 		var codeArr = params[1].split('=');
