@@ -233,7 +233,7 @@ function createWebview(args) {
 
 	var webview;
 
-	webview = qnx.webplatform.createWebView({defaultSendEventHandlers: ['onChooseFile', 'onOpenWindow']}, function () {
+	webview = qnx.webplatform.createWebView({processId: 1, defaultSendEventHandlers: ['onChooseFile', 'onOpenWindow']}, function () {
 		onWebviewCreated(webview, args);
 	});
 	_tabList[webview.id] = webview;
