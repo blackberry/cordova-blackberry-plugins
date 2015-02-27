@@ -1,11 +1,11 @@
 /*
  * Copyright 2013  QNX Software Systems Limited
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
  * compliance with the License. You may obtain a copy of the License
  * at: http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ function getProfile(profileId) {
  */
 module.exports = {
 	/**
-	 * Initializes the extension 
+	 * Initializes the extension
 	 */
 	init: function() {
 		//readerPPS
@@ -74,7 +74,7 @@ module.exports = {
 			throw "error opening db; path=/dev/qdb/personalization";
 		}
 	},
-	
+
 	/**
 	 * Sets the trigger function to call when an event is fired
 	 * @param {Function} trigger The trigger function to call when an event is fired
@@ -82,7 +82,7 @@ module.exports = {
 	setTriggerUpdate: function(trigger) {
 		_triggerUpdate = trigger;
 	},
-	
+
 	/**
 	 * Retrieves the current profile information
 	 * @returns {Object} The requested user object
@@ -90,7 +90,7 @@ module.exports = {
 	getActive: function() {
 		return getProfile(_readerPPS.data.user.id);
 	},
-	
+
 	/**
 	 * Change the active profile
 	 * @param {Number} profileId The id of the profile to make active
@@ -213,7 +213,7 @@ module.exports = {
 		var result = _db.query("SELECT * FROM nav_history WHERE profile_id={0} ORDER BY timestamp DESC".format(profileId));
 		return _qdb.resultToArray(result);
 	},
-	
+
 	/**
 	 * Clears the navigation history for a given user
 	 * @param {Number} profileId The id of the profile
@@ -221,17 +221,22 @@ module.exports = {
 	clearNavigationHistory: function(profileId) {
 		_db.query("DELETE FROM nav_history WHERE profile_id={0}".format(profileId));
 	},
-	
+
 	/**
 	 * Adds a location to the navigation history for a given user
 	 * @param {Number} profileId The id of the profile
-	 * @param {Object} location The location to add to the user's history 
+	 * @param {Object} location The location to add to the user's history
 	 */
 	addToNavigationHistory: function(profileId, location) {
-		var timestamp = Math.floor(new Date().getTime() / 1000);		
-		//Note we use COALESCE in this case as a fix for JI:608070
+		var timestamp = Math.floor(new Date().getTime() / 1000);
+		//In the database the name field cannot be null so we combine the
+		//number and street to create a name if there is none
 		//We should really fix this at the database level and allow the name field to be null
-		var query = "SELECT id FROM nav_history WHERE profile_id={0} AND name=COALESCE('{1}','') AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
+		if(location.name === null) {
+			location.name = (location.number + " " + location.street).trim();
+		}
+
+		var query = "SELECT id FROM nav_history WHERE profile_id={0} AND name='{1}'' AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
 
 		//see if this destination is already in the history
 		var result = _qdb.resultToArray(_db.query(query));
@@ -243,51 +248,51 @@ module.exports = {
 			_db.query("INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude, timestamp) VALUES ({0}, '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', {9}, {10}, {11})".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.postalCode), _qdb.sqlSafe(location.country), location.type, location.latitude, location.longitude, timestamp));
 		}
 
-		
+
 		/* TEST DATA
-		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
+		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude)
 		VALUES (1, 'Bridgehead Coffee', '126', 'Guiges Ave', 'Ottawa', 'ON', '', 'Canada', '', 1341949840000, 10.1234, 10.1234);
-		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
+		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude)
 		VALUES (1, 'QNX Software Systems', '1001', 'Farrar Rd', 'Kanata', 'ON', 'K2K 1Y5', 'Canada', '', 1341839740000, 10.1234, 10.1234);
-		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
+		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude)
 		VALUES (1, 'National Gallery of Canada', '380', 'Sussex Drive', 'Ottawa', 'ON', '', 'Canada', '', 1341839740000, 10.1234, 10.1234);
-		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
+		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude)
 		VALUES (1, 'ADDRESS', '404', 'Laurier Ave E', 'Ottawa', 'ON', 'K1N 6R2', 'Canada', '', 1341815840000, 10.1234, 10.1234);
-		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude) 
+		INSERT INTO nav_history (profile_id, name, number, street, city, province, postalCode, country, type, timestamp, latitude, longitude)
 		VALUES (1, 'Chez Lucien Restaurant', '137', 'Murray Street', 'Ottawa', 'ON', 'K1N 5M7', 'Canada', '', 1341802840000, 10.1234, 10.1234);
 		*/
 	},
-	
+
 	/**
 	 * Get the navigation favourites for a given user
 	 * @param {Number} profileId The id of the profile
 	 * @returns {Array} An array of navigation locations
 	 */
-	getNavigationFavourites: function(profileId) {	
-		var result = _db.query("SELECT * FROM nav_favourites WHERE profile_id={0}".format(profileId));		
+	getNavigationFavourites: function(profileId) {
+		var result = _db.query("SELECT * FROM nav_favourites WHERE profile_id={0}".format(profileId));
 		return _qdb.resultToArray(result);
 
 		/* TEST DATA
-		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
+		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude)
 		VALUES (1, 'Bridgehead Coffee', '126', 'Guiges Ave', 'Ottawa', 'ON', '', 'Canada', '', 10.1234, 10.1234);
-		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
+		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude)
 		VALUES (1, 'QNX Software Systems', '1001', 'Farrar Rd', 'Kanata', 'ON', 'K2K 1Y5', 'Canada', '', 10.1234, 10.1234);
-		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
+		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude)
 		VALUES (1, 'National Gallery of Canada', '380', 'Sussex Drive', 'Ottawa', 'ON', '', 'Canada', '', 10.1234, 10.1234);
-		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
+		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude)
 		VALUES (1, 'ADDRESS', '404', 'Laurier Ave E', 'Ottawa', 'ON', 'K1N 6R2', 'Canada', '', 10.1234, 10.1234);
-		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) 
+		INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude)
 		VALUES (1, 'Chez Lucien Restaurant', '137', 'Murray Street', 'Ottawa', 'ON', 'K1N 5M7', 'Canada', '', 10.1234, 10.1234);
 		*/
 	},
-	
+
 	/**
 	 * Adds a navigation location to the user's favourites
 	 * @param {Number} profileId The id of the profile
-	 * @param {Object} location The location to add to the user's favourites 
+	 * @param {Object} location The location to add to the user's favourites
 	 */
 	addNavigationFavourite: function(profileId, location) {
-		var timestamp = Math.floor(new Date().getTime() / 1000);		
+		var timestamp = Math.floor(new Date().getTime() / 1000);
 		var query = "SELECT id FROM nav_favourites WHERE profile_id={0} AND name='{1}' AND ((number='{2}' AND street='{3}' AND city='{4}' AND province='{5}' AND country='{6}') OR (latitude={7} AND longitude={8}))".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.country), location.latitude, location.longitude);
 
 		//see if this destination is already in the favourites
@@ -297,10 +302,10 @@ module.exports = {
 			_db.query("INSERT INTO nav_favourites (profile_id, name, number, street, city, province, postalCode, country, type, latitude, longitude) VALUES ({0}, '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', {9}, {10})".format(profileId, _qdb.sqlSafe(location.name), _qdb.sqlSafe(location.number), _qdb.sqlSafe(location.street), _qdb.sqlSafe(location.city), _qdb.sqlSafe(location.province), _qdb.sqlSafe(location.postalCode), _qdb.sqlSafe(location.country), location.type, location.latitude, location.longitude));
 		}
 	},
-	
+
 	/**
 	 * Removes a navigation location to the user's favourites
-	 * @param {Number} favouriteId The id of the favourite location to remove from the user's favourites 
+	 * @param {Number} favouriteId The id of the favourite location to remove from the user's favourites
 	 */
 	removeNavigationFavourite: function(favouriteId) {
 		_db.query("DELETE FROM nav_favourites WHERE id={0}".format(favouriteId));
