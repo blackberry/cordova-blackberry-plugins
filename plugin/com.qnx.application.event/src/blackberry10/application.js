@@ -1,11 +1,11 @@
 /*
  * Copyright 2013  QNX Software Systems Limited
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
  * compliance with the License. You may obtain a copy of the License
  * at: http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ var _pps = qnx.webplatform.pps,
 	_key;
 
 /**
- * Opens the windowgroup PPS object 
+ * Opens the windowgroup PPS object
  */
 function init () {
 	try {
@@ -60,7 +60,7 @@ function onCommand(event) {
 		//yes, manually trigger the event in the webview
 		var webview = window.qnx.webplatform.createWebView({WebViewId: _handlers[id].key}),
 			actionEvent = event.data[id].action;
-		
+
 		webview.executeJavaScript("webworks.event.trigger('" + actionEvent + "', '" + encodeURIComponent(JSON.stringify([event.data[id].args])) + "')");
 	}
 	else {
@@ -68,23 +68,23 @@ function onCommand(event) {
 		if (event && event.data && event.data.hasOwnProperty(_key) && typeof event.data[_key].action != "undefined") {
 			switch (event.data[_key].action) {
 				case 'reselect':
-					if (_reselectTrigger) { 
-						_reselectTrigger(event.data[_key].args); 
+					if (_reselectTrigger) {
+						_reselectTrigger(event.data[_key].args);
 					}
 					break;
 				case 'pause':
-					if (_pauseTrigger) { 
-						_pauseTrigger(event.data[_key].args); 
+					if (_pauseTrigger) {
+						_pauseTrigger(event.data[_key].args);
 					}
 					break;
 				case 'resume':
-					if (_resumeTrigger) { 
-						_resumeTrigger(event.data[_key].args); 
+					if (_resumeTrigger) {
+						_resumeTrigger(event.data[_key].args);
 					}
 					break;
 			}
 		}
-	}	
+	}
 };
 
 /**
@@ -103,8 +103,8 @@ function onAppDataReady(event) {
  * @param event {Object} The PPS event for the appdata object
  */
 function onAppData(event) {
-	if (_appdataTrigger && event && event.data && event.data[_key]) { 
-		_appdataTrigger(event.data[_key]); 
+	if (_appdataTrigger && event && event.data && event.data[_key]) {
+		_appdataTrigger(event.data[_key]);
 	}
 }
 
@@ -125,15 +125,15 @@ module.exports = {
 			_commandReaderPPS = _pps.create("/pps/system/navigator/command", _pps.PPSMode.DELTA);
 			_commandReaderPPS.onNewData = onCommand;
 			_commandReaderPPS.open(_pps.FileMode.RDONLY);
-		}	
+		}
 		//listen for startup arguments
 		if (typeof _appdataReaderPPS === "undefined") {
-			_appdataReaderPPS = _pps.create("/pps/system/navigator/appdata?f=" + _key, _pps.PPSMode.DELTA);
+			_appdataReaderPPS = _pps.create("/pps/system/navigator/appdata", _pps.PPSMode.DELTA);
 			_appdataReaderPPS.onFirstReadComplete = onAppDataReady;
 			_appdataReaderPPS.onNewData = onAppData;
 			_appdataReaderPPS.open(_pps.FileMode.RDONLY);
 		}
-		
+
 		// convenience feature to provide apps with their application's window group name.
 		var obj = {};
 		obj['[n]' + _key] = _windowGroup;
@@ -142,7 +142,7 @@ module.exports = {
 
 	/**
 	 * Retrieves the screen window group. Specific to this application.
-	 * @param id {String}  [optional] The application's id 
+	 * @param id {String}  [optional] The application's id
 	 */
 	getWindowGroup: function(id) {
 		if (id) {
@@ -152,7 +152,7 @@ module.exports = {
 				return _webview.windowGroup();
 			}
 		} else {
-			return _webview.windowGroup();			
+			return _webview.windowGroup();
 		}
 	},
 
@@ -163,7 +163,7 @@ module.exports = {
 	 * Ex. {
 	 * 		id: {String}, // The application id
 	 *		key: {Number}, // The webview id
-	 *		windowGroup: {String}, // The screen window group string 	
+	 *		windowGroup: {String}, // The screen window group string
 	 * }
 	 */
 	addLocalTrigger: function(args) {
@@ -196,7 +196,7 @@ module.exports = {
 	setReselectTrigger: function(trigger) {
 		_reselectTrigger = trigger;
 	},
-	
+
 	/**
 	 * Sets the trigger function to call when a reselect event is fired
 	 * @param trigger {Function} The trigger function to call when the event is fired
@@ -204,7 +204,7 @@ module.exports = {
 	setAppDataTrigger: function(trigger) {
 		_appdataTrigger = trigger;
 	},
-	
+
 	/**
 	 * Gets the data passed to the application on startup
 	 * @return {Mixed} The data passed to the application on startup, or null
@@ -214,4 +214,4 @@ module.exports = {
 	}
 };
 
-	
+
