@@ -1,11 +1,11 @@
 /*
  * Copyright 2013  QNX Software Systems Limited
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
  * compliance with the License. You may obtain a copy of the License
  * at: http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ var _wwfix = require("../../lib/wwfix"),
 	_eventResults = {};
 
 /**
- * Initializes the extension 
+ * Initializes the extension
  */
 function init() {
 	try {
@@ -111,7 +111,7 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-			
+
 	/**
 	 * Sets the active tuner by name.
 	 * @param success {Function} Function to call if the operation is a success
@@ -123,13 +123,13 @@ module.exports = {
 		var result = new PluginResult(args, env)
 		var fixedArgs = _wwfix.parseArgs(args);
 		try {
-			_radio.setTuner(fixedArgs.tuner);
+			_radio.setTuner(fixedArgs.tuner, fixedArgs.zone);
 			result.ok(undefined, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Tune to a specific station, optionally targeting a specific tuner. If the specified
 	 * tuner is not the active tuner, then the station will be automatically selected the next
@@ -150,7 +150,7 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Get the presets for the current tuner. Optionally, a tuner name can be specified, returning
 	 * presets for the specified tuner.
@@ -170,7 +170,7 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Sets the entire list of presets for the specified tuner(s).
 	 * @param success {Function} Function to call if the operation is a success
@@ -190,7 +190,7 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Seek for the next radio station in the given direction
 	 * @param success {Function} Function to call if the operation is a success
@@ -202,13 +202,13 @@ module.exports = {
 		var result = new PluginResult(args, env)
 		var fixedArgs = _wwfix.parseArgs(args);
 		try {
-			_radio.seek(fixedArgs.direction);
+			_radio.seek(fixedArgs.direction, fixedArgs.tuner);
 			result.ok(undefined, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Scan for available radio stations in the given direction
 	 * @param success {Function} Function to call if the operation is a success
@@ -220,13 +220,13 @@ module.exports = {
 		var result = new PluginResult(args, env)
 		var fixedArgs = _wwfix.parseArgs(args);
 		try {
-			_radio.scan(fixedArgs.direction);
+			_radio.scan(fixedArgs.direction, fixedArgs.tuner);
 			result.ok(undefined, false);
 		} catch (e) {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Stop scanning
 	 * @param success {Function} Function to call if the operation is a success
@@ -243,7 +243,7 @@ module.exports = {
 			result.error(JSON.stringify(e), false);
 		}
 	},
-	
+
 	/**
 	 * Get the current station metadata.
 	 * @param success {Function} Function to call if the operation is a success

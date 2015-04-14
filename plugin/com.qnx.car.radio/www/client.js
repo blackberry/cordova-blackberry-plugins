@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 - 2014.
  * QNX Software Systems Limited. All rights reserved.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"). You
  * may not reproduce, modify or distribute this software except in
  * compliance with the License. You may obtain a copy of the License
  * at: http://www.apache.org/licenses/LICENSE-2.0.
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OF ANY KIND, either express or implied.
@@ -59,9 +59,9 @@ function onUpdatePresets(data) {
  * @param {Function} callback The function to call when a change is detected.
  * @return {Number} An ID for the added watch.
  * @memberOf module:car.radio
- * @method watchRadio 
+ * @method watchRadio
  * @example
- * 
+ *
  * //define a callback function
  * function myCallback(metadata) {
  *		console.log("tuner = " + data.tuner + "\n" +
@@ -73,12 +73,12 @@ function onUpdatePresets(data) {
  *					"hd = " + data.hd
  *		);
  * }
- * 
+ *
  * var watchId = car.radio.watchRadio(myCallback);
  */
 _self.watchRadio = function (callback) {
 	var watchId = _utils.createUUID();
-	
+
 	_watchesRadio[watchId] = callback;
 	if (Object.keys(_watchesRadio).length === 1) {
 		window.cordova.exec(onUpdateRadio, null, _ID, 'startEvent', { eventName: 'radioUpdate' }, false);
@@ -92,9 +92,9 @@ _self.watchRadio = function (callback) {
  * @param {Function} callback The function to call when a change is detected.
  * @return {Number} An ID for the added watch.
  * @memberOf module:car.radio
- * @method watchPresets  
+ * @method watchPresets
  * @example
- * 
+ *
  * function myCallback(presets) {
  *		//iterate through all the presets
  *		for (var i=0; i&lt;presets.length; i++) {
@@ -105,12 +105,12 @@ _self.watchRadio = function (callback) {
  *			);
  *		}
  * }
- * 
+ *
  * var watchId = car.radio.watchPresets(myCallback);
  */
 _self.watchPresets = function (callback) {
 	var watchId = _utils.createUUID();
-	
+
 	_watchesPresets[watchId] = callback;
 	if (Object.keys(_watchesPresets).length === 1) {
 		window.cordova.exec(onUpdatePresets, null, _ID, 'startEvent', { eventName: 'presetUpdate' }, false);
@@ -123,9 +123,9 @@ _self.watchPresets = function (callback) {
  * @description Stop watching for metadata updates.
  * @param {Number} watchId The watch ID as returned by <code>car.radio.watchRadio()</code> or <code>car.radio.watchPresets()</code>.
  * @memberOf module:car.radio
- * @method cancelWatch   
+ * @method cancelWatch
  * @example
- * 
+ *
  * car.radio.cancelWatch(watchId);
  */
 _self.cancelWatch = function (watchId) {
@@ -148,8 +148,8 @@ _self.cancelWatch = function (watchId) {
  * @param {Function} successCallback The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
- * @method getTuners  
- * @example 
+ * @method getTuners
+ * @example
  *
  * //define your callback function(s)
  * function successCallback(tuners) {
@@ -181,18 +181,18 @@ _self.cancelWatch = function (watchId) {
  * Success Response:
  * {
  *		code: 1,
- *		data: [ 
- * 			{ 
- *				tuner: 'am', 
- *				type: 'analog', 
+ *		data: [
+ * 			{
+ *				tuner: 'am',
+ *				type: 'analog',
  *				settings: {
  *					rangeMin: 880,
  *					rangeMax: 1600,
  *					rangeStep: 10
  *				}
- *			}, { 
- *				tuner: 'fm', 
- *				type: 'analog', 
+ *			}, {
+ *				tuner: 'fm',
+ *				type: 'analog',
  *				settings: {
  *					rangeMin: 88.9,
  *					rangeMax: 107.1,
@@ -211,15 +211,16 @@ _self.cancelWatch = function (watchId) {
 _self.getTuners = function(successCallback, errorCallback) {
 	window.cordova.exec(successCallback, errorCallback, _ID, 'getTuners', null, false);
 };
-		
+
 /**
  * @description Set the active tuner by name.
  * @param {String} tuner The name of tuner to set as active.
+ * @param {String} zone The name of the zone to set the tuner active in
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
  * @method setTuner
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback() {
@@ -231,7 +232,7 @@ _self.getTuners = function(successCallback, errorCallback) {
  * }
  *
  * //call the method
- * car.radio.setTuner('fm', successCallback, errorCallback);
+ * car.radio.setTuner('fm', 'all', successCallback, errorCallback);
  *
  *
  *
@@ -251,9 +252,10 @@ _self.getTuners = function(successCallback, errorCallback) {
  *		msg: "An error has occurred"
  * }
  */
-_self.setTuner = function(tuner, successCallback, errorCallback) {
-	var args = { 
-		tuner: tuner 
+_self.setTuner = function(tuner, zone, successCallback, errorCallback) {
+	var args = {
+		tuner: tuner,
+		zone: zone
 	};
 	window.cordova.exec(successCallback, errorCallback, _ID, 'setTuner', args, false);
 };
@@ -268,7 +270,7 @@ _self.setTuner = function(tuner, successCallback, errorCallback) {
  * @param {String} [tuner] The tuner name. If not specified, the active tuner is used.
  * @memberOf module:car.radio
  * @method setStation
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback() {
@@ -301,8 +303,8 @@ _self.setTuner = function(tuner, successCallback, errorCallback) {
  * }
  */
 _self.setStation = function(station, successCallback, errorCallback, tuner) {
-	var args = { 
-		station: station 
+	var args = {
+		station: station
 	};
 	if (tuner) {
 		args.tuner = tuner;
@@ -319,7 +321,7 @@ _self.setStation = function(station, successCallback, errorCallback, tuner) {
  * @param {String} [tuner] The tuner of the presets. If not specified, the active tuner is used.
  * @memberOf module:car.radio
  * @method getPresets
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback(presets) {
@@ -350,19 +352,19 @@ _self.setStation = function(station, successCallback, errorCallback, tuner) {
  * Success Response:
  * {
  *		code: 1,
- *		data: [ 
- * 			{ 
- *				tuner: 'am', 
- *				station: '880', 
- *				index: 0, 
- *				group: 'am1', 
- *			}, { 
- *				tuner: 'am', 
- *				station: '1010', 
- *				index: 1, 
- *				group: 'am1', 
+ *		data: [
+ * 			{
+ *				tuner: 'am',
+ *				station: '880',
+ *				index: 0,
+ *				group: 'am1',
+ *			}, {
+ *				tuner: 'am',
+ *				station: '1010',
+ *				index: 1,
+ *				group: 'am1',
  *			},{
- *				...	
+ *				...
  *			}
  *		]
  * }
@@ -392,7 +394,7 @@ _self.getPresets = function(successCallback, errorCallback, tuner) {
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
  * @method setPreset
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback() {
@@ -425,7 +427,7 @@ _self.getPresets = function(successCallback, errorCallback, tuner) {
  * }
  */
 _self.setPreset = function(index, group, station, tuner, successCallback, errorCallback) {
-	var args = { 
+	var args = {
 		index: index,
 		group: group
 	};
@@ -440,12 +442,13 @@ _self.setPreset = function(index, group, station, tuner, successCallback, errorC
 
 /**
  * @description Seek for the next radio station in the specified direction.
- * @param {String} direction The direction to seek ('up' or 'down').
+ * @param {String} direction The direction to seek ('forward' or 'backward').
+ * @param {String} tuner The tuner you want to start seeking
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
  * @method seek
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback() {
@@ -457,14 +460,14 @@ _self.setPreset = function(index, group, station, tuner, successCallback, errorC
  * }
  *
  * //call the method
- * car.radio.seek('up', successCallback, errorCallback);
+ * car.radio.seek('forward', 'fm', successCallback, errorCallback);
  *
  *
  *
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car/radio/seek?direction=up
+ * http://&lt;car-ip&gt;/car/radio/seek?direction=forward
  *
  * Success Response:
  * {
@@ -477,21 +480,23 @@ _self.setPreset = function(index, group, station, tuner, successCallback, errorC
  *		msg: "An error has occurred"
  * }
  */
-_self.seek = function(direction, successCallback, errorCallback) {
-	var args = { 
-		direction: direction 
+_self.seek = function(direction, tuner, successCallback, errorCallback) {
+	var args = {
+		direction: direction,
+		tuner: tuner
 	};
     window.cordova.exec(successCallback, errorCallback, _ID, 'seek', args, false);
 };
 
 /**
  * @description Scan for available radio stations in the specified direction.
- * @param {String} direction The direction to seek ('up' or 'down').
+ * @param {String} direction The direction to seek ('forward' or 'backward').
+ * @param {String} tuner The tuner you want to start scanning
  * @param {Function} [successCallback] The function to call on success.
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
  * @method scan
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback() {
@@ -503,14 +508,14 @@ _self.seek = function(direction, successCallback, errorCallback) {
  * }
  *
  * //call the method
- * car.radio.scan('up', successCallback, errorCallback);
+ * car.radio.scan('forward', 'fm', successCallback, errorCallback);
  *
  *
  *
  * @example REST
  *
  * Request:
- * http://&lt;car-ip&gt;/car/radio/scan?direction=up
+ * http://&lt;car-ip&gt;/car/radio/scan?direction=forward
  *
  * Success Response:
  * {
@@ -523,9 +528,10 @@ _self.seek = function(direction, successCallback, errorCallback) {
  *		msg: "An error has occurred"
  * }
  */
-_self.scan = function(direction, successCallback, errorCallback) {
-	var args = { 
-		direction: direction 
+_self.scan = function(direction, tuner, successCallback, errorCallback) {
+	var args = {
+		direction: direction,
+		tuner: tuner
 	};
     window.cordova.exec(successCallback, errorCallback, _ID, 'scan', args, false);
 };
@@ -536,7 +542,7 @@ _self.scan = function(direction, successCallback, errorCallback) {
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
  * @method scanStop
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback() {
@@ -578,7 +584,7 @@ _self.scanStop = function(successCallback, errorCallback) {
  * @param {Function} [errorCallback] The function to call if there is an error.
  * @memberOf module:car.radio
  * @method getStatus
- * @example 
+ * @example
  *
  * //define your callback function(s)
  * function successCallback(data) {
