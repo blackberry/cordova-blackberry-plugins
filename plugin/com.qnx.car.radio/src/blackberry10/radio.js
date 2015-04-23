@@ -131,9 +131,9 @@ module.exports = {
 
 				tuner = _pps.create("/pps/qnxcar/radio/tuners/"+TUNER_LIST[i], _pps.PPSMode.DELTA);
 				tuner.onNewData = function(data) {
-					if(getStatus().tuner === data.objName) {
+					if(_zonePPS.data.zones.all === data.objName) {
 						if (_triggerUpdate) {
-							_triggerUpdate(getStatus());
+							_triggerUpdate(data.data);
 						}
 					}
 				}
@@ -144,7 +144,7 @@ module.exports = {
 			_zonePPS = _pps.create("/pps/qnxcar/radio/zones", _pps.PPSMode.DELTA);
 			_zonePPS.onNewData = function(data) {
 				if (_triggerUpdate) {
-					_triggerUpdate(getStatus());
+					_triggerUpdate({tuner:data.data.all});
 				}
 			};
 			_zonePPS.open(_pps.FileMode.RDONLY);
