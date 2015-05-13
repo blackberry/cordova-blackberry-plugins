@@ -440,10 +440,6 @@ Json::Value PimCalendarQt::EditCalendarEvent(bbpim::CalendarEvent& calEvent, con
             }
 
             if (calEvent.isValid()) {
-                if (mutex_lock() == 0) {
-                    calEvent = service->event(calEvent.accountId(), calEvent.id());
-                    mutex_unlock();
-                }
                 returnObj["event"] = populateEvent(calEvent, false);
                 returnObj["_success"] = true;
             }
