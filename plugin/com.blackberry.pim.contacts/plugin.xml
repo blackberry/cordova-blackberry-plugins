@@ -25,8 +25,8 @@
   <description>BlackBerry 10 Contacts APIs</description>
   <license>Apache 2.0</license>
   <platform name="blackberry10">
-    <dependency id="com.blackberry.utils"/>
-    <dependency id="com.blackberry.pim.lib"/>
+    <dependency id="cordova-plugin-bb-utils"/>
+    <dependency id="cordova-plugin-bb-pimlib"/>
     <js-module src="www/client.js">
       <clobbers target="blackberry.pim.contacts"/>
     </js-module>

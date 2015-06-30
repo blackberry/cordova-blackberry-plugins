@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.pim.lib"
+  id="cordova-plugin-bb-pimlib"
   version="1.0.0">
   <name>BlackBerry 10 PIM Libarary</name>
   <description>BlackBerry 10 PIM Library</description>
@@ -28,7 +28,7 @@
     <lib-file src="src/blackberry10/native/device/libpimcontacts.so" arch="device"/>
     <lib-file src="src/blackberry10/native/simulator/libpimcontacts.so" arch="simulator"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.pim.lib"/>
+      <feature name="cordova-plugin-bb-pimlib"/>
     </config-file>
   </platform>
 </plugin>

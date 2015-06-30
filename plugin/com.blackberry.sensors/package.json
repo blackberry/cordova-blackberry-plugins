@@ -1,0 +1,39 @@
+{
+  "name": "cordova-plugin-bb-sensors",
+  "version": "1.0.0",
+  "description": "BlackBerry 10 Sensors APIs",
+  "cordova": {
+    "id": "cordova-plugin-bb-sensors",
+    "platforms": [
+      "blackberry10"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackberry/cordova-blackberry-plugins.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-blackberry10",
+    "sensors",
+    "sensor",
+    "accelerometer",
+    "magnetometer",
+    "gyroscope", 
+    "compass",
+    "proximity",
+    "light",
+    "gravity",
+    "rotationmatrix",
+    "orientation",
+    "azimuthpitchroll",
+    "holster",
+    "linearacceleration"
+  ],
+  "author": "BlackBerry Limited",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/blackberry/cordova-blackberry-plugins/issues"
+  },
+  "homepage": "https://github.com/blackberry/cordova-blackberry-plugins#readme"
+}

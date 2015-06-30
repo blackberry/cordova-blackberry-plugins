@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.connection"
+  id="cordova-plugin-bb-connection"
   version="1.0.0">
   <name>BlackBerry 10 Connection</name>
   <description>BlackBerry 10 Connection APIs</description>
@@ -28,10 +28,10 @@
     <js-module src="www/client.js">
       <clobbers target="blackberry.connection"/>
     </js-module>
-    <dependency id="com.blackberry.utils"/>
+    <dependency id="cordova-plugin-bb-utils"/>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.connection" value="com.blackberry.connection"/>
+      <feature name="cordova-plugin-bb-connection" value="cordova-plugin-bb-connection"/>
     </config-file>
   </platform>
 </plugin>

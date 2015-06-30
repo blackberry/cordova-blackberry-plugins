@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.screenshot"
+  id="cordova-plugin-screenshot"
   version="1.0.0">
   <name>BlackBerry 10 Screenshot</name>
   <description>BlackBerry 10 Screenshot APIs</description>
@@ -32,8 +32,8 @@
     <lib-file src="src/blackberry10/native/device/libscreenshot.so" arch="device"/>
     <lib-file src="src/blackberry10/native/simulator/libscreenshot.so" arch="simulator"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.screenshot" value="com.blackberry.screenshot"/>
+      <feature name="cordova-plugin-screenshot" value="cordova-plugin-screenshot"/>
     </config-file>
-    <dependency id="com.blackberry.utils"/>
+    <dependency id="cordova-plugin-bb-utils"/>
   </platform>
 </plugin>

@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.app"
+  id="cordova-plugin-bb-app"
   version="1.0.0">
   <name>BlackBerry 10 Application</name>
   <description>BlackBerry 10 Application APIs</description>
@@ -30,7 +30,7 @@
     </js-module>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.app" value="com.blackberry.app"/>
+      <feature name="cordova-plugin-bb-app" value="cordova-plugin-bb-app"/>
     </config-file>
   </platform>
 </plugin>

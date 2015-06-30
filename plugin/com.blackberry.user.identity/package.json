@@ -1,0 +1,28 @@
+{
+  "name": "cordova-plugin-bb-idservice",
+  "version": "1.0.0",
+  "description": "BlackBerry 10 User Identity APIs",
+  "cordova": {
+    "id": "cordova-plugin-bb-idservice",
+    "platforms": [
+      "blackberry10"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackberry/cordova-blackberry-plugins.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-blackberry10",
+    "identity",
+    "userdata",
+    "idservice"
+  ],
+  "author": "BlackBerry Limited",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/blackberry/cordova-blackberry-plugins/issues"
+  },
+  "homepage": "https://github.com/blackberry/cordova-blackberry-plugins#readme"
+}

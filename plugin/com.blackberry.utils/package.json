@@ -1,0 +1,25 @@
+{
+  "name": "cordova-plugin-bb-utils",
+  "version": "1.0.0",
+  "description": "BlackBerry 10 Utilities Library",
+  "cordova": {
+    "id": "cordova-plugin-bb-utils",
+    "platforms": [
+      "blackberry10"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackberry/cordova-blackberry-plugins.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-blackberry10"
+  ],
+  "author": "BlackBerry Limited",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/blackberry/cordova-blackberry-plugins/issues"
+  },
+  "homepage": "https://github.com/blackberry/cordova-blackberry-plugins#readme"
+}

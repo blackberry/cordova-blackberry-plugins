@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.notification"
+  id="cordova-plugin-bb-notification"
   version="1.0.0">
   <name>BlackBerry 10 Notification</name>
   <description>BlackBerry 10 Notification APIs</description>
@@ -30,7 +30,7 @@
     </js-module>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.notification" value="com.blackberry.notification"/>
+      <feature name="cordova-plugin-bb-notification" value="cordova-plugin-bb-notification"/>
     </config-file>
     <config-file target="www/config.xml" parent="/widget/rim:permissions">
       <rim:permit>post_notification</rim:permit>
