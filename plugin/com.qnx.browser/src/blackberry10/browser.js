@@ -170,6 +170,16 @@ function onWebviewCreated(webview, args) {
 			});
 		}
 	});
+	webview.addEventListener("PropertyTitleEvent", function (e) {
+		if (_tabTrigger.length > 0 && e) {
+			triggerUpdate({
+				type: "PropertyTitleEvent",
+				webview: webview.id,
+				title: e
+			});
+		}
+	});
+
 	webview.enableDialogRequestedEvents = true;
 
 
