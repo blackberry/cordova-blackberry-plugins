@@ -18,7 +18,7 @@
  */
 
 var io = {},
-    ID = "com.blackberry.io",
+    ID = "cordova-plugin-bb-io",
     exec = cordova.require("cordova/exec");
 
 function getFieldValue(field) {

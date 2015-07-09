@@ -20,7 +20,7 @@
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
   id="cordova-plugin-bb-push"
-  version="1.0.0">
+  version="1.0.1">
   <name>BlackBerry 10 Push</name>
   <description>BlackBerry 10 Push APIs</description>
   <license>Apache 2.0</license>

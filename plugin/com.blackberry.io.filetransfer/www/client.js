@@ -19,7 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
-    _ID = "com.blackberry.io.filetransfer";
+    _ID = "cordova-plugin-bb-filetransfer";
 
 function defineReadOnlyField(obj, field, value) {
     Object.defineProperty(obj, field, {

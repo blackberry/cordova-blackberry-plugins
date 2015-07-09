@@ -20,7 +20,7 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.screenshot",
+    _ID = "cordova-plugin-screenshot",
     exec = cordova.require("cordova/exec");
 
 	/**

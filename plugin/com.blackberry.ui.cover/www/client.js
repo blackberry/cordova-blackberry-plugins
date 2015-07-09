@@ -20,7 +20,7 @@
  under the License.
  */
 
-var _ID = "com.blackberry.ui.cover",
+var _ID = "cordova-plugin-bb-cover",
     _self = {},
     exec = cordova.require("cordova/exec"),
     events = ["entercover", "exitcover"];

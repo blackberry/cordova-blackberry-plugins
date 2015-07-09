@@ -19,7 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
-    _ID = "com.blackberry.push",
+    _ID = "cordova-plugin-bb-push",
     PushService,
     PushPayload,
     createInvokeTargetId = null,

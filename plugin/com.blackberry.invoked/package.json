@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-bb-invoked",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 Invoked APIs",
   "cordova": {
     "id": "cordova-plugin-bb-invoked",

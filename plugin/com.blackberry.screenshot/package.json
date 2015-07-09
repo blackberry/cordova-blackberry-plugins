@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-screenshot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 Screenshot APIs",
   "cordova": {
     "id": "cordova-plugin-screenshot",

@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-touch-keyboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 Touch-Enabled Keyboard",
   "cordova": {
     "id": "cordova-plugin-touch-keyboard",

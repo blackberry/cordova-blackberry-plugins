@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-bb-filetransfer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 File Transfer APIs",
   "cordova": {
     "id": "cordova-plugin-bb-filetransfer",

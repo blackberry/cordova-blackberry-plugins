@@ -17,7 +17,7 @@
  under the License.
  */
 
-var _ID = "com.blackberry.notification",
+var _ID = "cordova-plugin-bb-notification",
     _self = {},
     exec = cordova.require("cordova/exec"),
     noop = function () {},

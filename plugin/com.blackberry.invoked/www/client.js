@@ -18,7 +18,7 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.invoked",
+    _ID = "cordova-plugin-bb-invoked",
     exec = cordova.require("cordova/exec"),
     _noop = function () {},
     _events = ["invoked", "oncardresize", "oncardclosed"],

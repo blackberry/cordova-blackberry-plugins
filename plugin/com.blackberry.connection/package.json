@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-bb-connection",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 Connection APIs",
   "cordova": {
     "id": "cordova-plugin-bb-connection",

@@ -18,7 +18,7 @@
 */
 
 var _self = {},
-    _ID = "com.blackberry.connection",
+    _ID = "cordova-plugin-bb-connection",
     exec = cordova.require("cordova/exec"),
     events = ["connectionchange"],
     UNKNOWN = "unknown";

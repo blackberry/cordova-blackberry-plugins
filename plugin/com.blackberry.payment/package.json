@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-bb-payment",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 Payment APIs",
   "cordova": {
     "id": "cordova-plugin-bb-payment",

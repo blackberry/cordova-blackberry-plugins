@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-bb-identity",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 Identity APIs",
   "cordova": {
     "id": "cordova-plugin-bb-identity",

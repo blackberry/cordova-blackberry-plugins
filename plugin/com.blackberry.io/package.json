@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-bb-io",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BlackBerry 10 I/O APIs",
   "cordova": {
     "id": "cordova-plugin-bb-io",
