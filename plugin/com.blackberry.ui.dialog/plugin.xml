@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.ui.dialog"
+  id="cordova-plugin-bb-dialog"
   version="1.0.0">
   <name>BlackBerry 10 Dialog</name>
   <description>BlackBerry 10 Dialog APIs</description>
@@ -30,7 +30,7 @@
     </js-module>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.ui.dialog" value="com.blackberry.ui.dialog"/>
+      <feature name="cordova-plugin-bb-dialog" value="cordova-plugin-bb-dialog"/>
     </config-file>
   </platform>
 </plugin>
