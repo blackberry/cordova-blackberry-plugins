@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.pim.calendar"
+  id="cordova-plugin-bb-calendar"
   version="1.0.0">
   <name>BlackBerry 10 Calendar</name>
   <description>BlackBerry 10 Calendar APIs</description>
@@ -46,7 +46,7 @@
     <lib-file src="src/blackberry10/native/device/libpimcalendar.so" arch="device"/>
     <lib-file src="src/blackberry10/native/simulator/libpimcalendar.so" arch="simulator"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.pim.calendar" value="com.blackberry.pim.calendar"/>
+      <feature name="cordova-plugin-bb-calendar" value="cordova-plugin-bb-calendar"/>
     </config-file>
     <config-file target="www/config.xml" parent="/widget/rim:permissions">
       <rim:permit>access_pimdomain_calendars</rim:permit>
