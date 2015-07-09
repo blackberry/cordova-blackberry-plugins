@@ -16,7 +16,7 @@
  
 var exec = cordova.require("cordova/exec"),
     _self = {},
-    _ID = "com.blackberry.pim.contacts",
+    _ID = "cordova-plugin-bb-contacts",
     contactConsts = require("./contactConsts"),
     Contact = require("./Contact"),
     ContactName = require("./ContactName"),

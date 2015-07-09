@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.pim.contacts"
+  id="cordova-plugin-bb-contacts"
   version="1.0.0">
   <name>BlackBerry 10 Contacts</name>
   <description>BlackBerry 10 Contacts APIs</description>
@@ -48,7 +48,7 @@
       <rim:permit>access_pimdomain_contacts</rim:permit>
     </config-file>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.pim.contacts" value="com.blackberry.pim.contacts"/>
+      <feature name="cordova-plugin-bb-contacts" value="cordova-plugin-bb-contacts"/>
     </config-file>
     <source-file src="src/blackberry10/ContactActivity.js"/>
     <source-file src="src/blackberry10/ContactAddress.js"/>
