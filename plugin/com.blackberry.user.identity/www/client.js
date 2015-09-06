@@ -15,7 +15,7 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.user.identity",
+    _ID = "cordova-plugin-bb-idservice",
     noop = function () {},
     exec = cordova.require("cordova/exec"),
     IDS_FAILURE = -1,  /*!< Indicates that the IDS API call function did not complete

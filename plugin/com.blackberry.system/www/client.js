@@ -18,7 +18,7 @@
  */
 
 var _self = {},
-    ID = "com.blackberry.system",
+    ID = "cordova-plugin-bb-system",
     deviceProperties,
     noop = function () {},
     execFunc = cordova.require("cordova/exec"),

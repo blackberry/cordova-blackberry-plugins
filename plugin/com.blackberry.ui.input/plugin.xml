@@ -18,21 +18,21 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
     xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="com.blackberry.ui.input"
-    version="1.0.0">
+    id="cordova-plugin-touch-keyboard"
+    version="1.0.1">
 
     <description>BlackBerry 10 Touch-Enabled Keyboard</description>
     <name>BlackBerry 10 Touch-Enabled Keyboard</name>
     <license>Apache 2.0</license>
 
     <platform name="blackberry10">
-        <dependency id="com.blackberry.utils" />
+        <dependency id="cordova-plugin-bb-utils" />
         <js-module src="www/client.js">
             <clobbers target="blackberry.ui.input" />
         </js-module>
         <source-file src="src/blackberry10/index.js" />
         <config-file target="www/config.xml" parent="/widget">
-            <feature name="com.blackberry.ui.input" value="com.blackberry.ui.input" />
+            <feature name="cordova-plugin-touch-keyboard" value="cordova-plugin-touch-keyboard" />
         </config-file>
     </platform>
 </plugin>

@@ -19,8 +19,8 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.identity"
-  version="1.0.0">
+  id="cordova-plugin-bb-identity"
+  version="1.0.1">
   <name>BlackBerry 10 Identity</name>
   <description>BlackBerry 10 Identity APIs</description>
   <license>Apache 2.0</license>
@@ -32,7 +32,7 @@
       <rim:permit>read_device_identifying_information</rim:permit>
     </config-file>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.identity" value="com.blackberry.identity"/>
+      <feature name="cordova-plugin-bb-identity" value="cordova-plugin-bb-identity"/>
     </config-file>
     <source-file src="src/blackberry10/index.js"/>
   </platform>

@@ -19,7 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
-    ID = "com.blackberry.app",
+    ID = "cordova-plugin-bb-app",
     readOnlyValues,
     noop = function () {},
     events = ["swipedown",

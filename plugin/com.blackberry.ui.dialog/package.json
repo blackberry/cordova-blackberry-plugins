@@ -1,0 +1,26 @@
+{
+  "name": "cordova-plugin-bb-dialog",
+  "version": "1.0.0",
+  "description": "BlackBerry 10 Dialog APIs",
+  "cordova": {
+    "id": "com.blackberry.ui.dialog",
+    "platforms": [
+      "blackberry10"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackberry/cordova-blackberry-plugins.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-blackberry10",
+    "dialog"
+  ],
+  "author": "BlackBerry Limited",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/blackberry/cordova-blackberry-plugins/issues"
+  },
+  "homepage": "https://github.com/blackberry/cordova-blackberry-plugins#readme"
+}

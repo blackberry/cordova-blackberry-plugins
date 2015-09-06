@@ -19,13 +19,13 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.payment"
-  version="1.0.0">
+  id="cordova-plugin-bb-payment"
+  version="1.0.1">
   <name>BlackBerry 10 Payment</name>
   <description>BlackBerry 10 Payment APIs</description>
   <license>Apache 2.0</license>
   <platform name="blackberry10">
-    <dependency id="com.blackberry.utils"/>
+    <dependency id="cordova-plugin-bb-utils"/>
     <js-module src="www/client.js">
       <clobbers target="blackberry.payment"/>
     </js-module>
@@ -33,7 +33,7 @@
     <lib-file src="src/blackberry10/native/device/libpaymentjnext.so" arch="device"/>
     <lib-file src="src/blackberry10/native/simulator/libpaymentjnext.so" arch="simulator"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.payment" value="com.blackberry.payment"/>
+      <feature name="cordova-plugin-bb-payment" value="cordova-plugin-bb-payment"/>
     </config-file>
   </platform>
 </plugin>

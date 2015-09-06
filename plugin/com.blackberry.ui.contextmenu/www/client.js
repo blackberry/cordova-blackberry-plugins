@@ -19,7 +19,7 @@
 
 var contextmenu = {},
     exec = cordova.require("cordova/exec"),
-    _ID = "com.blackberry.ui.contextmenu",
+    _ID = "cordova-plugin-bb-ctxmenu",
     noop = function () {},
     events = ["contextmenuhidden"];
 

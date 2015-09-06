@@ -27,7 +27,7 @@ module.exports = {
                 error.character + ', ' + error.reason + '\n';
         });
 
-        util.puts(len > 0 ? (str + "\n" + len + ' error' + ((len === 1) ? '' : 's\n')) : "Lint Free!\n");
+        console.log(len > 0 ? (str + "\n" + len + ' error' + ((len === 1) ? '' : 's\n')) : "Lint Free!\n");
 
         process.exit(len > 2 ? 1 : 0);
     }

@@ -18,7 +18,7 @@
 */
 
 var _self = {},
-    _ID = "com.blackberry.sensors",
+    _ID = "cordova-plugin-bb-sensors",
     sensorArray = null,
     noop = function () {},
     execFunc = cordova.require("cordova/exec"),

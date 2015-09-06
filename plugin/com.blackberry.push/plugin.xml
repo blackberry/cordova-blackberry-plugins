@@ -19,13 +19,13 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.push"
-  version="1.0.0">
+  id="cordova-plugin-bb-push"
+  version="1.0.1">
   <name>BlackBerry 10 Push</name>
   <description>BlackBerry 10 Push APIs</description>
   <license>Apache 2.0</license>
   <platform name="blackberry10">
-    <dependency id="com.blackberry.utils"/>
+    <dependency id="cordova-plugin-bb-utils"/>
     <js-module src="www/client.js">
       <clobbers target="blackberry.push"/>
     </js-module>
@@ -33,7 +33,7 @@
     <lib-file src="src/blackberry10/native/device/libpushjnext.so" arch="device"/>
     <lib-file src="src/blackberry10/native/simulator/libpushjnext.so" arch="simulator"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.push" value="com.blackberry.push"/>
+      <feature name="cordova-plugin-bb-push" value="cordova-plugin-bb-push"/>
     </config-file>
     <config-file target="www/config.xml" parent="/widget/rim:permissions">
       <rim:permit>run_when_backgrounded</rim:permit>

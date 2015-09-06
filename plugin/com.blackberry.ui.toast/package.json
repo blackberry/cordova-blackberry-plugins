@@ -1,0 +1,27 @@
+{
+  "name": "cordova-plugin-toast",
+  "version": "1.0.1",
+  "description": "BlackBerry 10 Toast APIs",
+  "cordova": {
+    "id": "cordova-plugin-toast",
+    "platforms": [
+      "blackberry10"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackberry/cordova-blackberry-plugins.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-blackberry10",
+    "toast",
+    "dialog"
+  ],
+  "author": "BlackBerry Limited",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/blackberry/cordova-blackberry-plugins/issues"
+  },
+  "homepage": "https://github.com/blackberry/cordova-blackberry-plugins#readme"
+}

@@ -26,7 +26,7 @@
 
 var exec = cordova.require("cordova/exec"),
     _self = {},
-    _ID = "com.blackberry.pim.calendar",
+    _ID = "cordova-plugin-bb-calendar",
     CalendarEvent = require("./CalendarEvent"),
     CalendarError = require("./CalendarError"),
     CalendarFindOptions = require("./CalendarFindOptions"),

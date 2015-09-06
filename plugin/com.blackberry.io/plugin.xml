@@ -19,8 +19,8 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.io"
-  version="1.0.0">
+  id="cordova-plugin-bb-io"
+  version="1.0.1">
   <name>BlackBerry 10 IO</name>
   <description>BlackBerry 10 I/O APIs</description>
   <license>Apache 2.0</license>
@@ -30,7 +30,7 @@
     </js-module>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.io" value="com.blackberry.io"/>
+      <feature name="cordova-plugin-bb-io" value="cordova-plugin-bb-io"/>
     </config-file>
   </platform>
 </plugin>

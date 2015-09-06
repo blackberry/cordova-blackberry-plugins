@@ -19,8 +19,8 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.ui.contextmenu"
-  version="1.0.0">
+  id="cordova-plugin-bb-ctxmenu"
+  version="1.0.1">
   <name>BlackBerry 10 Context Menu</name>
   <description>BlackBerry 10 Context Menu APIs</description>
   <license>Apache 2.0</license>
@@ -30,7 +30,7 @@
     </js-module>
     <source-file src="src/blackberry10/index.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.ui.contextmenu" value="com.blackberry.ui.contextmenu"/>
+      <feature name="cordova-plugin-bb-ctxmenu" value="cordova-plugin-bb-ctxmenu"/>
     </config-file>
   </platform>
 </plugin>

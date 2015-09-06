@@ -19,7 +19,7 @@
 
 var toast = {},
     exec = cordova.require("cordova/exec"),
-    ID = "com.blackberry.ui.toast";
+    ID = "cordova-plugin-toast";
 
 toast.show = function (message, options) {
     var toastId,

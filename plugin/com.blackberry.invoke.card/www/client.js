@@ -18,7 +18,7 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.invoke.card",
+    _ID = "cordova-plugin-bb-card",
     exec = cordova.require("cordova/exec"),
     _btoa = require('./btoa'),
     _noop = function () {};

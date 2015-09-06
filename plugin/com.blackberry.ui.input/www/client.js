@@ -18,7 +18,7 @@
  */
 
 var _self = {},
-    ID = "com.blackberry.ui.input",
+    ID = "cordova-plugin-touch-keyboard",
     deviceProperties,
     noop = function () {},
     execFunc = cordova.require("cordova/exec"),

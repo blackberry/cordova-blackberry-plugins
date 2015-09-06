@@ -25,7 +25,7 @@ var _self = {
     },
     noop = function () {},
     exec = cordova.require("cordova/exec"),
-    _ID = "com.blackberry.bbm.platform",
+    _ID = "cordova-plugin-bbm",
     _onAccessChangedChannel = cordova.addDocumentEventHandler("onaccesschanged"),
     _onUpdateChannel = cordova.addDocumentEventHandler("onupdate");
 

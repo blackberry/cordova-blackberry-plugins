@@ -19,28 +19,25 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.user.identity"
-  version="1.0.0">
+  id="cordova-plugin-bb-idservice"
+  version="1.0.1">
   <name>BlackBerry 10 User Identity</name>
   <description>BlackBerry 10 User Identity APIs</description>
   <license>Apache 2.0</license>
   <platform name="blackberry10">
-    <dependency id="com.blackberry.utils"/>
+    <dependency id="cordova-plugin-bb-utils"/>
     <js-module src="www/client.js">
       <clobbers target="blackberry.user.identity"/>
     </js-module>
     <config-file target="www/config.xml" parent="/widget/rim:permissions">
       <rim:permit>read_personally_identifiable_information</rim:permit>
     </config-file>
-    <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.user.identity" value="com.blackberry.user.identity"/>
-    </config-file>
     <source-file src="src/blackberry10/index.js"/>
     <source-file src="src/blackberry10/IDSJNEXT.js"/>
     <lib-file src="src/blackberry10/native/device/libidsext.so" arch="device"/>
     <lib-file src="src/blackberry10/native/simulator/libidsext.so" arch="simulator"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.user.identity" value="com.blackberry.user.identity"/>
+      <feature name="cordova-plugin-bb-idservice" value="cordova-plugin-bb-idservice"/>
     </config-file>
   </platform>
 </plugin>

@@ -19,7 +19,7 @@
 
 var _self = {},
     exec = cordova.require("cordova/exec"),
-    _ID = "com.blackberry.payment";
+    _ID = "cordova-plugin-bb-payment";
 
 function getFieldValue(field) {
     var value,

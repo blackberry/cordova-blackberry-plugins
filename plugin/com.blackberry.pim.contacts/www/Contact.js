@@ -16,7 +16,7 @@
 var Contact,
     ContactError = require("./ContactError"),
     ContactAccount = require("./ContactAccount"),
-    _ID = "com.blackberry.pim.contacts",
+    _ID = "cordova-plugin-bb-contacts",
     contactUtils = require("./contactUtils");
 
 function saveArgumentsError(contact, onSuccess, onError) {

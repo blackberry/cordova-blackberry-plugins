@@ -18,7 +18,7 @@
  */
 
 var _self = {},
-    _ID = "com.blackberry.identity",
+    _ID = "cordova-plugin-bb-identity",
     exec = cordova.require("cordova/exec"),
     _fields;
 

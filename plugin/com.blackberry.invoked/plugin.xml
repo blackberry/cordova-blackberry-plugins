@@ -19,8 +19,8 @@
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
   xmlns:rim="http://www.blackberry.com/ns/widgets"
-  id="com.blackberry.invoked"
-  version="1.0.0">
+  id="cordova-plugin-bb-invoked"
+  version="1.0.1">
   <name>BlackBerry 10 Invoked</name>
   <description>BlackBerry 10 Invoked APIs</description>
   <license>Apache 2.0</license>
@@ -31,7 +31,7 @@
     <source-file src="src/blackberry10/index.js"/>
     <source-file src="src/blackberry10/invocationEvents.js"/>
     <config-file target="www/config.xml" parent="/widget">
-      <feature name="com.blackberry.invoked" value="com.blackberry.invoked"/>
+      <feature name="cordova-plugin-bb-invoked" value="cordova-plugin-bb-invoked"/>
     </config-file>
   </platform>
 </plugin>
