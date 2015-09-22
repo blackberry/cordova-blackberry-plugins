@@ -174,6 +174,9 @@ std::string FileTransferCurl::Upload(FileUploadInfo *uploadInfo)
         return buildUploadErrorString(CONNECTION_ERR, source_escaped, target_escaped, http_status);
     }
 
+    // Import proxy settings (including BES support)
+    curl_easy_setopt(curl, CURLOPT_QNX_PROXYINFO, 1L);
+
     // Set up the form and fill in the file upload fields
     if (uploadInfo->chunkedMode) {
         upload_file = fopen(uploadInfo->sourceFile.c_str(), "r");
@@ -347,6 +350,9 @@ std::string FileTransferCurl::Download(FileDownloadInfo *downloadInfo)
     if (!curl) {
         return buildDownloadErrorString(CONNECTION_ERR, source_escaped, target_escaped, http_status);
     }
+
+    // Import proxy settings (including BES support)
+    curl_easy_setopt(curl, CURLOPT_QNX_PROXYINFO, 1L);
 
     fp = fopen(target, "wb");
     curl_easy_setopt(curl, CURLOPT_URL, source);
