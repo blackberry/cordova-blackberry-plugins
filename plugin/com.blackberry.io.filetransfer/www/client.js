@@ -85,6 +85,6 @@ _self.download = function (source, target, successCallback, errorCallback) {
 defineReadOnlyField(_self, "FILE_NOT_FOUND_ERR", 1);
 defineReadOnlyField(_self, "INVALID_URL_ERR", 2);
 defineReadOnlyField(_self, "CONNECTION_ERR", 3);
-defineReadOnlyField(_self, "PERMISSIONS_ERR", 3);
+defineReadOnlyField(_self, "PERMISSIONS_ERR", 4);
 
 module.exports = _self;
