@@ -88,23 +88,15 @@ function onCommand(event) {
 };
 
 /**
- * Method called when opened pps object ready
- * Contains data from opened PPS obect
- * @param event {Object} content the appdata object
- */
-function onAppDataReady(event) {
-	if (_appdataTrigger && event && event[_key]) {
-		_appdataTrigger(event[_key]);
-	}
-}
-
-/**
  * Method called when app data received
  * @param event {Object} The PPS event for the appdata object
  */
 function onAppData(event) {
-	if (_appdataTrigger && event && event.data && event.data[_key]) {
-		_appdataTrigger(event.data[_key]);
+	if (_appdataTrigger && event) {
+		var appLauncherData = event["app-launcher"];
+		if (appLauncherData && appLauncherData.req && appLauncherData.req.app && appLauncherData.req.dat && appLauncherData.req.app === _key) {
+				_appdataTrigger(appLauncherData.req.dat);
+		}
 	}
 }
 
@@ -128,8 +120,8 @@ module.exports = {
 		}
 		//listen for startup arguments
 		if (typeof _appdataReaderPPS === "undefined") {
-			_appdataReaderPPS = _pps.create("/pps/system/navigator/appdata", _pps.PPSMode.DELTA);
-			_appdataReaderPPS.onFirstReadComplete = onAppDataReady;
+			_appdataReaderPPS = _pps.create("/pps/services/app-launcher", _pps.PPSMode.FULL);
+			_appdataReaderPPS.onFirstReadComplete = onAppData;
 			_appdataReaderPPS.onNewData = onAppData;
 			_appdataReaderPPS.open(_pps.FileMode.RDONLY);
 		}
